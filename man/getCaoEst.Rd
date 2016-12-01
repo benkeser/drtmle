@@ -2,7 +2,7 @@
 % Please edit documentation in R/vermeulen2.R
 \name{getCaoEst}
 \alias{getCaoEst}
-\title{cao.dr}
+\title{getCaoEst}
 \usage{
 getCaoEst(R, Y, cov, family)
 }

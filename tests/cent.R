@@ -23,9 +23,9 @@ library(hal)
 library(drtmle)
 
 # parameters for simulation
-n <- c(500,2000)
+n <- c(500)
 est <- c("parametric","vv2","adaptive")
-seed <- 1:500
+seed <- 1:1
 parm <- expand.grid(seed=seed, n=n, est=est)
 
 # get the list size #########
@@ -35,11 +35,12 @@ if (args[1] == 'listsize') {
 
 # execute prepare job ##################
 if (args[1] == 'prepare') {
-    for(i in 1:nrow(parm)){
-        set.seed(parm$seed[i])
-        dat <- makeData(n=parm$n[i])
-        save(dat, file=paste0("~/dral/scratch/dat_n=",parm$n[i],
-                              "_seed=",parm$seed[i],".RData"))
+    parm.red <- expand.grid(seed=seed, n=n)
+    for(i in 1:nrow(parm.red)){
+        set.seed(parm.red$seed[i])
+        dat <- drtmle:::makeData(n=parm.red$n[i])
+        save(dat, file=paste0("~/dral/scratch/dat_n=",parm.red$n[i],
+                              "_seed=",parm.red$seed[i],".RData"))
     }
   print(paste0('initial datasets saved to: ~/dral/scratch/inFile ... .RData'))
 }

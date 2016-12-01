@@ -85,6 +85,7 @@ data.adaptive.biasreduced.DR <-
 #' m.biasreducedDR.identity
 #' 
 #' Code to implement Vermeulen non-data-adaptive estimator
+#' @export
 
 
 m.biasreducedDR.identity<-function(R,Y,cov){
@@ -108,7 +109,7 @@ m.biasreducedDR.identity<-function(R,Y,cov){
 }
 
 
-#' cao.dr
+#' getCaoEst
 #' 
 #' Code to implement Cao 2009 estimator
 getCaoEst <- function(R,Y,cov,family){
@@ -160,7 +161,10 @@ getCaoEst <- function(R,Y,cov,family){
     return(est)
 }
 
-
+#' cao.dr 
+#' 
+#' Compute the Cao 2009 estimator
+#' @export 
 cao.dr <- function(R,Y,cov, family = "gaussian",nBoot=500){
     # get estimate
     est <- getCaoEst(R=R,Y=Y,cov=cov,family=family)
