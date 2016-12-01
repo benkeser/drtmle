@@ -1,0 +1,11 @@
+Package: drtmle
+Title: Computes doubly-robust asymptotically linear tmles
+Version: 0.0.0.9000
+Authors@R: person("David", "Benkeser", email = "benkeser@berkeley.edu", role = c("aut", "cre"))
+Description: See manuscript
+Depends:
+    R (>= 3.0.1),SuperLearner,plyr
+License: MIT
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 5.0.1
