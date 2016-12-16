@@ -473,6 +473,7 @@ estimategrn <- function(Y, A, W, Qn, gn, librarygr, tolg, glmgr, a0, reduction){
             obj <- do.call(librarygr, args=list(Y=as.numeric(A==a),X=data.frame(Qn=Q,gn=g),obsWeights=rep(1, length(A)),
                                                  newX=data.frame(Qn=Q, gn=g), family=binomial()))
             grn <- predict(object=obj$fit, newdata=data.frame(Qn=Q,gn=g))
+            grn[grn < tolg] <- tolg
           }
           
         }
