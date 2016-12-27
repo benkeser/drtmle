@@ -36,7 +36,7 @@ data.adaptive.biasreduced.DR <-
                 #                       newX=dat.cov,verbose = FALSE,
                 #                       SL.library=SL.library,
                 #                       method="method.NNLS")$SL.predict
-                fm <- do.call("SL.rf.caret2",args=list(Y=Y[R==1], X=dat.cov.m,obsWeights=rep(1,length(Y[R==1])),
+                fm <- do.call("SL.gbm.caret2",args=list(Y=Y[R==1], X=dat.cov.m,obsWeights=rep(1,length(Y[R==1])),
                                                  newX=dat.cov, family=gaussian()))
                 initQ <- (fm$pred-a)/(b-a)
             }

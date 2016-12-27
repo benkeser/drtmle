@@ -765,7 +765,7 @@ SL.caret1 <- function (Y, X, newX, family, obsWeights, method = "rf", tuneLength
 #' Uses SL.caret1 to train rpart
 #' @export
 
-SL.rpart.caret1 <- function(...,method="rpart",tuneLength = 8){
+SL.rpart.caret1 <- function(...,method="rpart",tuneLength = 8, trControl = caret::trainControl(method = "cv", number = 5)){
   SL.caret1(...,method=method,tuneLength=tuneLength)
 }
 
@@ -774,7 +774,7 @@ SL.rpart.caret1 <- function(...,method="rpart",tuneLength = 8){
 #' Uses SL.caret1 to train random forest
 #' @export
 
-SL.rf.caret1 <- function(...,method="rf",tuneLength=8){
+SL.rf.caret1 <- function(...,method="rf",tuneLength=8, trControl = caret::trainControl(method = "cv", number = 5)){
   SL.caret1(...,method=method,tuneLength=tuneLength)
 }
 
@@ -783,7 +783,7 @@ SL.rf.caret1 <- function(...,method="rf",tuneLength=8){
 #' Uses SL.caret1 to train a gbm
 #' @export
 
-SL.gbm.caret1 <- function(...,method="gbm",tuneLength=8){
+SL.gbm.caret1 <- function(...,method="gbm",tuneLength=8, trControl = caret::trainControl(method = "cv", number = 5)){
   SL.caret1(...,method=method,tuneLength=tuneLength)
 }
 
@@ -810,16 +810,7 @@ SL.rf.caret2 <- function (..., method = "rf", tuneLength = 20, trControl = caret
 #' Uses SL.caret1 to train a linear svm 
 #' @export
 
-SL.svmLinear.caret1 <- function(...,method="svmLinear",tuneLength = 8){
-  SL.caret1(...,method=method,tuneLength=tuneLength)
-}
-
-#' SL.svmLinear.caret1 
-#' 
-#' Uses SL.caret1 to train a linear svm 
-#' @export
-
-SL.glmnet.caret1 <- function(...,method="glmnet",tuneLength=8){
+SL.svmLinear.caret1 <- function(...,method="svmLinear",tuneLength = 8, trControl = caret::trainControl(method = "cv", number = 5)){
   SL.caret1(...,method=method,tuneLength=tuneLength)
 }
 
@@ -827,7 +818,7 @@ SL.glmnet.caret1 <- function(...,method="glmnet",tuneLength=8){
 #' 
 #' Uses SL.caret1 to train a gam
 #' @export 
-SL.gamSpline.caret1 <- function(...,method="gamSpline",tuneLength=8){
+SL.gamSpline.caret1 <- function(...,method="gamSpline",tuneLength=8, trControl = caret::trainControl(method = "cv", number = 5)){
   SL.caret1(...,method=method,tuneLength=tuneLength)
 }
 
@@ -836,7 +827,7 @@ SL.gamSpline.caret1 <- function(...,method="gamSpline",tuneLength=8){
 #' 
 #' Uses SL.caret1 to train a neural net
 #' @export 
-SL.nnet.caret1 <- function(...,method="nnet", tuneLength=8){
+SL.nnet.caret1 <- function(...,method="nnet", tuneLength=8, trControl = caret::trainControl(method = "cv", number = 5)){
   SL.caret1(...,method=method,tuneLength=tuneLength)
 }
 
@@ -844,7 +835,7 @@ SL.nnet.caret1 <- function(...,method="nnet", tuneLength=8){
 #' 
 #' Uses SL.caret1 to train a elastic net regression
 #' @export 
-SL.glmnet.caret1 <- function(...,method="glmnet", tuneLength=8){
+SL.glmnet.caret1 <- function(...,method="glmnet", tuneLength=8, trControl = caret::trainControl(method = "cv", number = 5)){
   SL.caret1(...,method=method,tuneLength=tuneLength)
 }
 
@@ -852,7 +843,7 @@ SL.glmnet.caret1 <- function(...,method="glmnet", tuneLength=8){
 #' 
 #' Uses SL.caret1 to train a random GLM
 #' @export 
-SL.randomGLM.caret1 <- function(...,method="randomGLM",tuneLength=8){
+SL.randomGLM.caret1 <- function(...,method="randomGLM",tuneLength=8, trControl = caret::trainControl(method = "cv", number = 5)){
   SL.caret1(...,method=method,tuneLength=tuneLength)
 }
 
