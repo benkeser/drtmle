@@ -5,7 +5,7 @@
 \title{SL.gbm.caret2
 Uses SL.caret 1 to train a gbm with 10 choices of tuning parameters and 5-fold CV}
 \usage{
-SL.gbm.caret2(..., method = "gbm", tuneLength = 10,
+SL.gbm.caret2(..., method = "gbm", tuneLength = 20,
   trControl = caret::trainControl(method = "cv", number = 5))
 }
 \description{

@@ -4,7 +4,8 @@
 \alias{SL.svmLinear.caret1}
 \title{SL.svmLinear.caret1}
 \usage{
-SL.svmLinear.caret1(..., method = "svmLinear", tuneLength = 8)
+SL.svmLinear.caret1(..., method = "svmLinear", tuneLength = 8,
+  trControl = caret::trainControl(method = "cv", number = 5))
 }
 \description{
 Uses SL.caret1 to train a linear svm

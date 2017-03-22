@@ -4,7 +4,8 @@
 \alias{SL.nnet.caret1}
 \title{SL.nnet.caret1}
 \usage{
-SL.nnet.caret1(..., method = "nnet", tuneLength = 8)
+SL.nnet.caret1(..., method = "nnet", tuneLength = 8,
+  trControl = caret::trainControl(method = "cv", number = 5))
 }
 \description{
 Uses SL.caret1 to train a neural net

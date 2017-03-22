@@ -2,15 +2,12 @@
 % Please edit documentation in R/myFunctions.R
 \name{SL.glmnet.caret1}
 \alias{SL.glmnet.caret1}
-\title{SL.svmLinear.caret1}
+\title{SL.glmnet.caret1}
 \usage{
-SL.glmnet.caret1(..., method = "glmnet", tuneLength = 8)
-
-SL.glmnet.caret1(..., method = "glmnet", tuneLength = 8)
+SL.glmnet.caret1(..., method = "glmnet", tuneLength = 8,
+  trControl = caret::trainControl(method = "cv", number = 5))
 }
 \description{
-Uses SL.caret1 to train a linear svm
-
 Uses SL.caret1 to train a elastic net regression
 }
 

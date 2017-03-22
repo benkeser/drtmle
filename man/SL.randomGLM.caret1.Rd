@@ -4,7 +4,8 @@
 \alias{SL.randomGLM.caret1}
 \title{SL.randomGLM.caret1}
 \usage{
-SL.randomGLM.caret1(..., method = "randomGLM", tuneLength = 8)
+SL.randomGLM.caret1(..., method = "randomGLM", tuneLength = 8,
+  trControl = caret::trainControl(method = "cv", number = 5))
 }
 \description{
 Uses SL.caret1 to train a random GLM

@@ -4,7 +4,8 @@
 \alias{SL.rpart.caret1}
 \title{SL.rpart.caret1}
 \usage{
-SL.rpart.caret1(..., method = "rpart", tuneLength = 8)
+SL.rpart.caret1(..., method = "rpart", tuneLength = 8,
+  trControl = caret::trainControl(method = "cv", number = 5))
 }
 \description{
 Uses SL.caret1 to train rpart

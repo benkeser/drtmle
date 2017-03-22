@@ -4,7 +4,8 @@
 \alias{SL.rf.caret1}
 \title{SL.rf.caret1}
 \usage{
-SL.rf.caret1(..., method = "rf", tuneLength = 8)
+SL.rf.caret1(..., method = "rf", tuneLength = 8,
+  trControl = caret::trainControl(method = "cv", number = 5))
 }
 \description{
 Uses SL.caret1 to train random forest

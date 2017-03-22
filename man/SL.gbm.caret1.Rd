@@ -4,7 +4,8 @@
 \alias{SL.gbm.caret1}
 \title{SL.gbm.caret1}
 \usage{
-SL.gbm.caret1(..., method = "gbm", tuneLength = 8)
+SL.gbm.caret1(..., method = "gbm", tuneLength = 8,
+  trControl = caret::trainControl(method = "cv", number = 5))
 }
 \description{
 Uses SL.caret1 to train a gbm

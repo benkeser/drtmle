@@ -4,7 +4,8 @@
 \alias{SL.gamSpline.caret1}
 \title{SL.gamSpline.caret1}
 \usage{
-SL.gamSpline.caret1(..., method = "gamSpline", tuneLength = 8)
+SL.gamSpline.caret1(..., method = "gamSpline", tuneLength = 8,
+  trControl = caret::trainControl(method = "cv", number = 5))
 }
 \description{
 Uses SL.caret1 to train a gam

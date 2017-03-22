@@ -30,13 +30,14 @@ data.adaptive.biasreduced.DR <-
             else if(type.initQ=="SL"){
                 Ym.star <- Y.star[R==1]
                 dat.cov.m <- dat.cov[R==1,,drop=FALSE]
-                # SL.library <- c("SL.glm", "SL.randomForest",
-                #                 "SL.gam","SL.polymars", "SL.mean")
-                # initQ <- SuperLearner(Y=Ym.star,X=dat.cov.m,
-                #                       newX=dat.cov,verbose = FALSE,
-                #                       SL.library=SL.library,
-                #                       method="method.NNLS")$SL.predict
-                fm <- do.call("SL.gbm.caret2",args=list(Y=Y[R==1], X=dat.cov.m,obsWeights=rep(1,length(Y[R==1])),
+                SL.library <- c("SL.gbm.caret1","SL.step.interaction","SL.glm")
+                initQ <- SuperLearner(Y=Ym.star,X=dat.cov.m,
+                                      newX=dat.cov,verbose = FALSE,
+                                      SL.library=SL.library,
+                                      method="method.NNLS")$SL.predict
+                initQ <- (fm$pred-a)/(b-a)
+            }else if(type.initQ=="npreg"){
+                fm <- do.call("SL.npreg",args=list(Y=Y[R==1], X=dat.cov.m,obsWeights=rep(1,length(Y[R==1])),
                                                  newX=dat.cov, family=gaussian()))
                 initQ <- (fm$pred-a)/(b-a)
             }
