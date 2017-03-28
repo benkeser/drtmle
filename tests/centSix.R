@@ -28,7 +28,7 @@ library(gbm)
 
 # parameters for simulation
 n <- c(250,1000,5000)
-est <- c("parametric","vv2")
+est <- c("parametric","vv2","adaptive1","adaptive2")
 seed <- 1:500
 parm <- expand.grid(seed=seed, n=n, est=est)
 
@@ -42,8 +42,8 @@ if (args[1] == 'prepare') {
     parm.red <- expand.grid(seed=seed, n=n)
     for(i in 1:nrow(parm.red)){
         set.seed(parm.red$seed[i])
-        dat <- drtmle:::makeData(n=parm.red$n[i])
-        save(dat, file=paste0("~/dral/scratch/dat_n=",parm.red$n[i],
+        dat <- drtmle:::makeDataSix(n=parm.red$n[i])
+        save(dat, file=paste0("~/dral/scratch/dat6_n=",parm.red$n[i],
                               "_seed=",parm.red$seed[i],".RData"))
     }
   print(paste0('initial datasets saved to: ~/dral/scratch/inFile ... .RData'))
@@ -61,9 +61,11 @@ if (args[1] == 'run') {
     print(paste(Sys.time(), "i:" , i))
     
       # load data
-      load(paste0("~/dral/scratch/dat_n=",parm$n[i],
+      load(paste0("~/dral/scratch/dat6_n=",parm$n[i],
                 "_seed=",parm$seed[i],".RData"))
       
+      # compute truth
+      truth <- drtmle:::getTruth()
       # fit estimator 
       if(parm$est[i]=="parametric"){
           out <- vector(mode = "list")
@@ -72,8 +74,8 @@ if (args[1] == 'run') {
           names(out1$ci) <- NULL
           out$cao <- list(
               est = out1$est, ci = out1$ci,
-              cov = out1$ci[1] < 210 & out1$ci[2] > 210,
-              err = out1$est - 210
+              cov = out1$ci[1] < truth & out1$ci[2] > truth,
+              err = out1$est - truth
           )
           
           # original vermeulen
@@ -81,8 +83,8 @@ if (args[1] == 'run') {
           out2$ci <- c(out2$mn.Y - 1.96*out2$se.mn.Y, out2$mn.Y + 1.96*out2$se.mn.Y)
           out$verm1 <- list(
               est = out2$mn.Y, ci = out2$ci,
-              cov = out2$ci[1] < 210 & out2$ci[2] > 210,
-              err = out2$mn.Y - 210
+              cov = out2$ci[1] < truth & out2$ci[2] > truth,
+              err = out2$mn.Y - truth
           )
           
           # tan
@@ -96,20 +98,20 @@ if (args[1] == 'run') {
           out3$ci <- c(out3$mu - 1.96*sqrt(out3$v), out3$mu + 1.96*sqrt(out3$v))
           out$tan = list(
               est = out3$mu, ci = out3$ci, 
-              cov = out3$ci[1] < 210 & out3$ci[2] > 210,
-              err = out3$mu - 210
+              cov = out3$ci[1] < truth & out3$ci[2] > truth,
+              err = out3$mu - truth
           )
       }else if(parm$est[i] == "vv2"){
           out <- vector(mode = "list")
           # data-adaptive vermeulen
           out1 <- data.adaptive.biasreduced.DR(
-              R=dat$A,Y=dat$Y,cov=data.matrix(dat$W),type.initQ=c("npreg"),
+              R=dat$A,Y=dat$Y,cov=data.matrix(dat$W),type.initQ=c("SL"),
               zeta=0.005,fluc=c("unweighted"),
               alpha=0.05,psi.tilde=0)
           out$vv2 <- list(
               est = out1$est, ci = out1$ci, 
-              cov = out1$ci[1] < 210 & out1$ci[2] > 210,
-              err = out$est - 210
+              cov = out1$ci[1] < truth & out1$ci[2] > truth,
+              err = out1$est - truth
           )
       }else{
           out <- vector(mode = "list")
@@ -117,9 +119,9 @@ if (args[1] == 'run') {
           # define GBM function
           out1 <- drtmle(Y=dat$Y, A=dat$A, W=dat$W, family=gaussian(),
                         a0=1,
-                        maxIter = 3,
-                        libraryQ=c("SL.gbm.caret1"),
-                        libraryg=c("SL.hal"),
+                        maxIter = 10,
+                        libraryQ=c("SL.gbm.caret1","SL.step.interaction","SL.glm"),
+                        libraryg=c("SL.gbm.caret1","SL.step.interaction","SL.glm"),
                         librarygr=c("SL.npreg"),
                         libraryQr=c("SL.npreg"),
                         reduction=ifelse(parm$est[i]=="adaptive1","univariate","bivariate"),
@@ -151,53 +153,50 @@ if (args[1] == 'run') {
           if(parm$est[i] == "adaptive1"){
           out$os <- list(
               est = out1$os$est, ci = out1$os$ci,
-              cov = out1$os$ci[1] < 210 & out1$os$ci[2] > 210,
-              err = out1$os$est - 210
+              cov = out1$os$ci[1] < truth & out1$os$ci[2] > truth,
+              err = out1$os$est - truth
+          )
+          out$tmle <- list(
+              est = out1$tmle$est, ci = out1$tmle$ci,
+              cov = out1$tmle$ci[1] < truth & out1$tmle$ci[2] > truth,
+              err = out1$tmle$est - truth
           )
           }
           out$os.dral <- list(
               est = out1$os.dral$est, ci = out1$os.dral$ci,
-              cov = out1$os.dral$ci[1] < 210 & out1$os.dral$ci[2] > 210,
-              err = out1$os.dral$est - 210
+              cov = out1$os.dral$ci[1] < truth & out1$os.dral$ci[2] > truth,
+              err = out1$os.dral$est - truth
           )
-          if(parm$est[i] == "adaptive1"){
-          out$tmle <- list(
-              est = out1$tmle$est, ci = out1$tmle$ci,
-              cov = out1$tmle$ci[1] < 210 & out1$tmle$ci[2] > 210,
-              err = out1$tmle$est - 210
-          )
-          }
           out$tmle.dral <- list(
               est = out1$tmle.dral$est, ci = out1$tmle.dral$ci,
-              cov = out1$tmle.dral$ci[1] < 210 & out1$tmle.dral$ci[2] > 210,
-              err = out1$tmle.dral$est - 210
-          )
-          
+              cov = out1$tmle.dral$ci[1] < truth & out1$tmle.dral$ci[2] > truth,
+              err = out1$tmle.dral$est - truth
+          )   
       }
-    save(out,file=paste0("~/dral/out/KS_n=",parm$n[i],"_seed=",parm$seed[i],"_est=",parm$est[i], ".RData.tmp"))
-    file.rename(paste0("~/dral/out/KS_n=",parm$n[i],"_seed=",parm$seed[i],"_est=",parm$est[i], ".RData.tmp"),
-                paste0("~/dral/out/KS_n=",parm$n[i],"_seed=",parm$seed[i],"_est=",parm$est[i], ".RData"))
+    save(out,file=paste0("~/dral/out/newSim6_n=",parm$n[i],"_seed=",parm$seed[i],"_est=",parm$est[i], ".RData.tmp"))
+    file.rename(paste0("~/dral/out/newSim6_n=",parm$n[i],"_seed=",parm$seed[i],"_est=",parm$est[i], ".RData.tmp"),
+                paste0("~/dral/out/newSim6_n=",parm$n[i],"_seed=",parm$seed[i],"_est=",parm$est[i], ".RData"))
     print("file saved!")
   }
 }
 
 # merge job ###########################
 if (args[1] == 'merge') {
-    n <- c(500,4000,6000)
+    n <- c(250,1000,5000)
     seed <- 1:500
     parm <- expand.grid(seed=seed, n=n)
     
     allOut <- NULL
     for(i in 1:nrow(parm)){
         allOut <- tryCatch({
-        #out.parm <- get(load(paste0("~/dral/out/KS_n=",parm$n[i],"_seed=",parm$seed[i],"_est=parametric.RData")))
-        out.vv2 <- get(load(paste0("~/dral/out/KS_n=",parm$n[i],"_seed=",parm$seed[i],"_est=vv2.RData")))
-        out.adapt1 <- get(load(paste0("~/dral/out/KS_n=",parm$n[i],"_seed=",parm$seed[i],"_est=adaptive1.RData")))
-        out.adapt2 <- get(load(paste0("~/dral/out/KS_n=",parm$n[i],"_seed=",parm$seed[i],"_est=adaptive2.RData")))
+        out.parm <- get(load(paste0("~/dral/out/newSim6_n=",parm$n[i],"_seed=",parm$seed[i],"_est=parametric.RData")))
+        out.vv2 <- get(load(paste0("~/dral/out/newSim6_n=",parm$n[i],"_seed=",parm$seed[i],"_est=vv2.RData")))
+        out.adapt1 <- get(load(paste0("~/dral/out/newSim6_n=",parm$n[i],"_seed=",parm$seed[i],"_est=adaptive1.RData")))
+        out.adapt2 <- get(load(paste0("~/dral/out/newSim6_n=",parm$n[i],"_seed=",parm$seed[i],"_est=adaptive2.RData")))
         
         rbind(allOut,
-          #c(unlist(out.parm),unlist(out.vv2),unlist(out.adapt1),unlist(out.adapt2)))
-          c(unlist(out.vv2),unlist(out.adapt1),unlist(out.adapt2)))
+          c(unlist(out.parm),unlist(out.vv2),unlist(out.adapt1),unlist(out.adapt2)))
+          #c(unlist(out.vv2),unlist(out.adapt1),unlist(out.adapt2)))
           #c(unlist(out.adapt1),unlist(out.adapt2)))
         },error=function(e){
             rbind(allOut, rep(NA, ncol(allOut)))
@@ -224,5 +223,5 @@ if (args[1] == 'merge') {
     })
 
 
-    save(allOut, file = "~/dral/out/KS_allOut.RData")
+    save(allOut, file = "~/dral/out/newSim6_allOut.RData")
 }
