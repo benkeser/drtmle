@@ -46,7 +46,6 @@ notifications:
  - provider: Email
    to:
      - benkeser@berkeley.edu
-     - nh@nimahejazi.org
    subject: 'r-appveyor build {{status}}'
    message: "https://ci.appveyor.com/project/benkeser/survtmle"
    on_build_success: false
