@@ -4,7 +4,12 @@
 \alias{makeDataBiv}
 \title{makeDataBiv}
 \usage{
-makeDataBiv(n)
+makeDataBiv(n, beta = 1)
+}
+\arguments{
+\item{n}{Sample size}
+
+\item{beta}{Strength of interaction}
 }
 \description{
 Make simulation data set of size n

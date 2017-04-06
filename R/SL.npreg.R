@@ -1,5 +1,6 @@
 
 #' SL.npreg
+#' SuperLearner wrapper to fit kernel regression
 #' @param Y Training outcomes
 #' @param X Training predictors 
 #' @param family Not used by the function, but needed by \code{SuperLearner}
@@ -9,10 +10,9 @@
 #' returns the empirical average of the outcomes. 
 #' @param ... Other arguments (not currently used)
 #' 
-#' @importsFrom np npregbw npreg
-#' @importsFrom stats predict as.formula
+#' @importFrom np npregbw npreg
+#' @importFrom stats predict as.formula
 #' 
-#' SuperLearner wrapper to fit kernel regression
 #' @export 
 
 SL.npreg <- function (Y, X, newX, family, obsWeights, 

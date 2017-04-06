@@ -1,9 +1,9 @@
 
 #' estimategrn 
 #' 
-#' @importsFrom SuperLearner SuperLearner trimLogit
-#' @importsFrom stats predict glm as.formula
-
+#' Estimates the reduced dimension regressions necessary for the additional 
+#' fluctuations. 
+#' 
 #' @param Y A vector of continuous or binary outcomes. 
 #' @param A A vector of binary treatment assignment (assumed to be equal to 0 or 1)
 #' @param W A \code{data.frame} of named covariates
@@ -16,11 +16,12 @@
 #' @param reduction A character equal to \code{"univariate"} for a univariate misspecification correction or \code{"bivariate"}
 #' for the bivariate version. 
 #' @param tolg A numeric indicating the minimum value for estimates of the propensity score.
-#' @param verbose A boolean indicating whether to print status updates.
 #' @param a0 A list of fixed treatment values 
 #' 
-#' Estimates the reduced dimension regressions necessary for the additional 
-#' fluctuations. 
+#' @importFrom SuperLearner SuperLearner trimLogit
+#' @importFrom stats predict glm as.formula
+#' 
+#' 
 #' 
 #' 
 
@@ -47,9 +48,9 @@ estimategrn <- function(Y, A, W, Qn, gn, librarygr, tolg, glmgr, a0, reduction){
         if(length(librarygr)>1){
           if(reduction=="univariate"){
             fm1 <- SuperLearner::SuperLearner(Y=(as.numeric(A==a)-g)/g, X=data.frame(Qn=Q), 
-                                family=gaussian(),SL.library=librarygr,  method="method.NNLS2")
+                                family="gaussian",SL.library=librarygr,  method="method.NNLS2")
             fm2 <- SuperLearner::SuperLearner(Y=as.numeric(A==a), X=data.frame(Qn=Q), 
-                                family=binomial(),SL.library=librarygr)
+                                family=data.frame(family="binomial"),SL.library=librarygr)
             if(!all(fm1$coef==0)){
               grn1 <- stats::predict(fm1, newdata=data.frame(Qn=Q), onlySL=TRUE)[[1]]              
             }else{
@@ -65,7 +66,7 @@ estimategrn <- function(Y, A, W, Qn, gn, librarygr, tolg, glmgr, a0, reduction){
             grn2[grn2 < tolg] <- tolg
           }else if(reduction=="bivariate"){
             fm1 <- SuperLearner::SuperLearner(Y=as.numeric(A==a), X=data.frame(Qn=Q, gn=g), 
-                                family=binomial(),SL.library=librarygr)
+                                family=data.frame(family="binomial"),SL.library=librarygr)
             if(!all(fm1$coef==0)){
               grn <- stats::predict(fm1, newdata=data.frame(Qn=Q), onlySL=TRUE)[[1]]
             }else{
@@ -78,15 +79,15 @@ estimategrn <- function(Y, A, W, Qn, gn, librarygr, tolg, glmgr, a0, reduction){
             obj1 <- do.call(librarygr, 
                             args=list(Y=(as.numeric(A==a)-g)/g,X=data.frame(Qn=Q),
                                       obsWeights=rep(1, length(A)),
-                                      newX=data.frame(Qn=Q), family=gaussian()))
+                                      newX=data.frame(Qn=Q), family=data.frame(family="gaussian")))
             grn1 <- predict(object=obj1$fit, newdata=data.frame(Qn=Q))
             obj2 <- do.call(librarygr, args=list(Y=as.numeric(A==a), X=data.frame(Qn=Q),obsWeights=rep(1, length(A)),
-                                                 newX=data.frame(Qn=Q), family=binomial()))
+                                                 newX=data.frame(Qn=Q), family=data.frame(family="binomial")))
             grn2 <- predict(object=obj2$fit, newdata=data.frame(Qn=Q))
             grn2[grn2 < tolg] <- tolg
           }else if(reduction=="bivariate"){
             obj <- do.call(librarygr, args=list(Y=as.numeric(A==a),X=data.frame(Qn=Q,gn=g),obsWeights=rep(1, length(A)),
-                                                 newX=data.frame(Qn=Q, gn=g), family=binomial()))
+                                                 newX=data.frame(Qn=Q, gn=g), family=data.frame(family="binomial")))
             grn <- predict(object=obj$fit, newdata=data.frame(Qn=Q,gn=g))
             grn[grn < tolg] <- tolg
           }

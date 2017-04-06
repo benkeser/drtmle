@@ -1,5 +1,8 @@
 #' fluctuateQ1
 #' 
+#' Function called internally by drtmle to perform the first fluctuation 
+#' of the initial estimator of Q (i.e., solves the original EIF estimating eqn)
+#' 
 #' @param Y The outcome
 #' @param A The treatment
 #' @param W The covariates
@@ -7,11 +10,9 @@
 #' @param gn A list of propensity regression estimates evaluated on observed data
 #' @param a0 A list of fixed treatment values 
 #' 
-#' @importsFrom SuperLearner trimLogit
-#' @importsFrom stats predict glm
+#' @importFrom SuperLearner trimLogit
+#' @importFrom stats predict glm
 #' 
-#' Function called internally by drtmle to perform the first fluctuation 
-#' of the initial estimator of Q (i.e., solves the original EIF estimating eqn)
 
 fluctuateQ1 <- function(Y,A,W, Qn, gn, a0){
   QnStar <- mapply(a=a0,Q=Qn,g=gn,FUN=function(x, a, Q, g){

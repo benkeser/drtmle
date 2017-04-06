@@ -11,10 +11,12 @@
 #' @param method Character describing what algorithm to train
 #' @param tuneLength The number of tuning parameter combinations
 #' @param trControl Passed to \code{caret::train}
+#' @param family Character indicating family argument (ignored)
 #' @param ... Other arguments (not currently used)
 #' 
-#' @importsFrom caret train
-#' @importsFrom stats predict
+#' @importFrom caret train
+#' @importFrom stats predict
+#' 
 #' @export
 
 SL.caret1 <- function (Y, X, newX, family, obsWeights, method = "rf", tuneLength = 3, 

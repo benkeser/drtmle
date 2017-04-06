@@ -1,18 +1,22 @@
 
 #' getCaoEst
+#' 
+#' Code to implement Cao 2009 estimator
 #' @param R Missing indicator
 #' @param Y outcome
 #' @param cov Covariates
 #' @param family Character for family of outcome
 #' 
-#' Code to implement Cao 2009 estimator
+#' @importFrom stats glm predict optim
+#' @importFrom alabama constrOptim.nl
+#' 
 getCaoEst <- function(R,Y,cov,family){
     # fit outcome regression
-    Qmod <- glm(paste0("Y ~", paste0(colnames(cov),collapse="+")),
+    Qmod <- stats::glm(paste0("Y ~", paste0(colnames(cov),collapse="+")),
         data = data.frame(Y, cov)[R==1,],
         family = family)
 
-    Qn <- predict(Qmod, newdata=data.frame(Y,cov), type="response")
+    Qn <- stats::predict(Qmod, newdata=data.frame(Y,cov), type="response")
 
     # fit "enhanced propensity" regression
     negLogLik <- function(pars,R,cov){
@@ -33,7 +37,7 @@ getCaoEst <- function(R,Y,cov,family){
      return(c1)
     }
 
-    tmp <- optim(rep(0,ncol(cov)+2), fn = negLogLik, R = R, cov = cov,
+    tmp <- stats::optim(rep(0,ncol(cov)+2), fn = negLogLik, R = R, cov = cov,
      control=list(maxit=1e2))
     p <- tmp$par
     delta <- p[1]; gamma <- matrix(p[2:length(p)],ncol=1)
@@ -41,7 +45,7 @@ getCaoEst <- function(R,Y,cov,family){
     gn <- 1-exp(delta + X%*%gamma)/(1 + exp(X%*%gamma))
     if(any(gn > 1) | any(gn < 0)){
         suppressWarnings(
-        tmp2 <- constrOptim.nl(tmp$par, fn = negLogLik, hin = constraint, R = R, cov = cov)
+        tmp2 <- alabama::constrOptim.nl(tmp$par, fn = negLogLik, hin = constraint, R = R, cov = cov)
         )
         p <- tmp2$par
         delta <- p[1]; gamma <- matrix(p[2:length(p)],ncol=1)

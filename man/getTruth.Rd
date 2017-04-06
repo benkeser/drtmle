@@ -7,6 +7,11 @@ get true parameter value for simulation}
 \usage{
 getTruth(beta = 1, a0 = 1)
 }
+\arguments{
+\item{beta}{Strength of interaction}
+
+\item{a0}{Set level of treatment}
+}
 \description{
 getTruth
 get true parameter value for simulation

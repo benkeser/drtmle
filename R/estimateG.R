@@ -1,10 +1,8 @@
-
 #' estimateG
 #' 
 #' Function to estimate propensity score
-#' @importsFrom SuperLearner SuperLearner trimLogit
-#' @importsFrom stats predict glm as.formula
-#' @importsFrom plyr alply
+#' 
+#' @importFrom plyr alply
 #' @param A A vector of binary treatment assignment (assumed to be equal to 0 or 1)
 #' @param W A \code{data.frame} of named covariates
 #' @param libraryg A vector of characters or a list describing the Super Learner library to be used 
@@ -16,10 +14,12 @@
 #' @param glmg A character describing a formula to be used in the call to \code{glm} for the propensity score
 #' @param a0 A list of fixed treatment values 
 #' 
-#' Estimates the reduced dimension regressions necessary for the additional 
-#' fluctuations. 
+#' 
+#' @importFrom SuperLearner SuperLearner trimLogit
+#' @importFrom stats predict glm as.formula
+#' 
 
-estimateG <- function(A, W,libraryg,glmg,family,a0,tolg,verbose=FALSE, returnModels=FALSE){
+estimateG <- function(A, W,libraryg,glmg,a0,tolg,verbose=FALSE, returnModels=FALSE){
   if(is.null(libraryg) & is.null(glmg)) stop("Specify Super Learner library or GLM formula for g")
   if(!is.null(libraryg) & !is.null(glmg)){
     warning("Super Learner library and GLM formula specified. Proceeding with Super Learner only.")

@@ -1,5 +1,5 @@
 #' data.adaptive.biasreduced.DR
-#' 
+#' Vermeulen estimator from IJB paper
 #' @param R Missingness indicator
 #' @param Y Outcome
 #' @param cov Covariates
@@ -9,8 +9,7 @@
 #' @param alpha Truncation level for propensity score gn
 #' @param psi.tilde Null hypothesis value
 #' 
-#' Vermeulen estimator from IJB paper
-#' 
+#' @importFrom stats qnorm coef pnorm sd
 #' @export 
 
 data.adaptive.biasreduced.DR <-
@@ -48,7 +47,7 @@ data.adaptive.biasreduced.DR <-
             }else if(type.initQ=="npreg"){
                 dat.cov.m <- dat.cov[R==1,,drop=FALSE]
                 fm <- do.call("SL.npreg",args=list(Y=Y[R==1], X=dat.cov.m,obsWeights=rep(1,length(Y[R==1])),
-                                                 newX=dat.cov, family=gaussian()))
+                                                 newX=dat.cov, family=data.frame(family="gaussian")))
                 initQ <- (fm$pred-a)/(b-a)
             }
         }
@@ -59,17 +58,17 @@ data.adaptive.biasreduced.DR <-
             if(fluc=="unweighted"){
                 w.cov <- (1-ps.par)/ps.par*int.cov
                 fluctuationQ <- glm(Y.star ~ -1 + w.cov,
-                                   family=binomial,offset=logit(initQ.trunc),
+                                   family="binomial",offset=logit(initQ.trunc),
                                    subset=(R==1))
                 flucQ <- expit(logit(initQ.trunc)+
-                                   as.vector(coef(fluctuationQ)%*%t(w.cov)))
+                                   as.vector(stats::coef(fluctuationQ)%*%t(w.cov)))
             }
             else if(fluc=="weighted"){
                 fluctuationQ <-glm(Y.star~cov,
-                                   family=binomial,offset=logit(initQ.trunc),
+                                   family="binomial",offset=logit(initQ.trunc),
                                    subset=(R==1), weights=(1-ps.par)/ps.par)
                 flucQ <- expit(logit(initQ.trunc)+
-                   as.vector(coef(fluctuationQ)%*%t(int.cov)))
+                   as.vector(stats::coef(fluctuationQ)%*%t(int.cov)))
             }
         }
         # doubly robust estimator
@@ -80,14 +79,14 @@ data.adaptive.biasreduced.DR <-
                             outcome=flucQ,ps=ps.par))
         psi <- (b-a)*est.trunc+a
         # standard error
-        se.psi <- (b-a)*sd(U(R=R,Y=Y.star,
+        se.psi <- (b-a)*stats::sd(U(R=R,Y=Y.star,
                              outcome=flucQ,ps=ps.par))/sqrt(n)
         # 95% confidence interval
-        ci.psi <- psi+c(-1,1)*qnorm(1-alpha/2)*se.psi
+        ci.psi <- psi+c(-1,1)*stats::qnorm(1-alpha/2)*se.psi
         # Wald test statistic
         W <- (psi-psi.tilde)/se.psi
         # p-value Wald test
-        p.value <- 2*pnorm(abs(W),lower.tail=FALSE)
+        p.value <- 2*stats::pnorm(abs(W),lower.tail=FALSE)
         return(list(est=psi,se=se.psi,ci=ci.psi,
                     Wald.statistic=W,p.value=p.value))
     }

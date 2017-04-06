@@ -3,8 +3,8 @@
 #' 
 #' Estimates the reduced dimension regressions necessary for the  
 #' fluctuations of g
-#' @importsFrom SuperLearner SuperLearner trimLogit
-#' @importsFrom stats predict glm as.formula
+#' 
+#' 
 #' @param Y A vector of continuous or binary outcomes. 
 #' @param A A vector of binary treatment assignment (assumed to be equal to 0 or 1)
 #' @param W A \code{data.frame} of named covariates
@@ -15,9 +15,10 @@
 #' @param glmQr A character describing a formula to be used in the call to \code{glm} for the first reduced-dimension regression. Ignored
 #' if \code{librarygr!=NULL}.
 #' @param a0 A list of fixed treatment values 
-#' Estimates the reduced dimension regressions necessary for the additional 
-#' fluctuations. 
 #' 
+#' @importFrom SuperLearner SuperLearner trimLogit
+#' @importFrom stats predict glm as.formula
+
 estimateQrn  <- function(Y, A, W, Qn, gn, glmQr, libraryQr, a0){
   if(is.null(libraryQr) & is.null(glmQr)) stop("Specify Super Learner library or GLM formula for Qr")
   if(!is.null(libraryQr) & !is.null(glmQr)){
@@ -34,7 +35,7 @@ estimateQrn  <- function(Y, A, W, Qn, gn, glmQr, libraryQr, a0){
         if(length(libraryQr)>1){
           suppressWarnings(
           fm <- SuperLearner::SuperLearner(Y=(Y-Q)[A==a], X=data.frame(gn=g[A==a]),
-                             family=gaussian(),SL.library=libraryQr, method="method.NNLS2")
+                             family="gaussian",SL.library=libraryQr, method="method.NNLS2")
           )
           # if all weights = 0, use discrete SL
           if(!all(fm$coef==0)){
@@ -43,7 +44,7 @@ estimateQrn  <- function(Y, A, W, Qn, gn, glmQr, libraryQr, a0){
             stats::predict(fm, newdata=data.frame(gn=g), onlySL=FALSE)[[2]][,which(fm$cvRisk == min(fm$cvRisk, na.rm = TRUE))]
           }
         }else if(length(libraryQr)==1){
-          obj <- do.call(libraryQr, args=list(Y=(Y-Q)[A==a], X=data.frame(gn=g[A==a]),family=gaussian(),
+          obj <- do.call(libraryQr, args=list(Y=(Y-Q)[A==a], X=data.frame(gn=g[A==a]),family=data.frame(family="gaussian"),
                                               newX=data.frame(gn=g[A==a]),
                                               obsWeights=rep(1, length(Y[A==a]))))
           pred <- stats::predict(object=obj$fit, newdata=data.frame(gn=g))

@@ -1,7 +1,5 @@
 
 #' estimateQ 
-#' @importsFrom SuperLearner SuperLearner trimLogit
-#' @importsFrom stats predict glm as.formula
 #' 
 #' Function to estimate initial outcome regression
 #' 
@@ -16,8 +14,14 @@
 #' @param glmQ A character describing a formula to be used in the call to \code{glm} for the outcome regression
 #' @param a0 A list of fixed treatment values 
 #' @param family A character passed to \code{SuperLearner}
+#' @param stratify A \code{boolean} indicating whether to estimate the outcome regression separately
+#' for observations with \code{A} equal to 0/1 (if \code{TRUE}) or to pool across \code{A} (if \code{FALSE}).
+#' @param ... Additional arguments (not currently used) 
 #' 
+#' @importFrom SuperLearner SuperLearner trimLogit
+#' @importFrom stats predict glm as.formula
 #' 
+
 
 estimateQ <- function(Y,A,W,libraryQ,glmQ,a0,stratify,family,verbose=FALSE,returnModels=FALSE,...){
   if(is.null(libraryQ) & is.null(glmQ)) stop("Specify Super Learner library or GLM formula for Q")

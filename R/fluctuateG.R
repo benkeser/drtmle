@@ -1,6 +1,9 @@
-
-
 #' fluctuateG
+#' 
+#' Function called internally by drtmle to perform the fluctuation 
+#' of the initial estimator of g (i.e., solves the new estimating eqn that results
+#' from misspecification of Q)
+#' 
 #' @param Y The outcome
 #' @param A The treatment
 #' @param W The covariates
@@ -10,15 +13,11 @@
 #' @param coefTol A tolerance level on the magnitude of the coefficient that flags the
 #' result as potentially the result of numeric instability.
 #' @param tolg The lower bound on propensity score estimates
-#' @param reduction A character indicating what reduced dimension regression was used. 
 #' @param a0 A list of fixed treatment values 
 #' 
-#' @importsFrom SuperLearner trimLogit
-#' @importsFrom stats predict glm
-
-#' Function called internally by drtmle to perform the fluctuation 
-#' of the initial estimator of g (i.e., solves the new estimating eqn that results
-#' from misspecification of Q)
+#' @importFrom SuperLearner trimLogit
+#' @importFrom stats predict glm
+#' 
 
 fluctuateG <- function(Y, A, W, a0, Qn, gn, Qrn, tolg, coefTol=1e5){
   gnStar <- mapply(a=a0, Q=Qn, g=gn, Qr=Qrn, FUN=function(x, a, Q, g, Qr){

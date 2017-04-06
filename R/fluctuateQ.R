@@ -1,6 +1,10 @@
 
 #' fluctuateQ 
 #' 
+#' Function called internally by drtmle to perform simultaneous fluctuation 
+#' of the initial estimator of Q (i.e., solves both EIF estimating eqn and 
+#' the new estimating eqn that results from misspecification of g)
+#' 
 #' @param Y The outcome
 #' @param A The treatment
 #' @param W The covariates
@@ -12,13 +16,10 @@
 #' @param reduction A character indicating what reduced dimension regression was used. 
 #' @param a0 A list of fixed treatment values 
 #' 
-#' @importsFrom SuperLearner trimLogit
-#' @importsFrom stats predict glm
-#' Function called internally by drtmle to perform simultaneous fluctuation 
-#' of the initial estimator of Q (i.e., solves both EIF estimating eqn and 
-#' the new estimating eqn that results from misspecification of g)
-
-fluctuateQ <- function(Y,A,W,Qn,gn,grn,a0,family,reduction,coefTol=1e5){
+#' @importFrom SuperLearner trimLogit
+#' @importFrom stats predict glm
+#'
+fluctuateQ <- function(Y,A,W,Qn,gn,grn,a0,reduction,coefTol=1e5){
   QnStar <- mapply(a=a0,Q=Qn,g=gn,gr=grn,FUN=function(a, Q, g, gr){
     l <- min(Y); u <- max(Y)
     Yscale <- (Y-l)/(u-l)

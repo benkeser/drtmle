@@ -5,6 +5,7 @@
 #' @param Y A vector of continuous or binary outcomes. 
 #' @param A A vector of binary treatment assignment (assumed to be equal to 0 or 1)
 #' @param W A \code{data.frame} of named covariates
+#' @param a0 A vector of treatment levels at which to compute the adjusted mean outcome. 
 #' @param family A \code{character} equal to either \code{"binomial"} or \code{"gaussian"}. This is 
 #' passed to the \code{SuperLearner} function internally.
 #' @param stratify A \code{boolean} indicating whether to estimate the outcome regression separately
@@ -25,8 +26,8 @@
 #' if \code{libraryQr!=NULL}.
 #' @param glmgr A character describing a formula to be used in the call to \code{glm} for the second reduced-dimension regression. Ignored
 #' if \code{librarygr!=NULL}.
-#' @param guard A character vector indicating what pattern of misspecifications to guard against. If \code{"Q" %in% guard}, 
-#' then the TMLE guards against misspecification of the outcome regression. If \code{"g" %in% guard} then the TMLE 
+#' @param guard A character vector indicating what pattern of misspecifications to guard against. If \code{guard} contains \code{"Q"}, 
+#' then the TMLE guards against misspecification of the outcome regression. If \code{guard} contains \code{"g"} then the TMLE 
 #' (additionally) guards against misspecification of the propensity score. If \code{NULL}, the usual TMLE is computed.
 #' @param reduction A character equal to \code{"univariate"} for a univariate misspecification correction or \code{"bivariate"}
 #' for the bivariate version. 
@@ -41,6 +42,8 @@
 #' should be fit using a single minimization (\code{Qsteps = 1}) or a backfitting-type minimization (\code{Qsteps=2}). 
 #' The latter was found to be more stable in simulations. 
 #' @param ... Other options (not currently used)
+#' 
+#' @importFrom plyr llply laply
 #' 
 #' 
 #' @export 
@@ -72,7 +75,7 @@ drtmle <- function(Y,A,W,
 
   # estimate g
   gnOut <- estimateG(A=A, W=W, tolg=tolg, verbose=verbose, returnModels=returnModels,libraryg=libraryg, 
-    glmg=glmg, family="binomial", a0=a0)
+    glmg=glmg, a0=a0)
   if(returnModels){
     gnEst <- gnOut[[1]]
     gnMod <- gnOut[[2]]
@@ -170,26 +173,26 @@ drtmle <- function(Y,A,W,
       grnStar <- estimategrn(Y=Y, A=A, W=W, reduction=reduction, tolg=tolg, a0=a0, Qn=QnStar, gn=gnStar, glmgr=glmgr, librarygr=librarygr)
       
       if(Qsteps==1){
-        QnStarOut <- fluctuateQ(Y=Y, A=A, W=W, a0=a0, Qn=QnStar, gn=gnStar, grn=grnStar, reduction=reduction, family=family)
+        QnStarOut <- fluctuateQ(Y=Y, A=A, W=W, a0=a0, Qn=QnStar, gn=gnStar, grn=grnStar, reduction=reduction)
         QnStar <- llply(QnStarOut, function(x){unlist(x[[1]])})
         epsQ <- laply(QnStarOut, function(x){x$eps})
       }else if(Qsteps==2){
         # do the extra targeting
-        QnStarOut2 <- fluctuateQ2(Y=Y, A=A, W=W, a0=a0, Qn=QnStar, gn=gnStar, grn=grnStar, reduction=reduction, family=family)
+        QnStarOut2 <- fluctuateQ2(Y=Y, A=A, W=W, a0=a0, Qn=QnStar, gn=gnStar, grn=grnStar, reduction=reduction)
         QnStar <- llply(QnStarOut2, function(x){unlist(x[[1]])})
         
         # update grn based on new Qn
         # grnStar <- estimategrn(Y=Y, A=A, W=W, reduction=reduction, tolg=tolg, a0=a0, Qn=QnStar, gn=gnStar, glmgr=glmgr, librarygr=librarygr)
         
         # do the usual targeting
-        QnStarOut1 <- fluctuateQ1(Y=Y, A=A, W=W, a0=a0, Qn=QnStar, gn=gnStar, family=family)
+        QnStarOut1 <- fluctuateQ1(Y=Y, A=A, W=W, a0=a0, Qn=QnStar, gn=gnStar)
         QnStar <- llply(QnStarOut1, function(x){unlist(x[[1]])})
         
         # for later retrieval of fluct coefficients
         epsQ <- mapply(q1=QnStarOut1, q2=QnStarOut2, function(q1,q2){c(q1$eps,q2$eps)})
       }
     }else{
-      QnStarOut <- fluctuateQ1(Y=Y, A=A, W=W, a0=a0, Qn=QnStar, gn=gnStar, family=family)
+      QnStarOut <- fluctuateQ1(Y=Y, A=A, W=W, a0=a0, Qn=QnStar, gn=gnStar)
       QnStar <- llply(QnStarOut, function(x){unlist(x[[1]])})
       epsQ <- laply(QnStarOut, function(x){x$eps})
     }
@@ -234,7 +237,7 @@ drtmle <- function(Y,A,W,
   }
   
   # standard tmle fluctuations
-  QnStar1Out <- fluctuateQ1(Y=Y,A=A,W=W,Qn=Qn,gn=gn,a0=a0,family=family)
+  QnStar1Out <- fluctuateQ1(Y=Y,A=A,W=W,Qn=Qn,gn=gn,a0=a0)
   QnStar1 <- llply(QnStar1Out, function(x){unlist(x[[1]])})
   
   # tmle estimates

@@ -2,11 +2,18 @@
 % Please edit documentation in R/simFunctions.R
 \name{makeDataSix}
 \alias{makeDataSix}
-\title{makeDataSix}
+\title{makeDataSix
+Make simulation data set of size n}
 \usage{
-makeDataSix(n)
+makeDataSix(n, beta = 1)
+}
+\arguments{
+\item{n}{Sample size}
+
+\item{beta}{Strength of interaction}
 }
 \description{
+makeDataSix
 Make simulation data set of size n
 }
 

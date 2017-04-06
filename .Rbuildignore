@@ -3,7 +3,6 @@
 ^appveyor\.yml$
 ^\.gitignore$
 ^\README\.md$
-^cran-comments\.md$
 ^\.git$
 ^docs$
-^debug$
+^simulation$

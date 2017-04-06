@@ -1,10 +1,15 @@
 #' cao.dr 
+#' Compute the Cao 2009 estimator
+#' 
 #' @param R Missing indicator
 #' @param Y Outcome
+#' @param cov Covariates
 #' @param family Character
 #' @param nBoot Number of bootstrap resamples 
-#' Compute the Cao 2009 estimator
+#' 
 #' @export 
+#' 
+#' @importFrom stats quantile
 cao.dr <- function(R,Y,cov, family = "gaussian",nBoot=500){
     # get estimate
     est <- getCaoEst(R=R,Y=Y,cov=cov,family=family)
@@ -16,6 +21,6 @@ cao.dr <- function(R,Y,cov, family = "gaussian",nBoot=500){
         return(tmpEst)
     }
     estVec <- replicate(nBoot, doOneBoot())
-    ci <- quantile(estVec, p = c(0.025, 0.975))
+    ci <- stats::quantile(estVec, p = c(0.025, 0.975))
     return(list(est = est, ci = ci))
 }
