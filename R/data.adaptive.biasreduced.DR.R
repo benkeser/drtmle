@@ -1,6 +1,16 @@
 #' data.adaptive.biasreduced.DR
 #' 
+#' @param R Missingness indicator
+#' @param Y Outcome
+#' @param cov Covariates
+#' @param type.initQ How to estimate outcome regression (\code{"par","SL","npreg"})
+#' @param zeta Truncation level for logit transform of Qn
+#' @param fluc How to fit fluctuation submodel 
+#' @param alpha Truncation level for propensity score gn
+#' @param psi.tilde Null hypothesis value
+#' 
 #' Vermeulen estimator from IJB paper
+#' 
 #' @export 
 
 data.adaptive.biasreduced.DR <-
@@ -81,105 +91,6 @@ data.adaptive.biasreduced.DR <-
         return(list(est=psi,se=se.psi,ci=ci.psi,
                     Wald.statistic=W,p.value=p.value))
     }
-
-
-#' m.biasreducedDR.identity
-#' 
-#' Code to implement Vermeulen non-data-adaptive estimator
-#' @export
-
-
-m.biasreducedDR.identity<-function(R,Y,cov){
-  n<-length(R)
-  int.cov<-cbind(rep(1,n),cov)
-  expit<-function(x) exp(x)/(1+exp(x))
-  U <- function(R,Y,X,gamma,beta){
-    (R/expit(gamma%*%t(X))*(Y-beta%*%t(X))+beta%*%t(X))
-  }
-  min.Uint<-function(gamma){
-    -mean((-R*exp(-gamma%*%t(int.cov)))+(-(1-R)*(gamma%*%t(int.cov))))
-  }
-  init.gamma<-coef(glm(R~cov,family="binomial"))
-  sol<-nlm(min.Uint,init.gamma)
-  gamma.BR<-sol$estimate
-  weight<-as.vector(1/exp(gamma.BR%*%t(int.cov)))
-  beta.BR<-coef(lm(Y ~ -1+int.cov,subset=(R==1),weights=weight))
-  mn.Y<-mean(U(R,Y,int.cov,gamma.BR,beta.BR))
-  se.mn.Y<-sd(U(R,Y,int.cov,gamma.BR,beta.BR))/sqrt(n)
-  return(list(mn.Y=mn.Y,se.mn.Y=se.mn.Y,gamma.BR=gamma.BR,beta.BR=beta.BR))
-}
-
-
-#' getCaoEst
-#' 
-#' Code to implement Cao 2009 estimator
-getCaoEst <- function(R,Y,cov,family){
-    # fit outcome regression
-    Qmod <- glm(paste0("Y ~", paste0(colnames(cov),collapse="+")),
-        data = data.frame(Y, cov)[R==1,],
-        family = family)
-
-    Qn <- predict(Qmod, newdata=data.frame(Y,cov), type="response")
-
-    # fit "enhanced propensity" regression
-    negLogLik <- function(pars,R,cov){
-    delta <- pars[1]; gamma <- matrix(pars[2:length(pars)],ncol=1)
-    X <- data.matrix(cbind(rep(1,length(R)), cov))
-    g <- 1-exp(delta + X%*%gamma)/(1 + exp(X%*%gamma))
-    return(-sum(R*log(g) + (1-R)*log(1-g)))
-    }
-
-    constraint <- function(pars, R,cov){
-     delta <- pars[1]; gamma <- matrix(pars[2:length(pars)],ncol=1)
-     X <- data.matrix(cbind(rep(1,length(R)), cov))
-     g <- 1-exp(delta + X%*%gamma)/(1 + exp(X%*%gamma))
-     # first that all probs are between 0 and 1
-     c1 <- as.numeric(all(g < 1) & all(g > 0))
-     # now that sum of inverse weights sum to n
-     c2 <- as.numeric(sum(R/g) == length(R))    
-     return(c1)
-    }
-
-    tmp <- optim(rep(0,ncol(cov)+2), fn = negLogLik, R = R, cov = cov,
-     control=list(maxit=1e2))
-    p <- tmp$par
-    delta <- p[1]; gamma <- matrix(p[2:length(p)],ncol=1)
-    X <- data.matrix(cbind(rep(1,length(R)), cov))
-    gn <- 1-exp(delta + X%*%gamma)/(1 + exp(X%*%gamma))
-    if(any(gn > 1) | any(gn < 0)){
-        suppressWarnings(
-        tmp2 <- constrOptim.nl(tmp$par, fn = negLogLik, hin = constraint, R = R, cov = cov)
-        )
-        p <- tmp2$par
-        delta <- p[1]; gamma <- matrix(p[2:length(p)],ncol=1)
-        X <- data.matrix(cbind(rep(1,length(R)), cov))
-        g2 <- 1-exp(delta + X%*%gamma)/(1 + exp(X%*%gamma))
-    }
-    
-    est <- mean(
-        R*Y/gn - (R - gn)/gn * Qn
-    )
-    return(est)
-}
-
-#' cao.dr 
-#' 
-#' Compute the Cao 2009 estimator
-#' @export 
-cao.dr <- function(R,Y,cov, family = "gaussian",nBoot=500){
-    # get estimate
-    est <- getCaoEst(R=R,Y=Y,cov=cov,family=family)
-    # get bootstrap CI
-    doOneBoot <- function(){
-        samp <- sample(1:length(R), replace = TRUE)
-        tmpEst <- getCaoEst(R=R[samp],Y=Y[samp],cov=cov[samp,],
-            family=family)
-        return(tmpEst)
-    }
-    estVec <- replicate(nBoot, doOneBoot())
-    ci <- quantile(estVec, p = c(0.025, 0.975))
-    return(list(est = est, ci = ci))
-}
 
 
 
