@@ -99,8 +99,8 @@ drtmle <- function(Y,A,W,
   Dno1Mat <- matrix(unlist(Dno),ncol=length(Y), nrow=length(a0), byrow=TRUE)
   DnoMat <- matrix(unlist(Dno) - unlist(DnQo) - unlist(Dngo), ncol=length(Y), nrow=length(a0), byrow=TRUE)
   
-  cov.o1 <- Dno1Mat%*%t(Dno1Mat)/(length(Y)^2)
-  cov.o <- DnoMat%*%t(DnoMat)/(length(Y)^2)
+  cov.o1 <- (Dno1Mat-mean(Dno1Mat))%*%t(Dno1Mat-mean(Dno1Mat)) /(length(Y)^2)
+  cov.o <- (DnoMat-mean(DnoMat))%*%t(DnoMat-mean(DnoMat))/(length(Y)^2)
   
   # initialize fluctuations
   QnStar <- Qn
@@ -235,8 +235,8 @@ drtmle <- function(Y,A,W,
   Dno1StarMat <- matrix(unlist(Dno1Star), ncol=length(Y), nrow=length(a0), byrow=TRUE)
   DnoStarMat <- matrix(unlist(DnoStar) - unlist(DnQoStar) - unlist(DngoStar), ncol=length(Y), nrow=length(a0),byrow=TRUE)
   
-  cov.t1 <- Dno1StarMat%*%t(Dno1StarMat)/(length(Y)^2)
-  cov.t <- DnoStarMat%*%t(DnoStarMat)/(length(Y)^2)
+  cov.t1 <- (Dno1StarMat - mean(Dno1StarMat))%*%t((Dno1StarMat - mean(Dno1StarMat)))/(length(Y)^2)
+  cov.t <- (DnoStarMat - mean(DnoStarMat))%*%t((DnoStarMat - mean(DnoStarMat)))/(length(Y)^2)
   
   # final results
   if(returnModels){
