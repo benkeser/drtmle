@@ -1,4 +1,4 @@
-# R/`survtmle`
+# R/`drtmle`
 
 [![Travis-CI Build Status](https://travis-ci.org/benkeser/drtmle.svg?branch=master)](https://travis-ci.org/benkeser/drtml)
 [![AppVeyor Build  Status](https://ci.appveyor.com/api/projects/status/github/benkeser/drtmle?branch=master&svg=true)](https://ci.appveyor.com/project/benkeser/survtmle)
