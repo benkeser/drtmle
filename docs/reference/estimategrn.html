@@ -53,6 +53,9 @@
         <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li>
+  <a href="../news/index.html">News</a>
+</li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
@@ -77,12 +80,61 @@ fluctuations.</p>
     
 
     <pre><span class='fu'>estimategrn</span>(<span class='no'>Y</span>, <span class='no'>A</span>, <span class='no'>W</span>, <span class='no'>Qn</span>, <span class='no'>gn</span>, <span class='no'>librarygr</span>, <span class='no'>tolg</span>, <span class='no'>glmgr</span>, <span class='no'>a0</span>, <span class='no'>reduction</span>)</pre>
-        
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>Y</th>
+      <td><p>A vector of continuous or binary outcomes.</p></td>
+    </tr>
+    <tr>
+      <th>A</th>
+      <td><p>A vector of binary treatment assignment (assumed to be equal to 0 or 1)</p></td>
+    </tr>
+    <tr>
+      <th>W</th>
+      <td><p>A <code>data.frame</code> of named covariates</p></td>
+    </tr>
+    <tr>
+      <th>Qn</th>
+      <td><p>A list of outcome regression estimates evaluated on observed data</p></td>
+    </tr>
+    <tr>
+      <th>gn</th>
+      <td><p>A list of propensity regression estimates evaluated on observed data</p></td>
+    </tr>
+    <tr>
+      <th>librarygr</th>
+      <td><p>A vector of characters or a list describing the Super Learner library to be used 
+for the second reduced-dimension regression.</p></td>
+    </tr>
+    <tr>
+      <th>tolg</th>
+      <td><p>A numeric indicating the minimum value for estimates of the propensity score.</p></td>
+    </tr>
+    <tr>
+      <th>glmgr</th>
+      <td><p>A character describing a formula to be used in the call to <code>glm</code> for the second reduced-dimension regression. Ignored
+if <code>librarygr!=NULL</code>.</p></td>
+    </tr>
+    <tr>
+      <th>a0</th>
+      <td><p>A list of fixed treatment values</p></td>
+    </tr>
+    <tr>
+      <th>reduction</th>
+      <td><p>A character equal to <code>"univariate"</code> for a univariate misspecification correction or <code>"bivariate"</code>
+for the bivariate version.</p></td>
+    </tr>
+    </table>
+    
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
                 </ul>
 
   </div>

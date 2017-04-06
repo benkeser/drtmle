@@ -53,6 +53,9 @@
         <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li>
+  <a href="../news/index.html">News</a>
+</li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
@@ -75,14 +78,54 @@
     <p>Function to estimate propensity score</p>
     
 
-    <pre><span class='fu'>estimateG</span>(<span class='no'>A</span>, <span class='no'>W</span>, <span class='no'>libraryg</span>, <span class='no'>glmg</span>, <span class='no'>family</span>, <span class='no'>a0</span>, <span class='no'>tolg</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+    <pre><span class='fu'>estimateG</span>(<span class='no'>A</span>, <span class='no'>W</span>, <span class='no'>libraryg</span>, <span class='no'>glmg</span>, <span class='no'>a0</span>, <span class='no'>tolg</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>returnModels</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
-        
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>A</th>
+      <td><p>A vector of binary treatment assignment (assumed to be equal to 0 or 1)</p></td>
+    </tr>
+    <tr>
+      <th>W</th>
+      <td><p>A <code>data.frame</code> of named covariates</p></td>
+    </tr>
+    <tr>
+      <th>libraryg</th>
+      <td><p>A vector of characters or a list describing the Super Learner library to be used 
+for the propensity score</p></td>
+    </tr>
+    <tr>
+      <th>glmg</th>
+      <td><p>A character describing a formula to be used in the call to <code>glm</code> for the propensity score</p></td>
+    </tr>
+    <tr>
+      <th>a0</th>
+      <td><p>A list of fixed treatment values</p></td>
+    </tr>
+    <tr>
+      <th>tolg</th>
+      <td><p>A numeric indicating the minimum value for estimates of the propensity score.</p></td>
+    </tr>
+    <tr>
+      <th>verbose</th>
+      <td><p>A boolean indicating whether to print status updates.</p></td>
+    </tr>
+    <tr>
+      <th>returnModels</th>
+      <td><p>A boolean indicating whether to return model fits for the outcome regression, propensity score,
+and reduced-dimension regressions.</p></td>
+    </tr>
+    </table>
+    
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
                 </ul>
 
   </div>

@@ -53,6 +53,9 @@
         <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li>
+  <a href="../news/index.html">News</a>
+</li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
@@ -77,12 +80,52 @@ fluctuations of g</p>
     
 
     <pre><span class='fu'>estimateQrn</span>(<span class='no'>Y</span>, <span class='no'>A</span>, <span class='no'>W</span>, <span class='no'>Qn</span>, <span class='no'>gn</span>, <span class='no'>glmQr</span>, <span class='no'>libraryQr</span>, <span class='no'>a0</span>)</pre>
-        
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>Y</th>
+      <td><p>A vector of continuous or binary outcomes.</p></td>
+    </tr>
+    <tr>
+      <th>A</th>
+      <td><p>A vector of binary treatment assignment (assumed to be equal to 0 or 1)</p></td>
+    </tr>
+    <tr>
+      <th>W</th>
+      <td><p>A <code>data.frame</code> of named covariates</p></td>
+    </tr>
+    <tr>
+      <th>Qn</th>
+      <td><p>A list of outcome regression estimates evaluated on observed data</p></td>
+    </tr>
+    <tr>
+      <th>gn</th>
+      <td><p>A list of propensity regression estimates evaluated on observed data</p></td>
+    </tr>
+    <tr>
+      <th>glmQr</th>
+      <td><p>A character describing a formula to be used in the call to <code>glm</code> for the first reduced-dimension regression. Ignored
+if <code>librarygr!=NULL</code>.</p></td>
+    </tr>
+    <tr>
+      <th>libraryQr</th>
+      <td><p>A vector of characters or a list describing the Super Learner library to be used 
+for the first reduced-dimension regression.</p></td>
+    </tr>
+    <tr>
+      <th>a0</th>
+      <td><p>A list of fixed treatment values</p></td>
+    </tr>
+    </table>
+    
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
                 </ul>
 
   </div>

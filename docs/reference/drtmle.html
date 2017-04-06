@@ -53,6 +53,9 @@
         <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li>
+  <a href="../news/index.html">News</a>
+</li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
@@ -79,14 +82,128 @@
   <span class='kw'>libraryQ</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>libraryg</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>libraryQr</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>librarygr</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>glmQ</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>glmg</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>glmQr</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>glmgr</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>guard</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"Q"</span>,
   <span class='st'>"g"</span>), <span class='kw'>reduction</span> <span class='kw'>=</span> <span class='st'>"univariate"</span>, <span class='kw'>returnModels</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>maxIter</span> <span class='kw'>=</span> <span class='fl'>100</span>,
-  <span class='kw'>tolEps</span> <span class='kw'>=</span> <span class='fl'>1e-04</span>, <span class='kw'>tolIC</span> <span class='kw'>=</span> <span class='st'>"default"</span>, <span class='kw'>tolg</span> <span class='kw'>=</span> <span class='fl'>1e-08</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>Qsteps</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='no'>...</span>)</pre>
-        
+  <span class='kw'>tolIC</span> <span class='kw'>=</span> <span class='fl'>1</span>/<span class='fu'>length</span>(<span class='no'>Y</span>), <span class='kw'>tolg</span> <span class='kw'>=</span> <span class='fl'>1e-08</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>Qsteps</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='no'>...</span>)</pre>
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>Y</th>
+      <td><p>A vector of continuous or binary outcomes.</p></td>
+    </tr>
+    <tr>
+      <th>A</th>
+      <td><p>A vector of binary treatment assignment (assumed to be equal to 0 or 1)</p></td>
+    </tr>
+    <tr>
+      <th>W</th>
+      <td><p>A <code>data.frame</code> of named covariates</p></td>
+    </tr>
+    <tr>
+      <th>a0</th>
+      <td><p>A vector of treatment levels at which to compute the adjusted mean outcome.</p></td>
+    </tr>
+    <tr>
+      <th>family</th>
+      <td><p>A <code>character</code> equal to either <code>"binomial"</code> or <code>"gaussian"</code>. This is 
+passed to the <code>SuperLearner</code> function internally.</p></td>
+    </tr>
+    <tr>
+      <th>stratify</th>
+      <td><p>A <code>boolean</code> indicating whether to estimate the outcome regression separately
+for observations with <code>A</code> equal to 0/1 (if <code>TRUE</code>) or to pool across <code>A</code> (if <code>FALSE</code>).</p></td>
+    </tr>
+    <tr>
+      <th>libraryQ</th>
+      <td><p>A vector of characters or a list describing the Super Learner library to be used 
+for the outcome regression. See <code>link{SuperLearner::SuperLearner}</code> for details.</p></td>
+    </tr>
+    <tr>
+      <th>libraryg</th>
+      <td><p>A vector of characters or a list describing the Super Learner library to be used 
+for the propensity score. See <code>link{SuperLearner::SuperLearner}</code> for details.</p></td>
+    </tr>
+    <tr>
+      <th>libraryQr</th>
+      <td><p>A vector of characters or a list describing the Super Learner library to be used 
+for the first reduced-dimension regression.</p></td>
+    </tr>
+    <tr>
+      <th>librarygr</th>
+      <td><p>A vector of characters or a list describing the Super Learner library to be used 
+for the second reduced-dimension regression.</p></td>
+    </tr>
+    <tr>
+      <th>glmQ</th>
+      <td><p>A character describing a formula to be used in the call to <code>glm</code> for the outcome regression. Ignored
+if <code>libraryQ!=NULL</code>.</p></td>
+    </tr>
+    <tr>
+      <th>glmg</th>
+      <td><p>A character describing a formula to be used in the call to <code>glm</code> for the propensity score. Ignored
+if <code>libraryg!=NULL</code>.</p></td>
+    </tr>
+    <tr>
+      <th>glmQr</th>
+      <td><p>A character describing a formula to be used in the call to <code>glm</code> for the first reduced-dimension regression. Ignored
+if <code>libraryQr!=NULL</code>.</p></td>
+    </tr>
+    <tr>
+      <th>glmgr</th>
+      <td><p>A character describing a formula to be used in the call to <code>glm</code> for the second reduced-dimension regression. Ignored
+if <code>librarygr!=NULL</code>.</p></td>
+    </tr>
+    <tr>
+      <th>guard</th>
+      <td><p>A character vector indicating what pattern of misspecifications to guard against. If <code>guard</code> contains <code>"Q"</code>, 
+then the TMLE guards against misspecification of the outcome regression. If <code>guard</code> contains <code>"g"</code> then the TMLE 
+(additionally) guards against misspecification of the propensity score. If <code>NULL</code>, the usual TMLE is computed.</p></td>
+    </tr>
+    <tr>
+      <th>reduction</th>
+      <td><p>A character equal to <code>"univariate"</code> for a univariate misspecification correction or <code>"bivariate"</code>
+for the bivariate version.</p></td>
+    </tr>
+    <tr>
+      <th>returnModels</th>
+      <td><p>A boolean indicating whether to return model fits for the outcome regression, propensity score,
+and reduced-dimension regressions.</p></td>
+    </tr>
+    <tr>
+      <th>maxIter</th>
+      <td><p>A numeric that sets the maximum number of iterations the TMLE can perform in its fluctuation step.</p></td>
+    </tr>
+    <tr>
+      <th>tolIC</th>
+      <td><p>A numeric that defines the stopping criteria based on the empirical mean
+of the scores of the fluctuation submodels submodels. Setting to <code>"default"</code></p></td>
+    </tr>
+    <tr>
+      <th>tolg</th>
+      <td><p>A numeric indicating the minimum value for estimates of the propensity score.</p></td>
+    </tr>
+    <tr>
+      <th>verbose</th>
+      <td><p>A boolean indicating whether to print status updates.</p></td>
+    </tr>
+    <tr>
+      <th>Qsteps</th>
+      <td><p>A numeric equal to 1/2 indicating whether the fluctuation submodel for the outcome regression
+should be fit using a single minimization (<code>Qsteps = 1</code>) or a backfitting-type minimization (<code>Qsteps=2</code>). 
+The latter was found to be more stable in simulations.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Other options (not currently used)</p></td>
+    </tr>
+    </table>
+    
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
                 </ul>
 
   </div>

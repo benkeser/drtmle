@@ -53,6 +53,9 @@
         <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li>
+  <a href="../news/index.html">News</a>
+</li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
@@ -73,18 +76,61 @@
 
     
     <p>A modification of the SL.caret function from the SuperLearner package that
-suppresses some output when method = "gbm".</p>
+suppresses some output when method = "gbm" or "nnet". See <code>?SL.caret</code>
+for more information.</p>
     
 
     <pre><span class='fu'>SL.caret1</span>(<span class='no'>Y</span>, <span class='no'>X</span>, <span class='no'>newX</span>, <span class='no'>family</span>, <span class='no'>obsWeights</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"rf"</span>, <span class='kw'>tuneLength</span> <span class='kw'>=</span> <span class='fl'>3</span>,
   <span class='kw'>trControl</span> <span class='kw'>=</span> <span class='kw'>caret</span><span class='kw'>::</span><span class='fu'>trainControl</span>(<span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"cv"</span>, <span class='kw'>number</span> <span class='kw'>=</span> <span class='fu'>ifelse</span>(<span class='fu'>length</span>(<span class='no'>Y</span>) <span class='kw'>&lt;=</span>
-  <span class='fl'>100</span>, <span class='fl'>20</span>, <span class='fl'>10</span>), <span class='kw'>verboseIter</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>), <span class='no'>metric</span>, <span class='no'>...</span>)</pre>
-        
+  <span class='fl'>100</span>, <span class='fl'>20</span>, <span class='fl'>10</span>), <span class='kw'>verboseIter</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>), <span class='no'>...</span>)</pre>
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>Y</th>
+      <td><p>Training outcomes</p></td>
+    </tr>
+    <tr>
+      <th>X</th>
+      <td><p>Training predictors</p></td>
+    </tr>
+    <tr>
+      <th>newX</th>
+      <td><p>Test set predictors</p></td>
+    </tr>
+    <tr>
+      <th>family</th>
+      <td><p>Character indicating family argument (ignored)</p></td>
+    </tr>
+    <tr>
+      <th>obsWeights</th>
+      <td><p>Weights for the observations</p></td>
+    </tr>
+    <tr>
+      <th>method</th>
+      <td><p>Character describing what algorithm to train</p></td>
+    </tr>
+    <tr>
+      <th>tuneLength</th>
+      <td><p>The number of tuning parameter combinations</p></td>
+    </tr>
+    <tr>
+      <th>trControl</th>
+      <td><p>Passed to <code>caret::train</code></p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Other arguments (not currently used)</p></td>
+    </tr>
+    </table>
+    
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
                 </ul>
 
   </div>

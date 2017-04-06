@@ -6,7 +6,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>SL.npreg — SL.npreg • drtmle</title>
+<title>SL.npreg
+SuperLearner wrapper to fit kernel regression — SL.npreg • drtmle</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -53,6 +54,9 @@
         <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li>
+  <a href="../news/index.html">News</a>
+</li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
@@ -68,20 +72,57 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>SL.npreg</h1>
+    <h1>SL.npreg
+SuperLearner wrapper to fit kernel regression</h1>
     </div>
 
     
-    <p>SuperLearner wrapper to fit kernel regression</p>
+    <p>SL.npreg
+SuperLearner wrapper to fit kernel regression</p>
     
 
     <pre><span class='fu'>SL.npreg</span>(<span class='no'>Y</span>, <span class='no'>X</span>, <span class='no'>newX</span>, <span class='no'>family</span>, <span class='no'>obsWeights</span>, <span class='kw'>rangeThresh</span> <span class='kw'>=</span> <span class='fl'>1e-07</span>, <span class='no'>...</span>)</pre>
-        
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>Y</th>
+      <td><p>Training outcomes</p></td>
+    </tr>
+    <tr>
+      <th>X</th>
+      <td><p>Training predictors</p></td>
+    </tr>
+    <tr>
+      <th>newX</th>
+      <td><p>Test set predictors</p></td>
+    </tr>
+    <tr>
+      <th>family</th>
+      <td><p>Not used by the function, but needed by <code>SuperLearner</code></p></td>
+    </tr>
+    <tr>
+      <th>obsWeights</th>
+      <td><p>Weights for the observations</p></td>
+    </tr>
+    <tr>
+      <th>rangeThresh</th>
+      <td><p>If the the range of the outcomes is smaller than this number, the method
+returns the empirical average of the outcomes.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Other arguments (not currently used)</p></td>
+    </tr>
+    </table>
+    
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
                 </ul>
 
   </div>

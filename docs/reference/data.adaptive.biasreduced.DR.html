@@ -6,7 +6,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>data.adaptive.biasreduced.DR — data.adaptive.biasreduced.DR • drtmle</title>
+<title>data.adaptive.biasreduced.DR
+Vermeulen estimator from IJB paper — data.adaptive.biasreduced.DR • drtmle</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -53,6 +54,9 @@
         <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li>
+  <a href="../news/index.html">News</a>
+</li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
@@ -68,22 +72,62 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>data.adaptive.biasreduced.DR</h1>
+    <h1>data.adaptive.biasreduced.DR
+Vermeulen estimator from IJB paper</h1>
     </div>
 
     
-    <p>Vermeulen estimator from IJB paper</p>
+    <p>data.adaptive.biasreduced.DR
+Vermeulen estimator from IJB paper</p>
     
 
     <pre><span class='fu'>data.adaptive.biasreduced.DR</span>(<span class='no'>R</span>, <span class='no'>Y</span>, <span class='no'>cov</span>, <span class='kw'>type.initQ</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"par"</span>, <span class='st'>"SL"</span>),
   <span class='kw'>zeta</span> <span class='kw'>=</span> <span class='fl'>0.005</span>, <span class='kw'>fluc</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"unweighted"</span>, <span class='st'>"weighted"</span>), <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.05</span>,
   <span class='kw'>psi.tilde</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
-        
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>R</th>
+      <td><p>Missingness indicator</p></td>
+    </tr>
+    <tr>
+      <th>Y</th>
+      <td><p>Outcome</p></td>
+    </tr>
+    <tr>
+      <th>cov</th>
+      <td><p>Covariates</p></td>
+    </tr>
+    <tr>
+      <th>type.initQ</th>
+      <td><p>How to estimate outcome regression (<code>"par","SL","npreg"</code>)</p></td>
+    </tr>
+    <tr>
+      <th>zeta</th>
+      <td><p>Truncation level for logit transform of Qn</p></td>
+    </tr>
+    <tr>
+      <th>fluc</th>
+      <td><p>How to fit fluctuation submodel</p></td>
+    </tr>
+    <tr>
+      <th>alpha</th>
+      <td><p>Truncation level for propensity score gn</p></td>
+    </tr>
+    <tr>
+      <th>psi.tilde</th>
+      <td><p>Null hypothesis value</p></td>
+    </tr>
+    </table>
+    
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
                 </ul>
 
   </div>

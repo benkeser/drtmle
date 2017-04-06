@@ -6,8 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>SL.rf.caret2
-Uses SL.caret 1 to train a random forest with 10 choices of tuning parameters and 5-fold CV — SL.rf.caret2 • drtmle</title>
+<title>SL.rf.caret2 — SL.rf.caret2 • drtmle</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -54,6 +53,9 @@ Uses SL.caret 1 to train a random forest with 10 choices of tuning parameters an
         <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li>
+  <a href="../news/index.html">News</a>
+</li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
@@ -69,23 +71,43 @@ Uses SL.caret 1 to train a random forest with 10 choices of tuning parameters an
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>SL.rf.caret2
-Uses SL.caret 1 to train a random forest with 10 choices of tuning parameters and 5-fold CV</h1>
+    <h1>SL.rf.caret2</h1>
     </div>
 
     
-    <p>SL.rf.caret2
-Uses SL.caret 1 to train a random forest with 10 choices of tuning parameters and 5-fold CV</p>
+    <p>Uses SL.caret 1 to train a random forest with 10 choices of tuning parameters and 5-fold CV</p>
     
 
     <pre><span class='fu'>SL.rf.caret2</span>(<span class='no'>...</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"rf"</span>, <span class='kw'>tuneLength</span> <span class='kw'>=</span> <span class='fl'>20</span>,
   <span class='kw'>trControl</span> <span class='kw'>=</span> <span class='kw'>caret</span><span class='kw'>::</span><span class='fu'>trainControl</span>(<span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"cv"</span>, <span class='kw'>number</span> <span class='kw'>=</span> <span class='fl'>5</span>))</pre>
-        
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>...</th>
+      <td><p>Other arguments passed to <code>SL.caret1</code></p></td>
+    </tr>
+    <tr>
+      <th>method</th>
+      <td><p>Character describing what algorithm to train</p></td>
+    </tr>
+    <tr>
+      <th>tuneLength</th>
+      <td><p>The number of tuning parameter combinations</p></td>
+    </tr>
+    <tr>
+      <th>trControl</th>
+      <td><p>Passed to <code>caret::train</code></p></td>
+    </tr>
+    </table>
+    
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
                 </ul>
 
   </div>
