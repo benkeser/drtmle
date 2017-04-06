@@ -47,7 +47,7 @@ notifications:
    to:
      - benkeser@berkeley.edu
    subject: 'r-appveyor build {{status}}'
-   message: "https://ci.appveyor.com/project/benkeser/survtmle"
+   message: "https://ci.appveyor.com/project/benkeser/drtmle"
    on_build_success: false
    on_build_failure: true
    on_build_status_changed: true
