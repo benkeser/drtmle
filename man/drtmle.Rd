@@ -4,14 +4,14 @@
 \alias{drtmle}
 \title{drtmle}
 \usage{
-drtmle(Y, A, W, a0 = unique(A), family = "binomial", stratify = TRUE,
+drtmle(Y, A, W, a0 = unique(A), family = binomial(), stratify = TRUE,
   libraryQ = NULL, libraryg = NULL, libraryQr = NULL, librarygr = NULL,
   glmQ = NULL, glmg = NULL, glmQr = NULL, glmgr = NULL, guard = c("Q",
-  "g"), reduction = "univariate", returnModels = FALSE, maxIter = 100,
-  tolIC = 1/length(Y), tolg = 1e-08, verbose = TRUE, Qsteps = 2, ...)
+  "g"), reduction = "univariate", returnModels = FALSE, maxIter = 10,
+  tolIC = 1/length(Y), tolg = 1e-08, verbose = FALSE, Qsteps = 2, ...)
 }
 \arguments{
-\item{Y}{A vector of continuous or binary outcomes.}
+\item{Y}{A numeric of continuous or binary outcomes.}
 
 \item{A}{A vector of binary treatment assignment (assumed to be equal to 0 or 1)}
 
@@ -19,8 +19,8 @@ drtmle(Y, A, W, a0 = unique(A), family = "binomial", stratify = TRUE,
 
 \item{a0}{A vector of treatment levels at which to compute the adjusted mean outcome.}
 
-\item{family}{A \code{character} equal to either \code{"binomial"} or \code{"gaussian"}. This is 
-passed to the \code{SuperLearner} function internally.}
+\item{family}{A \code{character} equal to either \code{"binomial"} or \code{"gaussian"}, to be passed
+to the \code{SuperLearner} or \code{glm} function.}
 
 \item{stratify}{A \code{boolean} indicating whether to estimate the outcome regression separately
 for observations with \code{A} equal to 0/1 (if \code{TRUE}) or to pool across \code{A} (if \code{FALSE}).}
@@ -44,14 +44,17 @@ if \code{libraryQ!=NULL}.}
 if \code{libraryg!=NULL}.}
 
 \item{glmQr}{A character describing a formula to be used in the call to \code{glm} for the first reduced-dimension regression. Ignored
-if \code{libraryQr!=NULL}.}
+if \code{libraryQr!=NULL}. The formula should use the variable name \code{'gn'}.}
 
 \item{glmgr}{A character describing a formula to be used in the call to \code{glm} for the second reduced-dimension regression. Ignored
-if \code{librarygr!=NULL}.}
+if \code{librarygr!=NULL}. The formula should use the variable name \code{'Qn'} and \code{'gn'} if 
+\code{reduction='bivariate'} and \code{'Qn'} otherwise.}
 
 \item{guard}{A character vector indicating what pattern of misspecifications to guard against. If \code{guard} contains \code{"Q"}, 
-then the TMLE guards against misspecification of the outcome regression. If \code{guard} contains \code{"g"} then the TMLE 
-(additionally) guards against misspecification of the propensity score. If \code{NULL}, the usual TMLE is computed.}
+then the TMLE guards against misspecification of the outcome regression by estimating the reduced dimension regression
+specified by \code{glmQr} or \code{libraryQr}. If \code{guard} contains \code{"g"} then the TMLE 
+(additionally) guards against misspecification of the propensity score by estimating the reduced dimension regression
+specified by \code{glmgr} or \code{librarygr}. If \code{NULL}, the usual TMLE is computed.}
 
 \item{reduction}{A character equal to \code{"univariate"} for a univariate misspecification correction or \code{"bivariate"}
 for the bivariate version.}
@@ -77,4 +80,3 @@ The latter was found to be more stable in simulations.}
 \description{
 Main function to estimate TMLE with doubly-robust inference
 }
-
