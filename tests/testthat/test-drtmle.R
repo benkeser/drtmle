@@ -1,3 +1,4 @@
+# install.packages("~/Dropbox/R/drtmle",repos=NULL,type="source")
 library(drtmle)
 
 context("Testing drtmle function")
@@ -18,7 +19,7 @@ test_that("drtmle executes as expected with stratify = TRUE", {
 	# univariate reduction with
 	# all GLMs + stratify
 	fit1 <- drtmle(W = W, A = A, Y = Y, 
-                   family="gaussian",
+                   family=gaussian(),
                       stratify=TRUE,
                       glmQ="W1 + W2",
                       glmg="W1 + W2",
@@ -41,7 +42,7 @@ test_that("drtmle executes as expected with stratify = TRUE", {
 	# bivariate reduction with 
 	# all GLMs + stratify 
 	fit2 <- drtmle(W = W, A = A, Y = Y, 
-                   family="gaussian",
+                   family=gaussian(),
                       stratify=TRUE,
                       glmQ="W1 + W2",
                       glmg="W1 + W2",
@@ -64,7 +65,7 @@ test_that("drtmle executes as expected with stratify = TRUE", {
 	# univariate reduction with 
 	# all SL + stratify
 	fit3 <- drtmle(W = W, A = A, Y = Y, 
-               family="gaussian",
+               family=gaussian(),
                   stratify=TRUE,
                   libraryQ=c("SL.glm","SL.step"),
                   libraryg=c("SL.glm","SL.step"),
@@ -86,7 +87,7 @@ test_that("drtmle executes as expected with stratify = TRUE", {
 	#bivariate reduction with 
 	# all SL + stratify
 	fit4 <- drtmle(W = W, A = A, Y = Y, 
-           family="gaussian",
+           family=gaussian(),
               stratify=TRUE,
               libraryQ=c("SL.glm","SL.step"),
               libraryg=c("SL.glm","SL.step"),
@@ -107,7 +108,7 @@ test_that("drtmle executes as expected with stratify = TRUE", {
 	# bivariate reduction with 
 	# single SL + stratify
 	fit5 <- drtmle(W = W, A = A, Y = Y, 
-           family="gaussian",
+           family=gaussian(),
               stratify=TRUE,
               libraryQ="SL.glm",
               libraryg="SL.glm",
@@ -128,7 +129,7 @@ test_that("drtmle executes as expected with stratify = TRUE", {
 	# univariate reduction with 
 	# single SL + stratify
 	fit6 <- drtmle(W = W, A = A, Y = Y, 
-           family="gaussian",
+           family=gaussian(),
               stratify=TRUE,
               libraryQ="SL.glm",
               libraryg="SL.glm",
@@ -162,7 +163,7 @@ test_that("drtmle executes as expected with stratify = FALSE", {
 	# univariate reduction with
 	# all GLMs + stratify
 	fit1 <- drtmle(W = W, A = A, Y = Y, 
-                   family="gaussian",
+                   family=gaussian(),
                       stratify=FALSE,
                       glmQ="W1 + W2",
                       glmg="W1 + W2",
@@ -185,7 +186,7 @@ test_that("drtmle executes as expected with stratify = FALSE", {
 	# bivariate reduction with 
 	# all GLMs + stratify 
 	fit2 <- drtmle(W = W, A = A, Y = Y, 
-                   family="gaussian",
+                   family=gaussian(),
                       stratify=FALSE,
                       glmQ="W1 + W2",
                       glmg="W1 + W2",
@@ -208,7 +209,7 @@ test_that("drtmle executes as expected with stratify = FALSE", {
 	# univariate reduction with 
 	# all SL + stratify
 	fit3 <- drtmle(W = W, A = A, Y = Y, 
-               family="gaussian",
+               family=gaussian(),
                   stratify=FALSE,
                   libraryQ=c("SL.glm","SL.step"),
                   libraryg=c("SL.glm","SL.step"),
@@ -230,7 +231,7 @@ test_that("drtmle executes as expected with stratify = FALSE", {
 	#bivariate reduction with 
 	# all SL + stratify
 	fit4 <- drtmle(W = W, A = A, Y = Y, 
-           family="gaussian",
+           family=gaussian(),
               stratify=FALSE,
               libraryQ=c("SL.glm","SL.step"),
               libraryg=c("SL.glm","SL.step"),
@@ -251,7 +252,7 @@ test_that("drtmle executes as expected with stratify = FALSE", {
 	# bivariate reduction with 
 	# single SL + stratify
 	fit5 <- drtmle(W = W, A = A, Y = Y, 
-           family="gaussian",
+           family=gaussian(),
               stratify=FALSE,
               libraryQ="SL.glm",
               libraryg="SL.glm",
@@ -272,7 +273,7 @@ test_that("drtmle executes as expected with stratify = FALSE", {
 	# univariate reduction with 
 	# single SL + stratify
 	fit6 <- drtmle(W = W, A = A, Y = Y, 
-           family="gaussian",
+           family=gaussian(),
               stratify=FALSE,
               libraryQ="SL.glm",
               libraryg="SL.glm",

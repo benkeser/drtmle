@@ -20,8 +20,8 @@ drtmle(Y, A, W, a0 = unique(A), family = stats::binomial(),
 
 \item{a0}{A vector of treatment levels at which to compute the adjusted mean outcome.}
 
-\item{family}{A \code{character} equal to either \code{"binomial"} or \code{"gaussian"}, to be passed
-to the \code{SuperLearner} or \code{glm} function.}
+\item{family}{A \code{family} object equal to either \code{binomial()} or \code{gaussian()}, 
+to be passed to the \code{SuperLearner} or \code{glm} function.}
 
 \item{stratify}{A \code{boolean} indicating whether to estimate the outcome regression separately
 for observations with \code{A} equal to 0/1 (if \code{TRUE}) or to pool across \code{A} (if \code{FALSE}).}

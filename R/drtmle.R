@@ -6,8 +6,8 @@
 #' @param A A vector of binary treatment assignment (assumed to be equal to 0 or 1)
 #' @param Y A numeric of continuous or binary outcomes. 
 #' @param a0 A vector of treatment levels at which to compute the adjusted mean outcome. 
-#' @param family A \code{character} equal to either \code{"binomial"} or \code{"gaussian"}, to be passed
-#' to the \code{SuperLearner} or \code{glm} function.
+#' @param family A \code{family} object equal to either \code{binomial()} or \code{gaussian()}, 
+#' to be passed to the \code{SuperLearner} or \code{glm} function.
 #' @param stratify A \code{boolean} indicating whether to estimate the outcome regression separately
 #' for observations with \code{A} equal to 0/1 (if \code{TRUE}) or to pool across \code{A} (if \code{FALSE}).
 #' @param libraryQ A vector of characters or a list describing the Super Learner library to be used 
