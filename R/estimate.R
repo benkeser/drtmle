@@ -30,7 +30,9 @@ estimateG <- function(A, W,libraryg,glmg,a0,tolg,verbose=FALSE, returnModels=FAL
     if(length(libraryg)>1 | is.list(libraryg)){
       if(length(a0)==length(unique(A)) & length(unique(A))==2){
         fm <- SuperLearner::SuperLearner(Y=as.numeric(A==a0[1]), X=W, 
-                                         family=stats::binomial(),SL.library=libraryg,verbose=verbose)
+                                         family=stats::binomial(),
+                                         SL.library=libraryg,verbose=verbose,
+                                         method = "method.CC_nloglik")
         pred <- stats::predict(fm, onlySL=TRUE)[[1]]
         pred[pred < tolg] <- tolg
         gn <- vector(mode="list",length=2)
@@ -113,7 +115,12 @@ estimateQ <- function(Y,A,W,libraryQ,glmQ,a0,stratify,family,verbose=FALSE,retur
   if(!is.null(libraryQ)){
     if(!stratify){
       if(length(libraryQ)>1 | is.list(libraryQ)){
-        fm <- SuperLearner::SuperLearner(Y=Y, X=data.frame(A,W), verbose=verbose,family=family,SL.library=libraryQ,...)
+        fm <- SuperLearner::SuperLearner(Y=Y, X=data.frame(A,W), 
+                                         verbose=verbose,family=family,
+                                         SL.library=libraryQ,
+                                         method =ifelse(family$family=="binomial",
+                                                           "method.CC_LS","method.CC_LS"),
+                                         ...)
       
         Qn <- alply(a0,1,function(x){
           stats::predict(fm, newdata=data.frame(A=x,W), onlySL=TRUE)[[1]]
@@ -129,7 +136,10 @@ estimateQ <- function(Y,A,W,libraryQ,glmQ,a0,stratify,family,verbose=FALSE,retur
    }else{
      if(length(libraryQ)>1 | is.list(libraryQ)){
       tmp <- plyr::alply(a0,1,function(x){
-        fm <- SuperLearner::SuperLearner(Y=Y[A==x], X=W[A==x,], verbose=verbose,family=family,SL.library=libraryQ)
+        fm <- SuperLearner::SuperLearner(Y=Y[A==x], X=W[A==x,], 
+                                         verbose=verbose,family=family,
+                                         SL.library=libraryQ,
+                                         method = "method.CC_LS")
         list(est = predict(fm, newdata=data.frame(A=x,W), onlySL=TRUE)[[1]],
              fm = fm)
       })
@@ -137,7 +147,8 @@ estimateQ <- function(Y,A,W,libraryQ,glmQ,a0,stratify,family,verbose=FALSE,retur
       fm <- lapply(tmp,"[[",2)
      }else if(length(libraryQ)==1){
        tmp <- plyr::alply(a0,1,function(x){
-         fm <- do.call(libraryQ, args=list(Y=Y[A==x], X=W[A==x,], newX=W[A==x,],verbose=verbose,obsWeights=rep(1,sum(A==x)),
+         fm <- do.call(libraryQ, args=list(Y=Y[A==x], X=W[A==x,], newX=W[A==x,],
+                                           verbose=verbose,obsWeights=rep(1,sum(A==x)),
                                            family=family))
          list(est = stats::predict(object=fm$fit, newdata=data.frame(W)),
               fm = fm)
@@ -213,7 +224,9 @@ estimateQrn  <- function(Y, A, W, Qn, gn, glmQr, libraryQr, a0, returnModels){
         if(length(libraryQr)>1){
           suppressWarnings(
           fm <- SuperLearner::SuperLearner(Y=(Y-Q)[A==a], X=data.frame(gn=g[A==a]),
-                             family=stats::gaussian(),SL.library=libraryQr, method="method.CC_LS")
+                             family=stats::gaussian(),
+                             SL.library=libraryQr, 
+                             method="method.CC_LS")
           )
           # if all weights = 0, use discrete SL
           if(!all(fm$coef==0)){
@@ -314,9 +327,11 @@ estimategrn <- function(Y, A, W, Qn, gn, librarygr, tolg, glmgr, a0, reduction,r
         if(length(librarygr)>1){
           if(reduction=="univariate"){
             fm1 <- SuperLearner::SuperLearner(Y=(as.numeric(A==a)-g)/g, X=data.frame(Qn=Q), 
-                                family=stats::gaussian(),SL.library=librarygr,  method="method.NNLS2")
+                                family=stats::gaussian(),SL.library=librarygr,  
+                                method="method.CC_LS")
             fm2 <- SuperLearner::SuperLearner(Y=as.numeric(A==a), X=data.frame(Qn=Q), 
-                                family=stats::binomial(),SL.library=librarygr)
+                                family=stats::binomial(),SL.library=librarygr,
+                                method="method.CC_nloglik")
             if(!all(fm1$coef==0)){
               grn1 <- stats::predict(fm1, newdata=data.frame(Qn=Q), onlySL=TRUE)[[1]]              
             }else{
@@ -332,7 +347,8 @@ estimategrn <- function(Y, A, W, Qn, gn, librarygr, tolg, glmgr, a0, reduction,r
             grn2[grn2 < tolg] <- tolg
           }else if(reduction=="bivariate"){
             fm2 <- SuperLearner::SuperLearner(Y=as.numeric(A==a), X=data.frame(Qn=Q, gn=g), 
-                                family=stats::binomial(),SL.library=librarygr)
+                                family=stats::binomial(),SL.library=librarygr,
+                                method = "method.CC_nloglik")
             if(!all(fm2$coef==0)){
               grn2 <- stats::predict(fm2, newdata=data.frame(Qn=Q, gn = g), onlySL=TRUE)[[1]]
             }else{
