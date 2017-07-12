@@ -30,7 +30,7 @@ estimateG <- function(A, W,libraryg,glmg,a0,tolg,verbose=FALSE, returnModels=FAL
     if(length(libraryg)>1 | is.list(libraryg)){
       if(length(a0)==length(unique(A)) & length(unique(A))==2){
         fm <- SuperLearner::SuperLearner(Y=as.numeric(A==a0[1]), X=W, 
-                                         family=binomial(),SL.library=libraryg,verbose=verbose)
+                                         family=stats::binomial(),SL.library=libraryg,verbose=verbose)
         pred <- stats::predict(fm, onlySL=TRUE)[[1]]
         pred[pred < tolg] <- tolg
         gn <- vector(mode="list",length=2)
@@ -38,7 +38,7 @@ estimateG <- function(A, W,libraryg,glmg,a0,tolg,verbose=FALSE, returnModels=FAL
       }else{
         gn <- plyr::alply(a0, 1, function(x,A,W,libraryg){
           fm <- SuperLearner::SuperLearner(Y=as.numeric(A==x), X=W, 
-                                           family=binomial(),SL.library=libraryg,verbose=verbose)
+                                           family=stats::binomial(),SL.library=libraryg,verbose=verbose)
           pred <- stats::predict(fm, onlySL=TRUE)[[1]]
           pred[pred < tolg] <- tolg
           pred
@@ -48,7 +48,7 @@ estimateG <- function(A, W,libraryg,glmg,a0,tolg,verbose=FALSE, returnModels=FAL
       gn <- plyr::alply(a0, 1, function(x){
         fm <- do.call(libraryg, args=list(Y=as.numeric(A==x), X=W, 
                                           newX=W, obsWeights=rep(1,length(A)),
-                                          family=binomial()))
+                                          family=stats::binomial()))
         pred <- stats::predict(object=fm$fit,newdata=W)
         pred[pred < tolg] <- tolg
         list(pred=pred,gnMod=fm)
@@ -213,7 +213,7 @@ estimateQrn  <- function(Y, A, W, Qn, gn, glmQr, libraryQr, a0, returnModels){
         if(length(libraryQr)>1){
           suppressWarnings(
           fm <- SuperLearner::SuperLearner(Y=(Y-Q)[A==a], X=data.frame(gn=g[A==a]),
-                             family=gaussian(),SL.library=libraryQr, method="method.CC_LS")
+                             family=stats::gaussian(),SL.library=libraryQr, method="method.CC_LS")
           )
           # if all weights = 0, use discrete SL
           if(!all(fm$coef==0)){
@@ -223,7 +223,7 @@ estimateQrn  <- function(Y, A, W, Qn, gn, glmQr, libraryQr, a0, returnModels){
           }
         }else if(length(libraryQr)==1){
           fm <- do.call(libraryQr, args=list(Y=(Y-Q)[A==a], X=data.frame(gn=g[A==a]),
-                                             family=gaussian(),
+                                             family=stats::gaussian(),
                                               newX=data.frame(gn=g[A==a]),
                                               obsWeights=rep(1, length(Y[A==a]))))
           est <- stats::predict(object=fm$fit, newdata=data.frame(gn=g))
@@ -314,9 +314,9 @@ estimategrn <- function(Y, A, W, Qn, gn, librarygr, tolg, glmgr, a0, reduction,r
         if(length(librarygr)>1){
           if(reduction=="univariate"){
             fm1 <- SuperLearner::SuperLearner(Y=(as.numeric(A==a)-g)/g, X=data.frame(Qn=Q), 
-                                family=gaussian(),SL.library=librarygr,  method="method.NNLS2")
+                                family=stats::gaussian(),SL.library=librarygr,  method="method.NNLS2")
             fm2 <- SuperLearner::SuperLearner(Y=as.numeric(A==a), X=data.frame(Qn=Q), 
-                                family=binomial(),SL.library=librarygr)
+                                family=stats::binomial(),SL.library=librarygr)
             if(!all(fm1$coef==0)){
               grn1 <- stats::predict(fm1, newdata=data.frame(Qn=Q), onlySL=TRUE)[[1]]              
             }else{
@@ -332,7 +332,7 @@ estimategrn <- function(Y, A, W, Qn, gn, librarygr, tolg, glmgr, a0, reduction,r
             grn2[grn2 < tolg] <- tolg
           }else if(reduction=="bivariate"){
             fm2 <- SuperLearner::SuperLearner(Y=as.numeric(A==a), X=data.frame(Qn=Q, gn=g), 
-                                family=binomial(),SL.library=librarygr)
+                                family=stats::binomial(),SL.library=librarygr)
             if(!all(fm2$coef==0)){
               grn2 <- stats::predict(fm2, newdata=data.frame(Qn=Q, gn = g), onlySL=TRUE)[[1]]
             }else{
@@ -346,15 +346,15 @@ estimategrn <- function(Y, A, W, Qn, gn, librarygr, tolg, glmgr, a0, reduction,r
             fm1 <- do.call(librarygr, 
                             args=list(Y=(as.numeric(A==a)-g)/g,X=data.frame(Qn=Q),
                                       obsWeights=rep(1, length(A)),
-                                      newX=data.frame(Qn=Q), family=gaussian()))
+                                      newX=data.frame(Qn=Q), family=stats::gaussian()))
             grn1 <- predict(object=fm1$fit, newdata=data.frame(Qn=Q))
             fm2 <- do.call(librarygr, args=list(Y=as.numeric(A==a), X=data.frame(Qn=Q),obsWeights=rep(1, length(A)),
-                                                 newX=data.frame(Qn=Q), family=binomial()))
+                                                 newX=data.frame(Qn=Q), family=stats::binomial()))
             grn2 <- predict(object=fm2$fit, newdata=data.frame(Qn=Q))
             grn2[grn2 < tolg] <- tolg
           }else if(reduction=="bivariate"){
             fm2 <- do.call(librarygr, args=list(Y=as.numeric(A==a),X=data.frame(Qn=Q,gn=g),obsWeights=rep(1, length(A)),
-                                                 newX=data.frame(Qn=Q, gn=g), family=binomial()))
+                                                 newX=data.frame(Qn=Q, gn=g), family=stats::binomial()))
             grn2 <- predict(object=fm2$fit, newdata=data.frame(Qn=Q,gn=g))
             grn2[grn2 < tolg] <- tolg
             fm1 <- NULL; grn1 <- NULL

@@ -54,7 +54,7 @@
 
 drtmle <- function(Y,A,W,
                       a0=unique(A),
-                      family=binomial(),
+                      family=stats::binomial(),
                       stratify=TRUE,
                       libraryQ=NULL,
                       libraryg=NULL,
@@ -285,7 +285,7 @@ drtmle <- function(Y,A,W,
   out$QnMod <- NULL
   out$gnMod <- NULL
   if(returnModels){
-    out$QnMod <- QnMod; out$gnMod <- gnMod
+    out$QnMod <- QnOut$fm; out$gnMod <- gnOut$fm
     out$QrnMod <- QnStarOut$fm
     out$grnMod <- QnStarOut$fm
   }

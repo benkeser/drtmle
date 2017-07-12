@@ -4,11 +4,12 @@
 \alias{drtmle}
 \title{drtmle}
 \usage{
-drtmle(Y, A, W, a0 = unique(A), family = binomial(), stratify = TRUE,
-  libraryQ = NULL, libraryg = NULL, libraryQr = NULL, librarygr = NULL,
-  glmQ = NULL, glmg = NULL, glmQr = NULL, glmgr = NULL, guard = c("Q",
-  "g"), reduction = "univariate", returnModels = FALSE, maxIter = 10,
-  tolIC = 1/length(Y), tolg = 1e-08, verbose = FALSE, Qsteps = 2, ...)
+drtmle(Y, A, W, a0 = unique(A), family = stats::binomial(),
+  stratify = TRUE, libraryQ = NULL, libraryg = NULL, libraryQr = NULL,
+  librarygr = NULL, glmQ = NULL, glmg = NULL, glmQr = NULL,
+  glmgr = NULL, guard = c("Q", "g"), reduction = "univariate",
+  returnModels = FALSE, maxIter = 10, tolIC = 1/length(Y), tolg = 1e-08,
+  verbose = FALSE, Qsteps = 2, ...)
 }
 \arguments{
 \item{Y}{A numeric of continuous or binary outcomes.}
