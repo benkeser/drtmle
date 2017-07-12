@@ -1,4 +1,4 @@
-install.packages("~/Dropbox/R/drtmle",repos=NULL,type="source")
+# install.packages("~/Dropbox/R/drtmle",repos=NULL,type="source")
 library(drtmle)
 
 context("Testing drtmle function")
