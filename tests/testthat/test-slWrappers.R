@@ -10,12 +10,13 @@ library(glmnet)
 library(np)
 library(randomGLM)
 library(e1071)
+library(nnet)
 
 context("Testing super learner wrappers")
 
 test_that("SL.npreg works as expected",{
 	set.seed(1234)
-	n <- 60
+	n <- 100
 	X <- data.frame(X1 = rnorm(n))
 	Y <- rnorm(n,X$X1,1)
 	fit <- SL.npreg(Y=Y,X=X,newX=X,
@@ -31,7 +32,7 @@ test_that("SL.npreg works as expected",{
 })
 test_that("SL.svmLinear.caretMod works as expected",{
 	set.seed(1234)
-	n <- 60
+	n <- 100
 	X <- data.frame(X1 = rnorm(n))
 	Y <- rnorm(n,X$X1,1)
 	fit <- SL.svmLinear.caretMod(
@@ -50,7 +51,7 @@ test_that("SL.svmLinear.caretMod works as expected",{
 })
 test_that("SL.rpart.caretMod works as expected",{
 	set.seed(1234)
-	n <- 60
+	n <- 100
 	X <- data.frame(X1 = rnorm(n))
 	Y <- rnorm(n,X$X1,1)
 	fit <- SL.rpart.caretMod(
@@ -69,7 +70,7 @@ test_that("SL.rpart.caretMod works as expected",{
 })
 test_that("SL.rpart.caretMod works as expected with binary outcome",{
 	set.seed(1234)
-	n <- 60
+	n <- 100
 	X <- data.frame(X1 = rnorm(n))
 	Y <- rbinom(n,1,plogis(X$X1))
 	fit <- SL.rpart.caretMod(
@@ -88,7 +89,7 @@ test_that("SL.rpart.caretMod works as expected with binary outcome",{
 })
 test_that("SL.rf.caretMod works as expected",{
 	set.seed(1234)
-	n <- 60
+	n <- 100
 	X <- data.frame(X1 = rnorm(n))
 	Y <- rnorm(n,X$X1,1)
 	fit <- SL.rf.caretMod(
@@ -107,7 +108,7 @@ test_that("SL.rf.caretMod works as expected",{
 })
 test_that("SL.randomGLM.caretMod works as expected",{
 	set.seed(1234)
-	n <- 60
+	n <- 100
 	X <- data.frame(X1 = rnorm(n))
 	Y <- rnorm(n,X$X1,1)
 	fit <- SL.randomGLM.caretMod(
@@ -126,7 +127,7 @@ test_that("SL.randomGLM.caretMod works as expected",{
 })
 test_that("SL.nnet.caretMod works as expected",{
 	set.seed(1234)
-	n <- 60
+	n <- 100
 	X <- data.frame(X1 = rnorm(n))
 	Y <- rnorm(n,X$X1,1)
 	fit <- SL.nnet.caretMod(
@@ -145,7 +146,7 @@ test_that("SL.nnet.caretMod works as expected",{
 })
 test_that("SL.nnet.caretMod works as expected (with binary outcome)",{
 	set.seed(1234)
-	n <- 60
+	n <- 100
 	X <- data.frame(X1 = rnorm(n))
 	Y <- rbinom(n,1,plogis(X$X1))
 	fit <- SL.nnet.caretMod(
@@ -164,7 +165,7 @@ test_that("SL.nnet.caretMod works as expected (with binary outcome)",{
 })
 test_that("SL.glmnet.caretMod works as expected",{
 	set.seed(1234)
-	n <- 60
+	n <- 100
 	X <- data.frame(X1 = rnorm(n), X2 = rnorm(n))
 	Y <- rnorm(n,X$X1,1)
 	fit <- SL.glmnet.caretMod(
@@ -183,7 +184,7 @@ test_that("SL.glmnet.caretMod works as expected",{
 })
 test_that("SL.gbm.caretMod works as expected",{
 	set.seed(1234)
-	n <- 60
+	n <- 100
 	X <- data.frame(X1 = rnorm(n))
 	Y <- rnorm(n,X$X1,1)
 	fit <- SL.gbm.caretMod(
@@ -202,7 +203,7 @@ test_that("SL.gbm.caretMod works as expected",{
 })
 test_that("SL.gbm.caretMod works as expected with binary outcome",{
 	set.seed(1234)
-	n <- 60
+	n <- 100
 	X <- data.frame(X1 = rnorm(n))
 	Y <- rbinom(n,1,plogis(X$X1))
 	fit <- SL.gbm.caretMod(
@@ -221,7 +222,7 @@ test_that("SL.gbm.caretMod works as expected with binary outcome",{
 })
 test_that("SL.gamSpline.caretMod works as expected",{
 	set.seed(1234)
-	n <- 60
+	n <- 100
 	X <- data.frame(X1 = rnorm(n))
 	Y <- rnorm(n,X$X1,1)
 	fit <- SL.gamSpline.caretMod(
