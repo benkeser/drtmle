@@ -189,11 +189,17 @@ fluctuateQ <- function(Y,A,W,Qn,gn,grn,a0,reduction,coefTol=1e5){
     }
     
     if(reduction=="univariate"){
-      Qnstar <- stats::predict(fm,type="response",newdata=data.frame(off=off, H1=1/g, H2=1/gr[[2]] * gr[[1]]))*(u-l) +l 
+      Qnstar <- stats::predict(fm,type="response",
+                               newdata=data.frame(off=off, 
+                                                  H1=1/g, 
+                                                  H2=1/gr$grn2 * gr$grn1))*(u-l) +l 
         list(est=Qnstar,
              eps=fm$coef)
       }else if(reduction=="bivariate"){
-        Qnstar <- stats::predict(fm,type="response",newdata=data.frame(off=off, H1=1/g, H2=1/gr[[1]] * (gr[[1]]-g)/g))*(u-l) + l
+        Qnstar <- stats::predict(fm,type="response",
+                                 newdata=data.frame(off=off, 
+                                                    H1=1/g, 
+                                                    H2=1/gr$grn2 * (gr$grn2-g)/g))*(u-l) + l
         list(est=Qnstar,
              eps=fm$coef)
       }

@@ -315,4 +315,27 @@ test_that("drtmle executes as expected with stratify = FALSE", {
 	expect_true(is.numeric(fit7$os.dral$est))
 	expect_true(is.numeric(fit7$os.dral$cov))
 
+	# bivariate reduction with 
+	# single SL + stratify + Qsteps = 1
+	fit8 <- drtmle(W = W, A = A, Y = Y, 
+           family=gaussian(),
+              stratify=FALSE,
+              libraryQ="SL.glm",
+              libraryg="SL.glm",
+              libraryQr="SL.glm",
+              librarygr="SL.glm",
+              guard=c("Q","g"),
+              reduction="bivariate",
+              Qsteps = 1)
+	expect_true(is.numeric(fit8$naive$est))
+	expect_true(is.numeric(fit8$tmle$est))
+	expect_true(is.numeric(fit8$tmle$est))
+	expect_true(is.numeric(fit8$tmle$cov))
+	expect_true(is.numeric(fit8$tmle.dral$est))
+	expect_true(is.numeric(fit8$tmle.dral$cov))
+	expect_true(is.numeric(fit8$os$est))
+	expect_true(is.numeric(fit8$os$cov))
+	expect_true(is.numeric(fit8$os.dral$est))
+	expect_true(is.numeric(fit8$os.dral$cov))
+
 })
