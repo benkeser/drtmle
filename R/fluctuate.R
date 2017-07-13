@@ -166,8 +166,8 @@ fluctuateQ <- function(Y,A,W,Qn,gn,grn,a0,reduction,coefTol=1e5){
     Yscale <- (Y-l)/(u-l)
     off <- SuperLearner::trimLogit((Q-l)/(u-l))
     H1 <- as.numeric(A==a)/g
-    if(reduction=="univariate") H2 <- as.numeric(A==a)/gr[[2]] * gr[[1]]
-    if(reduction=="bivariate") H2 <- as.numeric(A==a)/gr[[1]] * (gr[[1]]-g)/g
+    if(reduction=="univariate") H2 <- as.numeric(A==a)/gr$grn2 * gr$grn1
+    if(reduction=="bivariate") H2 <- as.numeric(A==a)/gr$grn2 * (gr$grn2-g)/g
     suppressWarnings(
     fm <- stats::glm(Yscale ~ -1 + offset(off) + H1 + H2, start=c(0,0),
                data=data.frame(Y=Y, off=off, H1=H1, H2=H2), family="binomial")
