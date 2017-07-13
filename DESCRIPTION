@@ -11,8 +11,7 @@ Depends:
     SuperLearner,
     plyr,
     caret,
-    np,
-    quadprog
+    np
 Suggests:
     testthat,
     knitr,
@@ -24,7 +23,9 @@ Suggests:
     randomGLM,
     gam,
     glmnet,
-    kernlab
+    kernlab,
+    e1071,
+    quadprog
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

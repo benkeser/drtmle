@@ -135,7 +135,7 @@ test_that("SL.nnet.caretMod works as expected",{
 	expect_true(is.numeric(pred))
 	expect_true(all(!is.na(pred)))
 })
-test_that("SL.nnet.caretMod works as expected",{
+test_that("SL.nnet.caretMod works as expected (with binary outcome)",{
 	n <- 100
 	X <- data.frame(X1 = rnorm(n))
 	Y <- rbinom(n,1,plogis(X$X1))
