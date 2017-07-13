@@ -161,7 +161,7 @@ SL.glmnet.caretMod <- function(...,method="glmnet", tuneLength=10, trControl = c
 #' 
 #' @export
 
-SL.gbm.caret2 <- function (..., method = "gbm", tuneLength = 20, 
+SL.gbm.caretMod <- function (..., method = "gbm", tuneLength = 20, 
                            trControl = caret::trainControl(method = "cv", number = 5)) 
 {
     SL.caretMod(..., method = method, tuneLength = tuneLength, trControl = trControl)

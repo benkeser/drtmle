@@ -16,7 +16,15 @@ Depends:
 Suggests:
     testthat,
     knitr,
-    rmarkdown
+    rmarkdown,
+    rpart,
+    randomForest,
+    gbm,
+    nnet,
+    randomGLM,
+    gam,
+    glmnet,
+    kernlab
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
