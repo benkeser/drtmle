@@ -135,6 +135,24 @@ test_that("SL.nnet.caretMod works as expected",{
 	expect_true(is.numeric(pred))
 	expect_true(all(!is.na(pred)))
 })
+test_that("SL.nnet.caretMod works as expected",{
+	n <- 100
+	X <- data.frame(X1 = rnorm(n))
+	Y <- rbinom(n,1,plogis(X$X1))
+	fit <- SL.nnet.caretMod(
+     Y=Y,X=X,newX=X,tuneLength = 2, 
+     trControl = caret::trainControl(method = "cv", number = 2),
+     obsWeights = rep(1,n)
+    )
+	expect_true(is.numeric(fit$pred))
+	expect_true(all(!is.na(fit$pred)))
+	expect_true(class(fit$fit)=="SL.caret")
+	# test predict function
+	newX <- data.frame(X1=seq(-1,1,length=10))
+	pred <- predict(fit$fit, newdata=newX)
+	expect_true(is.numeric(pred))
+	expect_true(all(!is.na(pred)))
+})
 test_that("SL.glmnet.caretMod works as expected",{
 	n <- 100
 	X <- data.frame(X1 = rnorm(n), X2 = rnorm(n))
@@ -157,6 +175,24 @@ test_that("SL.gbm.caretMod works as expected",{
 	n <- 100
 	X <- data.frame(X1 = rnorm(n))
 	Y <- rnorm(n,X$X1,1)
+	fit <- SL.gbm.caretMod(
+     Y=Y,X=X,newX=X,tuneLength = 2, 
+     trControl = caret::trainControl(method = "cv", number = 2),
+     obsWeights = rep(1,n)
+    )
+	expect_true(is.numeric(fit$pred))
+	expect_true(all(!is.na(fit$pred)))
+	expect_true(class(fit$fit)=="SL.caret")
+	# test predict function
+	newX <- data.frame(X1=seq(-1,1,length=10))
+	pred <- predict(fit$fit, newdata=newX)
+	expect_true(is.numeric(pred))
+	expect_true(all(!is.na(pred)))
+})
+test_that("SL.gbm.caretMod works as expected with binary outcome",{
+	n <- 100
+	X <- data.frame(X1 = rnorm(n))
+	Y <- rbinom(n,1,plogis(X$X1))
 	fit <- SL.gbm.caretMod(
      Y=Y,X=X,newX=X,tuneLength = 2, 
      trControl = caret::trainControl(method = "cv", number = 2),
