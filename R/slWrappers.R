@@ -10,7 +10,7 @@
 #' @export
 
 SL.svmLinear.caretMod <- function(...,method="svmLinear",tuneLength = 15, 
-                                  trControl = caret::trainControl(method = "cv", number = 5)){
+                                  trControl = caret::trainControl(method = "cv", number = 2)){
   SL.caretMod(...,method=method,tuneLength=tuneLength)
 }
 
@@ -26,7 +26,7 @@ SL.svmLinear.caretMod <- function(...,method="svmLinear",tuneLength = 15,
 #' 
 #' @export
 
-SL.rpart.caretMod <- function(...,method="rpart",tuneLength = 10, trControl = caret::trainControl(method = "cv", number = 5)){
+SL.rpart.caretMod <- function(...,method="rpart",tuneLength = 10, trControl = caret::trainControl(method = "cv", number = 2)){
   SL.caretMod(...,method=method,tuneLength=tuneLength, trControl = trControl)
 }
 
@@ -42,7 +42,7 @@ SL.rpart.caretMod <- function(...,method="rpart",tuneLength = 10, trControl = ca
 #' @export
 
 SL.rf.caretMod <- function (..., method = "rf", tuneLength = 10, 
-                            trControl = caret::trainControl(method = "cv", number = 5)) 
+                            trControl = caret::trainControl(method = "cv", number = 2)) 
 {
     SL.caretMod(..., method = method, tuneLength = tuneLength, trControl = trControl)
 }
@@ -58,7 +58,7 @@ SL.rf.caretMod <- function (..., method = "rf", tuneLength = 10,
 #' 
 #' @export 
 SL.randomGLM.caretMod <- function(...,method="randomGLM",tuneLength=10, 
-                                  trControl = caret::trainControl(method = "cv", number = 5)){
+                                  trControl = caret::trainControl(method = "cv", number = 2)){
   SL.caretMod(...,method=method,tuneLength=tuneLength)
 }
 
@@ -130,7 +130,7 @@ predict.SL.npreg <- function(object, newdata, ...){
 #' @param ... Other arguments passed to \code{SL.caretMod}
 #' 
 #' @export 
-SL.nnet.caretMod <- function(...,method="nnet", tuneLength=20, trControl = caret::trainControl(method = "cv", number = 5)){
+SL.nnet.caretMod <- function(...,method="nnet", tuneLength=20, trControl = caret::trainControl(method = "cv", number = 2)){
   SL.caretMod(...,method=method,tuneLength=tuneLength)
 }
 
@@ -145,7 +145,7 @@ SL.nnet.caretMod <- function(...,method="nnet", tuneLength=20, trControl = caret
 #' @param ... Other arguments passed to \code{SL.caretMod}
 #' 
 #' @export 
-SL.glmnet.caretMod <- function(...,method="glmnet", tuneLength=10, trControl = caret::trainControl(method = "cv", number = 5)){
+SL.glmnet.caretMod <- function(...,method="glmnet", tuneLength=10, trControl = caret::trainControl(method = "cv", number = 2)){
   SL.caretMod(...,method=method,tuneLength=tuneLength)
 }
 
@@ -162,7 +162,7 @@ SL.glmnet.caretMod <- function(...,method="glmnet", tuneLength=10, trControl = c
 #' @export
 
 SL.gbm.caretMod <- function (..., method = "gbm", tuneLength = 20, 
-                           trControl = caret::trainControl(method = "cv", number = 5)) 
+                           trControl = caret::trainControl(method = "cv", number = 2)) 
 {
     SL.caretMod(..., method = method, tuneLength = tuneLength, trControl = trControl)
 }
@@ -180,7 +180,7 @@ SL.gbm.caretMod <- function (..., method = "gbm", tuneLength = 20,
 #'  
 #' @export 
 SL.gamSpline.caretMod <- function(...,method="gamSpline",tuneLength=10, 
-                                  trControl = caret::trainControl(method = "cv", number = 5)){
+                                  trControl = caret::trainControl(method = "cv", number = 2)){
   SL.caretMod(...,method=method,tuneLength=tuneLength)
 }
 
@@ -206,7 +206,7 @@ SL.gamSpline.caretMod <- function(...,method="gamSpline",tuneLength=10,
 #' @export
 
 SL.caretMod <- function (Y, X, newX, family, obsWeights, method, tuneLength = 10, 
-                       trControl = caret::trainControl(method = "cv", number = 5, verboseIter = FALSE), 
+                       trControl = caret::trainControl(method = "cv", number = 2, verboseIter = FALSE), 
                        ...) 
 {
   if (length(unique(Y))>2){
