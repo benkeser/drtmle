@@ -4,7 +4,7 @@
 \alias{fluctuateG}
 \title{fluctuateG}
 \usage{
-fluctuateG(Y, A, W, a0, Qn, gn, Qrn, tolg, coefTol = 1e+05)
+fluctuateG(Y, A, W, a_0, gn, Qrn, tolg, coefTol = 1e+05)
 }
 \arguments{
 \item{Y}{The outcome}
@@ -13,9 +13,7 @@ fluctuateG(Y, A, W, a0, Qn, gn, Qrn, tolg, coefTol = 1e+05)
 
 \item{W}{The covariates}
 
-\item{a0}{A list of fixed treatment values}
-
-\item{Qn}{A list of outcome regression estimates evaluated on observed data}
+\item{a_0}{A list of fixed treatment values}
 
 \item{gn}{A list of propensity regression estimates evaluated on observed data}
 

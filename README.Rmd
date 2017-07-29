@@ -1,3 +1,17 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "README-"
+)
+```
+
 # R/`drtmle`
 
 [![Travis-CI Build Status](https://travis-ci.org/benkeser/drtmle.svg?branch=master)](https://travis-ci.org/benkeser/drtmle)
@@ -8,6 +22,8 @@
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 
 > Doubly Robust, Asymptotically Linear Targeted Minimum Loss-Based Estimation 
+
+__Author:__ [David Benkeser](https://www.benkeserstatistics.com/)
 
 ---
 
@@ -35,9 +51,56 @@ normality, as discussed in Benkeser, Carone, van der Laan \& Gilbert, 2017,(_acc
 This package can be used to estimate covariate-adjusted marginal means under multiple discrete levels of a treatment. It may be used in situations where data consist of a vector of baseline covariates (`W`), a multi-level treatment assignment (`A`), and a continuous or binary-valued outcome (`Y`). The function `drtmle` may be used to estimate $E[E(Y | A=a_0, W)]$ for user-selected values of $a_0$ (via option `a_0`). The resulting targeted minimum loss-based estimates are doubly robust with respect to both consistency and asymptotic normality. The function computes doubly robust variance estimators that can be used to construct doubly robust confidence intervals for covariate-adjusted marginal means and contrasts between these means (via the `drconfint` function) for different levels of $a_0$. Doubly robust hypothesis tests are also available (via `drtest` function). A simple example on simulated data is shown below. 
 
 ```{r}
+# simulate simple data structure
+set.seed(1234)
+n <- 500
+W <- data.frame(W1 = runif(n,-2,2), W2 = rbinom(n,1,0.5))
+A <- rbinom(n, 1, plogis(-2 + W$W1 - 2*W$W2))
+Y <- rbinom(n, 1, plogis(-2 + W$W1 - 2*W$W2 + A))
 
+# estimate the covariate-adjusted marginal mean for A = 1 and A = 0
+# here, we do not properly estimate the propensity score
+fit <- drtmle(W = W, A = A, Y = Y, # input data
+              a_0 = c(0,1), # return estimates for A = 0 and A = 1
+              SL_Q = "SL.npreg", # use kernel regression for E(Y | A=a, W)
+              glm_g = "W1 + W2", # use misspecified main terms glm for E(A | W)
+              SL_Qr = "SL.npreg", # use kernel regression to guard against
+              					  # misspecification of outcome regression
+              SL_gr = "SL.npreg" # use kernel regression to guard against 
+              					 # misspecification of propensity score
+              )
+# print the output
+fit
+
+# get confidence intervals for means
+ci_fit <- drconfint(fit)
+# print the output
+ci_fit
+
+# get hypothesis test for means 
+test_fit <- drtest(fit)
+# print the output
+test_fit
 ```
+---
 
+## Issues
+
+If you encounter any bugs or have any specific feature requests, please [file an
+issue](https://github.com/benkeser/survtmle/issues).
+
+---
+
+## Citation
+
+After using the `drtmle` R package, please cite the following:
+
+        @article{benkeser2017improved,
+          year  = {2017},
+          author = {Benkeser, David C and Carone, Marco and van der Laan, Mark J and Gilbert, Peter B},
+          title = {Doubly-robust nonparametric inference on the average treatment effect},
+          journal = {Biometrika}
+        }
 
 ---
 

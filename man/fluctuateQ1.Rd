@@ -4,7 +4,7 @@
 \alias{fluctuateQ1}
 \title{fluctuateQ1}
 \usage{
-fluctuateQ1(Y, A, W, Qn, gn, a0)
+fluctuateQ1(Y, A, W, Qn, gn, a_0)
 }
 \arguments{
 \item{Y}{The outcome}
@@ -17,7 +17,7 @@ fluctuateQ1(Y, A, W, Qn, gn, a0)
 
 \item{gn}{A list of propensity regression estimates evaluated on observed data}
 
-\item{a0}{A list of fixed treatment values}
+\item{a_0}{A list of fixed treatment values}
 }
 \description{
 Function called internally by drtmle to perform the first fluctuation 

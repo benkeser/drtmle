@@ -4,8 +4,7 @@
 \alias{estimategrn}
 \title{estimategrn}
 \usage{
-estimategrn(Y, A, W, Qn, gn, librarygr, tolg, glmgr, a0, reduction,
-  returnModels)
+estimategrn(Y, A, W, Qn, gn, SL_gr, tolg, glm_gr, a_0, reduction, returnModels)
 }
 \arguments{
 \item{Y}{A vector of continuous or binary outcomes.}
@@ -18,15 +17,15 @@ estimategrn(Y, A, W, Qn, gn, librarygr, tolg, glmgr, a0, reduction,
 
 \item{gn}{A list of propensity regression estimates evaluated on observed data}
 
-\item{librarygr}{A vector of characters or a list describing the Super Learner library to be used 
+\item{SL_gr}{A vector of characters or a list describing the Super Learner library to be used 
 for the second reduced-dimension regression.}
 
 \item{tolg}{A numeric indicating the minimum value for estimates of the propensity score.}
 
-\item{glmgr}{A character describing a formula to be used in the call to \code{glm} for the second reduced-dimension regression. Ignored
-if \code{librarygr!=NULL}.}
+\item{glm_gr}{A character describing a formula to be used in the call to \code{glm} for the second reduced-dimension regression. Ignored
+if \code{SL_gr!=NULL}.}
 
-\item{a0}{A list of fixed treatment values}
+\item{a_0}{A list of fixed treatment values}
 
 \item{reduction}{A character equal to \code{"univariate"} for a univariate misspecification correction or \code{"bivariate"}
 for the bivariate version.}

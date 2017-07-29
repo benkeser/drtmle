@@ -4,7 +4,7 @@
 \alias{fluctuateQ}
 \title{fluctuateQ}
 \usage{
-fluctuateQ(Y, A, W, Qn, gn, grn, a0, reduction, coefTol = 1e+05)
+fluctuateQ(Y, A, W, Qn, gn, grn, a_0, reduction, coefTol = 1e+05)
 }
 \arguments{
 \item{Y}{The outcome}
@@ -19,7 +19,7 @@ fluctuateQ(Y, A, W, Qn, gn, grn, a0, reduction, coefTol = 1e+05)
 
 \item{grn}{A list of reduced-dimension regression estimates evaluated on observed data}
 
-\item{a0}{A list of fixed treatment values}
+\item{a_0}{A list of fixed treatment values}
 
 \item{reduction}{A character indicating what reduced dimension regression was used.}
 

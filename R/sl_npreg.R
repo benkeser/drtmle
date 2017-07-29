@@ -1,4 +1,3 @@
-
 #' Super learner wrapper for kernel regression
 #' 
 #' Kernel regression based on the \href{https://cran.r-project.org/web/packages/np/}{np}
@@ -22,11 +21,16 @@
 SL.npreg <- function (Y, X, newX, family, obsWeights, 
                       rangeThresh=1e-7, ...) 
 {
+  # turn off annoying messages
+  options(np.messages=FALSE)
+  # check range threshold
   if(abs(diff(range(Y))) <= rangeThresh){
     thisMod <- glm(Y ~ 1, data=X)
   }else{
-  bw <- np::npregbw(stats::as.formula(paste("Y ~", paste(names(X),collapse="+"))), data=X,
-                ftol=0.01, tol=0.01, remin=FALSE)
+    # bandwidth selection
+    bw <- np::npregbw(stats::as.formula(
+            paste("Y ~", paste(names(X),collapse="+"))), data=X,
+          ftol=0.01, tol=0.01, remin=FALSE)
   
   # fit the kernel regression
   thisMod <- np::npreg(bw)

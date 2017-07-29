@@ -2,13 +2,13 @@
 % Please edit documentation in R/drtmle.R
 \name{drtmle}
 \alias{drtmle}
-\title{drtmle}
+\title{TMLE estimate of the average treatment effect with doubly-robust inference}
 \usage{
-drtmle(Y, A, W, a0 = unique(A), family = stats::binomial(),
-  stratify = TRUE, libraryQ = NULL, libraryg = NULL, libraryQr = NULL,
-  librarygr = NULL, glmQ = NULL, glmg = NULL, glmQr = NULL,
-  glmgr = NULL, guard = c("Q", "g"), reduction = "univariate",
-  returnModels = FALSE, maxIter = 10, tolIC = 1/length(Y), tolg = 1e-08,
+drtmle(Y, A, W, a_0 = unique(A), family = stats::binomial(),
+  stratify = TRUE, SL_Q = NULL, SL_g = NULL, SL_Qr = NULL,
+  SL_gr = NULL, glm_Q = NULL, glm_g = NULL, glm_Qr = NULL,
+  glm_gr = NULL, guard = c("Q", "g"), reduction = "univariate",
+  returnModels = FALSE, maxIter = 3, tolIC = 1/length(Y), tolg = 0.01,
   verbose = FALSE, Qsteps = 2, ...)
 }
 \arguments{
@@ -18,7 +18,7 @@ drtmle(Y, A, W, a0 = unique(A), family = stats::binomial(),
 
 \item{W}{A \code{data.frame} of named covariates}
 
-\item{a0}{A vector of treatment levels at which to compute the adjusted mean outcome.}
+\item{a_0}{A vector of treatment levels at which to compute the adjusted mean outcome.}
 
 \item{family}{A \code{family} object equal to either \code{binomial()} or \code{gaussian()}, 
 to be passed to the \code{SuperLearner} or \code{glm} function.}
@@ -26,36 +26,36 @@ to be passed to the \code{SuperLearner} or \code{glm} function.}
 \item{stratify}{A \code{boolean} indicating whether to estimate the outcome regression separately
 for observations with \code{A} equal to 0/1 (if \code{TRUE}) or to pool across \code{A} (if \code{FALSE}).}
 
-\item{libraryQ}{A vector of characters or a list describing the Super Learner library to be used 
+\item{SL_Q}{A vector of characters or a list describing the Super Learner library to be used 
 for the outcome regression. See \code{link{SuperLearner::SuperLearner}} for details.}
 
-\item{libraryg}{A vector of characters or a list describing the Super Learner library to be used 
+\item{SL_g}{A vector of characters or a list describing the Super Learner library to be used 
 for the propensity score. See \code{link{SuperLearner::SuperLearner}} for details.}
 
-\item{libraryQr}{A vector of characters or a list describing the Super Learner library to be used 
+\item{SL_Qr}{A vector of characters or a list describing the Super Learner library to be used 
 for the first reduced-dimension regression.}
 
-\item{librarygr}{A vector of characters or a list describing the Super Learner library to be used 
+\item{SL_gr}{A vector of characters or a list describing the Super Learner library to be used 
 for the second reduced-dimension regression.}
 
-\item{glmQ}{A character describing a formula to be used in the call to \code{glm} for the outcome regression. Ignored
-if \code{libraryQ!=NULL}.}
+\item{glm_Q}{A character describing a formula to be used in the call to \code{glm} for the outcome regression. Ignored
+if \code{SL_Q!=NULL}.}
 
-\item{glmg}{A character describing a formula to be used in the call to \code{glm} for the propensity score. Ignored
-if \code{libraryg!=NULL}.}
+\item{glm_g}{A character describing a formula to be used in the call to \code{glm} for the propensity score. Ignored
+if \code{SL_g!=NULL}.}
 
-\item{glmQr}{A character describing a formula to be used in the call to \code{glm} for the first reduced-dimension regression. Ignored
-if \code{libraryQr!=NULL}. The formula should use the variable name \code{'gn'}.}
+\item{glm_Qr}{A character describing a formula to be used in the call to \code{glm} for the first reduced-dimension regression. Ignored
+if \code{SL_Qr!=NULL}. The formula should use the variable name \code{'gn'}.}
 
-\item{glmgr}{A character describing a formula to be used in the call to \code{glm} for the second reduced-dimension regression. Ignored
-if \code{librarygr!=NULL}. The formula should use the variable name \code{'Qn'} and \code{'gn'} if 
+\item{glm_gr}{A character describing a formula to be used in the call to \code{glm} for the second reduced-dimension regression. Ignored
+if \code{SL_gr!=NULL}. The formula should use the variable name \code{'Qn'} and \code{'gn'} if 
 \code{reduction='bivariate'} and \code{'Qn'} otherwise.}
 
 \item{guard}{A character vector indicating what pattern of misspecifications to guard against. If \code{guard} contains \code{"Q"}, 
 then the TMLE guards against misspecification of the outcome regression by estimating the reduced dimension regression
-specified by \code{glmQr} or \code{libraryQr}. If \code{guard} contains \code{"g"} then the TMLE 
+specified by \code{glm_Qr} or \code{SL_Qr}. If \code{guard} contains \code{"g"} then the TMLE 
 (additionally) guards against misspecification of the propensity score by estimating the reduced dimension regression
-specified by \code{glmgr} or \code{librarygr}. If \code{NULL}, the usual TMLE is computed.}
+specified by \code{glm_gr} or \code{SL_gr}. If \code{NULL}, the usual TMLE is computed.}
 
 \item{reduction}{A character equal to \code{"univariate"} for a univariate misspecification correction or \code{"bivariate"}
 for the bivariate version.}
@@ -78,6 +78,65 @@ The latter was found to be more stable in simulations.}
 
 \item{...}{Other options (not currently used)}
 }
+\value{
+An object of class \code{"drtmle"}.
+\describe{
+ \item{\code{drtmle}}{A \code{list} of doubly-robust point estimates and 
+       a doubly-robust covariance matrix}
+ \item{\code{nuisance_drtmle}}{A \code{list} of the final TMLE estimates of the
+       outcome regression (\code{$QnStar}), propensity score (\code{$gnStar}), 
+       and reduced-dimension regressions (\code{$QrnStar}, \code{$grnStar}) evaluated
+       at the observed data values.}
+ \item{\code{ic_drtmle}}{A \code{list} of the empirical mean of the efficient 
+       influence function (\code{$eif}) and the extra pieces of the influence
+       function resulting from misspecification. All should be smaller than 
+       \code{tolIC} (unless \code{maxIter} was reached first).}
+ \item{\code{aiptw_c}}{A \code{list} of doubly-robust point estimates and 
+       a non-doubly-robust covariance matrix. Theory does not guarantee performance of 
+       inference for these estimators, but simulation studies showed they often
+       perform adequately.}
+ \item{\code{nuisance_aiptw}}{A \code{list} of the initial estimates of the
+       outcome regression, propensity score, and reduced-dimension regressions 
+       evaluated at the observed data values.}
+ \item{\code{tmle}}{A \code{list} of doubly-robust point estimates and non-doubly-robust
+       covariance for the standard TMLE estimator.}
+ \item{\code{aiptw}}{A \code{list} of doubly-robust point estimates and non-doubly-robust
+       covariance matrix for the standard AIPTW estimator.}
+ \item{\code{gcomp}}{A \code{list} of non-doubly-robust point estimates and non-doubly-robust
+       covariance matrix for the standard G-computation estimator. If super learner is used
+       there is no guarantee of correct inference for this estimator.}
+ \item{\code{QnMod}}{The fitted object for the outcome regression. Returns \code{NULL}
+       if \code{returnModels = FALSE}.}
+ \item{\code{gnMod}}{The fitted object for the propensity score. Returns \code{NULL} if
+       \code{returnModels = FALSE}.}
+ \item{\code{QrnMod}}{The fitted object for the reduced-dimension regression that guards 
+       against misspecification of the outcome regression. Returns \code{NULL} if 
+       \code{returnModels = FALSE}.}
+ \item{\code{grnMod}}{The fitted object for the reduced-dimension regression that guards
+       against misspecification of the propensity score. Returns \code{NULL} if 
+       \code{returnModels = FALSE}.}
+ \item{\code{a_0}}{The treatment levels that were requested for computation of 
+       covariate-adjusted means.}
+}
+}
 \description{
-Main function to estimate TMLE with doubly-robust inference
+TMLE estimate of the average treatment effect with doubly-robust inference
+}
+\examples{
+# load super learner
+library(SuperLearner)
+# simulate data
+set.seed(123456)
+n <- 200
+W <- data.frame(W1 = runif(n), W2 = rnorm(n))
+A <- rbinom(n,1,plogis(W$W1 - W$W2))
+Y <- rbinom(n, 1, plogis(W$W1*W$W2*A))
+# fit drtmle
+fit1 <- drtmle(W = W, A = A, Y = Y, a_0 = c(1,0),
+               family=binomial(),
+               stratify=FALSE,
+               SL_Q=c("SL.glm","SL.mean","SL.step"),
+               SL_g=c("SL.glm","SL.mean","SL.step"),
+               SL_Qr="SL.npreg",
+               SL_gr="SL.npreg")
 }

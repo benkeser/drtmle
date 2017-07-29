@@ -4,7 +4,7 @@
 \alias{estimateQrn}
 \title{estimateQrn}
 \usage{
-estimateQrn(Y, A, W, Qn, gn, glmQr, libraryQr, a0, returnModels)
+estimateQrn(Y, A, W, Qn, gn, glm_Qr, SL_Qr, a_0, returnModels)
 }
 \arguments{
 \item{Y}{A vector of continuous or binary outcomes.}
@@ -13,17 +13,19 @@ estimateQrn(Y, A, W, Qn, gn, glmQr, libraryQr, a0, returnModels)
 
 \item{W}{A \code{data.frame} of named covariates}
 
-\item{Qn}{A list of outcome regression estimates evaluated on observed data}
+\item{Qn}{A list of outcome regression estimates evaluated on observed data. If 
+NULL then 0 is used for all Qn (as is needed to estimate reduced dimension regression
+for sl_iptw)}
 
 \item{gn}{A list of propensity regression estimates evaluated on observed data}
 
-\item{glmQr}{A character describing a formula to be used in the call to \code{glm} for the first reduced-dimension regression. Ignored
-if \code{librarygr!=NULL}.}
+\item{glm_Qr}{A character describing a formula to be used in the call to \code{glm} for the first reduced-dimension regression. Ignored
+if \code{SL_gr!=NULL}.}
 
-\item{libraryQr}{A vector of characters or a list describing the Super Learner library to be used 
+\item{SL_Qr}{A vector of characters or a list describing the Super Learner library to be used 
 for the first reduced-dimension regression.}
 
-\item{a0}{A list of fixed treatment values}
+\item{a_0}{A list of fixed treatment values}
 
 \item{returnModels}{A boolean indicating whether to return model fits for the outcome regression, propensity score,
 and reduced-dimension regressions.}

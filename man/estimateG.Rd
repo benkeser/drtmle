@@ -4,7 +4,7 @@
 \alias{estimateG}
 \title{estimateG}
 \usage{
-estimateG(A, W, libraryg, glmg, a0, tolg, verbose = FALSE,
+estimateG(A, W, SL_g, glm_g, a_0, tolg, verbose = FALSE,
   returnModels = FALSE)
 }
 \arguments{
@@ -12,12 +12,12 @@ estimateG(A, W, libraryg, glmg, a0, tolg, verbose = FALSE,
 
 \item{W}{A \code{data.frame} of named covariates}
 
-\item{libraryg}{A vector of characters or a list describing the Super Learner library to be used 
+\item{SL_g}{A vector of characters or a list describing the Super Learner library to be used 
 for the propensity score}
 
-\item{glmg}{A character describing a formula to be used in the call to \code{glm} for the propensity score}
+\item{glm_g}{A character describing a formula to be used in the call to \code{glm} for the propensity score}
 
-\item{a0}{A list of fixed treatment values}
+\item{a_0}{A list of fixed treatment values}
 
 \item{tolg}{A numeric indicating the minimum value for estimates of the propensity score.}
 

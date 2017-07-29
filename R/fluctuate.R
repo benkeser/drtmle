@@ -8,14 +8,14 @@
 #' @param W The covariates
 #' @param Qn A list of outcome regression estimates evaluated on observed data
 #' @param gn A list of propensity regression estimates evaluated on observed data
-#' @param a0 A list of fixed treatment values 
+#' @param a_0 A list of fixed treatment values 
 #' 
 #' @importFrom SuperLearner trimLogit
 #' @importFrom stats predict glm
 #' 
 
-fluctuateQ1 <- function(Y,A,W, Qn, gn, a0){
-  QnStar <- mapply(a=a0,Q=Qn,g=gn,FUN=function(x, a, Q, g){
+fluctuateQ1 <- function(Y,A,W, Qn, gn, a_0){
+  QnStar <- mapply(a=a_0,Q=Qn,g=gn,FUN=function(x, a, Q, g){
       l <- min(Y); u <- max(Y)
       Yscale <- (Y-l)/(u-l)
       off <- SuperLearner::trimLogit((Q-l)/(u-l))
@@ -40,20 +40,19 @@ fluctuateQ1 <- function(Y,A,W, Qn, gn, a0){
 #' @param Y The outcome
 #' @param A The treatment
 #' @param W The covariates
-#' @param Qn A list of outcome regression estimates evaluated on observed data
 #' @param gn A list of propensity regression estimates evaluated on observed data
 #' @param Qrn A list of reduced-dimension regression estimates evaluated on observed data
 #' @param coefTol A tolerance level on the magnitude of the coefficient that flags the
 #' result as potentially the result of numeric instability.
 #' @param tolg The lower bound on propensity score estimates
-#' @param a0 A list of fixed treatment values 
+#' @param a_0 A list of fixed treatment values 
 #' 
 #' @importFrom SuperLearner trimLogit
 #' @importFrom stats predict glm
 #' 
 
-fluctuateG <- function(Y, A, W, a0, Qn, gn, Qrn, tolg, coefTol=1e5){
-  gnStar <- mapply(a=a0, Q=Qn, g=gn, Qr=Qrn, FUN=function(x, a, Q, g, Qr){
+fluctuateG <- function(Y, A, W, a_0, gn, Qrn, tolg, coefTol=1e5){
+  gnStar <- mapply(a=a_0, g=gn, Qr=Qrn, FUN=function(x, a, g, Qr){
     H1 <- Qr/g
     off <- SuperLearner::trimLogit(g, tolg)
     thisA <- as.numeric(A==a)
@@ -93,15 +92,15 @@ fluctuateG <- function(Y, A, W, a0, Qn, gn, Qrn, tolg, coefTol=1e5){
 #' @param coefTol A tolerance level on the magnitude of the coefficient that flags the
 #' result as potentially the result of numeric instability.
 #' @param reduction A character indicating what reduced dimension regression was used. 
-#' @param a0 A list of fixed treatment values 
+#' @param a_0 A list of fixed treatment values 
 #' 
 #' @importFrom SuperLearner trimLogit
 #' @importFrom stats predict glm
 #' 
 
 
-fluctuateQ2 <- function(Y,A,W,Qn,gn,grn,a0,reduction,coefTol=1e5){
-  QnStar <- mapply(a=a0,Q=Qn,g=gn,gr=grn,FUN=function(a, Q, g, gr){
+fluctuateQ2 <- function(Y,A,W,Qn,gn,grn,a_0,reduction,coefTol=1e5){
+  QnStar <- mapply(a=a_0,Q=Qn,g=gn,gr=grn,FUN=function(a, Q, g, gr){
     l <- min(Y); u <- max(Y)
     Yscale <- (Y-l)/(u-l)
     off <- SuperLearner::trimLogit((Q-l)/(u-l))
@@ -155,13 +154,13 @@ fluctuateQ2 <- function(Y,A,W,Qn,gn,grn,a0,reduction,coefTol=1e5){
 #' @param coefTol A tolerance level on the magnitude of the coefficient that flags the
 #' result as potentially the result of numeric instability.
 #' @param reduction A character indicating what reduced dimension regression was used. 
-#' @param a0 A list of fixed treatment values 
+#' @param a_0 A list of fixed treatment values 
 #' 
 #' @importFrom SuperLearner trimLogit
 #' @importFrom stats predict glm
 #'
-fluctuateQ <- function(Y,A,W,Qn,gn,grn,a0,reduction,coefTol=1e5){
-  QnStar <- mapply(a=a0,Q=Qn,g=gn,gr=grn,FUN=function(a, Q, g, gr){
+fluctuateQ <- function(Y,A,W,Qn,gn,grn,a_0,reduction,coefTol=1e5){
+  QnStar <- mapply(a=a_0,Q=Qn,g=gn,gr=grn,FUN=function(a, Q, g, gr){
     l <- min(Y); u <- max(Y)
     Yscale <- (Y-l)/(u-l)
     off <- SuperLearner::trimLogit((Q-l)/(u-l))

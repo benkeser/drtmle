@@ -1,6 +1,6 @@
 # Contributing to `drtmle` development
 
-I use the same guide as is used for contributing to the development of the popular `ggplot2` R package, restate here. 
+I use the same guide for contributing as the `ggplot2` R package, which is restated here: 
 
 The goal of this guide is to help you get up and contributing to `drtmle` as
 quickly as possible. The guide is divided into two main pieces:

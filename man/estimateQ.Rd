@@ -4,7 +4,7 @@
 \alias{estimateQ}
 \title{estimateQ}
 \usage{
-estimateQ(Y, A, W, libraryQ, glmQ, a0, stratify, family, verbose = FALSE,
+estimateQ(Y, A, W, SL_Q, glm_Q, a_0, stratify, family, verbose = FALSE,
   returnModels = FALSE, ...)
 }
 \arguments{
@@ -14,12 +14,12 @@ estimateQ(Y, A, W, libraryQ, glmQ, a0, stratify, family, verbose = FALSE,
 
 \item{W}{A \code{data.frame} of named covariates}
 
-\item{libraryQ}{A vector of characters or a list describing the Super Learner library to be used 
+\item{SL_Q}{A vector of characters or a list describing the Super Learner library to be used 
 for the outcome regression}
 
-\item{glmQ}{A character describing a formula to be used in the call to \code{glm} for the outcome regression}
+\item{glm_Q}{A character describing a formula to be used in the call to \code{glm} for the outcome regression}
 
-\item{a0}{A list of fixed treatment values}
+\item{a_0}{A list of fixed treatment values}
 
 \item{stratify}{A \code{boolean} indicating whether to estimate the outcome regression separately
 for observations with \code{A} equal to 0/1 (if \code{TRUE}) or to pool across \code{A} (if \code{FALSE}).}
