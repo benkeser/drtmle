@@ -66,7 +66,7 @@ fluctuateG <- function(Y, A, W, a_0, gn, Qrn, tolg, coefTol=1e5){
                 data=data.frame(thisA=thisA, off=off, H1=H1), family="binomial")
       )
       if(!fm$converged | abs(fm$coef) > coefTol){
-        warning("No sane fluctuation found for G this iteration. Check mean of IC.") 
+        # warning("No sane fluctuation found for G this iteration. Check mean of IC.") 
       }
     }
     pred <- stats::predict(fm, type="response")
@@ -117,7 +117,7 @@ fluctuateQ2 <- function(Y,A,W,Qn,gn,grn,a_0,reduction,coefTol=1e5){
                   data=data.frame(Y=Y, off=off, H2=H2), family="binomial")
       )
       if(!fm$converged | abs(max(fm$coef)) > coefTol){
-        warning("No sane fluctuation found. Proceeding using current estimates.")
+        # warning("No sane fluctuation found. Proceeding using current estimates.")
         if(reduction=="univariate"){
           return(list(est=Q,eps=rep(0,2)))
         }else if(reduction=="bivariate"){
@@ -178,7 +178,7 @@ fluctuateQ <- function(Y,A,W,Qn,gn,grn,a_0,reduction,coefTol=1e5){
                 data=data.frame(Y=Y, off=off, H1=H1, H2=H2), family="binomial")
       )
       if(!fm$converged | abs(max(fm$coef)) > coefTol){
-        warning("No sane fluctuation found. Proceeding using current estimates.")
+        # warning("No sane fluctuation found. Proceeding using current estimates.")
         if(reduction=="univariate"){
           return(list(est=Q,eps=rep(0,2)))
         }else if(reduction=="bivariate"){
