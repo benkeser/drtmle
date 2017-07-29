@@ -30,13 +30,20 @@ Installation
 Use
 ---
 
-This package can be used to estimate covariate-adjusted marginal means under multiple discrete levels of a treatment. It may be used in situations where data consist of a vector of baseline covariates (`W`), a multi-level treatment assignment (`A`), and a continuous or binary-valued outcome (`Y`). The function `drtmle` may be used to estimate *E*\[*E*(*Y*|*A* = *a*<sub>0</sub>, *W*)\] for user-selected values of *a*<sub>0</sub> (via option `a_0`). The resulting targeted minimum loss-based estimates are doubly robust with respect to both consistency and asymptotic normality. The function computes doubly robust variance estimators that can be used to construct doubly robust confidence intervals for covariate-adjusted marginal means and contrasts between these means (via the `drconfint` function) for different levels of *a*<sub>0</sub>. Doubly robust hypothesis tests are also available (via `drtest` function). A simple example on simulated data is shown below.
+### Doubly-robust inference for average treatment effect
+
+This package can be used to estimate covariate-adjusted marginal means under multiple discrete levels of a treatment. It may be used in situations where data consist of a vector of baseline covariates (`W`), a multi-level treatment assignment (`A`), and a continuous or binary-valued outcome (`Y`). The function `drtmle` may be used to estimate *E*\[*E*(*Y*|*A* = *a*<sub>0</sub>, *W*)\] for user-selected values of *a*<sub>0</sub> (via option `a_0`). The resulting targeted minimum loss-based estimates are doubly robust with respect to both consistency and asymptotic normality. The function computes doubly robust variance estimators that can be used to construct doubly robust confidence intervals for covariate-adjusted marginal means and contrasts between these means (via the `drconfint` function) for different levels of *a*<sub>0</sub>. A simple example on simulated data is shown below.
 
 ``` r
-# load package
+# load packages
 library(drtmle)
 #> drtmle: TMLE with doubly robust inference
 #> Version: 0.0.0.9000
+library(SuperLearner)
+#> Loading required package: nnls
+#> Super Learner
+#> Version: 2.0-22
+#> Package created on 2017-07-18
 
 # simulate simple data structure
 set.seed(1234)
@@ -47,7 +54,7 @@ Y <- rbinom(n, 1, plogis(-2 + W$W1 - 2*W$W2 + A))
 
 # estimate the covariate-adjusted marginal mean for A = 1 and A = 0
 # here, we do not properly estimate the propensity score
-fit <- drtmle(W = W, A = A, Y = Y, # input data
+fit1 <- drtmle(W = W, A = A, Y = Y, # input data
               a_0 = c(0,1), # return estimates for A = 0 and A = 1
               SL_Q = "SL.npreg", # use kernel regression for E(Y | A=a, W)
               glm_g = "W1 + W2", # use misspecified main terms glm for E(A | W)
@@ -57,7 +64,7 @@ fit <- drtmle(W = W, A = A, Y = Y, # input data
                                  # misspecification of propensity score
               )
 # print the output
-fit
+fit1
 #> $est
 #>        [,1]
 #> 0 0.1403429
@@ -68,14 +75,62 @@ fit
 #> 0 0.0008238590 0.0002365695
 #> 1 0.0002365695 0.0015010560
 
-# get confidence intervals for means
-ci_fit <- confint(fit)
+# get confidence intervals for marginal means
+ci_fit1 <- confint(fit1)
 # print the output
-ci_fit
+ci_fit1
 #> $drtmle
 #>     est   cil   ciu
 #> 0 0.140 0.084 0.197
 #> 1 0.216 0.140 0.292
+
+# get confidence intervals for ate
+ci_ate1 <- confint(fit1,contrast = c(-1,1))
+# print the output
+ci_ate1
+#> $drtmle
+#>                   est    cil  ciu
+#> E[Y(1)]-E[Y(0)] 0.076 -0.009 0.16
+```
+
+### Inference for super learner-based IPTW
+
+The package additionally includes a function for computing valid confidence intervals about an inverse probability of treatment weight (IPTW) estimator when super learning is used to estimate the propensity score. We call this estimator the inverse super learning probability of treatment estimator (ISLPTW).
+
+``` r
+# fit iptw 
+fit2 <- islptw(Y = Y, A = A, W = W, a_0 = c(0,1),
+               SL_g = c("SL.glm","SL.mean","SL.step.interaction"),
+               SL_Qr = "SL.npreg")
+#> Loading required package: nloptr
+# print the output
+fit2
+#> $est
+#>        [,1]
+#> 0 0.1377524
+#> 1 0.1939986
+#> 
+#> $cov
+#>              0            1
+#> 0 0.0007588445 0.0002162052
+#> 1 0.0002162052 0.0104400274
+
+# compute a confidence interval for margin means
+ci_fit2 <- confint(fit2)
+# print the output
+ci_fit2
+#> $islptw_tmle
+#>     est    cil   ciu
+#> 0 0.138  0.084 0.192
+#> 1 0.194 -0.006 0.394
+
+# compute a confidence interval for the ate
+ci_ate2 <- confint(fit2, contrast = c(-1,1))
+# print the output
+ci_ate2
+#> $islptw_tmle
+#>                   est    cil  ciu
+#> E[Y(1)]-E[Y(0)] 0.056 -0.147 0.26
 ```
 
 ------------------------------------------------------------------------

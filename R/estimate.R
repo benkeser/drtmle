@@ -415,7 +415,7 @@ estimategrn <- function(Y, A, W, Qn, gn, SL_gr, tolg, glm_gr, a_0, reduction,ret
         glm_gr <- "1"
       }
       fm2 <- stats::glm(stats::as.formula(paste0("A~",glm_gr)), family="binomial",
-           data=data.frame(A=A, Qn=Q))
+           data=data.frame(A=as.numeric(A==a), Qn=Q))
       grn2 <- stats::predict(fm2, type="response")
       grn2[grn2 < tolg] <- tolg
       if(reduction == "univariate"){

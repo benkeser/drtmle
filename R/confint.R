@@ -88,8 +88,8 @@ confint.drtmle <- function(object, parm = c("drtmle"), level = 0.95,
 		if(length(contrast) != length(object$a_0)){
 			stop("length of contrast vector not equal to length of a_0")
 		}
-		if(!all(contrast %in% c(-1,1))){
-			stop("contrast should only be -1 or 1")
+		if(!all(contrast %in% c(-1,1,0))){
+			stop("contrast should only be -1, 1, or 0")
 		}
 		for(i in seq_along(parm)){
 			out[[i]] <- matrix(NA, nrow = 1, ncol = 3)
@@ -230,8 +230,8 @@ confint.islptw <- function(object, parm = c("islptw_tmle"), level = 0.95,
 		if(length(contrast) != length(object$a_0)){
 			stop("length of contrast vector not equal to length of a_0")
 		}
-		if(!all(contrast %in% c(-1,1))){
-			stop("contrast should only be -1 or 1")
+		if(!all(contrast %in% c(-1,1,0))){
+			stop("contrast should only be -1, 1, or 0")
 		}
 		for(i in seq_along(parm)){
 			out[[i]] <- matrix(NA, nrow = 1, ncol = 3)
