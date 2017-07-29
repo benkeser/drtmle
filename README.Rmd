@@ -49,9 +49,12 @@ treatments on continuous and binary outcomes. The targeted minimum loss-based (T
 This package can be used to estimate covariate-adjusted marginal means under multiple discrete levels of a treatment. It may be used in situations where data consist of a vector of baseline covariates (`W`), a multi-level treatment assignment (`A`), and a continuous or binary-valued outcome (`Y`). The function `drtmle` may be used to estimate $E[E(Y | A=a_0, W)]$ for user-selected values of $a_0$ (via option `a_0`). The resulting targeted minimum loss-based estimates are doubly robust with respect to both consistency and asymptotic normality. The function computes doubly robust variance estimators that can be used to construct doubly robust confidence intervals for covariate-adjusted marginal means and contrasts between these means (via the `drconfint` function) for different levels of $a_0$. Doubly robust hypothesis tests are also available (via `drtest` function). A simple example on simulated data is shown below. 
 
 ```{r}
+# load package
+library(drtmle)
+
 # simulate simple data structure
 set.seed(1234)
-n <- 500
+n <- 200
 W <- data.frame(W1 = runif(n,-2,2), W2 = rbinom(n,1,0.5))
 A <- rbinom(n, 1, plogis(-2 + W$W1 - 2*W$W2))
 Y <- rbinom(n, 1, plogis(-2 + W$W1 - 2*W$W2 + A))
@@ -71,14 +74,10 @@ fit <- drtmle(W = W, A = A, Y = Y, # input data
 fit
 
 # get confidence intervals for means
-ci_fit <- drconfint(fit)
+ci_fit <- confint(fit)
 # print the output
 ci_fit
 
-# get hypothesis test for means 
-test_fit <- drtest(fit)
-# print the output
-test_fit
 ```
 ---
 
