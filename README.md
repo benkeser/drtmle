@@ -56,8 +56,6 @@ fit <- drtmle(W = W, A = A, Y = Y, # input data
               SL_gr = "SL.npreg" # use kernel regression to guard against 
                                  # misspecification of propensity score
               )
-#> Warning in (function (a, Q, g, gr) : No sane fluctuation found. Proceeding
-#> using current estimates.
 # print the output
 fit
 #> $est
