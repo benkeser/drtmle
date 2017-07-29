@@ -135,7 +135,7 @@ estimateQ <- function(Y,A,W,SL_Q,glm_Q,a_0,stratify,family,verbose=FALSE,returnM
                                          verbose=verbose,family=family,
                                          SL.library=SL_Q,
                                          method =ifelse(family$family=="binomial",
-                                                           "method.CC_LS","method.CC_LS"),
+                                                        "method.CC_LS","method.CC_LS"),
                                          ...)
       
         Qn <- alply(a_0,1,function(x){
