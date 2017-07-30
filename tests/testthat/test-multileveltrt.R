@@ -19,7 +19,8 @@ test_that("drtmle executes as expected with multiple treatment levels", {
                       glm_Qr="gn",
                       glm_gr="Qn",
                       guard=c("Q","g"),
-                      reduction="univariate")
+                      reduction="univariate",
+                      returnModels = TRUE)
 
 	expect_true(is.numeric(fit1$gcomp$est))
 	expect_true(is.numeric(fit1$tmle$est))
@@ -51,7 +52,8 @@ test_that("drtmle executes as expected with multiple treatment levels", {
                       glm_Qr="gn",
                       glm_gr="Qn",
                       guard=c("Q","g"),
-                      reduction="univariate")
+                      reduction="univariate",
+                      returnModels = TRUE)
 
 	expect_true(is.numeric(fit1$gcomp$est))
 	expect_true(is.numeric(fit1$tmle$est))
@@ -86,6 +88,7 @@ test_that("islptw executes as expected with multiple treatment levels", {
 	# all GLMs + stratify
 	fit1 <- islptw(W = W, A = A, Y = Y, a_0=c(0,1,2),
                       glm_g="W1 + W2",
+                      returnModels = TRUE,
                       glm_Qr="gn")
 
 	expect_true(is.numeric(fit1$iptw$est))
@@ -108,6 +111,7 @@ test_that("islptw executes as expected with multiple treatment levels", {
 	# all GLMs + stratify
 	fit1 <- islptw(W = W, A = A, Y = Y, a_0=c(0,1,2),
                       SL_g=c("SL.step","SL.step.interaction"),
+                      returnModels = TRUE,
                       glm_Qr="gn")
 
 	expect_true(is.numeric(fit1$iptw$est))
