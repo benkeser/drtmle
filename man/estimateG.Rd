@@ -4,7 +4,7 @@
 \alias{estimateG}
 \title{estimateG}
 \usage{
-estimateG(A, W, SL_g, glm_g, a_0, tolg, verbose = FALSE,
+estimateG(A, W, SL_g, glm_g, a_0, tolg, validRows = NULL, verbose = FALSE,
   returnModels = FALSE)
 }
 \arguments{
@@ -17,9 +17,12 @@ for the propensity score}
 
 \item{glm_g}{A character describing a formula to be used in the call to \code{glm} for the propensity score}
 
-\item{a_0}{A list of fixed treatment values}
+\item{a_0}{A vector of fixed treatment values}
 
 \item{tolg}{A numeric indicating the minimum value for estimates of the propensity score.}
+
+\item{validRows}{A \code{list} of length \code{cvFolds} containing the row indexes
+of observations to include in validation fold.}
 
 \item{verbose}{A boolean indicating whether to print status updates.}
 

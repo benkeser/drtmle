@@ -4,7 +4,8 @@
 \alias{estimategrn}
 \title{estimategrn}
 \usage{
-estimategrn(Y, A, W, Qn, gn, SL_gr, tolg, glm_gr, a_0, reduction, returnModels)
+estimategrn(Y, A, W, Qn, gn, SL_gr, tolg, glm_gr, a_0, reduction, returnModels,
+  validRows)
 }
 \arguments{
 \item{Y}{A vector of continuous or binary outcomes.}
@@ -32,6 +33,9 @@ for the bivariate version.}
 
 \item{returnModels}{A boolean indicating whether to return model fits for the outcome regression, propensity score,
 and reduced-dimension regressions.}
+
+\item{validRows}{A \code{list} of length \code{cvFolds} containing the row indexes
+of observations to include in validation fold.}
 }
 \description{
 Estimates the reduced dimension regressions necessary for the additional 

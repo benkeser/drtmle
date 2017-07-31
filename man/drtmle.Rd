@@ -8,8 +8,8 @@ drtmle(Y, A, W, a_0 = unique(A), family = stats::binomial(),
   stratify = TRUE, SL_Q = NULL, SL_g = NULL, SL_Qr = NULL,
   SL_gr = NULL, glm_Q = NULL, glm_g = NULL, glm_Qr = NULL,
   glm_gr = NULL, guard = c("Q", "g"), reduction = "univariate",
-  returnModels = FALSE, maxIter = 3, tolIC = 1/length(Y), tolg = 0.01,
-  verbose = FALSE, Qsteps = 2, ...)
+  returnModels = FALSE, cvFolds = NULL, maxIter = 3,
+  tolIC = 1/length(Y), tolg = 0.01, verbose = FALSE, Qsteps = 2, ...)
 }
 \arguments{
 \item{Y}{A numeric of continuous or binary outcomes.}
@@ -62,6 +62,9 @@ for the bivariate version.}
 
 \item{returnModels}{A boolean indicating whether to return model fits for the outcome regression, propensity score,
 and reduced-dimension regressions.}
+
+\item{cvFolds}{A numeric equal to the number of folds to be used in cross-validated fitting of 
+nuisance parameters. If \code{NULL}, no cross-validation is used.}
 
 \item{maxIter}{A numeric that sets the maximum number of iterations the TMLE can perform in its fluctuation step.}
 

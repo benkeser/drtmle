@@ -4,7 +4,8 @@
 \alias{estimateQrn}
 \title{estimateQrn}
 \usage{
-estimateQrn(Y, A, W, Qn, gn, glm_Qr, SL_Qr, a_0, returnModels)
+estimateQrn(Y, A, W, Qn, gn, glm_Qr, SL_Qr, a_0, returnModels,
+  validRows = NULL)
 }
 \arguments{
 \item{Y}{A vector of continuous or binary outcomes.}
@@ -29,6 +30,9 @@ for the first reduced-dimension regression.}
 
 \item{returnModels}{A boolean indicating whether to return model fits for the outcome regression, propensity score,
 and reduced-dimension regressions.}
+
+\item{validRows}{A \code{list} of length \code{cvFolds} containing the row indexes
+of observations to include in validation fold.}
 }
 \description{
 Estimates the reduced dimension regressions necessary for the  

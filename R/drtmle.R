@@ -1,6 +1,5 @@
 #' TMLE estimate of the average treatment effect with doubly-robust inference
 #' 
-#' 
 #' @param W A \code{data.frame} of named covariates
 #' @param A A vector of binary treatment assignment (assumed to be equal to 0 or 1)
 #' @param Y A numeric of continuous or binary outcomes. 
@@ -43,6 +42,8 @@
 #' @param Qsteps A numeric equal to 1/2 indicating whether the fluctuation submodel for the outcome regression
 #' should be fit using a single minimization (\code{Qsteps = 1}) or a backfitting-type minimization (\code{Qsteps=2}). 
 #' The latter was found to be more stable in simulations. 
+#' @param cvFolds A numeric equal to the number of folds to be used in cross-validated fitting of 
+#' nuisance parameters. If \code{NULL}, no cross-validation is used. 
 #' @param ... Other options (not currently used)
 #' 
 #' @return An object of class \code{"drtmle"}.
@@ -109,37 +110,68 @@
 #'                SL_Qr="SL.npreg",
 #'                SL_gr="SL.npreg")
 
-drtmle <- function(Y,A,W,a_0=unique(A),
-                   family=stats::binomial(),
-                   stratify=TRUE,
-                   SL_Q=NULL,
-                   SL_g=NULL,
-                   SL_Qr=NULL,
-                   SL_gr=NULL,
-                   glm_Q=NULL,
-                   glm_g=NULL,
-                   glm_Qr=NULL,
-                   glm_gr=NULL,
-                   guard=c("Q","g"),
-                   reduction="univariate",
-                   returnModels=FALSE,
-                   maxIter=3,
-                   tolIC=1/length(Y), 
-                   tolg=1e-2,
-                   verbose=FALSE,
-                   Qsteps=2,
+drtmle <- function(Y, A, W, a_0 = unique(A),
+                   family = stats::binomial(),
+                   stratify = TRUE,
+                   SL_Q = NULL,
+                   SL_g = NULL,
+                   SL_Qr = NULL,
+                   SL_gr = NULL,
+                   glm_Q = NULL,
+                   glm_g = NULL,
+                   glm_Qr = NULL,
+                   glm_gr = NULL,
+                   guard = c("Q","g"),
+                   reduction = "univariate",
+                   returnModels = FALSE,
+                   cvFolds = NULL, 
+                   maxIter = 3,
+                   tolIC = 1/length(Y), 
+                   tolg = 1e-2,
+                   verbose = FALSE,
+                   Qsteps = 2,
                    ...){
-  # estimate g
-  gnOut <- estimateG(A=A, W=W, tolg=tolg, verbose=verbose, returnModels=returnModels,SL_g=SL_g, 
-    glm_g=glm_g, a_0=a_0)
-  gn <- gnOut$est
-  
-  # estimate Q
-  QnOut <- estimateQ(Y=Y, A=A, W=W, verbose=verbose, returnModels=returnModels, SL_Q=SL_Q, a_0=a_0,
+  # if cvFolds non-null split data into cvFolds pieces
+  n <- length(Y)
+  if(!is.null(cvFolds)){
+    validRows <- split(sample(1:n), rep(1:cvFolds, length = n))       
+    ordVR <- order(unlist(validRows, use.names = FALSE))
+  }else{
+    validRows <- list(NULL)
+    ordVR <- 1:n
+  }
+  #-------------------------------
+  # estimate propensity score
+  #-------------------------------
+  gnOut <- lapply(X = validRows, FUN = estimateG,
+                  A=A, W=W, tolg=tolg, verbose=verbose, 
+                  returnModels=returnModels,SL_g=SL_g,
+                  glm_g=glm_g, a_0=a_0)
+  # re-order predictions
+  gnValid <- unlist(gnOut, recursive = FALSE, use.names = FALSE)
+  gnUnOrd <- do.call(Map, c(c, gnValid[seq(1,length(gnValid),2)]))
+  gn <- lapply(gnUnOrd, function(x){ x[ordVR] })
+  # obtain list of propensity score fits
+  gnMod <- gnValid[seq(2,length(gnValid),2)]
+  # TO DO: Add reasonable names to gnMod?
+
+  #-------------------------------
+  # estimate outcome regression
+  #-------------------------------
+  QnOut <- lapply(X = validRows, FUN = estimateQ,
+                  Y=Y, A=A, W=W, verbose=verbose, 
+                  returnModels=returnModels, SL_Q=SL_Q, a_0=a_0,
                   stratify=stratify, glm_Q=glm_Q,family=family)
-  Qn <- QnOut$est
+  # re-order predictions
+  QnValid <- unlist(QnOut, recursive = FALSE, use.names = FALSE)
+  QnUnOrd <- do.call(Map, c(c, QnValid[seq(1,length(QnValid),2)]))
+  Qn <- lapply(QnUnOrd, function(x){ x[ordVR] })
+  # obtain list of outcome regression fits
+  QnMod <- QnValid[seq(2,length(QnValid),2)]
+  # TO DO: Add reasonable names to QnMod?
   
-  # naive estimate
+
+  # naive g-computation estimate
   psi.n <- lapply(Qn, mean)
   
   # estimate influence function
@@ -156,18 +188,35 @@ drtmle <- function(Y,A,W,a_0=unique(A),
   DnQo <- rep(0, length(Y))
   
   if("Q" %in% guard){
-      QrnOut <- estimateQrn(Y=Y, A=A, W=W, Qn=Qn, gn=gn, glm_Qr=glm_Qr, SL_Qr=SL_Qr, a_0=a_0,
-                            returnModels = returnModels)
-      Qrn <- QrnOut$est
+      QrnOut <- lapply(X = validRows, FUN = estimateQrn, 
+                       Y=Y, A=A, W=W, Qn=Qn, gn=gn, glm_Qr=glm_Qr, 
+                       SL_Qr=SL_Qr, a_0=a_0,returnModels = returnModels)
+      # re-order predictions
+      QrnValid <- unlist(QrnOut, recursive = FALSE, use.names = FALSE)
+      QrnUnOrd <- do.call(Map, c(c, QrnValid[seq(1,length(QrnValid),2)]))
+      Qrn <- lapply(QrnUnOrd, function(x){ x[ordVR] })
+      # obtain list of reduced dimension regression fits
+      QrnMod <- QrnValid[seq(2,length(QrnValid),2)]
+      # TO DO: Add reasonable names to QrnMod?
+
       Dngo <- mapply(a=split(a_0,1:length(a_0)),Qr=Qrn,g=gn,FUN=function(a,Qr,g){
         Qr/g * (as.numeric(A==a) - g)
       },SIMPLIFY=FALSE)
       PnDgn <- lapply(Dngo, mean)
   }
   if("g" %in% guard){
-      grnOut <- estimategrn(Y=Y,A=A, W=W, tolg=tolg, Qn=Qn, gn=gn, glm_gr=glm_gr, SL_gr=SL_gr, a_0=a_0, 
-                            reduction=reduction,returnModels = returnModels)
-      grn <- grnOut$est
+      grnOut <- lapply(X=validRows, FUN = estimategrn,
+                       Y=Y,A=A, W=W, tolg=tolg, Qn=Qn, gn=gn, 
+                       glm_gr=glm_gr, SL_gr=SL_gr, a_0=a_0, 
+                       reduction=reduction,returnModels = returnModels)      
+      # re-order predictions
+      grnValid <- unlist(grnOut, recursive = FALSE, use.names = FALSE)
+      grnUnOrd <- do.call(Map, c(rbind, grnValid[seq(1,length(grnValid),2)]))
+      grn <- lapply(grnUnOrd, function(x){ x[ordVR,] })
+      # obtain list of outcome regression fits
+      grnMod <- grnValid[seq(2,length(grnValid),2)]
+      # TO DO: Add reasonable names to grnMod?
+
       if(reduction=="univariate"){
         DnQo <- mapply(a=split(a_0,1:length(a_0)),Q=Qn,gr=grn,FUN=function(a,Q,gr){
           as.numeric(A==a)/gr$grn2 * gr$grn1 * (Y-Q)
@@ -218,18 +267,27 @@ drtmle <- function(Y,A,W,a_0=unique(A),
     
     # fluctuate QnStar
     if("g" %in% guard){
-      grnStarOut <- estimategrn(Y=Y, A=A, W=W, reduction=reduction, tolg=tolg, a_0=a_0, Qn=QnStar, 
-                                gn=gnStar, glm_gr=glm_gr, SL_gr=SL_gr,
-                                returnModels = returnModels)
-      grnStar <- grnStarOut$est
+      grnStarOut <- lapply(X=validRows, FUN = estimategrn,
+                       Y=Y,A=A, W=W, tolg=tolg, Qn=QnStar, gn=gnStar, 
+                       glm_gr=glm_gr, SL_gr=SL_gr, a_0=a_0, 
+                       reduction=reduction,returnModels = returnModels)
+      # re-order predictions
+      grnValid <- unlist(grnStarOut, recursive = FALSE, use.names = FALSE)
+      grnUnOrd <- do.call(Map, c(rbind, grnValid[seq(1,length(grnValid),2)]))
+      grn <- lapply(grnUnOrd, function(x){ x[ordVR,] })
+      # obtain list of outcome regression fits
+      grnMod <- grnValid[seq(2,length(grnValid),2)]
+      # TO DO: Add reasonable names to grnMod?
 
       if(Qsteps==1){
-        QnStarOut <- fluctuateQ(Y=Y, A=A, W=W, a_0=a_0, Qn=QnStar, gn=gnStar, grn=grnStar, reduction=reduction)
+        QnStarOut <- fluctuateQ(Y=Y, A=A, W=W, a_0=a_0, Qn=QnStar, 
+                                gn=gnStar, grn=grnStar, reduction=reduction)
         QnStar <- plyr::llply(QnStarOut, function(x){unlist(x$est)})
         epsQ <- plyr::laply(QnStarOut, function(x){x$eps})
       }else if(Qsteps==2){
         # do the extra targeting
-        QnStarOut2 <- fluctuateQ2(Y=Y, A=A, W=W, a_0=a_0, Qn=QnStar, gn=gnStar, grn=grnStar, reduction=reduction)
+        QnStarOut2 <- fluctuateQ2(Y=Y, A=A, W=W, a_0=a_0, Qn=QnStar, 
+                                  gn=gnStar, grn=grnStar, reduction=reduction)
         QnStar <- plyr::llply(QnStarOut2, function(x){unlist(x[[1]])})
         
         # do the usual targeting
@@ -246,9 +304,16 @@ drtmle <- function(Y,A,W,a_0=unique(A),
     }
     
     if("Q" %in% guard){
-      QrnStarOut <- estimateQrn(Y=Y, A=A, W=W, a_0=a_0, Qn=QnStar, gn=gnStar, glm_Qr=glm_Qr, 
-                                SL_Qr=SL_Qr,returnModels = returnModels)
-      QrnStar <- QrnStarOut$est
+      QrnStarOut <- lapply(X = validRows, FUN = estimateQrn, 
+                       Y=Y, A=A, W=W, Qn=QnStar, gn=gnStar, glm_Qr=glm_Qr, 
+                       SL_Qr=SL_Qr, a_0=a_0,returnModels = returnModels)
+      # re-order predictions
+      QrnValid <- unlist(QrnStarOut, recursive = FALSE, use.names = FALSE)
+      QrnUnOrd <- do.call(Map, c(c, QrnValid[seq(1,length(QrnValid),2)]))
+      QrnStar <- lapply(QrnUnOrd, function(x){ x[ordVR] })
+      # obtain list of reduced dimension regression fits
+      QrnMod <- QrnValid[seq(2,length(QrnValid),2)]
+      # TO DO: Add reasonable names to QrnMod?
     }
     
     # get fluctuation parameters
@@ -258,25 +323,33 @@ drtmle <- function(Y,A,W,a_0=unique(A),
     psi.t <- lapply(QnStar, mean)
     
     # calculate influence functions
-    DnoStar <- mapply(a=split(a_0,1:length(a_0)),Q=QnStar,g=gnStar,p=psi.t,FUN=function(a,Q,g,p){
+    DnoStar <- mapply(a=split(a_0,1:length(a_0)),
+                      Q=QnStar,g=gnStar,p=psi.t,
+                      FUN=function(a,Q,g,p){
       as.numeric(A==a)/g * (Y - Q) + Q - p
     },SIMPLIFY=FALSE)
     PnDnoStar <- lapply(DnoStar, mean)
     
     if("g" %in% guard){
       if(reduction=="univariate"){
-        DnQoStar <- mapply(a=split(a_0,1:length(a_0)),Q=QnStar,gr=grnStar,FUN=function(a,Q,gr){
+        DnQoStar <- mapply(a=split(a_0,1:length(a_0)),
+                           Q=QnStar,gr=grnStar,
+                           FUN=function(a,Q,gr){
           as.numeric(A==a)/gr$grn2 * gr$grn1 * (Y-Q)
         }, SIMPLIFY=FALSE)
       }else if(reduction=="bivariate"){
-        DnQoStar <- mapply(a=split(a_0,1:length(a_0)),Q=QnStar,g=gnStar,gr=grnStar,FUN=function(a,Q,gr,g){
+        DnQoStar <- mapply(a=split(a_0,1:length(a_0)),
+                           Q=QnStar,g=gnStar,gr=grnStar,
+                           FUN=function(a,Q,gr,g){
           as.numeric(A==a)/gr$grn2 * (gr$grn2 - g)/g * (Y-Q)
         },SIMPLIFY=FALSE)
       }
       PnDQnStar <- lapply(DnQoStar, mean)
     }
     if("Q" %in% guard){
-      DngoStar <- mapply(a=split(a_0,1:length(a_0)),Qr=QrnStar,g=gnStar,FUN=function(a,Qr,g){
+      DngoStar <- mapply(a=split(a_0,1:length(a_0)),
+                         Qr=QrnStar,
+                         g=gnStar,FUN=function(a,Qr,g){
         Qr/g * (as.numeric(A==a) - g)
       }, SIMPLIFY=FALSE)
       PnDgnStar <- lapply(DngoStar, mean)
@@ -296,11 +369,15 @@ drtmle <- function(Y,A,W,a_0=unique(A),
   psi.t1 <- lapply(QnStar1, mean)
   
   # covariance for tmle
-  Dno1Star <- mapply(a=split(a_0,1:length(a_0)),Q=QnStar1,g=gn,p=psi.n,FUN=function(a,Q,g,p){
+  Dno1Star <- mapply(a=split(a_0,1:length(a_0)),
+                     Q=QnStar1,g=gn,p=psi.n,
+                     FUN=function(a,Q,g,p){
     as.numeric(A==a)/g * (Y - Q) + Q - p
   },SIMPLIFY=FALSE)
   
-  DnoStar <- mapply(a=split(a_0,1:length(a_0)),Q=QnStar,g=gnStar,p=psi.n,FUN=function(a,Q,g,p){
+  DnoStar <- mapply(a=split(a_0,1:length(a_0)),
+                    Q=QnStar,g=gnStar,p=psi.n,
+                    FUN=function(a,Q,g,p){
     as.numeric(A==a)/g * (Y - Q) + Q - p
   },SIMPLIFY=FALSE)
   PnDnoStar <- lapply(DnoStar, mean)
@@ -310,11 +387,14 @@ drtmle <- function(Y,A,W,a_0=unique(A),
   
   if("g" %in% guard){
     if(reduction=="univariate"){
-      DnQoStar <- mapply(a=split(a_0,1:length(a_0)),Q=QnStar,gr=grnStar,FUN=function(a,Q,gr){
+      DnQoStar <- mapply(a=split(a_0,1:length(a_0)),
+                         Q=QnStar,gr=grnStar,
+                         FUN=function(a,Q,gr){
         as.numeric(A==a)/gr$grn2 * gr$grn1 * (Y-Q)
       }, SIMPLIFY=FALSE)
     }else if(reduction=="bivariate"){
-      DnQoStar <- mapply(a=split(a_0,1:length(a_0)),Q=QnStar,g=gn,gr=grnStar,FUN=function(a,Q,gr,g){
+      DnQoStar <- mapply(a=split(a_0,1:length(a_0)),Q=QnStar,
+                         g=gn,gr=grnStar,FUN=function(a,Q,gr,g){
         as.numeric(A==a)/gr$grn2 * (gr$grn2-g)/g * (Y-Q)
       }, SIMPLIFY=FALSE)
     }
@@ -322,17 +402,23 @@ drtmle <- function(Y,A,W,a_0=unique(A),
   }
   
   if("Q" %in% guard){
-    DngoStar <- mapply(a=split(a_0,1:length(a_0)),Qr=QrnStar,g=gnStar,FUN=function(a,Qr,g){
+    DngoStar <- mapply(a=split(a_0,1:length(a_0)),
+                       Qr=QrnStar,g=gnStar,
+                       FUN=function(a,Qr,g){
       Qr/g * (as.numeric(A==a) - g)
     }, SIMPLIFY=FALSE)
     PnDgnStar <- lapply(DngoStar, mean)
   }
   
-  Dno1StarMat <- matrix(unlist(Dno1Star), ncol=length(Y), nrow=length(a_0), byrow=TRUE)
-  DnoStarMat <- matrix(unlist(DnoStar) - unlist(DnQoStar) - unlist(DngoStar), ncol=length(Y), nrow=length(a_0),byrow=TRUE)
+  Dno1StarMat <- matrix(unlist(Dno1Star), ncol=length(Y), 
+                        nrow=length(a_0), byrow=TRUE)
+  DnoStarMat <- matrix(unlist(DnoStar) - unlist(DnQoStar) - unlist(DngoStar), 
+                       ncol=length(Y), nrow=length(a_0),byrow=TRUE)
   
-  cov.t1 <- (Dno1StarMat - mean(Dno1StarMat))%*%t((Dno1StarMat - mean(Dno1StarMat)))/(length(Y)^2)
-  cov.t <- (DnoStarMat - mean(DnoStarMat))%*%t((DnoStarMat - mean(DnoStarMat)))/(length(Y)^2)
+  cov.t1 <- (Dno1StarMat - mean(Dno1StarMat))%*%
+              t((Dno1StarMat - mean(Dno1StarMat)))/(length(Y)^2)
+  cov.t <- (DnoStarMat - mean(DnoStarMat))%*%
+              t((DnoStarMat - mean(DnoStarMat)))/(length(Y)^2)
   
 
   out <- list(drtmle = list(est = unlist(psi.t), cov = cov.t),
@@ -346,11 +432,13 @@ drtmle <- function(Y,A,W,a_0=unique(A),
               gcomp=list(est=unlist(psi.n), cov=cov.o1),
               QnMod = NULL, gnMod = NULL, QrnMod = NULL, grnMod = NULL,
               a_0 = a_0)
+
+  # tack on models if requested
   if(returnModels){
-    out$QnMod <- QnOut$fm
-    out$gnMod <- gnOut$fm
-    out$QrnMod <- QrnStarOut$fm
-    out$grnMod <- grnStarOut$fm
+    out$QnMod <- QnMod
+    out$gnMod <- gnMod
+    out$QrnMod <- QrnMod
+    out$grnMod <- grnMod
   }
   class(out) <- "drtmle"
   return(out)

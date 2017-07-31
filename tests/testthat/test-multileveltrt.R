@@ -1,3 +1,5 @@
+# install.packages("~/Dropbox/R/drtmle",repos=NULL,type="source")
+
 library(drtmle)
 library(SuperLearner)
 context("Testing drtmle function with > 2 treatment levels")

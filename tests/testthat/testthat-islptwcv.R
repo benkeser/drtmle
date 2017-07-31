@@ -3,16 +3,17 @@ library(SuperLearner)
 library(np)
 
 # TO DO: Add tests for multiple treatment levels
-context("Testing islptw works")
+context("Testing islptw works with cv")
 
-test_that("islptw works as expected",{
+test_that("islptw works as expected with cv",{
 	set.seed(123456)
 	n <- 200
 	W <- data.frame(W1 = runif(n), W2 = rnorm(n))
 	A <- rbinom(n,1,plogis(W$W1 - W$W2))
 	Y <- rnorm(n, W$W1*W$W2*A, 2)
 
-	fit1 <- islptw(W = W, A = A, Y = Y, 
+	fit1 <- islptw(W = W, A = A, Y = Y,
+					cvFolds = 2,  
 	               a_0 = c(0,1),
                   glm_g="W1 + W2",
                   glm_Qr="gn")

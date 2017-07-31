@@ -53,12 +53,12 @@ A <- rbinom(n,1,plogis(W$W1 - W$W2))
 Y <- rbinom(n, 1, plogis(W$W1*W$W2*A))
 # fit drtmle
 fit1 <- drtmle(W = W, A = A, Y = Y, a_0 = c(1,0),
-               family=binomial(),
-               stratify=FALSE,
-               SL_Q=c("SL.glm","SL.mean","SL.step"),
-               SL_g=c("SL.glm","SL.mean","SL.step"),
-               SL_Qr="SL.npreg",
-               SL_gr="SL.npreg")
+            family=binomial(),
+            stratify=FALSE,
+            SL_Q=c("SL.glm","SL.mean","SL.step"),
+            SL_g=c("SL.glm","SL.mean","SL.step"),
+            SL_Qr="SL.npreg",
+            SL_gr="SL.npreg")
 
 # get confidence intervals for each mean
 ci_mean <- confint(fit1)

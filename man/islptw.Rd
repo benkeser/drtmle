@@ -7,7 +7,7 @@ for the propensity score}
 \usage{
 islptw(W, A, Y, a_0 = unique(A), SL_g = NULL, glm_g = NULL,
   SL_Qr = NULL, glm_Qr = NULL, returnModels = TRUE, verbose = FALSE,
-  maxIter = 2, tolIC = 1/length(Y), tolg = 0.01)
+  maxIter = 2, tolIC = 1/length(Y), tolg = 0.01, cvFolds = NULL, ...)
 }
 \arguments{
 \item{W}{A \code{data.frame} of named covariates}
@@ -41,6 +41,11 @@ and reduced-dimension regressions.}
 of the scores of the fluctuation submodels submodels. Setting to \code{"default"}}
 
 \item{tolg}{A numeric indicating the minimum value for estimates of the propensity score.}
+
+\item{cvFolds}{A numeric equal to the number of folds to be used in cross-validated fitting of 
+nuisance parameters. If \code{NULL}, no cross-validation is used.}
+
+\item{...}{Other options (not currently used).}
 }
 \value{
 An object of class \code{"islptw"}.

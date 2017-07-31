@@ -5,7 +5,7 @@
 \title{estimateQ}
 \usage{
 estimateQ(Y, A, W, SL_Q, glm_Q, a_0, stratify, family, verbose = FALSE,
-  returnModels = FALSE, ...)
+  returnModels = FALSE, validRows = NULL, ...)
 }
 \arguments{
 \item{Y}{A vector of continuous or binary outcomes.}
@@ -30,6 +30,9 @@ for observations with \code{A} equal to 0/1 (if \code{TRUE}) or to pool across \
 
 \item{returnModels}{A boolean indicating whether to return model fits for the outcome regression, propensity score,
 and reduced-dimension regressions}
+
+\item{validRows}{A \code{list} of length \code{cvFolds} containing the row indexes
+of observations to include in validation fold.}
 
 \item{...}{Additional arguments (not currently used)}
 }
