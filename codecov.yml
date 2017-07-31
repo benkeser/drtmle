@@ -1,4 +1,4 @@
 comment: false
 
-ignore: "utils.R"
+ignore: "R/utils.R"
 
