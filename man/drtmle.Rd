@@ -8,8 +8,8 @@ drtmle(Y, A, W, a_0 = unique(A), family = stats::binomial(),
   stratify = TRUE, SL_Q = NULL, SL_g = NULL, SL_Qr = NULL,
   SL_gr = NULL, glm_Q = NULL, glm_g = NULL, glm_Qr = NULL,
   glm_gr = NULL, guard = c("Q", "g"), reduction = "univariate",
-  returnModels = FALSE, cvFolds = NULL, maxIter = 3,
-  tolIC = 1/length(Y), tolg = 0.01, verbose = FALSE, Qsteps = 2, ...)
+  returnModels = FALSE, cvFolds = 1, maxIter = 3, tolIC = 1/length(Y),
+  tolg = 0.01, verbose = FALSE, Qsteps = 2, parallel = FALSE, ...)
 }
 \arguments{
 \item{Y}{A numeric of continuous or binary outcomes.}
@@ -64,7 +64,7 @@ for the bivariate version.}
 and reduced-dimension regressions.}
 
 \item{cvFolds}{A numeric equal to the number of folds to be used in cross-validated fitting of 
-nuisance parameters. If \code{NULL}, no cross-validation is used.}
+nuisance parameters. If \code{cvFolds = 1}, no cross-validation is used.}
 
 \item{maxIter}{A numeric that sets the maximum number of iterations the TMLE can perform in its fluctuation step.}
 
@@ -78,6 +78,10 @@ of the scores of the fluctuation submodels submodels. Setting to \code{"default"
 \item{Qsteps}{A numeric equal to 1/2 indicating whether the fluctuation submodel for the outcome regression
 should be fit using a single minimization (\code{Qsteps = 1}) or a backfitting-type minimization (\code{Qsteps=2}). 
 The latter was found to be more stable in simulations.}
+
+\item{parallel}{A boolean indicating whether to use \code{foreach}
+to estimate nuisance parameters in parallel. Only useful if there is a registered parallel
+backend (see examples) and \code{cvFolds > 1}.}
 
 \item{...}{Other options (not currently used)}
 }

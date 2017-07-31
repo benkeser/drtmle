@@ -61,16 +61,19 @@ test_that("drtmle executes as expected with cvtmle and stratify = TRUE", {
 
 	# univariate reduction with 
 	# all SL + stratify
+	system.time(
 	fit3 <- drtmle(W = W, A = A, Y = Y, 
-   	               cvFolds = 2, 
+   	               cvFolds = 10, 
                family=gaussian(),
                   stratify=TRUE,
-                  SL_Q=c("SL.glm","SL.step"),
-                  SL_g=c("SL.glm","SL.step"),
+                  SL_Q=c("SL.glm","SL.mean"),
+                  SL_g=c("SL.glm","SL.mean"),
                   SL_Qr=c("SL.glm","SL.mean"),
                   SL_gr=c("SL.glm","SL.mean"),
                   guard=c("Q","g"),
                   reduction="univariate")
+	)
+	
 	expect_true(is.numeric(fit3$gcomp$est))
 	expect_true(is.numeric(fit3$tmle$est))
 	expect_true(is.numeric(fit3$tmle$est))

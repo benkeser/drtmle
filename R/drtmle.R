@@ -43,7 +43,10 @@
 #' should be fit using a single minimization (\code{Qsteps = 1}) or a backfitting-type minimization (\code{Qsteps=2}). 
 #' The latter was found to be more stable in simulations. 
 #' @param cvFolds A numeric equal to the number of folds to be used in cross-validated fitting of 
-#' nuisance parameters. If \code{NULL}, no cross-validation is used. 
+#' nuisance parameters. If \code{cvFolds = 1}, no cross-validation is used.
+#' @param parallel A boolean indicating whether to use \code{foreach}
+#' to estimate nuisance parameters in parallel. Only useful if there is a registered parallel
+#' backend (see examples) and \code{cvFolds > 1}.
 #' @param ... Other options (not currently used)
 #' 
 #' @return An object of class \code{"drtmle"}.
@@ -88,6 +91,7 @@
 #' 
 #' 
 #' @importFrom plyr llply laply
+#' @importFrom foreach foreach
 #' 
 #' 
 #' @export 
@@ -124,16 +128,17 @@ drtmle <- function(Y, A, W, a_0 = unique(A),
                    guard = c("Q","g"),
                    reduction = "univariate",
                    returnModels = FALSE,
-                   cvFolds = NULL, 
+                   cvFolds = 1, 
                    maxIter = 3,
                    tolIC = 1/length(Y), 
                    tolg = 1e-2,
                    verbose = FALSE,
                    Qsteps = 2,
+                   parallel = FALSE,
                    ...){
   # if cvFolds non-null split data into cvFolds pieces
   n <- length(Y)
-  if(!is.null(cvFolds)){
+  if(cvFolds!=1){
     validRows <- split(sample(1:n), rep(1:cvFolds, length = n))       
     ordVR <- order(unlist(validRows, use.names = FALSE))
   }else{
@@ -143,11 +148,20 @@ drtmle <- function(Y, A, W, a_0 = unique(A),
   #-------------------------------
   # estimate propensity score
   #-------------------------------
-  gnOut <- lapply(X = validRows, FUN = estimateG,
-                  A=A, W=W, tolg=tolg, verbose=verbose, 
-                  returnModels=returnModels,SL_g=SL_g,
-                  glm_g=glm_g, a_0=a_0)
-  # re-order predictions
+  if(!parallel){
+    gnOut <- lapply(X = validRows, FUN = estimateG,
+                    A=A, W=W, tolg=tolg, verbose=verbose, 
+                    returnModels=returnModels,SL_g=SL_g,
+                    glm_g=glm_g, a_0=a_0)
+  }else{
+    gnOut <- foreach::foreach(v = 1:cvFolds, .packages = "SuperLearner") %dopar% {
+      estimateG(A = A, W = W, tolg = tolg, verbose = verbose,
+                returnModels = returnModels, SL_g = SL_g,
+                glm_g = glm_g, a_0 = a_0, validRows = validRows[[v]])
+    }
+  }
+
+  # # re-order predictions
   gnValid <- unlist(gnOut, recursive = FALSE, use.names = FALSE)
   gnUnOrd <- do.call(Map, c(c, gnValid[seq(1,length(gnValid),2)]))
   gn <- lapply(gnUnOrd, function(x){ x[ordVR] })
@@ -158,10 +172,19 @@ drtmle <- function(Y, A, W, a_0 = unique(A),
   #-------------------------------
   # estimate outcome regression
   #-------------------------------
-  QnOut <- lapply(X = validRows, FUN = estimateQ,
-                  Y=Y, A=A, W=W, verbose=verbose, 
-                  returnModels=returnModels, SL_Q=SL_Q, a_0=a_0,
-                  stratify=stratify, glm_Q=glm_Q,family=family)
+  if(!parallel){
+    QnOut <- lapply(X = validRows, FUN = estimateQ,
+                    Y=Y, A=A, W=W, verbose=verbose, 
+                    returnModels=returnModels, SL_Q=SL_Q, a_0=a_0,
+                    stratify=stratify, glm_Q=glm_Q,family=family)
+  }else{
+    QnOut <- foreach::foreach(v = 1:cvFolds, .packages = "SuperLearner") %dopar% {
+      estimateQ(Y = Y, A = A, W = W, verbose = verbose,
+                returnModels = returnModels, SL_Q = SL_Q, a_0 = a_0,
+                glm_Q = glm_Q, family = family, stratify = stratify,
+                validRows = validRows[[v]])
+    }
+  }
   # re-order predictions
   QnValid <- unlist(QnOut, recursive = FALSE, use.names = FALSE)
   QnUnOrd <- do.call(Map, c(c, QnValid[seq(1,length(QnValid),2)]))
@@ -188,45 +211,62 @@ drtmle <- function(Y, A, W, a_0 = unique(A),
   DnQo <- rep(0, length(Y))
   
   if("Q" %in% guard){
+    if(!parallel){
       QrnOut <- lapply(X = validRows, FUN = estimateQrn, 
                        Y=Y, A=A, W=W, Qn=Qn, gn=gn, glm_Qr=glm_Qr, 
                        SL_Qr=SL_Qr, a_0=a_0,returnModels = returnModels)
-      # re-order predictions
-      QrnValid <- unlist(QrnOut, recursive = FALSE, use.names = FALSE)
-      QrnUnOrd <- do.call(Map, c(c, QrnValid[seq(1,length(QrnValid),2)]))
-      Qrn <- lapply(QrnUnOrd, function(x){ x[ordVR] })
-      # obtain list of reduced dimension regression fits
-      QrnMod <- QrnValid[seq(2,length(QrnValid),2)]
-      # TO DO: Add reasonable names to QrnMod?
+    }else{
+      QrnOut <- foreach::foreach(v = 1:cvFolds, .packages = "SuperLearner") %dopar% {
+        estimateQrn(Y=Y, A=A, W=W, Qn=Qn, gn=gn, glm_Qr=glm_Qr, 
+                    SL_Qr=SL_Qr, a_0=a_0,returnModels = returnModels,
+                    validRows = validRows[[v]])
+      }
+    }
+    # re-order predictions
+    QrnValid <- unlist(QrnOut, recursive = FALSE, use.names = FALSE)
+    QrnUnOrd <- do.call(Map, c(c, QrnValid[seq(1,length(QrnValid),2)]))
+    Qrn <- lapply(QrnUnOrd, function(x){ x[ordVR] })
+    # obtain list of reduced dimension regression fits
+    QrnMod <- QrnValid[seq(2,length(QrnValid),2)]
+    # TO DO: Add reasonable names to QrnMod?
 
-      Dngo <- mapply(a=split(a_0,1:length(a_0)),Qr=Qrn,g=gn,FUN=function(a,Qr,g){
-        Qr/g * (as.numeric(A==a) - g)
-      },SIMPLIFY=FALSE)
-      PnDgn <- lapply(Dngo, mean)
+    Dngo <- mapply(a=split(a_0,1:length(a_0)),Qr=Qrn,g=gn,FUN=function(a,Qr,g){
+      Qr/g * (as.numeric(A==a) - g)
+    },SIMPLIFY=FALSE)
+    PnDgn <- lapply(Dngo, mean)
   }
   if("g" %in% guard){
+    if(!parallel){
       grnOut <- lapply(X=validRows, FUN = estimategrn,
                        Y=Y,A=A, W=W, tolg=tolg, Qn=Qn, gn=gn, 
                        glm_gr=glm_gr, SL_gr=SL_gr, a_0=a_0, 
                        reduction=reduction,returnModels = returnModels)      
-      # re-order predictions
-      grnValid <- unlist(grnOut, recursive = FALSE, use.names = FALSE)
-      grnUnOrd <- do.call(Map, c(rbind, grnValid[seq(1,length(grnValid),2)]))
-      grn <- lapply(grnUnOrd, function(x){ x[ordVR,] })
-      # obtain list of outcome regression fits
-      grnMod <- grnValid[seq(2,length(grnValid),2)]
-      # TO DO: Add reasonable names to grnMod?
-
-      if(reduction=="univariate"){
-        DnQo <- mapply(a=split(a_0,1:length(a_0)),Q=Qn,gr=grn,FUN=function(a,Q,gr){
-          as.numeric(A==a)/gr$grn2 * gr$grn1 * (Y-Q)
-        },SIMPLIFY=FALSE)
-      }else if(reduction=="bivariate"){
-        DnQo <- mapply(a=split(a_0,1:length(a_0)),Q=Qn,g=gn, gr=grn,FUN=function(a,Q,gr,g){
-          as.numeric(A==a)/gr$grn2 * (gr$grn2 - g)/g * (Y-Q)
-        },SIMPLIFY=FALSE)
+    }else{
+      grnOut <- foreach::foreach(v = 1:cvFolds, .packages = "SuperLearner") %dopar% {
+        estimategrn(Y=Y,A=A, W=W, tolg=tolg, Qn=Qn, gn=gn, 
+                    glm_gr=glm_gr, SL_gr=SL_gr, a_0=a_0, 
+                    reduction=reduction,returnModels = returnModels,
+                    validRows = validRows[[v]])
       }
-      PnDQn <- lapply(DnQo, mean)
+    }
+    # re-order predictions
+    grnValid <- unlist(grnOut, recursive = FALSE, use.names = FALSE)
+    grnUnOrd <- do.call(Map, c(rbind, grnValid[seq(1,length(grnValid),2)]))
+    grn <- lapply(grnUnOrd, function(x){ x[ordVR,] })
+    # obtain list of outcome regression fits
+    grnMod <- grnValid[seq(2,length(grnValid),2)]
+    # TO DO: Add reasonable names to grnMod?
+
+    if(reduction=="univariate"){
+      DnQo <- mapply(a=split(a_0,1:length(a_0)),Q=Qn,gr=grn,FUN=function(a,Q,gr){
+        as.numeric(A==a)/gr$grn2 * gr$grn1 * (Y-Q)
+      },SIMPLIFY=FALSE)
+    }else if(reduction=="bivariate"){
+      DnQo <- mapply(a=split(a_0,1:length(a_0)),Q=Qn,g=gn, gr=grn,FUN=function(a,Q,gr,g){
+        as.numeric(A==a)/gr$grn2 * (gr$grn2 - g)/g * (Y-Q)
+      },SIMPLIFY=FALSE)
+    }
+    PnDQn <- lapply(DnQo, mean)
   }
   
   # one step estimates
@@ -267,10 +307,19 @@ drtmle <- function(Y, A, W, a_0 = unique(A),
     
     # fluctuate QnStar
     if("g" %in% guard){
-      grnStarOut <- lapply(X=validRows, FUN = estimategrn,
-                       Y=Y,A=A, W=W, tolg=tolg, Qn=QnStar, gn=gnStar, 
-                       glm_gr=glm_gr, SL_gr=SL_gr, a_0=a_0, 
-                       reduction=reduction,returnModels = returnModels)
+      if(!parallel){
+        grnStarOut <- lapply(X=validRows, FUN = estimategrn,
+                         Y=Y,A=A, W=W, tolg=tolg, Qn=QnStar, gn=gnStar, 
+                         glm_gr=glm_gr, SL_gr=SL_gr, a_0=a_0, 
+                         reduction=reduction,returnModels = returnModels)
+      }else{
+        grnStarOut <- foreach::foreach(v = 1:cvFolds, .packages = "SuperLearner") %dopar% {
+          estimategrn(Y=Y,A=A, W=W, tolg=tolg, Qn=QnStar, gn=gnStar, 
+                      glm_gr=glm_gr, SL_gr=SL_gr, a_0=a_0, 
+                      reduction=reduction,returnModels = returnModels,
+                      validRows = validRows[[v]])
+        }
+      }
       # re-order predictions
       grnValid <- unlist(grnStarOut, recursive = FALSE, use.names = FALSE)
       grnUnOrd <- do.call(Map, c(rbind, grnValid[seq(1,length(grnValid),2)]))
@@ -304,9 +353,17 @@ drtmle <- function(Y, A, W, a_0 = unique(A),
     }
     
     if("Q" %in% guard){
-      QrnStarOut <- lapply(X = validRows, FUN = estimateQrn, 
-                       Y=Y, A=A, W=W, Qn=QnStar, gn=gnStar, glm_Qr=glm_Qr, 
-                       SL_Qr=SL_Qr, a_0=a_0,returnModels = returnModels)
+      if(!parallel){
+        QrnStarOut <- lapply(X = validRows, FUN = estimateQrn, 
+                         Y=Y, A=A, W=W, Qn=QnStar, gn=gnStar, glm_Qr=glm_Qr, 
+                         SL_Qr=SL_Qr, a_0=a_0,returnModels = returnModels)
+      }else{
+        QrnStarOut <- foreach::foreach(v = 1:cvFolds, .packages = "SuperLearner") %dopar% {
+          estimateQrn(Y=Y, A=A, W=W, Qn=QnStar, gn=gnStar, glm_Qr=glm_Qr, 
+                      SL_Qr=SL_Qr, a_0=a_0,returnModels = returnModels,
+                      validRows = validRows[[v]])
+        }
+      }
       # re-order predictions
       QrnValid <- unlist(QrnStarOut, recursive = FALSE, use.names = FALSE)
       QrnUnOrd <- do.call(Map, c(c, QrnValid[seq(1,length(QrnValid),2)]))

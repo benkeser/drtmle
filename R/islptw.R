@@ -21,8 +21,11 @@
 #' @param returnModels A boolean indicating whether to return model fits for the propensity score
 #' and reduced-dimension regressions.
 #' @param cvFolds A numeric equal to the number of folds to be used in cross-validated fitting of 
-#' nuisance parameters. If \code{NULL}, no cross-validation is used.
+#' nuisance parameters. If \code{cvFolds = 1}, no cross-validation is used.
 #' @param ... Other options (not currently used).
+#' @param parallel A boolean indicating whether to use \code{foreach}
+#' to estimate nuisance parameters in parallel. Only useful if there is a registered parallel
+#' backend (see examples) and \code{cvFolds > 1}.
 #' @return An object of class \code{"islptw"}.
 #' \describe{
 #'  \item{\code{islptw_tmle}}{A \code{list} of point estimates and 
@@ -79,11 +82,12 @@ islptw <- function(W, A, Y, a_0 = unique(A),
                    maxIter = 2, 
                    tolIC=1/length(Y), 
                    tolg=1e-2,
-                   cvFolds = NULL, ... 
+                   cvFolds = 1, parallel = FALSE,
+                   ... 
                    ){
   # if cvFolds non-null split data into cvFolds pieces
   n <- length(Y)
-  if(!is.null(cvFolds)){
+  if(cvFolds != 1){
     validRows <- split(sample(1:n), rep(1:cvFolds, length = n))       
     ordVR <- order(unlist(validRows))
   }else{
@@ -94,10 +98,18 @@ islptw <- function(W, A, Y, a_0 = unique(A),
   #-------------------------------
   # estimate propensity score
   #-------------------------------
-  gnOut <- lapply(X = validRows, FUN = estimateG,
-                  A=A, W=W, tolg=tolg, verbose=verbose, 
-                  returnModels=returnModels,SL_g=SL_g,
-                  glm_g=glm_g, a_0=a_0)
+  if(!parallel){
+    gnOut <- lapply(X = validRows, FUN = estimateG,
+                    A=A, W=W, tolg=tolg, verbose=verbose, 
+                    returnModels=returnModels,SL_g=SL_g,
+                    glm_g=glm_g, a_0=a_0)
+  }else{
+    gnOut <- foreach::foreach(v = 1:cvFolds, .packages = "SuperLearner") %dopar% {
+      estimateG(A = A, W = W, tolg = tolg, verbose = verbose,
+                returnModels = returnModels, SL_g = SL_g,
+                glm_g = glm_g, a_0 = a_0, validRows = validRows[[v]])
+    }
+  }
   # re-order predictions
   gnValid <- unlist(gnOut, recursive = FALSE, use.names = FALSE)
   gnUnOrd <- do.call(Map, c(c, gnValid[seq(1,length(gnValid),2)]))
@@ -123,9 +135,18 @@ islptw <- function(W, A, Y, a_0 = unique(A),
 	# assign Qn = 0 for all a_0 because estimateQrn estimates the regression
 	# of Y - Qn on gn (which is needed for drtmle), while here we just need
 	# the regression of Y on gn. 
-  QrnOut <- lapply(X = validRows, FUN = estimateQrn, 
+  if(!parallel){
+    QrnOut <- lapply(X = validRows, FUN = estimateQrn, 
                    Y=Y, A=A, W=W, Qn=NULL, gn=gn, glm_Qr=glm_Qr, 
-                   SL_Qr=SL_Qr, a_0=a_0,returnModels = returnModels)
+                   SL_Qr=SL_Qr, a_0=a_0,returnModels = returnModels)  
+  }else{
+    QrnOut <- foreach::foreach(v = 1:cvFolds, .packages = "SuperLearner") %dopar% {
+      estimateQrn(Y=Y, A=A, W=W, Qn=NULL, gn=gn, glm_Qr=glm_Qr, 
+                  SL_Qr=SL_Qr, a_0=a_0,returnModels = returnModels,
+                  validRows = validRows[[v]])
+    }
+  }
+
   # re-order predictions
   QrnValid <- unlist(QrnOut, recursive = FALSE, use.names = FALSE)
   QrnUnOrd <- do.call(Map, c(c, QrnValid[seq(1,length(QrnValid),2)]))
@@ -159,13 +180,21 @@ islptw <- function(W, A, Y, a_0 = unique(A),
     gnStar <- plyr::llply(gnStarOut, function(x){unlist(x$est)})
     eps <- plyr::laply(gnStarOut, function(x){x$eps})
     # re-estimate reduced dimension regression
-    QrnOut <- lapply(X = validRows, FUN = estimateQrn, 
-                   Y=Y, A=A, W=W, Qn=NULL, gn=gn, glm_Qr=glm_Qr, 
+    if(!parallel){
+      QrnStarOut <- lapply(X = validRows, FUN = estimateQrn, 
+                   Y=Y, A=A, W=W, Qn=NULL, gn=gnStar, glm_Qr=glm_Qr, 
                    SL_Qr=SL_Qr, a_0=a_0,returnModels = returnModels)
+    }else{
+      QrnStarOut <- foreach::foreach(v = 1:cvFolds, .packages = "SuperLearner") %dopar% {
+        estimateQrn(Y=Y, A=A, W=W, Qn=NULL, gn=gnStar, glm_Qr=glm_Qr, 
+                    SL_Qr=SL_Qr, a_0=a_0,returnModels = returnModels,
+                    validRows = validRows[[v]])
+      }
+    }
     # re-order predictions
-    QrnValid <- unlist(QrnOut, recursive = FALSE, use.names = FALSE)
+    QrnValid <- unlist(QrnStarOut, recursive = FALSE, use.names = FALSE)
     QrnUnOrd <- do.call(Map, c(c, QrnValid[seq(1,length(QrnValid),2)]))
-    Qrn <- lapply(QrnUnOrd, function(x){ x[ordVR] })
+    QrnStar <- lapply(QrnUnOrd, function(x){ x[ordVR] })
     # obtain list of propensity score fits
     QrnMod <- QrnValid[seq(2,length(QrnValid),2)]
 
