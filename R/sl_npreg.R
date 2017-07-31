@@ -32,8 +32,8 @@ SL.npreg <- function (Y, X, newX, family, obsWeights,
             paste("Y ~", paste(names(X),collapse="+"))), data=X,
           ftol=0.01, tol=0.01, remin=FALSE)
   
-  # fit the kernel regression
-  thisMod <- np::npreg(bw)
+    # fit the kernel regression
+    thisMod <- np::npreg(bw)
   }
   
   pred <- stats::predict(thisMod, newdata=newX)

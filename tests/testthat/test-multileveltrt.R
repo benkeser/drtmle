@@ -35,13 +35,13 @@ test_that("drtmle executes as expected with multiple treatment levels", {
 	expect_true(is.numeric(fit1$aiptw_c$est))
 	expect_true(is.numeric(fit1$aiptw_c$cov))
 
-	# check confint works
-	ci <- confint(fit1)
+	# check ci works
+	ci <- ci(fit1)
 	expect_true(length(fit1$drtmle$est)==3)
 	# check contrasts work
-	ci2 <- confint(fit1, contrast = c(1,-1,0))
+	ci2 <- ci(fit1, contrast = c(1,-1,0))
 	expect_true(row.names(ci2$drtmle) == "E[Y(0)]-E[Y(1)]")
-	ci3 <- confint(fit1, contrast = c(1,0,-1))
+	ci3 <- ci(fit1, contrast = c(1,0,-1))
 	expect_true(row.names(ci3$drtmle) == "E[Y(0)]-E[Y(2)]")
 
 
@@ -68,13 +68,13 @@ test_that("drtmle executes as expected with multiple treatment levels", {
 	expect_true(is.numeric(fit1$aiptw_c$est))
 	expect_true(is.numeric(fit1$aiptw_c$cov))
 
-	# check confint works
-	ci <- confint(fit1)
+	# check ci works
+	ci <- ci(fit1)
 	expect_true(length(fit1$drtmle$est)==3)
 	# check contrasts work
-	ci2 <- confint(fit1, contrast = c(1,-1,0))
+	ci2 <- ci(fit1, contrast = c(1,-1,0))
 	expect_true(row.names(ci2$drtmle) == "E[Y(0)]-E[Y(1)]")
-	ci3 <- confint(fit1, contrast = c(1,0,-1))
+	ci3 <- ci(fit1, contrast = c(1,0,-1))
 	expect_true(row.names(ci3$drtmle) == "E[Y(0)]-E[Y(2)]")
 })
 
@@ -98,13 +98,13 @@ test_that("islptw executes as expected with multiple treatment levels", {
 	expect_true(is.numeric(fit1$islptw_os$est))
 	expect_true(is.numeric(fit1$islptw_os$cov))
 	expect_true(is.numeric(fit1$islptw_tmle$cov))
-	# check confint works
-	ci <- confint(fit1)
+	# check ci works
+	ci <- ci(fit1)
 	expect_true(length(fit1$islptw_tmle$est)==3)
 	# check contrasts work
-	ci2 <- confint(fit1, contrast = c(1,-1,0))
+	ci2 <- ci(fit1, contrast = c(1,-1,0))
 	expect_true(row.names(ci2$islptw_tmle) == "E[Y(0)]-E[Y(1)]")
-	ci3 <- confint(fit1, contrast = c(1,0,-1))
+	ci3 <- ci(fit1, contrast = c(1,0,-1))
 	expect_true(row.names(ci3$islptw_tmle) == "E[Y(0)]-E[Y(2)]")
 
 
@@ -121,13 +121,13 @@ test_that("islptw executes as expected with multiple treatment levels", {
 	expect_true(is.numeric(fit1$islptw_os$est))
 	expect_true(is.numeric(fit1$islptw_os$cov))
 	expect_true(is.numeric(fit1$islptw_tmle$cov))
-	# check confint works
-	ci <- confint(fit1)
+	# check ci works
+	ci <- ci(fit1)
 	expect_true(length(fit1$islptw_tmle$est)==3)
 	# check contrasts work
-	ci2 <- confint(fit1, contrast = c(1,-1,0))
+	ci2 <- ci(fit1, contrast = c(1,-1,0))
 	expect_true(row.names(ci2$islptw_tmle) == "E[Y(0)]-E[Y(1)]")
-	ci3 <- confint(fit1, contrast = c(1,0,-1))
+	ci3 <- ci(fit1, contrast = c(1,0,-1))
 	expect_true(row.names(ci3$islptw_tmle) == "E[Y(0)]-E[Y(2)]")
 
 

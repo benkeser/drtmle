@@ -1,8 +1,8 @@
 library(drtmle)
 library(SuperLearner)
 
-context("Testing ci.drtmle method ")
-test_that("ci.drtmle works as expected",{
+context("Testing wald_test.drtmle method ")
+test_that("wald_test.drtmle works as expected",{
 	# simulate data
 	set.seed(123456)
 	n <- 200
@@ -18,18 +18,18 @@ test_that("ci.drtmle works as expected",{
 	               SL_Qr="SL.glm",
 	               SL_gr="SL.glm")
 
-	# get confidence intervals for each mean for only drtmle
-	tmp <- ci(fit1)
+	# get test for each mean for only drtmle
+	tmp <- wald_test(fit1)
 	# correct class
-	expect_true(class(tmp)=="ci.drtmle")
+	expect_true(class(tmp)=="wald_test.drtmle")
 	# no NAs
 	expect_true(sum(is.na(unlist(tmp)))==0)
 
-	# get confidence intervals for each mean for drtmle and tmle
-	tmp <- ci(fit1, est = c("drtmle","tmle","aiptw","aiptw_c","gcomp"))
+	# get test for each mean for drtmle and tmle
+	tmp <- wald_test(fit1, est = c("drtmle","tmle","aiptw","aiptw_c","gcomp"))
 
 	# correct class
-	expect_true(class(tmp)=="ci.drtmle")
+	expect_true(class(tmp)=="wald_test.drtmle")
 	# no NAs
 	expect_true(sum(is.na(unlist(tmp)))==0)
 	expect_true(length(tmp) == 5)
@@ -37,59 +37,57 @@ test_that("ci.drtmle works as expected",{
 	expect_true(nrow(tmp$drtmle) == 2)
 	expect_true(nrow(tmp$tmle) == 2)
 
-	# get confidence intervals for ATE
-	tmp <- ci(fit1, contrast = c(1,-1))
+	# get test for ATE
+	tmp <- wald_test(fit1, contrast = c(1,-1))
 	# correct class
-	expect_true(class(tmp)=="ci.drtmle")
+	expect_true(class(tmp)=="wald_test.drtmle")
 	# correct row name
-	expect_true(row.names(tmp$drtmle) == "E[Y(1)]-E[Y(0)]")
+	expect_true(row.names(tmp$drtmle) == "H0:E[Y(1)]-E[Y(0)]=0")
 	# no NAs
 	expect_true(sum(is.na(unlist(tmp)))==0)
 
 	# throws error if crazy contrast is put in 
-	expect_error(ci(fit1, contrast = c(10214,NA)))
+	expect_error(wald_test(fit1, contrast = c(10214,NA)))
 
-	# get confidence intervals for risk ratio 
+	# get test for risk ratio 
 	# by inputting own contrast function
 	# this computes CI on log scale and back transforms
 	myContrast <- list(f = function(eff){ log(eff) },
 	                   f_inv = function(eff){ exp(eff) },
 	                   h = function(est){ est[1]/est[2] },
 	                   h_grad =  function(est){ c(1/est[1],-1/est[2]) })
-	tmp <- ci(fit1, contrast = myContrast)
-	expect_true(class(tmp)=="ci.drtmle")
-	expect_true(row.names(tmp$drtmle) == "user contrast")
+	tmp <- wald_test(fit1, contrast = myContrast, null = 1)
+	expect_true(class(tmp)=="wald_test.drtmle")
+	expect_true(row.names(tmp$drtmle) == "H0: user contrast = 1")
 	# no NAs
 	expect_true(sum(is.na(unlist(tmp)))==0)
 })
 
-##### ADD TEST FOR ci.islptw
-
 context("Testing ci.islptw method ")
-test_that("ci.islptw works as expected",{
+test_that("wald_test.islptw works as expected",{
 	# simulate data
 	set.seed(123456)
 	n <- 200
 	W <- data.frame(W1 = runif(n), W2 = rnorm(n))
 	A <- rbinom(n,1,plogis(W$W1 - W$W2))
 	Y <- rbinom(n, 1, plogis(W$W1*W$W2*A))
-	# fit a drtmle
+	# fit a islptw
 	fit1 <- islptw(W = W, A = A, Y = Y, a_0 = c(1,0),
 	               SL_g=c("SL.glm","SL.mean","SL.step"),
 	               SL_Qr="SL.glm")
 
-	# get confidence intervals for each 
-	tmp <- ci(fit1)
+	# get test for each mean for only drtmle
+	tmp <- wald_test(fit1)
 	# correct class
-	expect_true(class(tmp)=="ci.islptw")
+	expect_true(class(tmp)=="wald_test.islptw")
 	# no NAs
 	expect_true(sum(is.na(unlist(tmp)))==0)
 
-	# get confidence intervals for each mean 
-	tmp <- ci(fit1, est = c("islptw_tmle","islptw_os"))
+	# get test for each mean for drtmle and tmle
+	tmp <- wald_test(fit1, est = c("islptw_tmle","islptw_os"))
 
 	# correct class
-	expect_true(class(tmp)=="ci.islptw")
+	expect_true(class(tmp)=="wald_test.islptw")
 	# no NAs
 	expect_true(sum(is.na(unlist(tmp)))==0)
 	expect_true(length(tmp) == 2)
@@ -97,28 +95,28 @@ test_that("ci.islptw works as expected",{
 	expect_true(nrow(tmp$islptw_tmle) == 2)
 	expect_true(nrow(tmp$islptw_os) == 2)
 
-	# get confidence intervals for ATE
-	tmp <- ci(fit1, contrast = c(1,-1))
+	# get test for ATE
+	tmp <- wald_test(fit1, contrast = c(1,-1))
 	# correct class
-	expect_true(class(tmp)=="ci.islptw")
+	expect_true(class(tmp)=="wald_test.islptw")
 	# correct row name
-	expect_true(row.names(tmp$islptw_tmle) == "E[Y(1)]-E[Y(0)]")
+	expect_true(row.names(tmp$islptw_tmle) == "H0:E[Y(1)]-E[Y(0)]=0")
 	# no NAs
 	expect_true(sum(is.na(unlist(tmp)))==0)
 
 	# throws error if crazy contrast is put in 
-	expect_error(ci(fit1, contrast = c(10214,NA)))
+	expect_error(wald_test(fit1, contrast = c(10214,NA)))
 
-	# get confidence intervals for risk ratio 
+	# get test for risk ratio 
 	# by inputting own contrast function
 	# this computes CI on log scale and back transforms
 	myContrast <- list(f = function(eff){ log(eff) },
 	                   f_inv = function(eff){ exp(eff) },
 	                   h = function(est){ est[1]/est[2] },
 	                   h_grad =  function(est){ c(1/est[1],-1/est[2]) })
-	tmp <- ci(fit1, contrast = myContrast)
-	expect_true(class(tmp)=="ci.islptw")
-	expect_true(row.names(tmp$islptw_tmle) == "user contrast")
+	tmp <- wald_test(fit1, contrast = myContrast, null = 1)
+	expect_true(class(tmp)=="wald_test.islptw")
+	expect_true(row.names(tmp$islptw_tmle) == "H0: user contrast = 1")
 	# no NAs
 	expect_true(sum(is.na(unlist(tmp)))==0)
 })

@@ -40,26 +40,50 @@ print.islptw <- function(x,...){
 }
 
 
-#' Print the output of confint.drtmle
+#' Print the output of ci.drtmle
 #' @export
-#' @param x An object of class drconfint
+#' @param x An object of class ci.drtmle
 #' @param digits Number of digits to round to 
 #' @param ... Other options (not currently used)
-#' @method print confint.drtmle	
+#' @method print ci.drtmle	
 
-print.confint.drtmle <- function(x,digits = 3,...){
+print.ci.drtmle <- function(x,digits = 3,...){
 	tmp <- lapply(x, round, digits = digits)
 	print(tmp)
 }
 
-#' Print the output of confint.islptw
+#' Print the output of ci.islptw
 #' @export
-#' @param x An object of class drconfint
+#' @param x An object of class ci.islptw
 #' @param digits Number of digits to round to 
 #' @param ... Other options (not currently used)
-#' @method print confint.islptw 
+#' @method print ci.islptw 
 
-print.confint.islptw <- function(x,digits = 3,...){
+print.ci.islptw <- function(x,digits = 3,...){
 	tmp <- lapply(x, round, digits = digits)
 	print(tmp)
+}
+
+#' Print the output of wald_test.drtmle
+#' @export
+#' @param x An object of class wald_test.drtmle
+#' @param digits Number of digits to round to 
+#' @param ... Other options (not currently used)
+#' @method print wald_test.drtmle
+
+print.wald_test.drtmle <- function(x,digits = 3,...){
+  tmp <- lapply(x, round, digits = digits)
+  print(tmp)
+}
+
+#' Print the output of wald_test.islptw
+#' @export
+#' @param x An object of class wald_test.islptw
+#' @param digits Number of digits to round to 
+#' @param ... Other options (not currently used)
+#' @method print wald_test.islptw 
+
+print.wald_test.islptw <- function(x,digits = 3,...){
+  tmp <- lapply(x, round, digits = digits)
+  print(tmp)
 }

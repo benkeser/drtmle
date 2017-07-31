@@ -48,7 +48,7 @@ treatments on continuous and binary outcomes. The targeted minimum loss-based (T
 
 ### Doubly-robust inference for average treatment effect
 
-This package can be used to estimate covariate-adjusted marginal means under multiple discrete levels of a treatment. It may be used in situations where data consist of a vector of baseline covariates (`W`), a multi-level treatment assignment (`A`), and a continuous or binary-valued outcome (`Y`). The function `drtmle` may be used to estimate $E[E(Y | A=a_0, W)]$ for user-selected values of $a_0$ (via option `a_0`). The resulting targeted minimum loss-based estimates are doubly robust with respect to both consistency and asymptotic normality. The function computes doubly robust variance estimators that can be used to construct doubly robust confidence intervals for covariate-adjusted marginal means and contrasts between these means (via the `drconfint` function) for different levels of $a_0$. A simple example on simulated data is shown below. 
+This package can be used to estimate covariate-adjusted marginal means under multiple discrete levels of a treatment. It may be used in situations where data consist of a vector of baseline covariates (`W`), a multi-level treatment assignment (`A`), and a continuous or binary-valued outcome (`Y`). The function `drtmle` may be used to estimate $E[E(Y | A=a_0, W)]$ for user-selected values of $a_0$ (via option `a_0`). The resulting targeted minimum loss-based estimates are doubly robust with respect to both consistency and asymptotic normality. The function computes doubly robust variance estimators that can be used to construct doubly robust confidence intervals for covariate-adjusted marginal means and contrasts between these means (via the `ci` method) for different levels of $a_0$. A simple example on simulated data is shown below. 
 
 ```{r}
 # load packages
@@ -77,12 +77,12 @@ fit1 <- drtmle(W = W, A = A, Y = Y, # input data
 fit1
 
 # get confidence intervals for marginal means
-ci_fit1 <- confint(fit1)
+ci_fit1 <- ci(fit1)
 # print the output
 ci_fit1
 
 # get confidence intervals for ate
-ci_ate1 <- confint(fit1,contrast = c(-1,1))
+ci_ate1 <- ci(fit1,contrast = c(-1,1))
 # print the output
 ci_ate1
 ```
@@ -100,12 +100,12 @@ fit2 <- islptw(Y = Y, A = A, W = W, a_0 = c(0,1),
 fit2
 
 # compute a confidence interval for margin means
-ci_fit2 <- confint(fit2)
+ci_fit2 <- ci(fit2)
 # print the output
 ci_fit2
 
 # compute a confidence interval for the ate
-ci_ate2 <- confint(fit2, contrast = c(-1,1))
+ci_ate2 <- ci(fit2, contrast = c(-1,1))
 # print the output
 ci_ate2
 ```
