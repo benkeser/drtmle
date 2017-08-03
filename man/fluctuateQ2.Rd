@@ -4,7 +4,8 @@
 \alias{fluctuateQ2}
 \title{fluctuateQ2}
 \usage{
-fluctuateQ2(Y, A, W, Qn, gn, grn, a_0, reduction, coefTol = 1e+05)
+fluctuateQ2(Y, A, W, DeltaY, DeltaA, Qn, gn, grn, a_0, reduction,
+  coefTol = 1e+05)
 }
 \arguments{
 \item{Y}{The outcome}
@@ -12,6 +13,10 @@ fluctuateQ2(Y, A, W, Qn, gn, grn, a_0, reduction, coefTol = 1e+05)
 \item{A}{The treatment}
 
 \item{W}{The covariates}
+
+\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if missing 1 if observed)}
+
+\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if missing 1 if observed)}
 
 \item{Qn}{A list of outcome regression estimates evaluated on observed data}
 

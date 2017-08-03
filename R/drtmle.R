@@ -3,6 +3,8 @@
 #' @param W A \code{data.frame} of named covariates
 #' @param A A vector of binary treatment assignment (assumed to be equal to 0 or 1)
 #' @param Y A numeric of continuous or binary outcomes. 
+#' @param DeltaY Indicator of missing outcome (assumed to be equal to 0 if missing 1 if observed)
+#' @param DeltaA Indicator of missing treatment (assumed to be equal to 0 if missing 1 if observed)
 #' @param a_0 A vector of treatment levels at which to compute the adjusted mean outcome. 
 #' @param family A \code{family} object equal to either \code{binomial()} or \code{gaussian()}, 
 #' to be passed to the \code{SuperLearner} or \code{glm} function.
@@ -114,7 +116,10 @@
 #'                SL_Qr="SL.npreg",
 #'                SL_gr="SL.npreg")
 
-drtmle <- function(Y, A, W, a_0 = unique(A),
+drtmle <- function(Y, A, W, 
+                   DeltaA = as.numeric(!is.na(A)),
+                   DeltaY = as.numeric(!is.na(Y)),
+                   a_0 = unique(A[!is.na(A)]),
                    family = stats::binomial(),
                    stratify = TRUE,
                    SL_Q = NULL,
@@ -150,12 +155,14 @@ drtmle <- function(Y, A, W, a_0 = unique(A),
   #-------------------------------
   if(!parallel){
     gnOut <- lapply(X = validRows, FUN = estimateG,
-                    A=A, W=W, tolg=tolg, verbose=verbose, 
-                    returnModels=returnModels,SL_g=SL_g,
-                    glm_g=glm_g, a_0=a_0)
+                    A = A, W = W, DeltaA = DeltaA, DeltaY = DeltaY,
+                    tolg = tolg, verbose = verbose, stratify = stratify,
+                    returnModels = returnModels,SL_g = SL_g,
+                    glm_g = glm_g, a_0 = a_0)
   }else{
     gnOut <- foreach::foreach(v = 1:cvFolds, .packages = "SuperLearner") %dopar% {
-      estimateG(A = A, W = W, tolg = tolg, verbose = verbose,
+      estimateG(A = A, W = W, DeltaA = DeltaA, DeltaY = DeltaY, 
+                tolg = tolg, verbose = verbose, stratify = stratify,
                 returnModels = returnModels, SL_g = SL_g,
                 glm_g = glm_g, a_0 = a_0, validRows = validRows[[v]])
     }
@@ -163,10 +170,10 @@ drtmle <- function(Y, A, W, a_0 = unique(A),
 
   # # re-order predictions
   gnValid <- unlist(gnOut, recursive = FALSE, use.names = FALSE)
-  gnUnOrd <- do.call(Map, c(c, gnValid[seq(1,length(gnValid),2)]))
+  gnUnOrd <- do.call(Map, c(c, gnValid[seq(1, length(gnValid), 2)]))
   gn <- lapply(gnUnOrd, function(x){ x[ordVR] })
   # obtain list of propensity score fits
-  gnMod <- gnValid[seq(2,length(gnValid),2)]
+  gnMod <- gnValid[seq(2, length(gnValid), 2)]
   # TO DO: Add reasonable names to gnMod?
 
   #-------------------------------
@@ -174,15 +181,16 @@ drtmle <- function(Y, A, W, a_0 = unique(A),
   #-------------------------------
   if(!parallel){
     QnOut <- lapply(X = validRows, FUN = estimateQ,
-                    Y=Y, A=A, W=W, verbose=verbose, 
-                    returnModels=returnModels, SL_Q=SL_Q, a_0=a_0,
-                    stratify=stratify, glm_Q=glm_Q,family=family)
+                    Y = Y, A = A, W = W, DeltaA = DeltaA, DeltaY = DeltaY,
+                    verbose = verbose, returnModels = returnModels, 
+                    SL_Q = SL_Q, a_0 = a_0, stratify = stratify, 
+                    glm_Q = glm_Q, family = family)
   }else{
     QnOut <- foreach::foreach(v = 1:cvFolds, .packages = "SuperLearner") %dopar% {
-      estimateQ(Y = Y, A = A, W = W, verbose = verbose,
-                returnModels = returnModels, SL_Q = SL_Q, a_0 = a_0,
-                glm_Q = glm_Q, family = family, stratify = stratify,
-                validRows = validRows[[v]])
+      estimateQ(Y = Y, A = A, W = W, DeltaA = DeltaA, DeltaY = DeltaY,
+                verbose = verbose, returnModels = returnModels, 
+                SL_Q = SL_Q, a_0 = a_0, glm_Q = glm_Q, family = family, 
+                stratify = stratify, validRows = validRows[[v]])
     }
   }
   # re-order predictions
@@ -197,9 +205,16 @@ drtmle <- function(Y, A, W, a_0 = unique(A),
   # naive g-computation estimate
   psi.n <- lapply(Qn, mean)
   
+  # in order for influence function computations to compute properly
+  # replace missing A and Y by arbitrary numerics.
+  # Note that when these are missing, they are always getting multiplied
+  # by 0, but R return 0*NA = NA for some reason and this is a hacky fix
+  # to get around that. 
   # estimate influence function
   Dno <- mapply(a=split(a_0,1:length(a_0)),Q=Qn,g=gn,p=psi.n,FUN=function(a,Q,g,p){
-    as.numeric(A==a)/g * (Y - Q) + Q - p
+    modA <- A; modA[is.na(A)] <- -999
+    modY <- Y; modY[is.na(Y)] <- -999
+    as.numeric(modA == a & DeltaA == 1 & DeltaY == 1)/g * (modY - Q) + Q - p
   },SIMPLIFY=FALSE)
   
   # estimate bias correction
@@ -213,11 +228,13 @@ drtmle <- function(Y, A, W, a_0 = unique(A),
   if("Q" %in% guard){
     if(!parallel){
       QrnOut <- lapply(X = validRows, FUN = estimateQrn, 
-                       Y=Y, A=A, W=W, Qn=Qn, gn=gn, glm_Qr=glm_Qr, 
+                       Y=Y, A=A, W=W, DeltaA = DeltaA, DeltaY = DeltaY, 
+                       Qn=Qn, gn=gn, glm_Qr=glm_Qr, 
                        SL_Qr=SL_Qr, a_0=a_0,returnModels = returnModels)
     }else{
       QrnOut <- foreach::foreach(v = 1:cvFolds, .packages = "SuperLearner") %dopar% {
-        estimateQrn(Y=Y, A=A, W=W, Qn=Qn, gn=gn, glm_Qr=glm_Qr, 
+        estimateQrn(Y=Y, A=A, W=W, DeltaA = DeltaA, DeltaY = DeltaY, 
+                    Qn=Qn, gn=gn, glm_Qr=glm_Qr, 
                     SL_Qr=SL_Qr, a_0=a_0,returnModels = returnModels,
                     validRows = validRows[[v]])
       }
@@ -231,19 +248,23 @@ drtmle <- function(Y, A, W, a_0 = unique(A),
     # TO DO: Add reasonable names to QrnMod?
 
     Dngo <- mapply(a=split(a_0,1:length(a_0)),Qr=Qrn,g=gn,FUN=function(a,Qr,g){
-      Qr/g * (as.numeric(A==a) - g)
+      modA <- A; modA[is.na(A)] <- -999
+      Qr/g * (as.numeric(modA == a & DeltaA == 1 & DeltaY == 1) - g)
     },SIMPLIFY=FALSE)
     PnDgn <- lapply(Dngo, mean)
   }
   if("g" %in% guard){
     if(!parallel){
       grnOut <- lapply(X=validRows, FUN = estimategrn,
-                       Y=Y,A=A, W=W, tolg=tolg, Qn=Qn, gn=gn, 
+                       Y=Y,A=A, W=W, DeltaA = DeltaA, DeltaY = DeltaY, 
+                       tolg=tolg, Qn=Qn, gn=gn, 
                        glm_gr=glm_gr, SL_gr=SL_gr, a_0=a_0, 
                        reduction=reduction,returnModels = returnModels)      
     }else{
       grnOut <- foreach::foreach(v = 1:cvFolds, .packages = "SuperLearner") %dopar% {
-        estimategrn(Y=Y,A=A, W=W, tolg=tolg, Qn=Qn, gn=gn, 
+        estimategrn(Y=Y,A=A, W=W, 
+                    DeltaA = DeltaA, DeltaY = DeltaY,
+                    tolg=tolg, Qn=Qn, gn=gn, 
                     glm_gr=glm_gr, SL_gr=SL_gr, a_0=a_0, 
                     reduction=reduction,returnModels = returnModels,
                     validRows = validRows[[v]])
@@ -259,11 +280,15 @@ drtmle <- function(Y, A, W, a_0 = unique(A),
 
     if(reduction=="univariate"){
       DnQo <- mapply(a=split(a_0,1:length(a_0)),Q=Qn,gr=grn,FUN=function(a,Q,gr){
-        as.numeric(A==a)/gr$grn2 * gr$grn1 * (Y-Q)
+        modA <- A; modA[is.na(A)] <- -999
+        modY <- Y; modY[is.na(Y)] <- -999
+        as.numeric(modA == a & DeltaA == 1 & DeltaY == 1)/gr$grn2 * gr$grn1 * (modY-Q)
       },SIMPLIFY=FALSE)
     }else if(reduction=="bivariate"){
       DnQo <- mapply(a=split(a_0,1:length(a_0)),Q=Qn,g=gn, gr=grn,FUN=function(a,Q,gr,g){
-        as.numeric(A==a)/gr$grn2 * (gr$grn2 - g)/g * (Y-Q)
+        modA <- A; modA[is.na(A)] <- -999
+        modY <- Y; modY[is.na(Y)] <- -999
+        as.numeric(modA==a & DeltaA == 1 & DeltaY == 1)/gr$grn2 * (gr$grn2 - g)/g * (modY-Q)
       },SIMPLIFY=FALSE)
     }
     PnDQn <- lapply(DnQo, mean)
@@ -298,7 +323,8 @@ drtmle <- function(Y, A, W, a_0 = unique(A),
     # re-estimate Qrn
     if("Q" %in% guard){
       # fluctuate gnStar
-      gnStarOut <- fluctuateG(Y=Y, A=A, W=W, a_0=a_0, tolg=tolg, gn=gnStar, Qrn=QrnStar)
+      gnStarOut <- fluctuateG(Y=Y, A=A, W=W, DeltaA = DeltaA, DeltaY = DeltaY, 
+                              a_0=a_0, tolg=tolg, gn=gnStar, Qrn=QrnStar)
       gnStar <- plyr::llply(gnStarOut, function(x){unlist(x$est)})
       epsg <- plyr::laply(gnStarOut, function(x){x$eps})
     }else{
@@ -309,12 +335,14 @@ drtmle <- function(Y, A, W, a_0 = unique(A),
     if("g" %in% guard){
       if(!parallel){
         grnStarOut <- lapply(X=validRows, FUN = estimategrn,
-                         Y=Y,A=A, W=W, tolg=tolg, Qn=QnStar, gn=gnStar, 
+                         Y=Y,A=A, W=W, DeltaA = DeltaA, DeltaY = DeltaY, 
+                         tolg=tolg, Qn=QnStar, gn=gnStar, 
                          glm_gr=glm_gr, SL_gr=SL_gr, a_0=a_0, 
                          reduction=reduction,returnModels = returnModels)
       }else{
         grnStarOut <- foreach::foreach(v = 1:cvFolds, .packages = "SuperLearner") %dopar% {
-          estimategrn(Y=Y,A=A, W=W, tolg=tolg, Qn=QnStar, gn=gnStar, 
+          estimategrn(Y=Y,A=A, W=W, DeltaA = DeltaA, DeltaY = DeltaY, 
+                      tolg=tolg, Qn=QnStar, gn=gnStar, 
                       glm_gr=glm_gr, SL_gr=SL_gr, a_0=a_0, 
                       reduction=reduction,returnModels = returnModels,
                       validRows = validRows[[v]])
@@ -329,25 +357,29 @@ drtmle <- function(Y, A, W, a_0 = unique(A),
       # TO DO: Add reasonable names to grnMod?
 
       if(Qsteps==1){
-        QnStarOut <- fluctuateQ(Y=Y, A=A, W=W, a_0=a_0, Qn=QnStar, 
-                                gn=gnStar, grn=grnStar, reduction=reduction)
+        QnStarOut <- fluctuateQ(Y=Y, A=A, W=W, DeltaA = DeltaA, DeltaY = DeltaY, 
+                                a_0=a_0, Qn=QnStar, gn=gnStar, grn=grnStar, 
+                                reduction=reduction)
         QnStar <- plyr::llply(QnStarOut, function(x){unlist(x$est)})
         epsQ <- plyr::laply(QnStarOut, function(x){x$eps})
       }else if(Qsteps==2){
         # do the extra targeting
-        QnStarOut2 <- fluctuateQ2(Y=Y, A=A, W=W, a_0=a_0, Qn=QnStar, 
+        QnStarOut2 <- fluctuateQ2(Y=Y, A=A, W=W, DeltaA = DeltaA, DeltaY = DeltaY, 
+                                  a_0=a_0, Qn=QnStar, 
                                   gn=gnStar, grn=grnStar, reduction=reduction)
         QnStar <- plyr::llply(QnStarOut2, function(x){unlist(x[[1]])})
         
         # do the usual targeting
-        QnStarOut1 <- fluctuateQ1(Y=Y, A=A, W=W, a_0=a_0, Qn=QnStar, gn=gnStar)
+        QnStarOut1 <- fluctuateQ1(Y=Y, A=A, W=W, DeltaA = DeltaA, DeltaY = DeltaY, 
+                                  a_0=a_0, Qn=QnStar, gn=gnStar)
         QnStar <- plyr::llply(QnStarOut1, function(x){unlist(x[[1]])})
         
         # for later retrieval of fluct coefficients
         epsQ <- mapply(q1=QnStarOut1, q2=QnStarOut2, function(q1,q2){c(q1$eps,q2$eps)})
       }
     }else{
-      QnStarOut <- fluctuateQ1(Y=Y, A=A, W=W, a_0=a_0, Qn=QnStar, gn=gnStar)
+      QnStarOut <- fluctuateQ1(Y=Y, A=A, W=W, DeltaA = DeltaA, DeltaY = DeltaY, 
+                               a_0=a_0, Qn=QnStar, gn=gnStar)
       QnStar <- plyr::llply(QnStarOut, function(x){unlist(x[[1]])})
       epsQ <- plyr::laply(QnStarOut, function(x){x$eps})
     }
@@ -355,11 +387,13 @@ drtmle <- function(Y, A, W, a_0 = unique(A),
     if("Q" %in% guard){
       if(!parallel){
         QrnStarOut <- lapply(X = validRows, FUN = estimateQrn, 
-                         Y=Y, A=A, W=W, Qn=QnStar, gn=gnStar, glm_Qr=glm_Qr, 
+                         Y=Y, A=A, W=W, DeltaA = DeltaA, DeltaY = DeltaY, 
+                         Qn=QnStar, gn=gnStar, glm_Qr=glm_Qr, 
                          SL_Qr=SL_Qr, a_0=a_0,returnModels = returnModels)
       }else{
         QrnStarOut <- foreach::foreach(v = 1:cvFolds, .packages = "SuperLearner") %dopar% {
-          estimateQrn(Y=Y, A=A, W=W, Qn=QnStar, gn=gnStar, glm_Qr=glm_Qr, 
+          estimateQrn(Y=Y, A=A, W=W, DeltaA = DeltaA, DeltaY = DeltaY, 
+                      Qn=QnStar, gn=gnStar, glm_Qr=glm_Qr, 
                       SL_Qr=SL_Qr, a_0=a_0,returnModels = returnModels,
                       validRows = validRows[[v]])
         }
@@ -383,7 +417,9 @@ drtmle <- function(Y, A, W, a_0 = unique(A),
     DnoStar <- mapply(a=split(a_0,1:length(a_0)),
                       Q=QnStar,g=gnStar,p=psi.t,
                       FUN=function(a,Q,g,p){
-      as.numeric(A==a)/g * (Y - Q) + Q - p
+      modY <- Y; modY[is.na(Y)] <- -999
+      modA <- A; modA[is.na(A)] <- -999
+      as.numeric(modA==a & DeltaA == 1 & DeltaY == 1)/g * (modY - Q) + Q - p
     },SIMPLIFY=FALSE)
     PnDnoStar <- lapply(DnoStar, mean)
     
@@ -392,13 +428,17 @@ drtmle <- function(Y, A, W, a_0 = unique(A),
         DnQoStar <- mapply(a=split(a_0,1:length(a_0)),
                            Q=QnStar,gr=grnStar,
                            FUN=function(a,Q,gr){
-          as.numeric(A==a)/gr$grn2 * gr$grn1 * (Y-Q)
+          modY <- Y; modY[is.na(Y)] <- -999
+          modA <- A; modA[is.na(A)] <- -999
+          as.numeric(modA==a & DeltaA == 1 & DeltaY == 1)/gr$grn2 * gr$grn1 * (modY-Q)
         }, SIMPLIFY=FALSE)
       }else if(reduction=="bivariate"){
         DnQoStar <- mapply(a=split(a_0,1:length(a_0)),
                            Q=QnStar,g=gnStar,gr=grnStar,
                            FUN=function(a,Q,gr,g){
-          as.numeric(A==a)/gr$grn2 * (gr$grn2 - g)/g * (Y-Q)
+          modY <- Y; modY[is.na(Y)] <- -999
+          modA <- A; modA[is.na(A)] <- -999
+          as.numeric(modA==a & DeltaA == 1 & DeltaY == 1)/gr$grn2 * (gr$grn2 - g)/g * (modY - Q)
         },SIMPLIFY=FALSE)
       }
       PnDQnStar <- lapply(DnQoStar, mean)
@@ -407,7 +447,8 @@ drtmle <- function(Y, A, W, a_0 = unique(A),
       DngoStar <- mapply(a=split(a_0,1:length(a_0)),
                          Qr=QrnStar,
                          g=gnStar,FUN=function(a,Qr,g){
-        Qr/g * (as.numeric(A==a) - g)
+        modA <- A; modA[is.na(A)] <- -999
+        Qr/g * (as.numeric(modA==a & DeltaA == 1 & DeltaY == 1) - g)
       }, SIMPLIFY=FALSE)
       PnDgnStar <- lapply(DngoStar, mean)
     }
@@ -418,7 +459,8 @@ drtmle <- function(Y, A, W, a_0 = unique(A),
   }
   
   # standard tmle fluctuations
-  QnStar1Out <- fluctuateQ1(Y=Y,A=A,W=W,Qn=Qn,gn=gn,a_0=a_0)
+  QnStar1Out <- fluctuateQ1(Y=Y,A=A,W=W,DeltaA = DeltaA, DeltaY = DeltaY,
+                            Qn=Qn,gn=gn,a_0=a_0)
   QnStar1 <- plyr::llply(QnStar1Out, function(x){unlist(x[[1]])})
   
   # tmle estimates
@@ -429,13 +471,17 @@ drtmle <- function(Y, A, W, a_0 = unique(A),
   Dno1Star <- mapply(a=split(a_0,1:length(a_0)),
                      Q=QnStar1,g=gn,p=psi.n,
                      FUN=function(a,Q,g,p){
-    as.numeric(A==a)/g * (Y - Q) + Q - p
+    modY <- Y; modY[is.na(Y)] <- -999
+    modA <- A; modA[is.na(A)] <- -999
+    as.numeric(modA==a & DeltaA == 1 & DeltaY == 1)/g * (modY - Q) + Q - p
   },SIMPLIFY=FALSE)
   
   DnoStar <- mapply(a=split(a_0,1:length(a_0)),
                     Q=QnStar,g=gnStar,p=psi.n,
                     FUN=function(a,Q,g,p){
-    as.numeric(A==a)/g * (Y - Q) + Q - p
+    modY <- Y; modY[is.na(Y)] <- -999
+    modA <- A; modA[is.na(A)] <- -999                      
+    as.numeric(modA==a & DeltaA == 1 & DeltaY == 1)/g * (modY - Q) + Q - p
   },SIMPLIFY=FALSE)
   PnDnoStar <- lapply(DnoStar, mean)
   
@@ -447,12 +493,16 @@ drtmle <- function(Y, A, W, a_0 = unique(A),
       DnQoStar <- mapply(a=split(a_0,1:length(a_0)),
                          Q=QnStar,gr=grnStar,
                          FUN=function(a,Q,gr){
-        as.numeric(A==a)/gr$grn2 * gr$grn1 * (Y-Q)
+        modY <- Y; modY[is.na(Y)] <- -999
+        modA <- A; modA[is.na(A)] <- -999                        
+        as.numeric(modA==a & DeltaA == 1 & DeltaY == 1)/gr$grn2 * gr$grn1 * (modY-Q)
       }, SIMPLIFY=FALSE)
     }else if(reduction=="bivariate"){
       DnQoStar <- mapply(a=split(a_0,1:length(a_0)),Q=QnStar,
                          g=gn,gr=grnStar,FUN=function(a,Q,gr,g){
-        as.numeric(A==a)/gr$grn2 * (gr$grn2-g)/g * (Y-Q)
+        modY <- Y; modY[is.na(Y)] <- -999
+        modA <- A; modA[is.na(A)] <- -999        
+        as.numeric(modA==a & DeltaA == 1 & DeltaY == 1)/gr$grn2 * (gr$grn2-g)/g * (modY-Q)
       }, SIMPLIFY=FALSE)
     }
     PnDQnStar <- lapply(DnQoStar, mean)
@@ -462,7 +512,8 @@ drtmle <- function(Y, A, W, a_0 = unique(A),
     DngoStar <- mapply(a=split(a_0,1:length(a_0)),
                        Qr=QrnStar,g=gnStar,
                        FUN=function(a,Qr,g){
-      Qr/g * (as.numeric(A==a) - g)
+      modA <- A; modA[is.na(A)] <- -999
+      Qr/g * (as.numeric(modA==a & DeltaA == 1 & DeltaY == 1) - g)
     }, SIMPLIFY=FALSE)
     PnDgnStar <- lapply(DngoStar, mean)
   }

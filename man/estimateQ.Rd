@@ -4,8 +4,8 @@
 \alias{estimateQ}
 \title{estimateQ}
 \usage{
-estimateQ(Y, A, W, SL_Q, glm_Q, a_0, stratify, family, verbose = FALSE,
-  returnModels = FALSE, validRows = NULL, ...)
+estimateQ(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify, family,
+  verbose = FALSE, returnModels = FALSE, validRows = NULL, ...)
 }
 \arguments{
 \item{Y}{A vector of continuous or binary outcomes.}
@@ -13,6 +13,10 @@ estimateQ(Y, A, W, SL_Q, glm_Q, a_0, stratify, family, verbose = FALSE,
 \item{A}{A vector of binary treatment assignment (assumed to be equal to 0 or 1)}
 
 \item{W}{A \code{data.frame} of named covariates}
+
+\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if missing 1 if observed)}
+
+\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if missing 1 if observed)}
 
 \item{SL_Q}{A vector of characters or a list describing the Super Learner library to be used 
 for the outcome regression}

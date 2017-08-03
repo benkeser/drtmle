@@ -5,10 +5,11 @@
 \title{Compute asymptotically linear IPTW estimators with super learning 
 for the propensity score}
 \usage{
-islptw(W, A, Y, a_0 = unique(A), SL_g = NULL, glm_g = NULL,
-  SL_Qr = NULL, glm_Qr = NULL, returnModels = TRUE, verbose = FALSE,
-  maxIter = 2, tolIC = 1/length(Y), tolg = 0.01, cvFolds = 1,
-  parallel = FALSE, ...)
+islptw(W, A, Y, DeltaY = as.numeric(!is.na(Y)),
+  DeltaA = as.numeric(!is.na(A)), stratify = FALSE,
+  a_0 = unique(A[!is.na(A)]), SL_g = NULL, glm_g = NULL, SL_Qr = NULL,
+  glm_Qr = NULL, returnModels = TRUE, verbose = FALSE, maxIter = 2,
+  tolIC = 1/length(Y), tolg = 0.01, cvFolds = 1, parallel = FALSE, ...)
 }
 \arguments{
 \item{W}{A \code{data.frame} of named covariates}
@@ -16,6 +17,13 @@ islptw(W, A, Y, a_0 = unique(A), SL_g = NULL, glm_g = NULL,
 \item{A}{A vector of binary treatment assignment (assumed to be equal to 0 or 1)}
 
 \item{Y}{A numeric of continuous or binary outcomes.}
+
+\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if missing 1 if observed)}
+
+\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if missing 1 if observed)}
+
+\item{stratify}{A \code{boolean} indicating whether to estimate the missing outcome regression separately
+for observations with different levels of \code{A} (if \code{TRUE}) or to pool across \code{A} (if \code{FALSE}).}
 
 \item{a_0}{A vector of treatment levels at which to compute the adjusted mean outcome.}
 

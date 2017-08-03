@@ -3,8 +3,12 @@
 #' 
 #' @param W A \code{data.frame} of named covariates
 #' @param A A vector of binary treatment assignment (assumed to be equal to 0 or 1)
-#' @param Y A numeric of continuous or binary outcomes. 
+#' @param Y A numeric of continuous or binary outcomes.
+#' @param DeltaY Indicator of missing outcome (assumed to be equal to 0 if missing 1 if observed)
+#' @param DeltaA Indicator of missing treatment (assumed to be equal to 0 if missing 1 if observed) 
 #' @param a_0 A vector of treatment levels at which to compute the adjusted mean outcome. 
+#' @param stratify A \code{boolean} indicating whether to estimate the missing outcome regression separately
+#' for observations with different levels of \code{A} (if \code{TRUE}) or to pool across \code{A} (if \code{FALSE}).
 #' @param SL_g A vector of characters or a list describing the Super Learner library to be used 
 #' for the propensity score. See \code{link{SuperLearner::SuperLearner}} for details.
 #' @param SL_Qr A vector of characters or a list describing the Super Learner library to be used 
@@ -72,7 +76,11 @@
 #'                SL_g=c("SL.glm","SL.mean","SL.step"),
 #'                SL_Qr="SL.npreg")
 
-islptw <- function(W, A, Y, a_0 = unique(A),
+islptw <- function(W, A, Y, 
+                   DeltaY = as.numeric(!is.na(Y)), 
+                   DeltaA = as.numeric(!is.na(A)), 
+                   stratify = FALSE, 
+                   a_0 = unique(A[!is.na(A)]),
                    SL_g = NULL, 
                    glm_g = NULL,
                    SL_Qr = NULL,
@@ -100,32 +108,38 @@ islptw <- function(W, A, Y, a_0 = unique(A),
   #-------------------------------
   if(!parallel){
     gnOut <- lapply(X = validRows, FUN = estimateG,
-                    A=A, W=W, tolg=tolg, verbose=verbose, 
+                    A=A, W=W, DeltaA = DeltaA, DeltaY = DeltaY, 
+                    tolg=tolg, verbose=verbose, 
                     returnModels=returnModels,SL_g=SL_g,
-                    glm_g=glm_g, a_0=a_0)
+                    glm_g=glm_g, a_0=a_0,stratify = stratify)
   }else{
     gnOut <- foreach::foreach(v = 1:cvFolds, .packages = "SuperLearner") %dopar% {
-      estimateG(A = A, W = W, tolg = tolg, verbose = verbose,
+      estimateG(A = A, W = W, DeltaA = DeltaA, DeltaY = DeltaY, 
+                tolg = tolg, verbose = verbose,stratify = stratify,
                 returnModels = returnModels, SL_g = SL_g,
                 glm_g = glm_g, a_0 = a_0, validRows = validRows[[v]])
     }
   }
   # re-order predictions
   gnValid <- unlist(gnOut, recursive = FALSE, use.names = FALSE)
-  gnUnOrd <- do.call(Map, c(c, gnValid[seq(1,length(gnValid),2)]))
+  gnUnOrd <- do.call(Map, c(c, gnValid[seq(1, length(gnValid), 2)]))
   gn <- lapply(gnUnOrd, function(x){ x[ordVR] })
   # obtain list of propensity score fits
-  gnMod <- gnValid[seq(2,length(gnValid),2)]
+  gnMod <- gnValid[seq(2, length(gnValid), 2)]
   # TO DO: Add reasonable names to gnMod?
 
  	# compute iptw estimator
 	psi.n <- mapply(a = split(a_0, 1:length(a_0)),g=gn, function(a,g){
-		mean(as.numeric(A==a)/g * Y)
+    modA <- A; modA[is.na(A)] <- -999
+    modY <- Y; modY[is.na(Y)] <- -999
+		mean(as.numeric(modA == a & DeltaA == 1 & DeltaY == 1)/g * modY)
 	})
 
   # estimate influence function
 	Dno <- mapply(a=split(a_0,1:length(a_0)),g=gn,psi=psi.n,FUN=function(a,g,psi){
-  	as.numeric(A==a)/g * Y - psi
+    modA <- A; modA[is.na(A)] <- -999
+    modY <- Y; modY[is.na(Y)] <- -999
+  	as.numeric(modA == a & DeltaA == 1 & DeltaY == 1)/g * modY - psi
 	},SIMPLIFY=FALSE)
 
   #-------------------------------------
@@ -137,11 +151,13 @@ islptw <- function(W, A, Y, a_0 = unique(A),
 	# the regression of Y on gn. 
   if(!parallel){
     QrnOut <- lapply(X = validRows, FUN = estimateQrn, 
-                   Y=Y, A=A, W=W, Qn=NULL, gn=gn, glm_Qr=glm_Qr, 
+                   Y=Y, A=A, W=W, DeltaA = DeltaA, DeltaY = DeltaY, 
+                   Qn=NULL, gn=gn, glm_Qr=glm_Qr, 
                    SL_Qr=SL_Qr, a_0=a_0,returnModels = returnModels)  
   }else{
     QrnOut <- foreach::foreach(v = 1:cvFolds, .packages = "SuperLearner") %dopar% {
-      estimateQrn(Y=Y, A=A, W=W, Qn=NULL, gn=gn, glm_Qr=glm_Qr, 
+      estimateQrn(Y=Y, A=A, W=W, DeltaA = DeltaA, DeltaY = DeltaY, 
+                  Qn=NULL, gn=gn, glm_Qr=glm_Qr, 
                   SL_Qr=SL_Qr, a_0=a_0,returnModels = returnModels,
                   validRows = validRows[[v]])
     }
@@ -156,7 +172,8 @@ islptw <- function(W, A, Y, a_0 = unique(A),
   # TO DO: Add reasonable names to QrnMod?
 
   Dngo <- mapply(a=split(a_0,1:length(a_0)),Qr=Qrn,g=gn,FUN=function(a,Qr,g){
-    Qr/g * (as.numeric(A==a) - g)
+    modA <- A; modA[is.na(A)] <- -999
+    Qr/g * (as.numeric(modA == a & DeltaA == 1 & DeltaY == 1) - g)
   },SIMPLIFY=FALSE)
   PnDgn <- lapply(Dngo, mean)
 
@@ -175,18 +192,22 @@ islptw <- function(W, A, Y, a_0 = unique(A),
     ct <- ct + 1
   
     # fluctuate gnStar
-    gnStarOut <- fluctuateG(Y=Y, A=A, W=W, a_0=a_0, tolg=tolg, 
+    gnStarOut <- fluctuateG(Y=Y, A=A, W=W, 
+                            DeltaA = DeltaA, DeltaY = DeltaY, 
+                            a_0=a_0, tolg=tolg, 
                             gn=gnStar, Qrn=QrnStar)
     gnStar <- plyr::llply(gnStarOut, function(x){unlist(x$est)})
     eps <- plyr::laply(gnStarOut, function(x){x$eps})
     # re-estimate reduced dimension regression
     if(!parallel){
       QrnStarOut <- lapply(X = validRows, FUN = estimateQrn, 
-                   Y=Y, A=A, W=W, Qn=NULL, gn=gnStar, glm_Qr=glm_Qr, 
+                   Y=Y, A=A, W=W, DeltaA = DeltaA, DeltaY = DeltaY, 
+                   Qn=NULL, gn=gnStar, glm_Qr=glm_Qr, 
                    SL_Qr=SL_Qr, a_0=a_0,returnModels = returnModels)
     }else{
       QrnStarOut <- foreach::foreach(v = 1:cvFolds, .packages = "SuperLearner") %dopar% {
-        estimateQrn(Y=Y, A=A, W=W, Qn=NULL, gn=gnStar, glm_Qr=glm_Qr, 
+        estimateQrn(Y=Y, A=A, W=W, DeltaA = DeltaA, DeltaY = DeltaY, 
+                    Qn=NULL, gn=gnStar, glm_Qr=glm_Qr, 
                     SL_Qr=SL_Qr, a_0=a_0,returnModels = returnModels,
                     validRows = validRows[[v]])
       }
@@ -202,7 +223,8 @@ islptw <- function(W, A, Y, a_0 = unique(A),
     DngoStar <- mapply(a=split(a_0,1:length(a_0)),
                        Qr=QrnStar,g=gnStar,
                        FUN=function(a,Qr,g){
-      Qr/g * (as.numeric(A==a) - g)
+      modA <- A; modA[is.na(A)] <- -999
+      Qr/g * (as.numeric(modA == a & DeltaA == 1 & DeltaY == 1) - g)
     }, SIMPLIFY=FALSE)
     PnDgnStar <- lapply(DngoStar, mean)
     if(verbose){
@@ -214,14 +236,18 @@ islptw <- function(W, A, Y, a_0 = unique(A),
   # compute final tmle-iptw estimate
 	# compute iptw estimator
   psi.nStar <- mapply(a = split(a_0, 1:length(a_0)),g=gnStar, function(a,g){
-  	mean(as.numeric(A==a)/g * Y)
+    modA <- A; modA[is.na(A)] <- -999
+    modY <- Y; modY[is.na(Y)] <- -999
+  	mean(as.numeric(modA == a & DeltaA == 1 & DeltaY == 1)/g * modY)
   })
 
   # compute variance estimators 
   # original influence function
 	DnoStar <- mapply(a=split(a_0,1:length(a_0)),g=gnStar,
 	                  psi=psi.nStar,FUN=function(a,g,psi){
-	                  	as.numeric(A==a)/g * Y - psi
+                      modA <- A; modA[is.na(A)] <- -999
+                      modY <- Y; modY[is.na(Y)] <- -999
+	                  	as.numeric(modA == a & DeltaA == 1 & DeltaY == 1)/g * modY - psi
 	                  },SIMPLIFY=FALSE)
 	# new influence function in DngoStar already
   DnoStarMat <- matrix(unlist(DnoStar) - unlist(DngoStar), 

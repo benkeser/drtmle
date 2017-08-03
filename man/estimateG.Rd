@@ -4,22 +4,29 @@
 \alias{estimateG}
 \title{estimateG}
 \usage{
-estimateG(A, W, SL_g, glm_g, a_0, tolg, validRows = NULL, verbose = FALSE,
-  returnModels = FALSE)
+estimateG(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg, stratify = FALSE,
+  validRows = NULL, verbose = FALSE, returnModels = FALSE)
 }
 \arguments{
 \item{A}{A vector of binary treatment assignment (assumed to be equal to 0 or 1)}
 
 \item{W}{A \code{data.frame} of named covariates}
 
+\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if missing 1 if observed)}
+
+\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if missing 1 if observed)}
+
 \item{SL_g}{A vector of characters or a list describing the Super Learner library to be used 
-for the propensity score}
+for the propensity score !!!!! TO DO: Add new description.}
 
 \item{glm_g}{A character describing a formula to be used in the call to \code{glm} for the propensity score}
 
 \item{a_0}{A vector of fixed treatment values}
 
 \item{tolg}{A numeric indicating the minimum value for estimates of the propensity score.}
+
+\item{stratify}{A \code{boolean} indicating whether to estimate the missing outcome regression separately
+for observations with \code{A} equal to 0/1 (if \code{TRUE}) or to pool across \code{A} (if \code{FALSE}).}
 
 \item{validRows}{A \code{list} of length \code{cvFolds} containing the row indexes
 of observations to include in validation fold.}

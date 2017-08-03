@@ -4,12 +4,14 @@
 \alias{drtmle}
 \title{TMLE estimate of the average treatment effect with doubly-robust inference}
 \usage{
-drtmle(Y, A, W, a_0 = unique(A), family = stats::binomial(),
-  stratify = TRUE, SL_Q = NULL, SL_g = NULL, SL_Qr = NULL,
-  SL_gr = NULL, glm_Q = NULL, glm_g = NULL, glm_Qr = NULL,
-  glm_gr = NULL, guard = c("Q", "g"), reduction = "univariate",
-  returnModels = FALSE, cvFolds = 1, maxIter = 3, tolIC = 1/length(Y),
-  tolg = 0.01, verbose = FALSE, Qsteps = 2, parallel = FALSE, ...)
+drtmle(Y, A, W, DeltaA = as.numeric(!is.na(A)),
+  DeltaY = as.numeric(!is.na(Y)), a_0 = unique(A[!is.na(A)]),
+  family = stats::binomial(), stratify = TRUE, SL_Q = NULL, SL_g = NULL,
+  SL_Qr = NULL, SL_gr = NULL, glm_Q = NULL, glm_g = NULL,
+  glm_Qr = NULL, glm_gr = NULL, guard = c("Q", "g"),
+  reduction = "univariate", returnModels = FALSE, cvFolds = 1,
+  maxIter = 3, tolIC = 1/length(Y), tolg = 0.01, verbose = FALSE,
+  Qsteps = 2, parallel = FALSE, ...)
 }
 \arguments{
 \item{Y}{A numeric of continuous or binary outcomes.}
@@ -17,6 +19,10 @@ drtmle(Y, A, W, a_0 = unique(A), family = stats::binomial(),
 \item{A}{A vector of binary treatment assignment (assumed to be equal to 0 or 1)}
 
 \item{W}{A \code{data.frame} of named covariates}
+
+\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if missing 1 if observed)}
+
+\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if missing 1 if observed)}
 
 \item{a_0}{A vector of treatment levels at which to compute the adjusted mean outcome.}
 

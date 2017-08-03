@@ -4,7 +4,7 @@
 \alias{estimateQrn}
 \title{estimateQrn}
 \usage{
-estimateQrn(Y, A, W, Qn, gn, glm_Qr, SL_Qr, a_0, returnModels,
+estimateQrn(Y, A, W, DeltaA, DeltaY, Qn, gn, glm_Qr, SL_Qr, a_0, returnModels,
   validRows = NULL)
 }
 \arguments{
@@ -13,6 +13,10 @@ estimateQrn(Y, A, W, Qn, gn, glm_Qr, SL_Qr, a_0, returnModels,
 \item{A}{A vector of binary treatment assignment (assumed to be equal to 0 or 1)}
 
 \item{W}{A \code{data.frame} of named covariates}
+
+\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if missing 1 if observed)}
+
+\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if missing 1 if observed)}
 
 \item{Qn}{A list of outcome regression estimates evaluated on observed data. If 
 NULL then 0 is used for all Qn (as is needed to estimate reduced dimension regression

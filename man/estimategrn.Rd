@@ -4,8 +4,8 @@
 \alias{estimategrn}
 \title{estimategrn}
 \usage{
-estimategrn(Y, A, W, Qn, gn, SL_gr, tolg, glm_gr, a_0, reduction, returnModels,
-  validRows)
+estimategrn(Y, A, W, DeltaA, DeltaY, Qn, gn, SL_gr, tolg, glm_gr, a_0,
+  reduction, returnModels, validRows)
 }
 \arguments{
 \item{Y}{A vector of continuous or binary outcomes.}
@@ -13,6 +13,10 @@ estimategrn(Y, A, W, Qn, gn, SL_gr, tolg, glm_gr, a_0, reduction, returnModels,
 \item{A}{A vector of binary treatment assignment (assumed to be equal to 0 or 1)}
 
 \item{W}{A \code{data.frame} of named covariates}
+
+\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if missing 1 if observed)}
+
+\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if missing 1 if observed)}
 
 \item{Qn}{A list of outcome regression estimates evaluated on observed data}
 

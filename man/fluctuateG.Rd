@@ -4,7 +4,7 @@
 \alias{fluctuateG}
 \title{fluctuateG}
 \usage{
-fluctuateG(Y, A, W, a_0, gn, Qrn, tolg, coefTol = 1e+05)
+fluctuateG(Y, A, W, DeltaY, DeltaA, a_0, gn, Qrn, tolg, coefTol = 1e+05)
 }
 \arguments{
 \item{Y}{The outcome}
@@ -12,6 +12,10 @@ fluctuateG(Y, A, W, a_0, gn, Qrn, tolg, coefTol = 1e+05)
 \item{A}{The treatment}
 
 \item{W}{The covariates}
+
+\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if missing 1 if observed)}
+
+\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if missing 1 if observed)}
 
 \item{a_0}{A list of fixed treatment values}
 
