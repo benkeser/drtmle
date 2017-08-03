@@ -1,3 +1,5 @@
+globalVariables(c("v", "%dopar%"))
+
 #' TMLE estimate of the average treatment effect with doubly-robust inference
 #' 
 #' @param W A \code{data.frame} of named covariates

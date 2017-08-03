@@ -12,7 +12,7 @@
 ^\.git$
 ^docs$
 ^debug$
-^paper_JSS$
+^JSS$
 ^\.Rproj\.user$
 ^README\.Rmd$
 ^README-.*\.png$

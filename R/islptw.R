@@ -1,3 +1,5 @@
+globalVariables(c("v", "%dopar%"))
+
 #' Compute asymptotically linear IPTW estimators with super learning 
 #' for the propensity score
 #' 
