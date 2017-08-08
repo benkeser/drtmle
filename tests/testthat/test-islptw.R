@@ -52,7 +52,7 @@ test_that("islptw works as expected with multi-level treatment",{
 
 	fit1 <- islptw(W = W, A = A, Y = Y, 
 	               a_0 = c(0,1,2),
-                  glm_g="W1 + W2",
+                  SL_g="SL.glm",
                   glm_Qr="gn")
 	expect_true(all(!is.na(fit1$islptw_tmle$est)))
 	expect_true(all(!is.na(fit1$islptw_tmle$cov)))
