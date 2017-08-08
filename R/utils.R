@@ -1,7 +1,3 @@
-# variable Y appears in expression for axis label
-# and cause R CMD CHECK note
-globalVariables(c("Y"))
-
 #--------------------------------------------------
 # Print methods
 #--------------------------------------------------
@@ -156,7 +152,7 @@ plot.drtmle <- function(x, nPoints = 500,
   plot(0, type = "n", xlim = xl, ylim = yl,
        xaxt = "n", yaxt = "n", bty = "n", 
        xlab = expression(g[n](W)), 
-       ylab = expression("E["*Y-Q["n"](W)*" | "*g[n](W)*"]"))
+       ylab = expression("E[Y-"*Q[n](W)*" | "*g[n](W)*"]"))
   # add axes
   axis(side = 1); axis(side = 2)
   # add lines

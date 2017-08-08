@@ -33,7 +33,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
   }
 
   # subset data into training and validation sets
-  if(length(validRows)!=length(Y)){
+  if(length(validRows)!=length(A)){
     trainDeltaA <- DeltaA[-validRows]
     trainDeltaY <- DeltaY[-validRows]
     trainA <- A[-validRows]
