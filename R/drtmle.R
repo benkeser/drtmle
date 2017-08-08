@@ -96,6 +96,7 @@ globalVariables(c("v", "%dopar%"))
 #' 
 #' @importFrom plyr llply laply
 #' @importFrom foreach foreach
+#' @importFrom stats cov
 #' 
 #' 
 #' @export 
@@ -124,14 +125,10 @@ drtmle <- function(Y, A, W,
                    a_0 = unique(A[!is.na(A)]),
                    family = stats::binomial(),
                    stratify = TRUE,
-                   SL_Q = NULL,
-                   SL_g = NULL,
-                   SL_Qr = NULL,
-                   SL_gr = NULL,
-                   glm_Q = NULL,
-                   glm_g = NULL,
-                   glm_Qr = NULL,
-                   glm_gr = NULL,
+                   SL_Q = NULL, SL_g = NULL,
+                   SL_Qr = NULL, SL_gr = NULL,
+                   glm_Q = NULL, glm_g = NULL,
+                   glm_Qr = NULL, glm_gr = NULL,
                    guard = c("Q","g"),
                    reduction = "univariate",
                    returnModels = FALSE,
@@ -211,27 +208,19 @@ drtmle <- function(Y, A, W,
   # TO DO: Add reasonable names to QnMod?
   
   # naive g-computation estimate
-  psi.n <- lapply(Qn, mean)
+  psi_n <- lapply(Qn, mean)
   
-  # in order for influence function computations to compute properly
-  # replace missing A and Y by arbitrary numerics.
-  # Note that when these are missing, they are always getting multiplied
-  # by 0, but R return 0*NA = NA for some reason and this is a hacky fix
-  # to get around that. 
   # estimate influence function
-  Dno <- mapply(a=split(a_0,1:length(a_0)),Q=Qn,g=gn,p=psi.n,FUN=function(a,Q,g,p){
-    modA <- A; modA[is.na(A)] <- -999
-    modY <- Y; modY[is.na(Y)] <- -999
-    as.numeric(modA == a & DeltaA == 1 & DeltaY == 1)/g * (modY - Q) + Q - p
-  },SIMPLIFY=FALSE)
+  Dno <- eval_Dstar(A = A, Y = Y, DeltaY = DeltaY, DeltaA = DeltaA, 
+                    Qn = Qn, gn = gn, psi_n = psi_n, a_0 = a_0)
   
   # estimate bias correction
   PnDn <- lapply(Dno, mean)
   
   # additional bias terms
+  Dngo <- rep(0, n)
+  DnQo <- rep(0, n)
   PnDQn <- PnDgn <- 0
-  Dngo <- rep(0, length(Y))
-  DnQo <- rep(0, length(Y))
   
   if("Q" %in% guard){
     if(!parallel){
@@ -259,10 +248,8 @@ drtmle <- function(Y, A, W,
     QrnMod <- QrnValid[seq(2,length(QrnValid),2)]
     # TO DO: Add reasonable names to QrnMod?
 
-    Dngo <- mapply(a=split(a_0,1:length(a_0)),Qr=Qrn,g=gn,FUN=function(a,Qr,g){
-      modA <- A; modA[is.na(A)] <- -999
-      Qr/g * (as.numeric(modA == a & DeltaA == 1 & DeltaY == 1) - g)
-    },SIMPLIFY=FALSE)
+    Dngo <- eval_Dstar_g(A = A, DeltaY = DeltaY, 
+                         DeltaA = DeltaA, Qrn = Qrn, gn = gn, a_0 = a_0)
     PnDgn <- lapply(Dngo, mean)
   }
   if("g" %in% guard){
@@ -294,34 +281,26 @@ drtmle <- function(Y, A, W,
     grnMod <- grnValid[seq(2,length(grnValid),2)]
     # TO DO: Add reasonable names to grnMod?
 
-    if(reduction=="univariate"){
-      DnQo <- mapply(a=split(a_0,1:length(a_0)),Q=Qn,gr=grn,FUN=function(a,Q,gr){
-        modA <- A; modA[is.na(A)] <- -999
-        modY <- Y; modY[is.na(Y)] <- -999
-        as.numeric(modA == a & DeltaA == 1 & DeltaY == 1)/gr$grn2 * gr$grn1 * (modY-Q)
-      },SIMPLIFY=FALSE)
-    }else if(reduction=="bivariate"){
-      DnQo <- mapply(a=split(a_0,1:length(a_0)),Q=Qn,g=gn, gr=grn,FUN=function(a,Q,gr,g){
-        modA <- A; modA[is.na(A)] <- -999
-        modY <- Y; modY[is.na(Y)] <- -999
-        as.numeric(modA==a & DeltaA == 1 & DeltaY == 1)/gr$grn2 * (gr$grn2 - g)/g * (modY-Q)
-      },SIMPLIFY=FALSE)
-    }
+    # evaluate extra piece of influence function
+    DnQo <- eval_Dstar_Q(A = A, Y = Y, DeltaY = DeltaY, 
+                         DeltaA = DeltaA, Qn = Qn, grn = grn, gn = gn, a_0 = a_0, 
+                         reduction = reduction)
     PnDQn <- lapply(DnQo, mean)
   }
   
   # one step estimates
-  psi.o1 <- mapply(a=psi.n,b=PnDn,SIMPLIFY=FALSE, 
+  psi_o1 <- mapply(a=psi_n,b=PnDn,SIMPLIFY=FALSE, 
                    FUN=function(a,b){a+b})
-  psi.o <- mapply(a=psi.n,b=PnDn,c=PnDQn,d=PnDgn,SIMPLIFY=FALSE,
+  psi_o <- mapply(a=psi_n,b=PnDn,c=PnDQn,d=PnDgn,SIMPLIFY=FALSE,
                   FUN=function(a,b,c,d){a+b-c-d}) 
   
   # covariance for one step
-  Dno1Mat <- matrix(unlist(Dno),ncol=length(Y), nrow=length(a_0), byrow=TRUE)
-  DnoMat <- matrix(unlist(Dno) - unlist(DnQo) - unlist(Dngo), ncol=length(Y), nrow=length(a_0), byrow=TRUE)
+  Dno1Mat <- matrix(unlist(Dno),nrow=n, ncol=length(a_0))
+  DnoMat <- matrix(unlist(Dno) - unlist(DnQo) - unlist(Dngo), 
+                   nrow=n, ncol=length(a_0))
   
-  cov.o1 <- (Dno1Mat-mean(Dno1Mat))%*%t(Dno1Mat-mean(Dno1Mat)) /(length(Y)^2)
-  cov.o <- (DnoMat-mean(DnoMat))%*%t(DnoMat-mean(DnoMat))/(length(Y)^2)
+  cov_o1 <- stats::cov(Dno1Mat)/n 
+  cov_o <- stats::cov(DnoMat)/n
   
   # initialize fluctuations
   QnStar <- Qn
@@ -435,50 +414,29 @@ drtmle <- function(Y, A, W,
     eps <- c(epsQ, epsg)
     
     # tmle estimates
-    psi.t <- lapply(QnStar, mean)
+    psi_t <- lapply(QnStar, mean)
     
     # calculate influence functions
-    DnoStar <- mapply(a=split(a_0,1:length(a_0)),
-                      Q=QnStar,g=gnStar,p=psi.t,
-                      FUN=function(a,Q,g,p){
-      modY <- Y; modY[is.na(Y)] <- -999
-      modA <- A; modA[is.na(A)] <- -999
-      as.numeric(modA==a & DeltaA == 1 & DeltaY == 1)/g * (modY - Q) + Q - p
-    },SIMPLIFY=FALSE)
+    DnoStar <- eval_Dstar(A = A, Y = Y, DeltaY = DeltaY, DeltaA = DeltaA, 
+                    Qn = QnStar, gn = gnStar, psi_n = psi_t, a_0 = a_0)
     PnDnoStar <- lapply(DnoStar, mean)
     
     if("g" %in% guard){
-      if(reduction=="univariate"){
-        DnQoStar <- mapply(a=split(a_0,1:length(a_0)),
-                           Q=QnStar,gr=grnStar,
-                           FUN=function(a,Q,gr){
-          modY <- Y; modY[is.na(Y)] <- -999
-          modA <- A; modA[is.na(A)] <- -999
-          as.numeric(modA==a & DeltaA == 1 & DeltaY == 1)/gr$grn2 * gr$grn1 * (modY-Q)
-        }, SIMPLIFY=FALSE)
-      }else if(reduction=="bivariate"){
-        DnQoStar <- mapply(a=split(a_0,1:length(a_0)),
-                           Q=QnStar,g=gnStar,gr=grnStar,
-                           FUN=function(a,Q,gr,g){
-          modY <- Y; modY[is.na(Y)] <- -999
-          modA <- A; modA[is.na(A)] <- -999
-          as.numeric(modA==a & DeltaA == 1 & DeltaY == 1)/gr$grn2 * (gr$grn2 - g)/g * (modY - Q)
-        },SIMPLIFY=FALSE)
-      }
+      DnQoStar <- eval_Dstar_Q(A = A, Y = Y, DeltaY = DeltaY, 
+                         DeltaA = DeltaA, Qn = QnStar, grn = grnStar, gn = gn,
+                         a_0 = a_0, reduction = reduction)
       PnDQnStar <- lapply(DnQoStar, mean)
     }
     if("Q" %in% guard){
-      DngoStar <- mapply(a=split(a_0,1:length(a_0)),
-                         Qr=QrnStar,
-                         g=gnStar,FUN=function(a,Qr,g){
-        modA <- A; modA[is.na(A)] <- -999
-        Qr/g * (as.numeric(modA==a & DeltaA == 1 & DeltaY == 1) - g)
-      }, SIMPLIFY=FALSE)
+      DngoStar <- eval_Dstar_g(A = A, DeltaY = DeltaY, DeltaA = DeltaA, 
+                               Qrn = QrnStar, gn = gnStar, a_0 = a_0)
       PnDgnStar <- lapply(DngoStar, mean)
     }
     if(verbose){
       cat("TMLE Iteration", ct, "=", round(unlist(eps),5), "\n")
-      cat("Mean of IC       =", round(c(unlist(PnDnoStar), unlist(PnDQnStar), unlist(PnDgnStar)), 10),"\n")
+      cat("Mean of IC       =", round(c(unlist(PnDnoStar), 
+                                        unlist(PnDQnStar), 
+                                        unlist(PnDgnStar)), 10),"\n")
     }
   }
   
@@ -488,80 +446,51 @@ drtmle <- function(Y, A, W,
   QnStar1 <- plyr::llply(QnStar1Out, function(x){unlist(x[[1]])})
   
   # tmle estimates
-  psi.t <- lapply(QnStar, mean)
-  psi.t1 <- lapply(QnStar1, mean)
+  psi_t <- lapply(QnStar, mean)
+  psi_t1 <- lapply(QnStar1, mean)
   
   # covariance for tmle
-  Dno1Star <- mapply(a=split(a_0,1:length(a_0)),
-                     Q=QnStar1,g=gn,p=psi.n,
-                     FUN=function(a,Q,g,p){
-    modY <- Y; modY[is.na(Y)] <- -999
-    modA <- A; modA[is.na(A)] <- -999
-    as.numeric(modA==a & DeltaA == 1 & DeltaY == 1)/g * (modY - Q) + Q - p
-  },SIMPLIFY=FALSE)
-  
-  DnoStar <- mapply(a=split(a_0,1:length(a_0)),
-                    Q=QnStar,g=gnStar,p=psi.n,
-                    FUN=function(a,Q,g,p){
-    modY <- Y; modY[is.na(Y)] <- -999
-    modA <- A; modA[is.na(A)] <- -999                      
-    as.numeric(modA==a & DeltaA == 1 & DeltaY == 1)/g * (modY - Q) + Q - p
-  },SIMPLIFY=FALSE)
+  Dno1Star <- eval_Dstar(A = A, Y = Y, DeltaA = DeltaA, DeltaY = DeltaY, 
+                         Qn = QnStar1, gn = gn, psi_n = psi_t1, a_0 = a_0)
+  Dno1StarMat <- matrix(unlist(Dno1Star), nrow=n, ncol=length(a_0))
+  cov_t1 <- stats::cov(Dno1StarMat)
+
+  # covariance for drtmle
+  DnoStar <- eval_Dstar(A = A, Y = Y, DeltaA = DeltaA, DeltaY = DeltaY, 
+                        Qn = QnStar, gn = gnStar, psi_n = psi_t, a_0 = a_0)
   PnDnoStar <- lapply(DnoStar, mean)
   
-  DnQoStar <- list(rep(0, length(Y)))
-  DngoStar <- list(rep(0, length(Y)))
+  # TO DO: Update this (list should be longer)
+  DnQoStar <- list(rep(0, n))
+  DngoStar <- list(rep(0, n))
   
   if("g" %in% guard){
-    if(reduction=="univariate"){
-      DnQoStar <- mapply(a=split(a_0,1:length(a_0)),
-                         Q=QnStar,gr=grnStar,
-                         FUN=function(a,Q,gr){
-        modY <- Y; modY[is.na(Y)] <- -999
-        modA <- A; modA[is.na(A)] <- -999                        
-        as.numeric(modA==a & DeltaA == 1 & DeltaY == 1)/gr$grn2 * gr$grn1 * (modY-Q)
-      }, SIMPLIFY=FALSE)
-    }else if(reduction=="bivariate"){
-      DnQoStar <- mapply(a=split(a_0,1:length(a_0)),Q=QnStar,
-                         g=gn,gr=grnStar,FUN=function(a,Q,gr,g){
-        modY <- Y; modY[is.na(Y)] <- -999
-        modA <- A; modA[is.na(A)] <- -999        
-        as.numeric(modA==a & DeltaA == 1 & DeltaY == 1)/gr$grn2 * (gr$grn2-g)/g * (modY-Q)
-      }, SIMPLIFY=FALSE)
-    }
+    DnQoStar <- eval_Dstar_Q(A = A, Y = Y, DeltaY = DeltaY, 
+                       DeltaA = DeltaA, Qn = QnStar, grn = grnStar, gn = gn, 
+                       a_0 = a_0, reduction = reduction)
     PnDQnStar <- lapply(DnQoStar, mean)
   }
-  
   if("Q" %in% guard){
-    DngoStar <- mapply(a=split(a_0,1:length(a_0)),
-                       Qr=QrnStar,g=gnStar,
-                       FUN=function(a,Qr,g){
-      modA <- A; modA[is.na(A)] <- -999
-      Qr/g * (as.numeric(modA==a & DeltaA == 1 & DeltaY == 1) - g)
-    }, SIMPLIFY=FALSE)
+    DngoStar <- eval_Dstar_g(A = A, DeltaY = DeltaY, DeltaA = DeltaA, 
+                             Qrn = QrnStar, gn = gnStar, a_0 = a_0)
     PnDgnStar <- lapply(DngoStar, mean)
   }
   
-  Dno1StarMat <- matrix(unlist(Dno1Star), ncol=length(Y), 
-                        nrow=length(a_0), byrow=TRUE)
   DnoStarMat <- matrix(unlist(DnoStar) - unlist(DnQoStar) - unlist(DngoStar), 
-                       ncol=length(Y), nrow=length(a_0),byrow=TRUE)
-  
-  cov.t1 <- (Dno1StarMat - mean(Dno1StarMat))%*%
-              t((Dno1StarMat - mean(Dno1StarMat)))/(length(Y)^2)
-  cov.t <- (DnoStarMat - mean(DnoStarMat))%*%
-              t((DnoStarMat - mean(DnoStarMat)))/(length(Y)^2)
-  
+                       nrow=n, ncol=length(a_0))
+  cov_t <- stats::cov(DnoStarMat)/n 
 
-  out <- list(drtmle = list(est = unlist(psi.t), cov = cov.t),
+  out <- list(drtmle = list(est = unlist(psi_t), cov = cov_t),
               nuisance_drtmle = list(QnStar = QnStar, gnStar = gnStar,
-                                     QrnStar = QrnStar, grnStar = grn),
+                                     QrnStar = QrnStar, grnStar = grn,
+                                     meanIC = unlist(c(PnDnoStar, PnDQnStar, 
+                                                       PnDgnStar))),
               ic_drtmle = list(eif = PnDnoStar, missQ = PnDgnStar, missg = PnDQnStar),
-              aiptw_c = list(est = unlist(psi.o),cov=cov.o),
+              aiptw_c = list(est = unlist(psi_o),cov=cov_o),
               nuisance_aiptw_c = list(Qn = Qn, gn = gn, Qrn = Qrn, grn = grn),
-              tmle = list(est=unlist(psi.t1),cov=cov.t1),
-              aiptw = list(est=unlist(psi.o1), cov=cov.o1),
-              gcomp=list(est=unlist(psi.n), cov=cov.o1),
+              tmle = list(est=unlist(psi_t1),cov=cov_t1),
+              aiptw = list(est=unlist(psi_o1), cov=cov_o1),
+              gcomp=list(est=unlist(psi_n), cov=cov_o1),
               QnMod = NULL, gnMod = NULL, QrnMod = NULL, grnMod = NULL,
               a_0 = a_0, call = call)
 

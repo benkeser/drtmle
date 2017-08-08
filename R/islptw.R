@@ -65,6 +65,7 @@ globalVariables(c("v", "%dopar%"))
 #' 
 #' TO DO: Add call to output
 #' @importFrom plyr llply laply
+#' @importFrom stats cov 
 #' @export
 #' @examples 
 #' # load super learner
@@ -136,18 +137,15 @@ islptw <- function(W, A, Y,
   # TO DO: Add reasonable names to gnMod?
 
  	# compute iptw estimator
-	psi.n <- mapply(a = split(a_0, 1:length(a_0)),g=gn, function(a,g){
+	psi_n <- mapply(a = split(a_0, 1:length(a_0)),g=gn, function(a,g){
     modA <- A; modA[is.na(A)] <- -999
     modY <- Y; modY[is.na(Y)] <- -999
 		mean(as.numeric(modA == a & DeltaA == 1 & DeltaY == 1)/g * modY)
 	})
 
   # estimate influence function
-	Dno <- mapply(a=split(a_0,1:length(a_0)),g=gn,psi=psi.n,FUN=function(a,g,psi){
-    modA <- A; modA[is.na(A)] <- -999
-    modY <- Y; modY[is.na(Y)] <- -999
-  	as.numeric(modA == a & DeltaA == 1 & DeltaY == 1)/g * modY - psi
-	},SIMPLIFY=FALSE)
+	Dno <- eval_Diptw(A = A, Y = Y, DeltaA = DeltaA, DeltaY = DeltaY,
+                     gn = gn, psi_n = psi_n, a_0 = a_0)
 
   #-------------------------------------
 	# estimate reduced dimension Q
@@ -182,14 +180,12 @@ islptw <- function(W, A, Y,
   QrnMod <- QrnValid[seq(2,length(QrnValid),2)]
   # TO DO: Add reasonable names to QrnMod?
 
-  Dngo <- mapply(a=split(a_0,1:length(a_0)),Qr=Qrn,g=gn,FUN=function(a,Qr,g){
-    modA <- A; modA[is.na(A)] <- -999
-    Qr/g * (as.numeric(modA == a & DeltaA == 1 & DeltaY == 1) - g)
-  },SIMPLIFY=FALSE)
+  Dngo <- eval_Diptw_g(A = A, DeltaA = DeltaA, DeltaY = DeltaY, 
+                       Qrn = Qrn, gn = gn, a_0 = a_0)
   PnDgn <- lapply(Dngo, mean)
 
   # one-step iptw estimator
-  psi.o <- mapply(a=psi.n,b=PnDgn,SIMPLIFY=FALSE,
+  psi.o <- mapply(a=psi_n,b=PnDgn,SIMPLIFY=FALSE,
   	            FUN=function(a,b){a-b}) 
 
   # targeted g estimator
@@ -235,12 +231,8 @@ islptw <- function(W, A, Y,
     QrnMod <- QrnValid[seq(2,length(QrnValid),2)]
 
     # compute influence function for fluctuated estimators
-    DngoStar <- mapply(a=split(a_0,1:length(a_0)),
-                       Qr=QrnStar,g=gnStar,
-                       FUN=function(a,Qr,g){
-      modA <- A; modA[is.na(A)] <- -999
-      Qr/g * (as.numeric(modA == a & DeltaA == 1 & DeltaY == 1) - g)
-    }, SIMPLIFY=FALSE)
+    DngoStar <-  eval_Diptw_g(A = A, DeltaA = DeltaA, DeltaY = DeltaY, 
+                       Qrn = QrnStar, gn = gnStar, a_0 = a_0)
     PnDgnStar <- lapply(DngoStar, mean)
     if(verbose){
       cat("TMLE Iteration", ct, "=", round(unlist(eps),5), "\n")
@@ -250,7 +242,7 @@ islptw <- function(W, A, Y,
 
   # compute final tmle-iptw estimate
 	# compute iptw estimator
-  psi.nStar <- mapply(a = split(a_0, 1:length(a_0)),g=gnStar, function(a,g){
+  psi_nStar <- mapply(a = split(a_0, 1:length(a_0)),g=gnStar, function(a,g){
     modA <- A; modA[is.na(A)] <- -999
     modY <- Y; modY[is.na(Y)] <- -999
   	mean(as.numeric(modA == a & DeltaA == 1 & DeltaY == 1)/g * modY)
@@ -258,27 +250,24 @@ islptw <- function(W, A, Y,
 
   # compute variance estimators 
   # original influence function
-	DnoStar <- mapply(a=split(a_0,1:length(a_0)),g=gnStar,
-	                  psi=psi.nStar,FUN=function(a,g,psi){
-                      modA <- A; modA[is.na(A)] <- -999
-                      modY <- Y; modY[is.na(Y)] <- -999
-	                  	as.numeric(modA == a & DeltaA == 1 & DeltaY == 1)/g * modY - psi
-	                  },SIMPLIFY=FALSE)
-	# new influence function in DngoStar already
-  DnoStarMat <- matrix(unlist(DnoStar) - unlist(DngoStar), 
-                       ncol=length(Y), nrow=length(a_0), byrow = TRUE)
-  cov.t <- (DnoStarMat - mean(DnoStarMat))%*%t((DnoStarMat - mean(DnoStarMat)))/(length(Y)^2)
-  DnoMat <- matrix(unlist(Dno) - unlist(DngoStar), 
-                   ncol = length(Y), nrow = length(a_0), byrow = TRUE)
-  cov.os <- (DnoMat - mean(DnoMat))%*%t((DnoMat - mean(DnoMat)))/(length(Y)^2)
+	DnoStar <- eval_Diptw(A = A, Y = Y, DeltaA = DeltaA, DeltaY = DeltaY,
+                     gn = gnStar, psi_n = psi_nStar, a_0 = a_0)
+
+	# covariance for tmle iptw
+  DnoStarMat <- matrix(unlist(DnoStar) - unlist(DngoStar), nrow=n, ncol=length(a_0))
+  cov.t <- stats::cov(DnoStarMat)/n
+  # covariate for one-step iptw
+  DnoMat <- matrix(unlist(Dno) - unlist(Dngo), nrow = n, ncol = length(a_0))
+  cov.os <- stats::cov(DnoMat)/n
 
   # output
-  out <- list(islptw_tmle = list(est = unlist(psi.nStar), cov = cov.t),
+  out <- list(islptw_tmle = list(est = unlist(psi_nStar), cov = cov.t),
               islptw_tmle_nuisance = list(gn = gnStar, QrnStar = QrnStar),
               islptw_os = list(est = unlist(psi.o), cov = cov.os),
               islptw_os_nuisance = list(gn = gn, Qrn = Qrn),
-              iptw = list(est = unlist(psi.n)),
+              iptw = list(est = unlist(psi_n)),
               gnMod = NULL, QrnMod = NULL, a_0 = a_0, call = call)
+
 	if(returnModels){
 	 out$gnMod <- gnMod
  	 out$QrnMod <- QrnMod
