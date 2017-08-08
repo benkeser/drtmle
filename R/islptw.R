@@ -62,6 +62,8 @@ globalVariables(c("v", "%dopar%"))
 #'  \item{\code{a_0}}{The treatment levels that were requested for computation of 
 #'        covariate-adjusted means.}
 #' }
+#' 
+#' TO DO: Add call to output
 #' @importFrom plyr llply laply
 #' @export
 #' @examples 
@@ -95,14 +97,13 @@ islptw <- function(W, A, Y,
                    cvFolds = 1, parallel = FALSE,
                    ... 
                    ){
+  call <- match.call()
   # if cvFolds non-null split data into cvFolds pieces
   n <- length(Y)
-  if(cvFolds != 1){
+  if(cvFolds!=1){
     validRows <- split(sample(1:n), rep(1:cvFolds, length = n))       
-    ordVR <- order(unlist(validRows))
   }else{
-    validRows <- list(NULL)
-    ordVR <- 1:n
+    validRows <- list(1:n)
   }
 
   #-------------------------------
@@ -125,7 +126,11 @@ islptw <- function(W, A, Y,
   # re-order predictions
   gnValid <- unlist(gnOut, recursive = FALSE, use.names = FALSE)
   gnUnOrd <- do.call(Map, c(c, gnValid[seq(1, length(gnValid), 2)]))
-  gn <- lapply(gnUnOrd, function(x){ x[ordVR] })
+  gn <- vector(mode = "list", length = length(a_0))
+  for(i in 1:length(a_0)){
+    gn[[i]] <- rep(NA, n)
+    gn[[i]][unlist(validRows)] <- gnUnOrd[[i]]
+  }
   # obtain list of propensity score fits
   gnMod <- gnValid[seq(2, length(gnValid), 2)]
   # TO DO: Add reasonable names to gnMod?
@@ -168,7 +173,11 @@ islptw <- function(W, A, Y,
   # re-order predictions
   QrnValid <- unlist(QrnOut, recursive = FALSE, use.names = FALSE)
   QrnUnOrd <- do.call(Map, c(c, QrnValid[seq(1,length(QrnValid),2)]))
-  Qrn <- lapply(QrnUnOrd, function(x){ x[ordVR] })
+  Qrn <- vector(mode = "list", length = length(a_0))
+  for(i in 1:length(a_0)){
+    Qrn[[i]] <- rep(NA, n)
+    Qrn[[i]][unlist(validRows)] <- QrnUnOrd[[i]]
+  }
   # obtain list of propensity score fits
   QrnMod <- QrnValid[seq(2,length(QrnValid),2)]
   # TO DO: Add reasonable names to QrnMod?
@@ -217,7 +226,11 @@ islptw <- function(W, A, Y,
     # re-order predictions
     QrnValid <- unlist(QrnStarOut, recursive = FALSE, use.names = FALSE)
     QrnUnOrd <- do.call(Map, c(c, QrnValid[seq(1,length(QrnValid),2)]))
-    QrnStar <- lapply(QrnUnOrd, function(x){ x[ordVR] })
+    QrnStar <- vector(mode = "list", length = length(a_0))
+    for(i in 1:length(a_0)){
+      QrnStar[[i]] <- rep(NA, n)
+      QrnStar[[i]][unlist(validRows)] <- QrnUnOrd[[i]]
+    }
     # obtain list of propensity score fits
     QrnMod <- QrnValid[seq(2,length(QrnValid),2)]
 
@@ -265,7 +278,7 @@ islptw <- function(W, A, Y,
               islptw_os = list(est = unlist(psi.o), cov = cov.os),
               islptw_os_nuisance = list(gn = gn, Qrn = Qrn),
               iptw = list(est = unlist(psi.n)),
-              gnMod = NULL, QrnMod = NULL, a_0 = a_0)
+              gnMod = NULL, QrnMod = NULL, a_0 = a_0, call = call)
 	if(returnModels){
 	 out$gnMod <- gnMod
  	 out$QrnMod <- QrnMod

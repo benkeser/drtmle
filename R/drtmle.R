@@ -143,14 +143,13 @@ drtmle <- function(Y, A, W,
                    Qsteps = 2,
                    parallel = FALSE,
                    ...){
+  call <- match.call()
   # if cvFolds non-null split data into cvFolds pieces
   n <- length(Y)
   if(cvFolds!=1){
     validRows <- split(sample(1:n), rep(1:cvFolds, length = n))       
-    ordVR <- order(unlist(validRows, use.names = FALSE))
   }else{
-    validRows <- list(NULL)
-    ordVR <- 1:n
+    validRows <- list(1:n)
   }
   #-------------------------------
   # estimate propensity score
@@ -173,7 +172,11 @@ drtmle <- function(Y, A, W,
   # # re-order predictions
   gnValid <- unlist(gnOut, recursive = FALSE, use.names = FALSE)
   gnUnOrd <- do.call(Map, c(c, gnValid[seq(1, length(gnValid), 2)]))
-  gn <- lapply(gnUnOrd, function(x){ x[ordVR] })
+  gn <- vector(mode = "list", length = length(a_0))
+  for(i in 1:length(a_0)){
+    gn[[i]] <- rep(NA, n)
+    gn[[i]][unlist(validRows)] <- gnUnOrd[[i]]
+  }
   # obtain list of propensity score fits
   gnMod <- gnValid[seq(2, length(gnValid), 2)]
   # TO DO: Add reasonable names to gnMod?
@@ -198,12 +201,15 @@ drtmle <- function(Y, A, W,
   # re-order predictions
   QnValid <- unlist(QnOut, recursive = FALSE, use.names = FALSE)
   QnUnOrd <- do.call(Map, c(c, QnValid[seq(1,length(QnValid),2)]))
-  Qn <- lapply(QnUnOrd, function(x){ x[ordVR] })
+  Qn <- vector(mode = "list", length = length(a_0))
+  for(i in 1:length(a_0)){
+    Qn[[i]] <- rep(NA, n)
+    Qn[[i]][unlist(validRows)] <- QnUnOrd[[i]]
+  }
   # obtain list of outcome regression fits
   QnMod <- QnValid[seq(2,length(QnValid),2)]
   # TO DO: Add reasonable names to QnMod?
   
-
   # naive g-computation estimate
   psi.n <- lapply(Qn, mean)
   
@@ -244,7 +250,11 @@ drtmle <- function(Y, A, W,
     # re-order predictions
     QrnValid <- unlist(QrnOut, recursive = FALSE, use.names = FALSE)
     QrnUnOrd <- do.call(Map, c(c, QrnValid[seq(1,length(QrnValid),2)]))
-    Qrn <- lapply(QrnUnOrd, function(x){ x[ordVR] })
+    Qrn <- vector(mode = "list", length = length(a_0))
+    for(i in 1:length(a_0)){
+      Qrn[[i]] <- rep(NA, n)
+      Qrn[[i]][unlist(validRows)] <- QrnUnOrd[[i]]
+    }
     # obtain list of reduced dimension regression fits
     QrnMod <- QrnValid[seq(2,length(QrnValid),2)]
     # TO DO: Add reasonable names to QrnMod?
@@ -275,7 +285,11 @@ drtmle <- function(Y, A, W,
     # re-order predictions
     grnValid <- unlist(grnOut, recursive = FALSE, use.names = FALSE)
     grnUnOrd <- do.call(Map, c(rbind, grnValid[seq(1,length(grnValid),2)]))
-    grn <- lapply(grnUnOrd, function(x){ x[ordVR,] })
+    grn <- vector(mode = "list", length = length(a_0))
+    for(i in 1:length(a_0)){
+      grn[[i]] <- data.frame(grn1=rep(NA, n),grn2=rep(NA, n))
+      grn[[i]][unlist(validRows),] <- cbind(grnUnOrd[[i]])
+    }
     # obtain list of outcome regression fits
     grnMod <- grnValid[seq(2,length(grnValid),2)]
     # TO DO: Add reasonable names to grnMod?
@@ -353,7 +367,11 @@ drtmle <- function(Y, A, W,
       # re-order predictions
       grnValid <- unlist(grnStarOut, recursive = FALSE, use.names = FALSE)
       grnUnOrd <- do.call(Map, c(rbind, grnValid[seq(1,length(grnValid),2)]))
-      grn <- lapply(grnUnOrd, function(x){ x[ordVR,] })
+      grnStar <- vector(mode = "list", length = length(a_0))
+      for(i in 1:length(a_0)){
+        grnStar[[i]] <- data.frame(grn1=rep(NA, n),grn2=rep(NA, n))
+        grnStar[[i]][unlist(validRows),] <- cbind(grnUnOrd[[i]])
+      }
       # obtain list of outcome regression fits
       grnMod <- grnValid[seq(2,length(grnValid),2)]
       # TO DO: Add reasonable names to grnMod?
@@ -403,7 +421,11 @@ drtmle <- function(Y, A, W,
       # re-order predictions
       QrnValid <- unlist(QrnStarOut, recursive = FALSE, use.names = FALSE)
       QrnUnOrd <- do.call(Map, c(c, QrnValid[seq(1,length(QrnValid),2)]))
-      QrnStar <- lapply(QrnUnOrd, function(x){ x[ordVR] })
+      QrnStar <- vector(mode = "list", length = length(a_0))
+      for(i in 1:length(a_0)){
+        QrnStar[[i]] <- rep(NA, n)
+        QrnStar[[i]][unlist(validRows)] <- QrnUnOrd[[i]]
+      }      
       # obtain list of reduced dimension regression fits
       QrnMod <- QrnValid[seq(2,length(QrnValid),2)]
       # TO DO: Add reasonable names to QrnMod?
@@ -536,12 +558,12 @@ drtmle <- function(Y, A, W,
                                      QrnStar = QrnStar, grnStar = grn),
               ic_drtmle = list(eif = PnDnoStar, missQ = PnDgnStar, missg = PnDQnStar),
               aiptw_c = list(est = unlist(psi.o),cov=cov.o),
-              nuisance_aiptw = list(Qn = Qn, gn = gn, Qrn = Qrn, grn = grn),
+              nuisance_aiptw_c = list(Qn = Qn, gn = gn, Qrn = Qrn, grn = grn),
               tmle = list(est=unlist(psi.t1),cov=cov.t1),
               aiptw = list(est=unlist(psi.o1), cov=cov.o1),
               gcomp=list(est=unlist(psi.n), cov=cov.o1),
               QnMod = NULL, gnMod = NULL, QrnMod = NULL, grnMod = NULL,
-              a_0 = a_0)
+              a_0 = a_0, call = call)
 
   # tack on models if requested
   if(returnModels){

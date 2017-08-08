@@ -33,7 +33,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
   }
 
   # subset data into training and validation sets
-  if(!is.null(validRows)){
+  if(length(validRows)!=length(Y)){
     trainDeltaA <- DeltaA[-validRows]
     trainDeltaY <- DeltaY[-validRows]
     trainA <- A[-validRows]
@@ -470,7 +470,7 @@ estimateQ <- function(Y, A, W, DeltaA, DeltaY,
     glm_Q <- NULL
   }
   # subset data into training and validation sets
-  if(!is.null(validRows)){
+  if(length(validRows)!=length(Y)){
     trainY <- Y[-validRows]
     trainA <- A[-validRows]
     trainW <- W[-validRows,,drop=FALSE]
@@ -632,7 +632,7 @@ estimateQrn  <- function(Y, A, W, DeltaA, DeltaY,
   }
 
   # subset data into training and validation sets
-  if(!is.null(validRows)){
+  if(length(validRows)!=length(Y)){
     trainY <- Y[-validRows]
     trainA <- A[-validRows]
     trainW <- W[-validRows,,drop=FALSE]
@@ -677,8 +677,8 @@ estimateQrn  <- function(Y, A, W, DeltaA, DeltaY,
                        ". Using empirical average as Qr estimate."))
         m1 <- mean((trainY-train_Q)[Aeq_a & trainDeltaA == 1 & trainDeltaY == 1])
         est <- rep(m1, length(validY))
-        fm <- list(object = m1)
-        class(fm) <- "SL.mean"
+        fm <- list(fit = list(object = m1), pred = NULL)
+        class(fm$fit) <- "SL.mean"
       }else{
         if(length(SL_Qr)>1){
           suppressWarnings(
@@ -786,7 +786,7 @@ estimategrn <- function(Y, A, W, DeltaA, DeltaY,
                         Qn, gn, SL_gr, tolg, 
                         glm_gr, a_0, reduction,returnModels,
                         validRows){
-  if(!is.null(validRows)){
+  if(length(validRows)!=length(Y)){
     trainY <- Y[-validRows]
     trainA <- A[-validRows]
     trainW <- W[-validRows,,drop=FALSE]
@@ -836,17 +836,17 @@ estimategrn <- function(Y, A, W, DeltaA, DeltaY,
           m2 <- mean(as.numeric(Aeq_a & trainDeltaA == 1 & trainDeltaY == 1))
           grn2 <- rep(m2, length(validY))
           grn2[grn2 < tolg] <- tolg
-          fm1 <- list(object = m1)
-          class(fm1) <- "SL.mean"
-          fm2 <- list(object = m2)
-          class(fm1) <- "SL.mean"
+          fm1 <- list(fit = list(object = m1), pred = NULL)
+          class(fm1$fit) <- "SL.mean"
+          fm2 <- list(fit = list(object = m2), pred = NULL)
+          class(fm2$fit) <- "SL.mean"
         }else if(reduction=="bivariate"){
           m2 <- mean(as.numeric(Aeq_a & trainDeltaA == 1 & trainDeltaY == 1))
           grn2 <- rep(m2, length(validY))
           grn2[grn2 < tolg] <- tolg
-          fm2 <- list(object = m2)
-          class(fm2) <- "SL.mean"
-          fm1 <- NULL; grn1 <- rep(NA,length(validY))
+          fm2 <- list(fit = list(object = m2), pred = NULL)
+          class(fm2$fit) <- "SL.mean"
+          fm1 <- NULL; grn1 <- rep(NA, length(validY))
         }
       }else{
         if(length(SL_gr) > 1){
