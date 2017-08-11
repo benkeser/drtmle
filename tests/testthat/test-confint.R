@@ -55,7 +55,7 @@ test_that("ci.drtmle works as expected",{
 	myContrast <- list(f = function(eff){ log(eff) },
 	                   f_inv = function(eff){ exp(eff) },
 	                   h = function(est){ est[1]/est[2] },
-	                   h_grad =  function(est){ c(1/est[1],-1/est[2]) })
+	                   fh_grad =  function(est){ c(1/est[1],-1/est[2]) })
 	tmp <- ci(fit1, contrast = myContrast)
 	expect_true(class(tmp)=="ci.drtmle")
 	expect_true(row.names(tmp$drtmle) == "user contrast")
@@ -115,7 +115,7 @@ test_that("ci.islptw works as expected",{
 	myContrast <- list(f = function(eff){ log(eff) },
 	                   f_inv = function(eff){ exp(eff) },
 	                   h = function(est){ est[1]/est[2] },
-	                   h_grad =  function(est){ c(1/est[1],-1/est[2]) })
+	                   fh_grad =  function(est){ c(1/est[1],-1/est[2]) })
 	tmp <- ci(fit1, contrast = myContrast)
 	expect_true(class(tmp)=="ci.islptw")
 	expect_true(row.names(tmp$islptw_tmle) == "user contrast")

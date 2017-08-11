@@ -55,7 +55,7 @@ test_that("wald_test.drtmle works as expected",{
 	myContrast <- list(f = function(eff){ log(eff) },
 	                   f_inv = function(eff){ exp(eff) },
 	                   h = function(est){ est[1]/est[2] },
-	                   h_grad =  function(est){ c(1/est[1],-1/est[2]) })
+	                   fh_grad =  function(est){ c(1/est[1],-1/est[2]) })
 	tmp <- wald_test(fit1, contrast = myContrast, null = 1)
 	expect_true(class(tmp)=="wald_test.drtmle")
 	expect_true(row.names(tmp$drtmle) == "H0: user contrast = 1")
@@ -113,7 +113,7 @@ test_that("wald_test.islptw works as expected",{
 	myContrast <- list(f = function(eff){ log(eff) },
 	                   f_inv = function(eff){ exp(eff) },
 	                   h = function(est){ est[1]/est[2] },
-	                   h_grad =  function(est){ c(1/est[1],-1/est[2]) })
+	                   fh_grad =  function(est){ c(1/est[1],-1/est[2]) })
 	tmp <- wald_test(fit1, contrast = myContrast, null = 1)
 	expect_true(class(tmp)=="wald_test.islptw")
 	expect_true(row.names(tmp$islptw_tmle) == "H0: user contrast = 1")
