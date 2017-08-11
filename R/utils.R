@@ -12,12 +12,14 @@ print.drtmle <- function(x,...){
   tmp <- list(est = cbind(x$drtmle$est),
   	          cov = x$drtmle$cov)
   row.names(tmp$est) <- x$a_0
+  colnames(tmp$est) <- ""
   row.names(tmp$cov) <- colnames(tmp$cov) <- x$a_0
   if(length(x$a_0) <= 4){
   	print(tmp)
   }else{
   	tmp$cov <- diag(tmp$cov)
   }
+  invisible(tmp)
 }
 
 #' Print the output of a \code{"islptw"} object.
@@ -31,12 +33,14 @@ print.islptw <- function(x,...){
   tmp <- list(est = cbind(x$islptw_tmle$est),
   	          cov = x$islptw_tmle$cov)
   row.names(tmp$est) <- x$a_0
+  colnames(tmp$est) <- ""
   row.names(tmp$cov) <- colnames(tmp$cov) <- x$a_0
   if(length(x$a_0) <= 4){
   	print(tmp)
   }else{
   	tmp$cov <- diag(tmp$cov)
   }
+  invisible(tmp)
 }
 
 
@@ -50,6 +54,7 @@ print.islptw <- function(x,...){
 print.ci.drtmle <- function(x,digits = 3,...){
 	tmp <- lapply(x, round, digits = digits)
 	print(tmp)
+  invisible(tmp)
 }
 
 #' Print the output of ci.islptw
@@ -62,6 +67,7 @@ print.ci.drtmle <- function(x,digits = 3,...){
 print.ci.islptw <- function(x,digits = 3,...){
 	tmp <- lapply(x, round, digits = digits)
 	print(tmp)
+  invisible(tmp)
 }
 
 #' Print the output of wald_test.drtmle
@@ -74,6 +80,7 @@ print.ci.islptw <- function(x,digits = 3,...){
 print.wald_test.drtmle <- function(x,digits = 3,...){
   tmp <- lapply(x, round, digits = digits)
   print(tmp)
+  invisible(tmp)
 }
 
 #' Print the output of wald_test.islptw
@@ -86,6 +93,7 @@ print.wald_test.drtmle <- function(x,digits = 3,...){
 print.wald_test.islptw <- function(x,digits = 3,...){
   tmp <- lapply(x, round, digits = digits)
   print(tmp)
+  invisible(tmp)
 }
 
 

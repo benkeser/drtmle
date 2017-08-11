@@ -21,13 +21,13 @@ ci <- function(...){
 #' marginal means. \code{contrast} can also be input as a numeric vector of ones, negative ones,
 #' and zeros to define linear combinations of the various means (e.g., to estimate an average
 #' treatment effect, see examples). \code{contrast} can also be a list with named functions
-#' \code{f}, \code{f_inv}, \code{h}, and \code{h_grad}. The first two functions should take
+#' \code{f}, \code{f_inv}, \code{h}, and \code{fh_grad}. The first two functions should take
 #' as input argument \code{eff}. Respectively, these specify which transformation 
 #' of the effect measure to compute the confidence interval for and the inverse
 #' transformation to put the confidence interval back on the original scale. The function \code{h}
 #' defines the contrast to be estimated and should take as input \code{est}, a vector
 #' of the same length as \code{object$a_0}, and output the desired contrast. The function
-#' \code{h_grad} is the gradient of the function \code{h}. See examples. 
+#' \code{fh_grad} is the gradient of the function \code{h}. See examples. 
 #' @param ... Other options (not currently used)
 #' @importFrom stats qnorm
 #' @export
@@ -64,7 +64,7 @@ ci <- function(...){
 #' myContrast <- list(f = function(eff){ log(eff) },
 #'                    f_inv = function(eff){ exp(eff) },
 #'                    h = function(est){ est[1]/est[2] },
-#'                    h_grad =  function(est){ c(1/est[1],-1/est[2]) })
+#'                    fh_grad =  function(est){ c(1/est[1],-1/est[2]) })
 #' ci_RR <- ci(fit1, contrast = myContrast)
 
 
@@ -123,7 +123,7 @@ ci.drtmle <- function(object, est = c("drtmle"), level = 0.95,
 			colnames(out[[i]]) <- c("est","cil","ciu")
 		}
 	}else if(is.list(contrast)){
-		if(!all(c("f","f_inv","h","h_grad") %in% names(contrast))){
+		if(!all(c("f","f_inv","h","fh_grad") %in% names(contrast))){
 			stop("some function missing in contrast. see ?ci.drtmle for help.")
 		}
 		for(i in seq_along(est)){
@@ -131,7 +131,7 @@ ci.drtmle <- function(object, est = c("drtmle"), level = 0.95,
 			thisC <- do.call(contrast$h,args=list(est = object[[est[i]]]$est))
 			f_thisC <- do.call(contrast$f,args=list(eff = thisC))
 
-			grad <- matrix(do.call(contrast$h_grad,
+			grad <- matrix(do.call(contrast$fh_grad,
 			                       args=list(est = object[[est[i]]]$est)
 			               ),nrow = length(object$a_0))
 			v <- object[[est[i]]]$cov
@@ -163,13 +163,13 @@ ci.drtmle <- function(object, est = c("drtmle"), level = 0.95,
 #' marginal means. \code{contrast} can also be input as a numeric vector of ones, negative ones,
 #' and zeros to define linear combinations of the various means (e.g., to estimate an average
 #' treatment effect, see examples). \code{contrast} can also be a list with named functions
-#' \code{f}, \code{f_inv}, \code{h}, and \code{h_grad}. The first two functions should take
+#' \code{f}, \code{f_inv}, \code{h}, and \code{fh_grad}. The first two functions should take
 #' as input argument \code{eff}. Respectively, these specify which transformation 
 #' of the effect measure to compute the confidence interval for and the inverse
 #' transformation to put the confidence interval back on the original scale. The function \code{h}
 #' defines the contrast to be estimated and should take as input \code{est}, a vector
 #' of the same length as \code{object$est}, and output the desired contrast. The function
-#' \code{h_grad} is the gradient of the function \code{h}. See examples. 
+#' \code{fh_grad} is the gradient of the function \code{h}. See examples. 
 #' @param ... Other options (not currently used)
 #' @export
 #' @method ci islptw
@@ -202,7 +202,7 @@ ci.drtmle <- function(object, est = c("drtmle"), level = 0.95,
 #' myContrast <- list(f = function(eff){ log(eff) },
 #'                    f_inv = function(eff){ exp(eff) },
 #'                    h = function(est){ est[1]/est[2] },
-#'                    h_grad =  function(est){ c(1/est[1],-1/est[2]) })
+#'                    fh_grad =  function(est){ c(1/est[1],-1/est[2]) })
 #' ci_RR <- ci(fit1, contrast = myContrast)
 
 
@@ -263,7 +263,7 @@ ci.islptw <- function(object, est = c("islptw_tmle"), level = 0.95,
 			colnames(out[[i]]) <- c("est","cil","ciu")
 		}
 	}else if(is.list(contrast)){
-		if(!all(c("f","f_inv","h","h_grad") %in% names(contrast))){
+		if(!all(c("f","f_inv","h","fh_grad") %in% names(contrast))){
 			stop("some function missing in contrast.")
 		}
 		for(i in seq_along(est)){
@@ -271,7 +271,7 @@ ci.islptw <- function(object, est = c("islptw_tmle"), level = 0.95,
 			thisC <- do.call(contrast$h,args=list(est = object[[est[i]]]$est))
 			f_thisC <- do.call(contrast$f,args=list(eff = thisC))
 
-			grad <- matrix(do.call(contrast$h_grad,
+			grad <- matrix(do.call(contrast$fh_grad,
 			                       args=list(est = object[[est[i]]]$est)
 			               ),nrow = length(object$a_0))
 			v <- object[[est[i]]]$cov

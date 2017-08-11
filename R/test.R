@@ -24,12 +24,12 @@ wald_test <- function(...){
 #' treatment effect, see examples). In this case, we test the null hypothesis that the 
 #' linear combination of means equals the value specified in \code{null}. 
 #' \code{contrast} can also be a list with named functions
-#' \code{f}, \code{h}, and \code{h_grad}. The function \code{f} takes
+#' \code{f}, \code{h}, and \code{fh_grad}. The function \code{f} takes
 #' as input argument \code{eff} and specifies which transformation 
 #' of the effect measure to test. The function \code{h} defines the contrast 
 #' to be estimated and should take as input \code{est}, a vector
 #' of the same length as \code{object$a_0}, and output the desired contrast. The function
-#' \code{h_grad} is the gradient of the function \code{h(f())}. The function
+#' \code{fh_grad} is the gradient of the function \code{h(f())}. The function
 #' computes a test of the null hypothesis that \code{h(f(object$est)) = null}. 
 #' See examples. 
 #' @param ... Other options (not currently used)
@@ -67,7 +67,7 @@ wald_test <- function(...){
 #' myContrast <- list(f = function(eff){ log(eff) },
 #'                    f_inv = function(eff){ exp(eff) },
 #'                    h = function(est){ est[1]/est[2] },
-#'                    h_grad =  function(est){ c(1/est[1],-1/est[2]) })
+#'                    fh_grad =  function(est){ c(1/est[1],-1/est[2]) })
 #' ci_RR <- ci(fit1, contrast = myContrast, null = 1)
 
 wald_test.drtmle <- function(object, est = c("drtmle"), null = 0,
@@ -138,7 +138,7 @@ wald_test.drtmle <- function(object, est = c("drtmle"), null = 0,
 			colnames(out[[i]]) <- c("zstat","pval")
 		}
 	}else if(is.list(contrast)){
-		if(!all(c("f","h","h_grad") %in% names(contrast))){
+		if(!all(c("f","h","fh_grad") %in% names(contrast))){
 			stop("some function missing in contrast. see ?wald_test for help.")
 		}
 		if(length(null) > 1){
@@ -149,7 +149,7 @@ wald_test.drtmle <- function(object, est = c("drtmle"), null = 0,
 			thisC <- do.call(contrast$h,args=list(est = object[[est[i]]]$est))
 			f_thisC <- do.call(contrast$f,args=list(eff = thisC))
 
-			grad <- matrix(do.call(contrast$h_grad,
+			grad <- matrix(do.call(contrast$fh_grad,
 			                       args=list(est = object[[est[i]]]$est)
 			               ),nrow = length(object$a_0))
 			v <- object[[est[i]]]$cov
@@ -183,12 +183,12 @@ wald_test.drtmle <- function(object, est = c("drtmle"), null = 0,
 #' treatment effect, see examples). In this case, we test the null hypothesis that the 
 #' linear combination of means equals the value specified in \code{null}. 
 #' \code{contrast} can also be a list with named functions
-#' \code{f}, \code{h}, and \code{h_grad}. The function \code{f} takes
+#' \code{f}, \code{h}, and \code{fh_grad}. The function \code{f} takes
 #' as input argument \code{eff} and specifies which transformation 
 #' of the effect measure to test. The function \code{h} defines the contrast 
 #' to be estimated and should take as input \code{est}, a vector
 #' of the same length as \code{object$a_0}, and output the desired contrast. The function
-#' \code{h_grad} is the gradient of the function \code{h(f())}. The function
+#' \code{fh_grad} is the gradient of the function \code{h(f())}. The function
 #' computes a test of the null hypothesis that \code{h(f(object$est)) = null}. 
 #' See examples. 
 #' @param ... Other options (not currently used)
@@ -223,7 +223,7 @@ wald_test.drtmle <- function(object, est = c("drtmle"), null = 0,
 #' myContrast <- list(f = function(eff){ log(eff) },
 #'                    f_inv = function(eff){ exp(eff) }, # not necessary
 #'                    h = function(est){ est[1]/est[2] },
-#'                    h_grad =  function(est){ c(1/est[1],-1/est[2]) })
+#'                    fh_grad =  function(est){ c(1/est[1],-1/est[2]) })
 #' ci_RR <- ci(fit1, contrast = myContrast, null = 1)
 
 wald_test.islptw <- function(object, est = c("islptw_tmle"), null = 0,
@@ -297,7 +297,7 @@ wald_test.islptw <- function(object, est = c("islptw_tmle"), null = 0,
 			colnames(out[[i]]) <- c("zstat","pval")
 		}
 	}else if(is.list(contrast)){
-		if(!all(c("f","h","h_grad") %in% names(contrast))){
+		if(!all(c("f","h","fh_grad") %in% names(contrast))){
 			stop("some function missing in contrast. see ?wald_test for help.")
 		}
 		if(length(null) > 1){
@@ -308,7 +308,7 @@ wald_test.islptw <- function(object, est = c("islptw_tmle"), null = 0,
 			thisC <- do.call(contrast$h,args=list(est = object[[est[i]]]$est))
 			f_thisC <- do.call(contrast$f,args=list(eff = thisC))
 
-			grad <- matrix(do.call(contrast$h_grad,
+			grad <- matrix(do.call(contrast$fh_grad,
 			                       args=list(est = object[[est[i]]]$est)
 			               ),nrow = length(object$a_0))
 			v <- object[[est[i]]]$cov

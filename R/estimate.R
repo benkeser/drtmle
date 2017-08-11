@@ -51,14 +51,14 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
 
   if(!is.null(SL_g)){
     # check for names in SL_g
-    namedSL_g <- c("DeltaA","A","DeltaY") %in% unlist(SL_g)
+    namedSL_g <- c("DeltaA","A","DeltaY") %in% names(SL_g)
     # if none of the above names appear, then it is assumed that
     # you want to use SL_g for each of DeltaA, A, and Y
     if(!any(namedSL_g)){
       SL_g <- list(DeltaA = SL_g, A = SL_g, DeltaY = SL_g)
     }
   }else if(!is.null(glm_g)){
-    namedglm_g <- c("DeltaA","A","DeltaY") %in% unlist(glm_g)
+    namedglm_g <- c("DeltaA","A","DeltaY") %in% names(glm_g)
     # if none of the above names appear, then it is assumed that
     # you want to use glm_g for each of DeltaA, A, and Y
     if(!any(namedglm_g)){
@@ -398,7 +398,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
         for(a in a_0){
           a_ct <- a_ct + 1
           gn_DeltaY[[a_ct]] <- stats::predict(
-            fm_DeltaY, newdata = data.frame(A==a, validW), type = "response" 
+            fm_DeltaY, newdata = data.frame(A=a, validW), type = "response" 
           )
         } # end loop over treatments
       } # end !stratified glm

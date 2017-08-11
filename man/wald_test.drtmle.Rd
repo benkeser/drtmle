@@ -28,12 +28,12 @@ and zeros to define linear combinations of the various means (e.g., to estimate 
 treatment effect, see examples). In this case, we test the null hypothesis that the 
 linear combination of means equals the value specified in \code{null}. 
 \code{contrast} can also be a list with named functions
-\code{f}, \code{h}, and \code{h_grad}. The function \code{f} takes
+\code{f}, \code{h}, and \code{fh_grad}. The function \code{f} takes
 as input argument \code{eff} and specifies which transformation 
 of the effect measure to test. The function \code{h} defines the contrast 
 to be estimated and should take as input \code{est}, a vector
 of the same length as \code{object$a_0}, and output the desired contrast. The function
-\code{h_grad} is the gradient of the function \code{h(f())}. The function
+\code{fh_grad} is the gradient of the function \code{h(f())}. The function
 computes a test of the null hypothesis that \code{h(f(object$est)) = null}. 
 See examples.}
 
@@ -73,6 +73,6 @@ test_ATE <- wald_test(fit1, null = 0, contrast = c(1,-1))
 myContrast <- list(f = function(eff){ log(eff) },
                    f_inv = function(eff){ exp(eff) },
                    h = function(est){ est[1]/est[2] },
-                   h_grad =  function(est){ c(1/est[1],-1/est[2]) })
+                   fh_grad =  function(est){ c(1/est[1],-1/est[2]) })
 ci_RR <- ci(fit1, contrast = myContrast, null = 1)
 }
