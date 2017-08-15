@@ -23,7 +23,7 @@ returns the empirical average of the outcomes. Used for computational expediency
 \item{...}{Other arguments (not currently used).}
 }
 \description{
-Kernel regression based on the \href{https://cran.r-project.org/web/packages/np/}{np}
+Kernel regression based on the \href{https://CRAN.R-project.org/package=np}{np}
 package. Uses leave-one-out cross-validation to fit a kernel regression. 
 See \code{?npreg} for more details.
 }
