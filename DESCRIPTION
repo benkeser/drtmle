@@ -14,7 +14,7 @@ Suggests:
     testthat,
     knitr,
     rmarkdown,
-    rpart,
+    gam,
     quadprog,
     nloptr
 License: MIT + file LICENSE
