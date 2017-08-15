@@ -79,7 +79,7 @@ test_that("drtmle executes as expected with multiple treatment levels", {
 })
 
 
-test_that("islptw executes as expected with multiple treatment levels", {
+test_that("adaptive_iptw executes as expected with multiple treatment levels", {
 	set.seed(123456)
 	n <- 200
 	W <- data.frame(W1 = runif(n), W2 = rnorm(n))
@@ -88,47 +88,47 @@ test_that("islptw executes as expected with multiple treatment levels", {
 
 	# univariate reduction with
 	# all GLMs + stratify
-	fit1 <- islptw(W = W, A = A, Y = Y, a_0=c(0,1,2),
+	fit1 <- adaptive_iptw(W = W, A = A, Y = Y, a_0=c(0,1,2),
                       glm_g="W1 + W2",
                       returnModels = TRUE,
                       glm_Qr="gn")
 
 	expect_true(is.numeric(fit1$iptw$est))
-	expect_true(is.numeric(fit1$islptw_tmle$est))
-	expect_true(is.numeric(fit1$islptw_os$est))
-	expect_true(is.numeric(fit1$islptw_os$cov))
-	expect_true(is.numeric(fit1$islptw_tmle$cov))
+	expect_true(is.numeric(fit1$iptw_tmle$est))
+	expect_true(is.numeric(fit1$iptw_os$est))
+	expect_true(is.numeric(fit1$iptw_os$cov))
+	expect_true(is.numeric(fit1$iptw_tmle$cov))
 	# check ci works
 	ci <- ci(fit1)
-	expect_true(length(fit1$islptw_tmle$est)==3)
+	expect_true(length(fit1$iptw_tmle$est)==3)
 	# check contrasts work
 	ci2 <- ci(fit1, contrast = c(1,-1,0))
-	expect_true(row.names(ci2$islptw_tmle) == "E[Y(0)]-E[Y(1)]")
+	expect_true(row.names(ci2$iptw_tmle) == "E[Y(0)]-E[Y(1)]")
 	ci3 <- ci(fit1, contrast = c(1,0,-1))
-	expect_true(row.names(ci3$islptw_tmle) == "E[Y(0)]-E[Y(2)]")
+	expect_true(row.names(ci3$iptw_tmle) == "E[Y(0)]-E[Y(2)]")
 
 
 	# same thing but with super learner for g
 	# univariate reduction with
 	# all GLMs + stratify
-	fit1 <- islptw(W = W, A = A, Y = Y, a_0=c(0,1,2),
+	fit1 <- adaptive_iptw(W = W, A = A, Y = Y, a_0=c(0,1,2),
                       SL_g=c("SL.step","SL.step.interaction"),
                       returnModels = TRUE,
                       glm_Qr="gn")
 
 	expect_true(is.numeric(fit1$iptw$est))
-	expect_true(is.numeric(fit1$islptw_tmle$est))
-	expect_true(is.numeric(fit1$islptw_os$est))
-	expect_true(is.numeric(fit1$islptw_os$cov))
-	expect_true(is.numeric(fit1$islptw_tmle$cov))
+	expect_true(is.numeric(fit1$iptw_tmle$est))
+	expect_true(is.numeric(fit1$iptw_os$est))
+	expect_true(is.numeric(fit1$iptw_os$cov))
+	expect_true(is.numeric(fit1$iptw_tmle$cov))
 	# check ci works
 	ci <- ci(fit1)
-	expect_true(length(fit1$islptw_tmle$est)==3)
+	expect_true(length(fit1$iptw_tmle$est)==3)
 	# check contrasts work
 	ci2 <- ci(fit1, contrast = c(1,-1,0))
-	expect_true(row.names(ci2$islptw_tmle) == "E[Y(0)]-E[Y(1)]")
+	expect_true(row.names(ci2$iptw_tmle) == "E[Y(0)]-E[Y(1)]")
 	ci3 <- ci(fit1, contrast = c(1,0,-1))
-	expect_true(row.names(ci3$islptw_tmle) == "E[Y(0)]-E[Y(2)]")
+	expect_true(row.names(ci3$iptw_tmle) == "E[Y(0)]-E[Y(2)]")
 
 
 })

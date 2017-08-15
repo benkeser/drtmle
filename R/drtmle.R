@@ -226,12 +226,12 @@ drtmle <- function(Y, A, W,
     if(!parallel){
       QrnOut <- lapply(X = validRows, FUN = estimateQrn, 
                        Y=Y, A=A, W=W, DeltaA = DeltaA, DeltaY = DeltaY, 
-                       Qn=Qn, gn=gn, glm_Qr=glm_Qr, 
+                       Qn=Qn, gn=gn, glm_Qr=glm_Qr, family = stats::gaussian(),
                        SL_Qr=SL_Qr, a_0=a_0,returnModels = returnModels)
     }else{
       QrnOut <- foreach::foreach(v = 1:cvFolds, .packages = "SuperLearner") %dopar% {
         estimateQrn(Y=Y, A=A, W=W, DeltaA = DeltaA, DeltaY = DeltaY, 
-                    Qn=Qn, gn=gn, glm_Qr=glm_Qr, 
+                    Qn=Qn, gn=gn, glm_Qr=glm_Qr, family = stats::gaussian(),
                     SL_Qr=SL_Qr, a_0=a_0,returnModels = returnModels,
                     validRows = validRows[[v]])
       }
@@ -364,7 +364,7 @@ drtmle <- function(Y, A, W,
       }else if(Qsteps==2){
         # do the extra targeting
         QnStarOut2 <- fluctuateQ2(Y=Y, A=A, W=W, DeltaA = DeltaA, DeltaY = DeltaY, 
-                                  a_0=a_0, Qn=QnStar, 
+                                  a_0=a_0, Qn=QnStar,   
                                   gn=gnStar, grn=grnStar, reduction=reduction)
         QnStar <- plyr::llply(QnStarOut2, function(x){unlist(x[[1]])})
         
@@ -387,12 +387,12 @@ drtmle <- function(Y, A, W,
       if(!parallel){
         QrnStarOut <- lapply(X = validRows, FUN = estimateQrn, 
                          Y=Y, A=A, W=W, DeltaA = DeltaA, DeltaY = DeltaY, 
-                         Qn=QnStar, gn=gnStar, glm_Qr=glm_Qr, 
+                         Qn=QnStar, gn=gnStar, glm_Qr=glm_Qr, family = stats::gaussian(), 
                          SL_Qr=SL_Qr, a_0=a_0,returnModels = returnModels)
       }else{
         QrnStarOut <- foreach::foreach(v = 1:cvFolds, .packages = "SuperLearner") %dopar% {
           estimateQrn(Y=Y, A=A, W=W, DeltaA = DeltaA, DeltaY = DeltaY, 
-                      Qn=QnStar, gn=gnStar, glm_Qr=glm_Qr, 
+                      Qn=QnStar, gn=gnStar, glm_Qr=glm_Qr, family = stats::gaussian(),
                       SL_Qr=SL_Qr, a_0=a_0,returnModels = returnModels,
                       validRows = validRows[[v]])
         }

@@ -22,16 +22,16 @@ print.drtmle <- function(x,...){
   invisible(tmp)
 }
 
-#' Print the output of a \code{"islptw"} object.
+#' Print the output of a \code{"adaptive_iptw"} object.
 #' 
-#' @param x A \code{"islptw"} object.
+#' @param x A \code{"adaptive_iptw"} object.
 #' @param ... Other arguments (not used)
 #' @export
-#' @method print islptw
+#' @method print adaptive_iptw
 
-print.islptw <- function(x,...){
-  tmp <- list(est = cbind(x$islptw_tmle$est),
-  	          cov = x$islptw_tmle$cov)
+print.adaptive_iptw <- function(x,...){
+  tmp <- list(est = cbind(x$iptw_tmle$est),
+  	          cov = x$iptw_tmle$cov)
   row.names(tmp$est) <- x$a_0
   colnames(tmp$est) <- ""
   row.names(tmp$cov) <- colnames(tmp$cov) <- x$a_0
@@ -57,14 +57,14 @@ print.ci.drtmle <- function(x,digits = 3,...){
   invisible(tmp)
 }
 
-#' Print the output of ci.islptw
+#' Print the output of ci.adaptive_iptw
 #' @export
-#' @param x An object of class ci.islptw
+#' @param x An object of class ci.adaptive_iptw
 #' @param digits Number of digits to round to 
 #' @param ... Other options (not currently used)
-#' @method print ci.islptw 
+#' @method print ci.adaptive_iptw 
 
-print.ci.islptw <- function(x,digits = 3,...){
+print.ci.adaptive_iptw <- function(x,digits = 3,...){
 	tmp <- lapply(x, round, digits = digits)
 	print(tmp)
   invisible(tmp)
@@ -83,14 +83,14 @@ print.wald_test.drtmle <- function(x,digits = 3,...){
   invisible(tmp)
 }
 
-#' Print the output of wald_test.islptw
+#' Print the output of wald_test.adaptive_iptw
 #' @export
-#' @param x An object of class wald_test.islptw
+#' @param x An object of class wald_test.adaptive_iptw
 #' @param digits Number of digits to round to 
 #' @param ... Other options (not currently used)
-#' @method print wald_test.islptw 
+#' @method print wald_test.adaptive_iptw 
 
-print.wald_test.islptw <- function(x,digits = 3,...){
+print.wald_test.adaptive_iptw <- function(x,digits = 3,...){
   tmp <- lapply(x, round, digits = digits)
   print(tmp)
   invisible(tmp)

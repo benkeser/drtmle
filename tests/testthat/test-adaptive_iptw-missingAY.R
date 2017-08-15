@@ -4,8 +4,8 @@ library(np)
 library(testthat)
 
 # TO DO: Add tests for multiple treatment levels
-context("Testing islptw works")
-test_that("islptw works as expected with missing data",{
+context("Testing adaptive_iptw works")
+test_that("adaptive_iptw works as expected with missing data",{
 	set.seed(123456)
 	n <- 200
 	W <- data.frame(W1 = runif(n), W2 = rnorm(n))
@@ -16,14 +16,14 @@ test_that("islptw works as expected with missing data",{
 	Y[DeltaY == 0] <- NA
 	A[DeltaA == 0] <- NA
 
-	fit1 <- islptw(W = W, A = A, Y = Y, 
+	fit1 <- adaptive_iptw(W = W, A = A, Y = Y, 
 	               a_0 = c(0,1),
                   glm_g="W1 + W2",
                   glm_Qr="gn")
-	expect_true(all(!is.na(fit1$islptw_tmle$est)))
-	expect_true(all(!is.na(fit1$islptw_tmle$cov)))
-	expect_true(all(!is.na(fit1$islptw_os$est)))
-	expect_true(all(!is.na(fit1$islptw_os$cov)))
+	expect_true(all(!is.na(fit1$iptw_tmle$est)))
+	expect_true(all(!is.na(fit1$iptw_tmle$cov)))
+	expect_true(all(!is.na(fit1$iptw_os$est)))
+	expect_true(all(!is.na(fit1$iptw_os$cov)))
 	expect_true(all(!is.na(fit1$iptw$est)))
-	expect_true(class(fit1)=="islptw")
+	expect_true(class(fit1)=="adaptive_iptw")
 })

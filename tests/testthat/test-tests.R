@@ -63,44 +63,44 @@ test_that("wald_test.drtmle works as expected",{
 	expect_true(sum(is.na(unlist(tmp)))==0)
 })
 
-context("Testing ci.islptw method ")
-test_that("wald_test.islptw works as expected",{
+context("Testing ci.adaptive_iptw method ")
+test_that("wald_test.adaptive_iptw works as expected",{
 	# simulate data
 	set.seed(123456)
 	n <- 200
 	W <- data.frame(W1 = runif(n), W2 = rnorm(n))
 	A <- rbinom(n,1,plogis(W$W1 - W$W2))
 	Y <- rbinom(n, 1, plogis(W$W1*W$W2*A))
-	# fit a islptw
-	fit1 <- islptw(W = W, A = A, Y = Y, a_0 = c(1,0),
+	# fit a adaptive_iptw
+	fit1 <- adaptive_iptw(W = W, A = A, Y = Y, a_0 = c(1,0),
 	               SL_g=c("SL.glm","SL.mean","SL.step"),
 	               SL_Qr="SL.glm")
 
 	# get test for each mean for only drtmle
 	tmp <- wald_test(fit1)
 	# correct class
-	expect_true(class(tmp)=="wald_test.islptw")
+	expect_true(class(tmp)=="wald_test.adaptive_iptw")
 	# no NAs
 	expect_true(sum(is.na(unlist(tmp)))==0)
 
 	# get test for each mean for drtmle and tmle
-	tmp <- wald_test(fit1, est = c("islptw_tmle","islptw_os"))
+	tmp <- wald_test(fit1, est = c("iptw_tmle","iptw_os"))
 
 	# correct class
-	expect_true(class(tmp)=="wald_test.islptw")
+	expect_true(class(tmp)=="wald_test.adaptive_iptw")
 	# no NAs
 	expect_true(sum(is.na(unlist(tmp)))==0)
 	expect_true(length(tmp) == 2)
-	expect_true(all(names(tmp) == c("islptw_tmle","islptw_os")))
-	expect_true(nrow(tmp$islptw_tmle) == 2)
-	expect_true(nrow(tmp$islptw_os) == 2)
+	expect_true(all(names(tmp) == c("iptw_tmle","iptw_os")))
+	expect_true(nrow(tmp$iptw_tmle) == 2)
+	expect_true(nrow(tmp$iptw_os) == 2)
 
 	# get test for ATE
 	tmp <- wald_test(fit1, contrast = c(1,-1))
 	# correct class
-	expect_true(class(tmp)=="wald_test.islptw")
+	expect_true(class(tmp)=="wald_test.adaptive_iptw")
 	# correct row name
-	expect_true(row.names(tmp$islptw_tmle) == "H0:E[Y(1)]-E[Y(0)]=0")
+	expect_true(row.names(tmp$iptw_tmle) == "H0:E[Y(1)]-E[Y(0)]=0")
 	# no NAs
 	expect_true(sum(is.na(unlist(tmp)))==0)
 
@@ -115,8 +115,8 @@ test_that("wald_test.islptw works as expected",{
 	                   h = function(est){ est[1]/est[2] },
 	                   fh_grad =  function(est){ c(1/est[1],-1/est[2]) })
 	tmp <- wald_test(fit1, contrast = myContrast, null = 1)
-	expect_true(class(tmp)=="wald_test.islptw")
-	expect_true(row.names(tmp$islptw_tmle) == "H0: user contrast = 1")
+	expect_true(class(tmp)=="wald_test.adaptive_iptw")
+	expect_true(row.names(tmp$iptw_tmle) == "H0: user contrast = 1")
 	# no NAs
 	expect_true(sum(is.na(unlist(tmp)))==0)
 })

@@ -1,4 +1,4 @@
-#' Wald tests for drtmle and islptw objects
+#' Wald tests for drtmle and adaptive_iptw objects
 #' @param ... Arguments to be passed to method
 #' @export
 wald_test <- function(...){
@@ -166,13 +166,13 @@ wald_test.drtmle <- function(object, est = c("drtmle"), null = 0,
 	return(out)
 }
 
-#' Wald tests for islptw objects
+#' Wald tests for adaptive_iptw objects
 #' 
-#' @param object An object of class \code{"islptw"}
+#' @param object An object of class \code{"adaptive_iptw"}
 #' @param est A vector indicating for which estimators to return a 
 #' confidence interval. Possible estimators include the TMLE IPTW 
-#' (\code{"islptw_tmle"}, recommended), the one-step IPTW 
-#' (\code{"islptw_os"}, not recommended), the standard IPTW 
+#' (\code{"iptw_tmle"}, recommended), the one-step IPTW 
+#' (\code{"iptw_os"}, not recommended), the standard IPTW 
 #' (\code{"iptw"}, recommended only for comparison to the other two estimators).
 #' @param null The null hypothesis value(s). 
 #' @param contrast This option specifies what parameter to return confidence intervals for.
@@ -195,21 +195,21 @@ wald_test.drtmle <- function(object, est = c("drtmle"), null = 0,
 #' 
 #' @importFrom stats pnorm
 #' @export
-#' @method wald_test islptw
-#' @return An object of class \code{"ci.islptw"} with point estimates and
+#' @method wald_test adaptive_iptw
+#' @return An object of class \code{"ci.adaptive_iptw"} with point estimates and
 #' confidence intervals of the specified level. 
 #' 
 #' @examples
 #' # load super learner
 #' library(SuperLearner)
-#' # fit islptw
+#' # fit adaptive_iptw
 #' set.seed(123456)
 #' n <- 200
 #' W <- data.frame(W1 = runif(n), W2 = rnorm(n))
 #' A <- rbinom(n,1,plogis(W$W1 - W$W2))
 #' Y <- rbinom(n, 1, plogis(W$W1*W$W2*A))
 #'
-#' fit1 <- islptw(W = W, A = A, Y = Y, a_0 = c(1,0),
+#' fit1 <- adaptive_iptw(W = W, A = A, Y = Y, a_0 = c(1,0),
 #'                SL_g=c("SL.glm","SL.mean","SL.step"),
 #'                SL_Qr="SL.glm")
 #' 
@@ -226,13 +226,13 @@ wald_test.drtmle <- function(object, est = c("drtmle"), null = 0,
 #'                    fh_grad =  function(est){ c(1/est[1],-1/est[2]) })
 #' ci_RR <- ci(fit1, contrast = myContrast, null = 1)
 
-wald_test.islptw <- function(object, est = c("islptw_tmle"), null = 0,
+wald_test.adaptive_iptw <- function(object, est = c("iptw_tmle"), null = 0,
                              contrast = NULL, ...){
 	if(any(est=="iptw")){
 		stop("Theory does not support inference for naive IPTW with super learner.")
 	}
-	if(class(object) != "islptw"){
-		stop("ci only works with islptw objects")
+	if(class(object) != "adaptive_iptw"){
+		stop("ci only works with adaptive_iptw objects")
 	}
 	out <- vector(mode = "list", length = length(est))
 	names(out) <- est
@@ -320,6 +320,6 @@ wald_test.islptw <- function(object, est = c("islptw_tmle"), null = 0,
 			colnames(out[[i]]) <- c("zstat","pval")
 		}
 	}
-	class(out) <- "wald_test.islptw"
+	class(out) <- "wald_test.adaptive_iptw"
 	return(out)
 }

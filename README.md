@@ -1,5 +1,4 @@
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
 R/`drtmle`
 ==========
 
@@ -14,7 +13,9 @@ R/`drtmle`
 Description
 -----------
 
-`drtmle` is an R package that computes marginal effect estimators for binary treatments on continuous and binary outcomes. The targeted minimum loss-based (TMLE) estimators are doubly robust, not only with respect to consistency, but also with respect to asymptotic normality, as discussed in Benkeser, Carone, van der Laan & Gilbert, 2017 (*accepted Biometrika*; [working paper](http://biostats.bepress.com/ucbbiostat/paper356/)). Therefore, it is possible to construct doubly-robust confidence intervals and hypothesis tests. Also included are methods for computing valid confidence intervals for an inverse probability of treatment weighted (IPTW) estimator of the average treatment effect when the propensity score is estimated via super learning, as discussed in [van der Laan, 2014](https://www.degruyter.com/downloadpdf/j/ijb.2014.10.issue-1/ijb-2012-0038/ijb-2012-0038.pdf).
+`drtmle` is an R package that computes marginal means of an outcome under fixed levels of a treatment. The package computes targeted minimum loss-based (TMLE) estimators that are doubly robust, not only with respect to consistency, but also with respect to asymptotic normality, as discussed in Benkeser, Carone, van der Laan & Gilbert, 2017 (*accepted Biometrika*; [working paper](http://biostats.bepress.com/ucbbiostat/paper356/)). This property facilitates construction of doubly-robust confidence intervals and hypothesis tests.
+
+The package additionally includes methods for computing valid confidence intervals for an inverse probability of treatment weighted (IPTW) estimator of the average treatment effect when the propensity score is estimated via super learning, as discussed in [van der Laan, 2014](https://www.degruyter.com/downloadpdf/j/ijb.2014.10.issue-1/ijb-2012-0038/ijb-2012-0038.pdf).
 
 ------------------------------------------------------------------------
 
@@ -32,15 +33,14 @@ Use
 
 ### Doubly-robust inference for average treatment effect
 
-This package can be used to estimate covariate-adjusted marginal means under multiple discrete levels of a treatment. It may be used in situations where data consist of a vector of baseline covariates (`W`), a multi-level treatment assignment (`A`), and a continuous or binary-valued outcome (`Y`). The function `drtmle` may be used to estimate *E*\[*E*(*Y*|*A* = *a*<sub>0</sub>, *W*)\] for user-selected values of *a*<sub>0</sub> (via option `a_0`). The resulting targeted minimum loss-based estimates are doubly robust with respect to both consistency and asymptotic normality. The function computes doubly robust variance estimators that can be used to construct doubly robust confidence intervals for covariate-adjusted marginal means and contrasts between these means (via the `drconfint` function) for different levels of *a*<sub>0</sub>. A simple example on simulated data is shown below.
+Suppose the data consist of a vector of baseline covariates (`W`), a multi-level treatment assignment (`A`), and a continuous or binary-valued outcome (`Y`). The function `drtmle` may be used to estimate *E*\[*E*(*Y*|*A* = *a*<sub>0</sub>, *W*)\] for user-selected values of *a*<sub>0</sub> (via option `a_0`). The resulting targeted minimum loss-based estimates are doubly robust with respect to both consistency and asymptotic normality. The function computes doubly robust covariance estimates that can be used to construct doubly robust confidence intervals for marginal means and contrasts between means. A simple example on simulated data is shown below. We refer users to the vignette for more information and further examples.
 
 ``` r
 # load packages
-library(drtmle)
+library(drtmle, quietly = TRUE)
 #> drtmle: TMLE with doubly robust inference
 #> Version: 0.0.0.9000
-library(SuperLearner)
-#> Loading required package: nnls
+library(SuperLearner, quietly = TRUE)
 #> Super Learner
 #> Version: 2.0-22
 #> Package created on 2017-07-18
@@ -66,71 +66,71 @@ fit1 <- drtmle(W = W, A = A, Y = Y, # input data
 # print the output
 fit1
 #> $est
-#>        [,1]
-#> 0 0.1403429
+#>            
+#> 0 0.1403428
 #> 1 0.2158854
 #> 
 #> $cov
 #>              0            1
-#> 0 0.0008238590 0.0002365695
-#> 1 0.0002365695 0.0015010560
+#> 0 0.0008075554 0.0002582092
+#> 1 0.0002582092 0.0014881480
 
 # get confidence intervals for marginal means
-ci_fit1 <- confint(fit1)
+ci_fit1 <- ci(fit1)
 # print the output
 ci_fit1
 #> $drtmle
 #>     est   cil   ciu
-#> 0 0.140 0.084 0.197
-#> 1 0.216 0.140 0.292
+#> 0 0.140 0.085 0.196
+#> 1 0.216 0.140 0.291
 
 # get confidence intervals for ate
-ci_ate1 <- confint(fit1,contrast = c(-1,1))
+ci_ate1 <- ci(fit1,contrast = c(-1,1))
 # print the output
 ci_ate1
 #> $drtmle
-#>                   est    cil  ciu
-#> E[Y(1)]-E[Y(0)] 0.076 -0.009 0.16
+#>                   est    cil   ciu
+#> E[Y(1)]-E[Y(0)] 0.076 -0.007 0.158
 ```
 
 ### Inference for super learner-based IPTW
 
-The package additionally includes a function for computing valid confidence intervals about an inverse probability of treatment weight (IPTW) estimator when super learning is used to estimate the propensity score. We call this estimator the inverse super learning probability of treatment estimator (ISLPTW).
+The package additionally includes a function for computing valid confidence intervals about an inverse probability of treatment weight (IPTW) estimator when super learning is used to estimate the propensity score.
 
 ``` r
 # fit iptw 
-fit2 <- islptw(Y = Y, A = A, W = W, a_0 = c(0,1),
+fit2 <- adaptive_iptw(Y = Y, A = A, W = W, a_0 = c(0,1),
                SL_g = c("SL.glm","SL.mean","SL.step.interaction"),
                SL_Qr = "SL.npreg")
 #> Loading required package: nloptr
 # print the output
 fit2
 #> $est
-#>        [,1]
+#>            
 #> 0 0.1377524
-#> 1 0.1939986
+#> 1 0.1943633
 #> 
 #> $cov
 #>              0            1
-#> 0 0.0007588445 0.0002162052
-#> 1 0.0002162052 0.0104400274
+#> 0 0.0007623723 0.0002181465
+#> 1 0.0002181465 0.0106635990
 
 # compute a confidence interval for margin means
-ci_fit2 <- confint(fit2)
+ci_fit2 <- ci(fit2)
 # print the output
 ci_fit2
-#> $islptw_tmle
+#> $iptw_tmle
 #>     est    cil   ciu
 #> 0 0.138  0.084 0.192
-#> 1 0.194 -0.006 0.394
+#> 1 0.194 -0.008 0.397
 
 # compute a confidence interval for the ate
-ci_ate2 <- confint(fit2, contrast = c(-1,1))
+ci_ate2 <- ci(fit2, contrast = c(-1,1))
 # print the output
 ci_ate2
-#> $islptw_tmle
-#>                   est    cil  ciu
-#> E[Y(1)]-E[Y(0)] 0.056 -0.147 0.26
+#> $iptw_tmle
+#>                   est    cil   ciu
+#> E[Y(1)]-E[Y(0)] 0.057 -0.149 0.262
 ```
 
 ------------------------------------------------------------------------
@@ -138,7 +138,7 @@ ci_ate2
 Issues
 ------
 
-If you encounter any bugs or have any specific feature requests, please [file an issue](https://github.com/benkeser/survtmle/issues).
+If you encounter any bugs or have any specific feature requests, please [file an issue](https://github.com/benkeser/drtmle/issues).
 
 ------------------------------------------------------------------------
 

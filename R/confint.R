@@ -1,4 +1,4 @@
-#' Compute confidence intervals for drtmle and islptw@
+#' Compute confidence intervals for drtmle and adaptive_iptw@
 #' @param ... Arguments to be passed to method
 #' @export
 ci <- function(...){
@@ -147,15 +147,15 @@ ci.drtmle <- function(object, est = c("drtmle"), level = 0.95,
 	return(out)
 }
 
-#' Confidence intervals for islptw objects
+#' Confidence intervals for adaptive_iptw objects
 #' 
-#' Estimate confidence intervals for objects of class \code{"islptw"}
+#' Estimate confidence intervals for objects of class \code{"adaptive_iptw"}
 #' 
-#' @param object An object of class \code{"islptw"}
+#' @param object An object of class \code{"adaptive_iptw"}
 #' @param est A vector indicating for which estimators to return a 
 #' confidence interval. Possible estimators include the TMLE IPTW 
-#' (\code{"islptw_tmle"}, recommended), the one-step IPTW 
-#' (\code{"islptw_os"}, not recommended), the standard IPTW 
+#' (\code{"iptw_tmle"}, recommended), the one-step IPTW 
+#' (\code{"iptw_os"}, not recommended), the standard IPTW 
 #' (\code{"iptw"}, recommended only for comparison to the other two estimators).
 #' @param level The level of the confidence interval
 #' @param contrast This option specifies what parameter to return confidence intervals for.
@@ -172,21 +172,21 @@ ci.drtmle <- function(object, est = c("drtmle"), level = 0.95,
 #' \code{fh_grad} is the gradient of the function \code{h}. See examples. 
 #' @param ... Other options (not currently used)
 #' @export
-#' @method ci islptw
-#' @return An object of class \code{"ci.islptw"} with point estimates and
+#' @method ci adaptive_iptw
+#' @return An object of class \code{"ci.adaptive_iptw"} with point estimates and
 #' confidence intervals of the specified level. 
 #' 
 #' @examples
 #' # load super learner
 #' library(SuperLearner)
-#' # fit islptw
+#' # fit adaptive_iptw
 #' set.seed(123456)
 #' n <- 200
 #' W <- data.frame(W1 = runif(n), W2 = rnorm(n))
 #' A <- rbinom(n,1,plogis(W$W1 - W$W2))
 #' Y <- rbinom(n, 1, plogis(W$W1*W$W2*A))
 #'
-#' fit1 <- islptw(W = W, A = A, Y = Y, a_0 = c(1,0),
+#' fit1 <- adaptive_iptw(W = W, A = A, Y = Y, a_0 = c(1,0),
 #'                SL_g=c("SL.glm","SL.mean","SL.step"),
 #'                SL_Qr="SL.glm")
 #' 
@@ -206,13 +206,13 @@ ci.drtmle <- function(object, est = c("drtmle"), level = 0.95,
 #' ci_RR <- ci(fit1, contrast = myContrast)
 
 
-ci.islptw <- function(object, est = c("islptw_tmle"), level = 0.95,
+ci.adaptive_iptw <- function(object, est = c("iptw_tmle"), level = 0.95,
                       contrast = NULL,...){
 	if(any(est=="iptw")){
 		stop("Theory does not support inference for naive IPTW with super learner.")
 	}
-	if(class(object) != "islptw"){
-		stop("ci only works with islptw objects")
+	if(class(object) != "adaptive_iptw"){
+		stop("ci only works with adaptive_iptw objects")
 	}
 	out <- vector(mode = "list", length = length(est))
 	names(out) <- est
@@ -283,6 +283,6 @@ ci.islptw <- function(object, est = c("islptw_tmle"), level = 0.95,
 			colnames(out[[i]]) <- c("est","cil","ciu")
 		}
 	}
-	class(out) <- "ci.islptw"
+	class(out) <- "ci.adaptive_iptw"
 	return(out)
 }

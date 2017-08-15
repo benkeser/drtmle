@@ -4,8 +4,8 @@
 \alias{estimateQrn}
 \title{estimateQrn}
 \usage{
-estimateQrn(Y, A, W, DeltaA, DeltaY, Qn, gn, glm_Qr, SL_Qr, a_0, returnModels,
-  validRows = NULL)
+estimateQrn(Y, A, W, DeltaA, DeltaY, Qn, gn, glm_Qr, SL_Qr,
+  family = stats::gaussian(), a_0, returnModels, validRows = NULL)
 }
 \arguments{
 \item{Y}{A vector of continuous or binary outcomes.}
@@ -29,6 +29,8 @@ if \code{SL_gr!=NULL}.}
 
 \item{SL_Qr}{A vector of characters or a list describing the Super Learner library to be used 
 for the first reduced-dimension regression.}
+
+\item{family}{Should be gaussian() unless called from adaptive_iptw with binary \code{Y}}
 
 \item{a_0}{A list of fixed treatment values}
 

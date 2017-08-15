@@ -2,7 +2,7 @@
 % Please edit documentation in R/confint.R
 \name{ci}
 \alias{ci}
-\title{Compute confidence intervals for drtmle and islptw@}
+\title{Compute confidence intervals for drtmle and adaptive_iptw@}
 \usage{
 ci(...)
 }
@@ -10,5 +10,5 @@ ci(...)
 \item{...}{Arguments to be passed to method}
 }
 \description{
-Compute confidence intervals for drtmle and islptw@
+Compute confidence intervals for drtmle and adaptive_iptw@
 }

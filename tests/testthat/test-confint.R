@@ -63,10 +63,10 @@ test_that("ci.drtmle works as expected",{
 	expect_true(sum(is.na(unlist(tmp)))==0)
 })
 
-##### ADD TEST FOR ci.islptw
+##### ADD TEST FOR ci.adaptive_iptw
 
-context("Testing ci.islptw method ")
-test_that("ci.islptw works as expected",{
+context("Testing ci.adaptive_iptw method ")
+test_that("ci.adaptive_iptw works as expected",{
 	# simulate data
 	set.seed(123456)
 	n <- 200
@@ -74,35 +74,35 @@ test_that("ci.islptw works as expected",{
 	A <- rbinom(n,1,plogis(W$W1 - W$W2))
 	Y <- rbinom(n, 1, plogis(W$W1*W$W2*A))
 	# fit a drtmle
-	fit1 <- islptw(W = W, A = A, Y = Y, a_0 = c(1,0),
+	fit1 <- adaptive_iptw(W = W, A = A, Y = Y, a_0 = c(1,0),
 	               SL_g=c("SL.glm","SL.mean","SL.step"),
 	               SL_Qr="SL.glm")
 
 	# get confidence intervals for each 
 	tmp <- ci(fit1)
 	# correct class
-	expect_true(class(tmp)=="ci.islptw")
+	expect_true(class(tmp)=="ci.adaptive_iptw")
 	# no NAs
 	expect_true(sum(is.na(unlist(tmp)))==0)
 
 	# get confidence intervals for each mean 
-	tmp <- ci(fit1, est = c("islptw_tmle","islptw_os"))
+	tmp <- ci(fit1, est = c("iptw_tmle","iptw_os"))
 
 	# correct class
-	expect_true(class(tmp)=="ci.islptw")
+	expect_true(class(tmp)=="ci.adaptive_iptw")
 	# no NAs
 	expect_true(sum(is.na(unlist(tmp)))==0)
 	expect_true(length(tmp) == 2)
-	expect_true(all(names(tmp) == c("islptw_tmle","islptw_os")))
-	expect_true(nrow(tmp$islptw_tmle) == 2)
-	expect_true(nrow(tmp$islptw_os) == 2)
+	expect_true(all(names(tmp) == c("iptw_tmle","iptw_os")))
+	expect_true(nrow(tmp$iptw_tmle) == 2)
+	expect_true(nrow(tmp$iptw_os) == 2)
 
 	# get confidence intervals for ATE
 	tmp <- ci(fit1, contrast = c(1,-1))
 	# correct class
-	expect_true(class(tmp)=="ci.islptw")
+	expect_true(class(tmp)=="ci.adaptive_iptw")
 	# correct row name
-	expect_true(row.names(tmp$islptw_tmle) == "E[Y(1)]-E[Y(0)]")
+	expect_true(row.names(tmp$iptw_tmle) == "E[Y(1)]-E[Y(0)]")
 	# no NAs
 	expect_true(sum(is.na(unlist(tmp)))==0)
 
@@ -117,8 +117,8 @@ test_that("ci.islptw works as expected",{
 	                   h = function(est){ est[1]/est[2] },
 	                   fh_grad =  function(est){ c(1/est[1],-1/est[2]) })
 	tmp <- ci(fit1, contrast = myContrast)
-	expect_true(class(tmp)=="ci.islptw")
-	expect_true(row.names(tmp$islptw_tmle) == "user contrast")
+	expect_true(class(tmp)=="ci.adaptive_iptw")
+	expect_true(row.names(tmp$iptw_tmle) == "user contrast")
 	# no NAs
 	expect_true(sum(is.na(unlist(tmp)))==0)
 })

@@ -11,6 +11,8 @@ globalVariables(c("v", "%dopar%"))
 #' @param a_0 A vector of treatment levels at which to compute the adjusted mean outcome. 
 #' @param stratify A \code{boolean} indicating whether to estimate the missing outcome regression separately
 #' for observations with different levels of \code{A} (if \code{TRUE}) or to pool across \code{A} (if \code{FALSE}).
+#' @param family A \code{family} object equal to either \code{binomial()} or \code{gaussian()}, 
+#' to be passed to the \code{SuperLearner} or \code{glm} function.
 #' @param SL_g A vector of characters or a list describing the Super Learner library to be used 
 #' for the propensity score. See \code{link{SuperLearner::SuperLearner}} for details.
 #' @param SL_Qr A vector of characters or a list describing the Super Learner library to be used 
@@ -32,17 +34,17 @@ globalVariables(c("v", "%dopar%"))
 #' @param parallel A boolean indicating whether to use \code{foreach}
 #' to estimate nuisance parameters in parallel. Only useful if there is a registered parallel
 #' backend (see examples) and \code{cvFolds > 1}.
-#' @return An object of class \code{"islptw"}.
+#' @return An object of class \code{"adaptive_iptw"}.
 #' \describe{
-#'  \item{\code{islptw_tmle}}{A \code{list} of point estimates and 
+#'  \item{\code{iptw_tmle}}{A \code{list} of point estimates and 
 #'        covariance matrix for the IPTW estimator based on a targeted propensity 
 #' 		  score. }
-#'  \item{\code{islptw_tmle_nuisance}}{A \code{list} of the final TMLE estimates of the
+#'  \item{\code{iptw_tmle_nuisance}}{A \code{list} of the final TMLE estimates of the
 #'        propensity score (\code{$gnStar}) and reduced-dimension regression (\code{$QrnStar}) 
 #' 		  evaluated at the observed data values.}
-#'  \item{\code{islptw_os}}{A \code{list} of point estimates and covariance matrix for the
+#'  \item{\code{iptw_os}}{A \code{list} of point estimates and covariance matrix for the
 #' 		  one-step correct IPTW estimator.}
-#'  \item{\code{islptw_os_nuisance}}{A \code{list} of the initial estimates of the
+#'  \item{\code{iptw_os_nuisance}}{A \code{list} of the initial estimates of the
 #'        propensity score and reduced-dimension regression evaluated at the observed data values.}
 #'  \item{\code{iptw}}{A \code{list} of point estimates for the standard IPTW estimator. No
 #' 		  estimate of the covariance matrix is provided because theory does not support asymptotic
@@ -61,9 +63,9 @@ globalVariables(c("v", "%dopar%"))
 #'        \code{returnModels = FALSE}.}
 #'  \item{\code{a_0}}{The treatment levels that were requested for computation of 
 #'        covariate-adjusted means.}
+#'  \item{\code{call}}{The call to \code{adaptive_iptw}}
 #' }
 #' 
-#' TO DO: Add call to output
 #' @importFrom plyr llply laply
 #' @importFrom stats cov 
 #' @export
@@ -77,14 +79,17 @@ globalVariables(c("v", "%dopar%"))
 #' A <- rbinom(n,1,plogis(W$W1 - W$W2))
 #' Y <- rbinom(n, 1, plogis(W$W1*W$W2*A))
 #'
-#' fit1 <- islptw(W = W, A = A, Y = Y, a_0 = c(1,0),
+#' fit1 <- adaptive_iptw(W = W, A = A, Y = Y, a_0 = c(1,0),
 #'                SL_g=c("SL.glm","SL.mean","SL.step"),
 #'                SL_Qr="SL.npreg")
 
-islptw <- function(W, A, Y, 
+adaptive_iptw <- function(W, A, Y, 
                    DeltaY = as.numeric(!is.na(Y)), 
                    DeltaA = as.numeric(!is.na(A)), 
                    stratify = FALSE, 
+                   family = if(all(Y %in% c(0,1))){
+                    stats::binomial()
+                   }else{ stats::gaussian() },
                    a_0 = unique(A[!is.na(A)]),
                    SL_g = NULL, 
                    glm_g = NULL,
@@ -157,12 +162,12 @@ islptw <- function(W, A, Y,
   if(!parallel){
     QrnOut <- lapply(X = validRows, FUN = estimateQrn, 
                    Y=Y, A=A, W=W, DeltaA = DeltaA, DeltaY = DeltaY, 
-                   Qn=NULL, gn=gn, glm_Qr=glm_Qr, 
+                   Qn=NULL, gn=gn, glm_Qr=glm_Qr, family = family, 
                    SL_Qr=SL_Qr, a_0=a_0,returnModels = returnModels)  
   }else{
     QrnOut <- foreach::foreach(v = 1:cvFolds, .packages = "SuperLearner") %dopar% {
       estimateQrn(Y=Y, A=A, W=W, DeltaA = DeltaA, DeltaY = DeltaY, 
-                  Qn=NULL, gn=gn, glm_Qr=glm_Qr, 
+                  Qn=NULL, gn=gn, glm_Qr=glm_Qr, family = family, 
                   SL_Qr=SL_Qr, a_0=a_0,returnModels = returnModels,
                   validRows = validRows[[v]])
     }
@@ -209,12 +214,12 @@ islptw <- function(W, A, Y,
     if(!parallel){
       QrnStarOut <- lapply(X = validRows, FUN = estimateQrn, 
                    Y=Y, A=A, W=W, DeltaA = DeltaA, DeltaY = DeltaY, 
-                   Qn=NULL, gn=gnStar, glm_Qr=glm_Qr, 
+                   Qn=NULL, gn=gnStar, glm_Qr=glm_Qr, family = family, 
                    SL_Qr=SL_Qr, a_0=a_0,returnModels = returnModels)
     }else{
       QrnStarOut <- foreach::foreach(v = 1:cvFolds, .packages = "SuperLearner") %dopar% {
         estimateQrn(Y=Y, A=A, W=W, DeltaA = DeltaA, DeltaY = DeltaY, 
-                    Qn=NULL, gn=gnStar, glm_Qr=glm_Qr, 
+                    Qn=NULL, gn=gnStar, glm_Qr=glm_Qr, family = family, 
                     SL_Qr=SL_Qr, a_0=a_0,returnModels = returnModels,
                     validRows = validRows[[v]])
       }
@@ -261,10 +266,10 @@ islptw <- function(W, A, Y,
   cov.os <- stats::cov(DnoMat)/n
 
   # output
-  out <- list(islptw_tmle = list(est = unlist(psi_nStar), cov = cov.t),
-              islptw_tmle_nuisance = list(gn = gnStar, QrnStar = QrnStar),
-              islptw_os = list(est = unlist(psi.o), cov = cov.os),
-              islptw_os_nuisance = list(gn = gn, Qrn = Qrn),
+  out <- list(iptw_tmle = list(est = unlist(psi_nStar), cov = cov.t),
+              iptw_tmle_nuisance = list(gn = gnStar, QrnStar = QrnStar),
+              iptw_os = list(est = unlist(psi.o), cov = cov.os),
+              iptw_os_nuisance = list(gn = gn, Qrn = Qrn),
               iptw = list(est = unlist(psi_n)),
               gnMod = NULL, QrnMod = NULL, a_0 = a_0, call = call)
 
@@ -272,6 +277,6 @@ islptw <- function(W, A, Y,
 	 out$gnMod <- gnMod
  	 out$QrnMod <- QrnMod
 	}
-	class(out) <- "islptw"
+	class(out) <- "adaptive_iptw"
 	return(out)
 }

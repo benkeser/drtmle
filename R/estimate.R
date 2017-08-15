@@ -100,9 +100,12 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
       gn_DeltaA <- stats::predict(fm_DeltaA, newdata = data.frame(DeltaA = validDeltaA, validW),
                                   type = "response")
     }
+    # name for returned models
+    name_DeltaA <- "DeltaA ~ W"
   }else{ 
     # if all DeltaA==1 then put NULL model and 1 predictions
     fm_DeltaA <- NULL
+    name_DeltaA <- ""
     gn_DeltaA <- rep(1, length(validDeltaA))
   }
 
@@ -124,12 +127,15 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
                                            method = "method.CC_nloglik")
         gn_A <- vector(mode="list",length=2)
         gn_A[[1]] <- fm_A$SL.predict; gn_A[[2]] <- 1-gn_A[[1]]
+        # name for this model 
+        name_A <- paste0("I(A = ",a_0[1],") ~ W | DeltaA == 1")
       # if there are more than two unique values of A, then we need more
       # than one call to super learner
       }else{
         a_ct <- 0
         gn_A <- vector(mode = "list", length = length(a_0))
         fm_A <- vector(mode = "list", length = length(a_0) - 1)
+        name_A <- rep(NA, length(a_0) - 1)
         for(a in a_0[1:(length(a_0)-1)]){
           # determine who to include in the regression for this outcome
           if(a_ct == 0){  
@@ -155,6 +161,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
             gn_A[[a_ct + 1]] <- tmp_pred
           }
           fm_A[[a_ct + 1]] <- tmp_fm
+          name_A[a_ct + 1] <- paste0("I(A = ",a,") ~ W | DeltaA == 1")
           a_ct <- a_ct + 1
         }
         # add in final predictions
@@ -170,10 +177,12 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
                       family=stats::binomial()
                       ))
         gn_A[[1]] <- fm_A$pred; gn_A[[2]] <- 1 - fm_A$pred
+        name_A <- paste0("I(A = ",a_0[1],") ~ W | DeltaA == 1")
       }else{
         a_ct <- 0
         gn_A <- vector(mode = "list", length = length(a_0))
         fm_A <- vector(mode = "list", length = length(a_0) - 1)
+        name_A <- rep(NA, length(a_0) - 1)
         for(a in a_0[1:(length(a_0)-1)]){
           # determine who to include in the regression for this outcome
           if(a_ct == 0){  
@@ -199,6 +208,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
             gn_A[[a_ct + 1]] <- tmp_pred
           }
           fm_A[[a_ct + 1]] <- tmp_fm
+          name_A[a_ct + 1] <- paste0("I(A = ",a,") ~ W | DeltaA == 1")
           a_ct <- a_ct + 1
         }
         # add in final predictions
@@ -216,6 +226,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
       fm_A <- stats::glm(stats::as.formula(paste0("A~",glm_g$A)), data=thisDat, 
                          family=stats::binomial())
       gn_A <- vector(mode="list",length=2)
+      name_A <- paste0("I(A = ", a_0[1],") ~ W | DeltaA == 1")
       gn_A[[1]] <- stats::predict(fm_A, newdata = data.frame(A = validA, validW),
                                   type = "response")
       gn_A[[2]] <- 1 - gn_A[[1]]
@@ -223,6 +234,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
       a_ct <- 0
       gn_A <- vector(mode = "list", length = length(a_0))
       fm_A <- vector(mode = "list", length = length(a_0) - 1)
+      name_A <- rep(NA, length(a_0) - 1)
       for(a in a_0[1:(length(a_0)-1)]){
         # determine who to include in the regression for this outcome
         if(a_ct == 0){  
@@ -248,6 +260,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
           gn_A[[a_ct + 1]] <- tmp_pred
         }
         fm_A[[a_ct + 1]] <- tmp_fm
+        name_A[a_ct + 1] <- paste0("I(A = ", a, ") ~ W | DeltaA == 1")
         a_ct <- a_ct + 1
       } # end for loop over treatment levels
       # add in final predictions
@@ -272,6 +285,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
         if(stratify){
           fm_DeltaY <- vector(mode = "list", length = length(a_0))
           gn_DeltaY <- vector(mode = "list", length = length(a_0))
+          name_DeltaY <- rep(NA, length(a_0))
           a_ct <- 0
           for(a in a_0){
             a_ct <- a_ct + 1
@@ -289,7 +303,8 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
                 SL.library=SL_g$DeltaY,verbose=verbose,
                 method = "method.CC_nloglik"
             )
-
+            # name the fit
+            name_DeltaY[a_ct] <- paste0("DeltaY ~ W | DeltaA == 1 & A == ", a)
             # get predictions back on everybody
             gn_DeltaY[[a_ct]] <- fm_DeltaY[[a_ct]]$SL.predict
           } # end loop over treatment levels
@@ -307,6 +322,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
 
           # get predictions back setting A = a for every a in a_0
           gn_DeltaY <- vector(mode = "list", length = length(a_0))
+          name_DeltaY <- paste0("DeltaY ~ W + A | DeltaA == 1")
           a_ct <- 0
           for(a in a_0){
             a_ct <- a_ct + 1
@@ -321,6 +337,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
         if(stratify){
           fm_DeltaY <- vector(mode = "list", length = length(a_0))
           gn_DeltaY <- vector(mode = "list", length = length(a_0))
+          name_DeltaY <- rep(NA, length(a_0))
           a_ct <- 0
           for(a in a_0){
             a_ct <- a_ct + 1
@@ -336,6 +353,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
                                          obsWeights=rep(1,length(trainA[include & include2])),
                                          family=stats::binomial()
                                         ))
+            name_DeltaY[a_ct] <- paste0("DeltaY ~ W | DeltaA == 1 & A == ", a)
             # get predictions 
             gn_DeltaY[[a_ct]] <- fm_DeltaY[[a_ct]]$pred
           } # end loop over a_0
@@ -348,7 +366,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
             obsWeights=rep(1,length(trainA[include])),
             family=stats::binomial())
           )
-
+          name_DeltaY <- paste0("DeltaY ~ W + A | DeltaA == 1")
           # loop to get predictions setting A = a
           gn_DeltaY <- vector(mode = "list", length = length(a_0))
           a_ct <- 0
@@ -364,6 +382,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
       if(stratify){
         fm_DeltaY <- vector(mode = "list", length = length(a_0))
         gn_DeltaY <- vector(mode = "list", length = length(a_0))
+        name_DeltaY <- rep(NA, length = length(a_0))
         a_ct <- 0
         for(a in a_0){
           a_ct <- a_ct + 1
@@ -378,6 +397,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
             data=data.frame(trainW[include & include2,,drop = FALSE]), 
             family=stats::binomial()
           )
+          name_DeltaY[a_ct] <- paste0("DeltaY ~ W | DeltaA == 1 & A == ", a)          
           # get predictions back for everyone 
           gn_DeltaY[[a_ct]] <- stats::predict(
             fm_DeltaY[[a_ct]], newdata = validW, type = "response"
@@ -391,7 +411,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
                             trainW[include,,drop = FALSE]), 
             family=stats::binomial()
         )
-
+        name_DeltaY <- paste0("DeltaY ~ W + A | DeltaA == 1")
         # get predictions back setting A = a
         gn_DeltaY <- vector(mode = "list", length = length(a_0))
         a_ct <- 0
@@ -406,6 +426,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
   }else{ # end if !all(DeltaY == 1)
     # if all DeltaY==1 then put NULL model and 1 predictions
     fm_DeltaY <- NULL
+    name_DeltaY <- ""
     gn_DeltaY <- vector(mode = "list", length = length(a_0))
     for(i in 1:length(a_0)){
       gn_DeltaY[[i]] <- rep(1, length(validDeltaY))
@@ -425,6 +446,13 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
 
   out <- list(est = gn, fm = NULL)
   if(returnModels){
+    names(fm_A) <- name_A
+    if(!is.null(fm_DeltaA)){
+      names(fm_DeltaA) <- name_DeltaA      
+    }
+    if(!is.null(fm_DeltaY)){
+      names(fm_DeltaY) <- name_DeltaY      
+    }
     out$fm <- list(DeltaA = fm_DeltaA, A = fm_A, DeltaY = fm_DeltaY)
   }
   return(out)
@@ -612,18 +640,19 @@ estimateQ <- function(Y, A, W, DeltaA, DeltaY,
 #' @param a_0 A list of fixed treatment values 
 #' @param returnModels A boolean indicating whether to return model fits for the outcome regression, propensity score,
 #' and reduced-dimension regressions.
+#' @param family Should be gaussian() unless called from adaptive_iptw with binary \code{Y}
 #' @param validRows A \code{list} of length \code{cvFolds} containing the row indexes
 #' of observations to include in validation fold.
 #' @importFrom SuperLearner SuperLearner trimLogit
-#' @importFrom stats predict glm as.formula
+#' @importFrom stats predict glm as.formula gaussian binomial
 
 estimateQrn  <- function(Y, A, W, DeltaA, DeltaY,
-                         Qn, gn, glm_Qr, SL_Qr, 
+                         Qn, gn, glm_Qr, SL_Qr, family = stats::gaussian(),
                          a_0, returnModels, validRows = NULL){
 
-  # if estimateQrn is called in islptw, then Qn will enter as 
+  # if estimateQrn is called in adaptive_iptw, then Qn will enter as 
   # NULL. Here we fill its value to 0 so that we estimate
-  # the correct nuisance parameter for islptw
+  # the correct nuisance parameter for adaptive_iptw
   if(is.null(Qn)){
     Qn <- vector(mode = "list", length = length(a_0))
     for(i in 1:length(a_0)){ 
@@ -690,7 +719,7 @@ estimateQrn  <- function(Y, A, W, DeltaA, DeltaY,
                                               trainDeltaA == 1 & 
                                               trainDeltaY == 1]),
                   newX = data.frame(gn = valid_g),
-                  family = stats::gaussian(),
+                  family = family,
                   SL.library = SL_Qr, 
                   method = "method.CC_LS"))
           # if all weights = 0, use discrete SL
@@ -707,7 +736,7 @@ estimateQrn  <- function(Y, A, W, DeltaA, DeltaY,
                   X = data.frame(gn=train_g[Aeq_a & 
                                             trainDeltaA == 1 & 
                                             trainDeltaY ==1]),
-                  family = stats::gaussian(),
+                  family = family,
                   newX = data.frame(gn=valid_g),
                   obsWeights = rep(1, length(trainY[Aeq_a & 
                                                     trainDeltaA == 1 & 
@@ -740,7 +769,7 @@ estimateQrn  <- function(Y, A, W, DeltaA, DeltaY,
                       gn = train_g[Aeq_a & 
                                    trainDeltaY == 1 & 
                                    trainDeltaY == 1]),
-                family = "gaussian")
+                family = family)
       est <- stats::predict(fm, newdata = data.frame(gn = valid_g),
                             type = "response")
       out <- list(est = est, fm = NULL)

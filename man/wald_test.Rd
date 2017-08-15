@@ -2,7 +2,7 @@
 % Please edit documentation in R/test.R
 \name{wald_test}
 \alias{wald_test}
-\title{Wald tests for drtmle and islptw objects}
+\title{Wald tests for drtmle and adaptive_iptw objects}
 \usage{
 wald_test(...)
 }
@@ -10,5 +10,5 @@ wald_test(...)
 \item{...}{Arguments to be passed to method}
 }
 \description{
-Wald tests for drtmle and islptw objects
+Wald tests for drtmle and adaptive_iptw objects
 }
