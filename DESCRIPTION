@@ -17,7 +17,8 @@ Suggests:
     gam,
     quadprog,
     nloptr,
-    doMC
+    snow, 
+    doParallel
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

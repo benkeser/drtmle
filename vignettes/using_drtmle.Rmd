@@ -402,11 +402,12 @@ cv_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
 cv_sl_fit
 ```
 
-Cross validation may significantly increase computation time necessary for running `drtmle`. Parallelized regression fitting is available by setting `parallel = TRUE`, which allows for use of the `foreach` package [@foreachPackage] to parallelize the estimation of the OR, PS, and reduced dimension regressions. The function `foreach` assumes that a a parallel back-end is registered before running `drtmle`. The appropriate back-end is system-specific, but below we demonstrate registration with a back-end based on the `doMC` package [@doMCPackage].
+Cross validation may significantly increase computation time necessary for running `drtmle`. Parallelized regression fitting is available by setting `parallel = TRUE`, which allows for use of the `foreach` package [@foreachPackage] to parallelize the estimation of the OR, PS, and reduced dimension regressions. The function `foreach` assumes that a a parallel back-end is registered before running `drtmle`. The appropriate back-end is system-specific, but below we demonstrate registration with a back-end based on the `doParallel` [@doParallelPackage] and `snow` packages [@snowPackage].
 
 ```{r, cache = TRUE, message = FALSE}
-library(doMC)
-registerDoMC(cores = 2)
+library(doParallel)
+workers <- makeCluster(2, type="SOCK")
+registerDoParallel(workers)
 pcv_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
                  SL_g = c("SL.glm", "SL.glm.interaction","SL.mean"), 
                  SL_Q = c("SL.glm", "SL.glm.interaction","SL.mean"), 
