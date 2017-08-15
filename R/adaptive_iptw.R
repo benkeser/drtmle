@@ -16,10 +16,10 @@ globalVariables(c("v", "%dopar%"))
 #' @param SL_g A vector of characters or a list describing the Super Learner library to be used 
 #' for the propensity score. See \code{link{SuperLearner::SuperLearner}} for details.
 #' @param SL_Qr A vector of characters or a list describing the Super Learner library to be used 
-#' for the first reduced-dimension regression. 
+#' for the reduced-dimension outcome regression. 
 #' @param glm_g A character describing a formula to be used in the call to \code{glm} for the propensity score. Ignored
 #' if \code{SL_g!=NULL}.
-#' @param glm_Qr A character describing a formula to be used in the call to \code{glm} for the first reduced-dimension regression. Ignored
+#' @param glm_Qr A character describing a formula to be used in the call to \code{glm} for reduced-dimension outcome regression. Ignored
 #' if \code{SL_Qr!=NULL}. The formula should use the variable name \code{'gn'}.
 #' @param maxIter A numeric that sets the maximum number of iterations the TMLE can perform in its fluctuation step.
 #' @param tolIC A numeric that defines the stopping criteria based on the empirical mean
@@ -30,10 +30,10 @@ globalVariables(c("v", "%dopar%"))
 #' and reduced-dimension regressions.
 #' @param cvFolds A numeric equal to the number of folds to be used in cross-validated fitting of 
 #' nuisance parameters. If \code{cvFolds = 1}, no cross-validation is used.
-#' @param ... Other options (not currently used).
 #' @param parallel A boolean indicating whether to use \code{foreach}
 #' to estimate nuisance parameters in parallel. Only useful if there is a registered parallel
-#' backend (see examples) and \code{cvFolds > 1}.
+#' backend and \code{cvFolds > 1}.
+#' @param ... Other options (not currently used).
 #' @return An object of class \code{"adaptive_iptw"}.
 #' \describe{
 #'  \item{\code{iptw_tmle}}{A \code{list} of point estimates and 

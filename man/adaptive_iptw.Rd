@@ -38,9 +38,9 @@ for the propensity score. See \code{link{SuperLearner::SuperLearner}} for detail
 if \code{SL_g!=NULL}.}
 
 \item{SL_Qr}{A vector of characters or a list describing the Super Learner library to be used 
-for the first reduced-dimension regression.}
+for the reduced-dimension outcome regression.}
 
-\item{glm_Qr}{A character describing a formula to be used in the call to \code{glm} for the first reduced-dimension regression. Ignored
+\item{glm_Qr}{A character describing a formula to be used in the call to \code{glm} for reduced-dimension outcome regression. Ignored
 if \code{SL_Qr!=NULL}. The formula should use the variable name \code{'gn'}.}
 
 \item{returnModels}{A boolean indicating whether to return model fits for the propensity score
@@ -60,7 +60,7 @@ nuisance parameters. If \code{cvFolds = 1}, no cross-validation is used.}
 
 \item{parallel}{A boolean indicating whether to use \code{foreach}
 to estimate nuisance parameters in parallel. Only useful if there is a registered parallel
-backend (see examples) and \code{cvFolds > 1}.}
+backend and \code{cvFolds > 1}.}
 
 \item{...}{Other options (not currently used).}
 }

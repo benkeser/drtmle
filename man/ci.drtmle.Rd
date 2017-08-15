@@ -18,22 +18,23 @@ for misspecification (\code{"aiptw_c"}, not recommended), the standard TMLE
 AIPTW (\code{"aiptw"}, recommended only for comparison to "drtmle"), and 
 G-computation (\code{"gcomp"}, not recommended).}
 
-\item{level}{The level of the confidence interval}
+\item{level}{The nominal coverage probability of the desired confidence interval (should be
+between 0 and 1). Default computes 95% confidence intervals.}
 
-\item{contrast}{This option specifies what parameter to return confidence intervals for.
-If \code{contrast=NULL}, then compute confidence intervals for the covariate-adjusted
-marginal means. \code{contrast} can also be input as a numeric vector of ones, negative ones,
+\item{contrast}{Specifies the parameter for which to return confidence intervals.
+If \code{contrast=NULL}, then confidence intervals for the
+marginal means are computed. If instead, \code{contrast} is a numeric vector of ones, negative ones,
 and zeros to define linear combinations of the various means (e.g., to estimate an average
-treatment effect, see examples). \code{contrast} can also be a list with named functions
+treatment effect, see example). Finally, \code{contrast} can be a list with named functions
 \code{f}, \code{f_inv}, \code{h}, and \code{fh_grad}. The first two functions should take
 as input argument \code{eff}. Respectively, these specify which transformation 
 of the effect measure to compute the confidence interval for and the inverse
 transformation to put the confidence interval back on the original scale. The function \code{h}
 defines the contrast to be estimated and should take as input \code{est}, a vector
 of the same length as \code{object$a_0}, and output the desired contrast. The function
-\code{fh_grad} is the gradient of the function \code{h}. See examples.}
+\code{fh_grad} is the gradient of the function \code{h}. See examples and vignette for more information.}
 
-\item{...}{Other options (not currently used)}
+\item{...}{Other options (not currently used).}
 }
 \value{
 An object of class \code{"ci.drtmle"} with point estimates and

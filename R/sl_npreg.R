@@ -4,14 +4,14 @@
 #' package. Uses leave-one-out cross-validation to fit a kernel regression. 
 #' See \code{?npreg} for more details.
 #' 
-#' @param Y Training outcomes
-#' @param X Training predictors 
-#' @param family Not used by the function, but needed for compatibility with \code{SuperLearner}
-#' @param newX Test set predictors 
-#' @param obsWeights Weights for the observations
-#' @param rangeThresh For stability: if the the range of the outcomes is smaller than this number, the method
-#' returns the empirical average of the outcomes. 
-#' @param ... Other arguments (not currently used)
+#' @param Y A vector of outcomes.
+#' @param X A matrix or data.frame of training data predictors. 
+#' @param family Not used by the function directly, but ensures compatibility with \code{SuperLearner}.
+#' @param newX A test set of predictors.
+#' @param obsWeights Not used by the function directly, but ensures compatibility with \code{SuperLearner}.
+#' @param rangeThresh If the the range of the outcomes is smaller than this number, the method
+#' returns the empirical average of the outcomes. Used for computational expediency and stability.  
+#' @param ... Other arguments (not currently used).
 #' 
 #' @importFrom np npregbw npreg
 #' @importFrom stats predict as.formula
@@ -47,9 +47,9 @@ SL.npreg <- function (Y, X, newX, family, obsWeights,
 #' 
 #' Method for predicting SL.npreg objects. 
 #' 
-#' @param object An object of class \code{"SL.npreg"}
-#' @param newdata The new data used to obtain predictions 
-#' @param ... Other arguments passed to predict
+#' @param object An object of class \code{"SL.npreg"}.
+#' @param newdata The new data used to obtain predictions.
+#' @param ... Other arguments passed to predict.
 #' 
 #' @importFrom stats predict
 #' @method predict SL.npreg

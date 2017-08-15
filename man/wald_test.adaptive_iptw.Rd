@@ -35,7 +35,7 @@ of the same length as \code{object$a_0}, and output the desired contrast. The fu
 computes a test of the null hypothesis that \code{h(f(object$est)) = null}. 
 See examples.}
 
-\item{...}{Other options (not currently used)}
+\item{...}{Other options (not currently used).}
 }
 \value{
 An object of class \code{"ci.adaptive_iptw"} with point estimates and

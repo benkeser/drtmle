@@ -14,23 +14,23 @@ drtmle(Y, A, W, DeltaA = as.numeric(!is.na(A)),
   Qsteps = 2, parallel = FALSE, ...)
 }
 \arguments{
-\item{Y}{A numeric of continuous or binary outcomes.}
+\item{Y}{numeric of continuous or binary outcomes.}
 
-\item{A}{A vector of binary treatment assignment (assumed to be equal to 0 or 1)}
+\item{A}{A vector of discrete-valued treatment assignment (assumed to be equal to 0 or 1).}
 
-\item{W}{A \code{data.frame} of named covariates}
+\item{W}{A \code{data.frame} of named covariates.}
 
-\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if missing 1 if observed)}
+\item{DeltaA}{A vector of missing treatment indicator (assumed to be equal to 0 if missing 1 if observed).}
 
-\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if missing 1 if observed)}
+\item{DeltaY}{A vector of missing outcome indicator (assumed to be equal to 0 if missing 1 if observed).}
 
-\item{a_0}{A vector of treatment levels at which to compute the adjusted mean outcome.}
+\item{a_0}{A vector of treatment levels at which to compute the adjusted mean outcome (should correspond to values of \code{A}).}
 
 \item{family}{A \code{family} object equal to either \code{binomial()} or \code{gaussian()}, 
 to be passed to the \code{SuperLearner} or \code{glm} function.}
 
 \item{stratify}{A \code{boolean} indicating whether to estimate the outcome regression separately
-for observations with \code{A} equal to 0/1 (if \code{TRUE}) or to pool across \code{A} (if \code{FALSE}).}
+for different values of \code{A} (if \code{TRUE}) or to pool across \code{A} (if \code{FALSE}).}
 
 \item{SL_Q}{A vector of characters or a list describing the Super Learner library to be used 
 for the outcome regression. See \code{link{SuperLearner::SuperLearner}} for details.}
@@ -39,10 +39,10 @@ for the outcome regression. See \code{link{SuperLearner::SuperLearner}} for deta
 for the propensity score. See \code{link{SuperLearner::SuperLearner}} for details.}
 
 \item{SL_Qr}{A vector of characters or a list describing the Super Learner library to be used 
-for the first reduced-dimension regression.}
+for the reduced-dimension outcome regression.}
 
 \item{SL_gr}{A vector of characters or a list describing the Super Learner library to be used 
-for the second reduced-dimension regression.}
+for the second reduced-dimension propensity score.}
 
 \item{glm_Q}{A character describing a formula to be used in the call to \code{glm} for the outcome regression. Ignored
 if \code{SL_Q!=NULL}.}
@@ -50,20 +50,20 @@ if \code{SL_Q!=NULL}.}
 \item{glm_g}{A character describing a formula to be used in the call to \code{glm} for the propensity score. Ignored
 if \code{SL_g!=NULL}.}
 
-\item{glm_Qr}{A character describing a formula to be used in the call to \code{glm} for the first reduced-dimension regression. Ignored
+\item{glm_Qr}{A character describing a formula to be used in the call to \code{glm} for reduced-dimension outcome regression. Ignored
 if \code{SL_Qr!=NULL}. The formula should use the variable name \code{'gn'}.}
 
-\item{glm_gr}{A character describing a formula to be used in the call to \code{glm} for the second reduced-dimension regression. Ignored
+\item{glm_gr}{A character describing a formula to be used in the call to \code{glm} for the reduced-dimension propensity score. Ignored
 if \code{SL_gr!=NULL}. The formula should use the variable name \code{'Qn'} and \code{'gn'} if 
 \code{reduction='bivariate'} and \code{'Qn'} otherwise.}
 
 \item{guard}{A character vector indicating what pattern of misspecifications to guard against. If \code{guard} contains \code{"Q"}, 
-then the TMLE guards against misspecification of the outcome regression by estimating the reduced dimension regression
+then the TMLE guards against misspecification of the outcome regression by estimating the reduced-dimension outcome regression
 specified by \code{glm_Qr} or \code{SL_Qr}. If \code{guard} contains \code{"g"} then the TMLE 
-(additionally) guards against misspecification of the propensity score by estimating the reduced dimension regression
-specified by \code{glm_gr} or \code{SL_gr}. If \code{NULL}, the usual TMLE is computed.}
+(additionally) guards against misspecification of the propensity score by estimating the reduced-dimension propensity score
+specified by \code{glm_gr} or \code{SL_gr}.}
 
-\item{reduction}{A character equal to \code{"univariate"} for a univariate misspecification correction or \code{"bivariate"}
+\item{reduction}{A character equal to \code{"univariate"} for a univariate misspecification correction (default) or \code{"bivariate"}
 for the bivariate version.}
 
 \item{returnModels}{A boolean indicating whether to return model fits for the outcome regression, propensity score,
@@ -75,21 +75,21 @@ nuisance parameters. If \code{cvFolds = 1}, no cross-validation is used.}
 \item{maxIter}{A numeric that sets the maximum number of iterations the TMLE can perform in its fluctuation step.}
 
 \item{tolIC}{A numeric that defines the stopping criteria based on the empirical mean
-of the scores of the fluctuation submodels submodels. Setting to \code{"default"}}
+of the scores of the fluctuation submodels submodels.}
 
 \item{tolg}{A numeric indicating the minimum value for estimates of the propensity score.}
 
 \item{verbose}{A boolean indicating whether to print status updates.}
 
-\item{Qsteps}{A numeric equal to 1/2 indicating whether the fluctuation submodel for the outcome regression
+\item{Qsteps}{A numeric equal to 1 or 2 indicating whether the fluctuation submodel for the outcome regression
 should be fit using a single minimization (\code{Qsteps = 1}) or a backfitting-type minimization (\code{Qsteps=2}). 
-The latter was found to be more stable in simulations.}
+The latter was found to be more stable in simulations and is the default.}
 
 \item{parallel}{A boolean indicating whether to use \code{foreach}
 to estimate nuisance parameters in parallel. Only useful if there is a registered parallel
-backend (see examples) and \code{cvFolds > 1}.}
+backend and \code{cvFolds > 1}.}
 
-\item{...}{Other options (not currently used)}
+\item{...}{Other options (not currently used).}
 }
 \value{
 An object of class \code{"drtmle"}.

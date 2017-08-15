@@ -7,20 +7,20 @@
 SL.npreg(Y, X, newX, family, obsWeights, rangeThresh = 1e-07, ...)
 }
 \arguments{
-\item{Y}{Training outcomes}
+\item{Y}{A vector of outcomes.}
 
-\item{X}{Training predictors}
+\item{X}{A matrix or data.frame of training data predictors.}
 
-\item{newX}{Test set predictors}
+\item{newX}{A test set of predictors.}
 
-\item{family}{Not used by the function, but needed for compatibility with \code{SuperLearner}}
+\item{family}{Not used by the function directly, but ensures compatibility with \code{SuperLearner}.}
 
-\item{obsWeights}{Weights for the observations}
+\item{obsWeights}{Not used by the function directly, but ensures compatibility with \code{SuperLearner}.}
 
-\item{rangeThresh}{For stability: if the the range of the outcomes is smaller than this number, the method
-returns the empirical average of the outcomes.}
+\item{rangeThresh}{If the the range of the outcomes is smaller than this number, the method
+returns the empirical average of the outcomes. Used for computational expediency and stability.}
 
-\item{...}{Other arguments (not currently used)}
+\item{...}{Other arguments (not currently used).}
 }
 \description{
 Kernel regression based on the \href{https://cran.r-project.org/web/packages/np/}{np}

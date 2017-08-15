@@ -7,11 +7,11 @@
 \method{predict}{SL.npreg}(object, newdata, ...)
 }
 \arguments{
-\item{object}{An object of class \code{"SL.npreg"}}
+\item{object}{An object of class \code{"SL.npreg"}.}
 
-\item{newdata}{The new data used to obtain predictions}
+\item{newdata}{The new data used to obtain predictions.}
 
-\item{...}{Other arguments passed to predict}
+\item{...}{Other arguments passed to predict.}
 }
 \description{
 Method for predicting SL.npreg objects.

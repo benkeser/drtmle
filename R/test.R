@@ -32,7 +32,7 @@ wald_test <- function(...){
 #' \code{fh_grad} is the gradient of the function \code{h(f())}. The function
 #' computes a test of the null hypothesis that \code{h(f(object$est)) = null}. 
 #' See examples. 
-#' @param ... Other options (not currently used)
+#' @param ... Other options (not currently used).
 #' 
 #' @importFrom stats pnorm
 #' @export
@@ -191,7 +191,7 @@ wald_test.drtmle <- function(object, est = c("drtmle"), null = 0,
 #' \code{fh_grad} is the gradient of the function \code{h(f())}. The function
 #' computes a test of the null hypothesis that \code{h(f(object$est)) = null}. 
 #' See examples. 
-#' @param ... Other options (not currently used)
+#' @param ... Other options (not currently used).
 #' 
 #' @importFrom stats pnorm
 #' @export

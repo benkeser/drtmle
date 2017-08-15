@@ -2,56 +2,56 @@ globalVariables(c("v", "%dopar%"))
 
 #' TMLE estimate of the average treatment effect with doubly-robust inference
 #' 
-#' @param W A \code{data.frame} of named covariates
-#' @param A A vector of binary treatment assignment (assumed to be equal to 0 or 1)
-#' @param Y A numeric of continuous or binary outcomes. 
-#' @param DeltaY Indicator of missing outcome (assumed to be equal to 0 if missing 1 if observed)
-#' @param DeltaA Indicator of missing treatment (assumed to be equal to 0 if missing 1 if observed)
-#' @param a_0 A vector of treatment levels at which to compute the adjusted mean outcome. 
+#' @param W A \code{data.frame} of named covariates.
+#' @param A A vector of discrete-valued treatment assignment (assumed to be equal to 0 or 1).
+#' @param Y numeric of continuous or binary outcomes.
+#' @param DeltaY A vector of missing outcome indicator (assumed to be equal to 0 if missing 1 if observed).
+#' @param DeltaA A vector of missing treatment indicator (assumed to be equal to 0 if missing 1 if observed).
+#' @param a_0 A vector of treatment levels at which to compute the adjusted mean outcome (should correspond to values of \code{A}).
 #' @param family A \code{family} object equal to either \code{binomial()} or \code{gaussian()}, 
 #' to be passed to the \code{SuperLearner} or \code{glm} function.
 #' @param stratify A \code{boolean} indicating whether to estimate the outcome regression separately
-#' for observations with \code{A} equal to 0/1 (if \code{TRUE}) or to pool across \code{A} (if \code{FALSE}).
+#' for different values of \code{A} (if \code{TRUE}) or to pool across \code{A} (if \code{FALSE}).
 #' @param SL_Q A vector of characters or a list describing the Super Learner library to be used 
 #' for the outcome regression. See \code{link{SuperLearner::SuperLearner}} for details.
 #' @param SL_g A vector of characters or a list describing the Super Learner library to be used 
 #' for the propensity score. See \code{link{SuperLearner::SuperLearner}} for details.
 #' @param SL_Qr A vector of characters or a list describing the Super Learner library to be used 
-#' for the first reduced-dimension regression. 
+#' for the reduced-dimension outcome regression. 
 #' @param SL_gr A vector of characters or a list describing the Super Learner library to be used 
-#' for the second reduced-dimension regression.
+#' for the second reduced-dimension propensity score. 
 #' @param glm_Q A character describing a formula to be used in the call to \code{glm} for the outcome regression. Ignored
 #' if \code{SL_Q!=NULL}.
 #' @param glm_g A character describing a formula to be used in the call to \code{glm} for the propensity score. Ignored
 #' if \code{SL_g!=NULL}.
-#' @param glm_Qr A character describing a formula to be used in the call to \code{glm} for the first reduced-dimension regression. Ignored
+#' @param glm_Qr A character describing a formula to be used in the call to \code{glm} for reduced-dimension outcome regression. Ignored
 #' if \code{SL_Qr!=NULL}. The formula should use the variable name \code{'gn'}.
-#' @param glm_gr A character describing a formula to be used in the call to \code{glm} for the second reduced-dimension regression. Ignored
+#' @param glm_gr A character describing a formula to be used in the call to \code{glm} for the reduced-dimension propensity score. Ignored
 #' if \code{SL_gr!=NULL}. The formula should use the variable name \code{'Qn'} and \code{'gn'} if 
 #' \code{reduction='bivariate'} and \code{'Qn'} otherwise.
 #' @param guard A character vector indicating what pattern of misspecifications to guard against. If \code{guard} contains \code{"Q"}, 
-#' then the TMLE guards against misspecification of the outcome regression by estimating the reduced dimension regression
+#' then the TMLE guards against misspecification of the outcome regression by estimating the reduced-dimension outcome regression
 #' specified by \code{glm_Qr} or \code{SL_Qr}. If \code{guard} contains \code{"g"} then the TMLE 
-#' (additionally) guards against misspecification of the propensity score by estimating the reduced dimension regression
-#' specified by \code{glm_gr} or \code{SL_gr}. If \code{NULL}, the usual TMLE is computed.
-#' @param reduction A character equal to \code{"univariate"} for a univariate misspecification correction or \code{"bivariate"}
+#' (additionally) guards against misspecification of the propensity score by estimating the reduced-dimension propensity score
+#' specified by \code{glm_gr} or \code{SL_gr}. 
+#' @param reduction A character equal to \code{"univariate"} for a univariate misspecification correction (default) or \code{"bivariate"}
 #' for the bivariate version. 
 #' @param returnModels A boolean indicating whether to return model fits for the outcome regression, propensity score,
 #' and reduced-dimension regressions.
 #' @param maxIter A numeric that sets the maximum number of iterations the TMLE can perform in its fluctuation step.
 #' @param tolIC A numeric that defines the stopping criteria based on the empirical mean
-#' of the scores of the fluctuation submodels submodels. Setting to \code{"default"}
+#' of the scores of the fluctuation submodels submodels.
 #' @param tolg A numeric indicating the minimum value for estimates of the propensity score.
 #' @param verbose A boolean indicating whether to print status updates.
-#' @param Qsteps A numeric equal to 1/2 indicating whether the fluctuation submodel for the outcome regression
+#' @param Qsteps A numeric equal to 1 or 2 indicating whether the fluctuation submodel for the outcome regression
 #' should be fit using a single minimization (\code{Qsteps = 1}) or a backfitting-type minimization (\code{Qsteps=2}). 
-#' The latter was found to be more stable in simulations. 
+#' The latter was found to be more stable in simulations and is the default. 
 #' @param cvFolds A numeric equal to the number of folds to be used in cross-validated fitting of 
 #' nuisance parameters. If \code{cvFolds = 1}, no cross-validation is used.
 #' @param parallel A boolean indicating whether to use \code{foreach}
 #' to estimate nuisance parameters in parallel. Only useful if there is a registered parallel
-#' backend (see examples) and \code{cvFolds > 1}.
-#' @param ... Other options (not currently used)
+#' backend and \code{cvFolds > 1}.
+#' @param ... Other options (not currently used).
 #' 
 #' @return An object of class \code{"drtmle"}.
 #' \describe{
