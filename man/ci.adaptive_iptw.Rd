@@ -17,7 +17,7 @@ confidence interval. Possible estimators include the TMLE IPTW
 (\code{"iptw"}, recommended only for comparison to the other two estimators).}
 
 \item{level}{The nominal coverage probability of the desired confidence interval (should be
-between 0 and 1). Default computes 95% confidence intervals.}
+between 0 and 1). Default computes 95\% confidence intervals.}
 
 \item{contrast}{Specifies the parameter for which to return confidence intervals.
 If \code{contrast=NULL}, then confidence intervals for the
@@ -32,7 +32,7 @@ defines the contrast to be estimated and should take as input \code{est}, a vect
 of the same length as \code{object$a_0}, and output the desired contrast. The function
 \code{fh_grad} is the gradient of the function \code{h}. See examples and vignette for more information.}
 
-\item{...}{Other options (not currently used)}
+\item{...}{Other options (not currently used).}
 }
 \value{
 An object of class \code{"ci.adaptive_iptw"} with point estimates and

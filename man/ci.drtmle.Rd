@@ -19,7 +19,7 @@ AIPTW (\code{"aiptw"}, recommended only for comparison to "drtmle"), and
 G-computation (\code{"gcomp"}, not recommended).}
 
 \item{level}{The nominal coverage probability of the desired confidence interval (should be
-between 0 and 1). Default computes 95% confidence intervals.}
+between 0 and 1). Default computes 95\% confidence intervals.}
 
 \item{contrast}{Specifies the parameter for which to return confidence intervals.
 If \code{contrast=NULL}, then confidence intervals for the

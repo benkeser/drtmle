@@ -16,7 +16,7 @@ ci <- function(...){
 #' AIPTW (\code{"aiptw"}, recommended only for comparison to "drtmle"), and 
 #' G-computation (\code{"gcomp"}, not recommended).  
 #' @param level The nominal coverage probability of the desired confidence interval (should be
-#' between 0 and 1). Default computes 95% confidence intervals. 
+#' between 0 and 1). Default computes 95\% confidence intervals. 
 #' @param contrast Specifies the parameter for which to return confidence intervals.
 #' If \code{contrast=NULL}, then confidence intervals for the
 #' marginal means are computed. If instead, \code{contrast} is a numeric vector of ones, negative ones,
@@ -159,7 +159,7 @@ ci.drtmle <- function(object, est = c("drtmle"), level = 0.95,
 #' (\code{"iptw_os"}, not recommended), the standard IPTW 
 #' (\code{"iptw"}, recommended only for comparison to the other two estimators).
 #' @param level The nominal coverage probability of the desired confidence interval (should be
-#' between 0 and 1). Default computes 95% confidence intervals. 
+#' between 0 and 1). Default computes 95\% confidence intervals. 
 #' @param contrast Specifies the parameter for which to return confidence intervals.
 #' If \code{contrast=NULL}, then confidence intervals for the
 #' marginal means are computed. If instead, \code{contrast} is a numeric vector of ones, negative ones,
@@ -172,7 +172,7 @@ ci.drtmle <- function(object, est = c("drtmle"), level = 0.95,
 #' defines the contrast to be estimated and should take as input \code{est}, a vector
 #' of the same length as \code{object$a_0}, and output the desired contrast. The function
 #' \code{fh_grad} is the gradient of the function \code{h}. See examples and vignette for more information. 
-#' @param ... Other options (not currently used)
+#' @param ... Other options (not currently used).
 #' @export
 #' @method ci adaptive_iptw
 #' @return An object of class \code{"ci.adaptive_iptw"} with point estimates and
