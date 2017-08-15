@@ -16,7 +16,8 @@ Suggests:
     rmarkdown,
     gam,
     quadprog,
-    nloptr
+    nloptr,
+    doMC
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
