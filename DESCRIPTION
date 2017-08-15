@@ -1,7 +1,7 @@
 Package: drtmle
-Title: Doubly-robust Nonparametric Estimation and Inference
+Title: Doubly-Robust Nonparametric Estimation and Inference
 Version: 1.0.0
-Authors@R: person("David", "Benkeser", email = "benkeser@emory.edu", role = c("aut", "cre"))
+Authors@R: person("David", "Benkeser", email = "benkeser@emory.edu", role = c("aut", "cre","cph"))
 Description: Targeted minimum loss-based estimators of counterfactual means and causal effects that are doubly-robust with respect both to consistency and asymptotic normality. Doubly-robust variance estimators, confidence intervals, and hypothesis tests are also provided.
 Depends:
     R (>= 3.2.0)
