@@ -1,5 +1,5 @@
 Package: drtmle
-Title: Doubly-robust nonparametric estimation and inference for covariate-adjusted marginal means and average treatment effects
+Title: Doubly-robust Nonparametric Estimation and Inference
 Version: 1.0.0
 Authors@R: person("David", "Benkeser", email = "benkeser@emory.edu", role = c("aut", "cre"))
 Description: Targeted minimum loss-based estimators of counterfactual means and causal effects that are doubly-robust with respect both to consistency and asymptotic normality. Doubly-robust variance estimators, confidence intervals, and hypothesis tests are also provided.
@@ -17,7 +17,6 @@ Suggests:
     gam,
     quadprog,
     nloptr,
-    snow, 
     doParallel
 License: MIT + file LICENSE
 Encoding: UTF-8
