@@ -8,7 +8,12 @@ There were 0 ERRORs.
 
 There were 0 WARNINGs.
 
-There were 0 NOTEs.
+There were 1 NOTEs.
+
+Maintainer: ‘David Benkeser <benkeser@emory.edu>’
+New submission
+
+According to [this](https://mailman.stat.ethz.ch/pipermail/r-devel/2014-March/068497.html), this note is safe to ignore. 
 
 ## Downstream dependencies
 Nothing to report.
