@@ -394,8 +394,8 @@ When considering adaptive estimation techniques, one runs the risk of overfittin
 
 ```{r, cache = TRUE}
 cv_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
-                 SL_g = c("SL.glm", "SL.glm.interaction", "SL.mean"), 
-                 SL_Q = c("SL.glm", "SL.glm.interaction", "SL.mean"), 
+                 SL_g = c("SL.glm", "SL.glm.interaction", "SL.gam"), 
+                 SL_Q = c("SL.glm", "SL.glm.interaction", "SL.gam"), 
                  SL_gr = c("SL.glm", "SL.gam", "SL.mean"),
                  SL_Qr = c("SL.glm", "SL.gam", "SL.mean"), 
                  stratify = FALSE, cvFolds = 2, a_0 = c(0,1,2))
@@ -409,8 +409,8 @@ library(doParallel)
 workers <- makeCluster(2, type="SOCK")
 registerDoParallel(workers)
 pcv_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
-                 SL_g = c("SL.glm", "SL.glm.interaction","SL.mean"), 
-                 SL_Q = c("SL.glm", "SL.glm.interaction","SL.mean"), 
+                 SL_g = c("SL.glm", "SL.glm.interaction","SL.gam"), 
+                 SL_Q = c("SL.glm", "SL.glm.interaction","SL.gam"), 
                  SL_gr = c("SL.glm", "SL.gam", "SL.mean"),
                  SL_Qr = c("SL.glm", "SL.gam", "SL.mean"), 
                  stratify = FALSE, a_0 = c(0,1,2), 
