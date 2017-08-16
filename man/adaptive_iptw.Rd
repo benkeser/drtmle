@@ -15,57 +15,70 @@ adaptive_iptw(W, A, Y, DeltaY = as.numeric(!is.na(Y)),
 \arguments{
 \item{W}{A \code{data.frame} of named covariates}
 
-\item{A}{A vector of binary treatment assignment (assumed to be equal to 0 or 1)}
+\item{A}{A vector of binary treatment assignment (assumed to be equal to 0 or
+1)}
 
 \item{Y}{A numeric of continuous or binary outcomes.}
 
-\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if missing 1 if observed)}
+\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if 
+missing 1 if observed)}
 
-\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if missing 1 if observed)}
+\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if 
+missing 1 if observed)}
 
-\item{stratify}{A \code{boolean} indicating whether to estimate the missing outcome regression separately
-for observations with different levels of \code{A} (if \code{TRUE}) or to pool across \code{A} (if \code{FALSE}).}
+\item{stratify}{A \code{boolean} indicating whether to estimate the missing 
+outcome regression separately
+for observations with different levels of \code{A} (if \code{TRUE}) or to 
+pool across \code{A} (if \code{FALSE}).}
 
-\item{family}{A \code{family} object equal to either \code{binomial()} or \code{gaussian()}, 
-to be passed to the \code{SuperLearner} or \code{glm} function.}
+\item{family}{A \code{family} object equal to either \code{binomial()} or 
+\code{gaussian()}, to be passed to the \code{SuperLearner} or \code{glm} 
+function.}
 
-\item{a_0}{A vector of treatment levels at which to compute the adjusted mean outcome.}
+\item{a_0}{A vector of fixed treatment values at which to return marginal 
+mean estimates.}
 
-\item{SL_g}{A vector of characters describing the super learner library to be used
-for each of the propensity score regressions (\code{DeltaA}, \code{A}, and \code{DeltaY}). To use the same
-library for each of the regressions (or if there is no missing data in \code{A} nor \code{Y}), 
-a single library may be input. See \code{link{SuperLearner::SuperLearner}} for details on how super 
-learner libraries can be specified.}
+\item{SL_g}{A vector of characters describing the super learner library to be 
+used for each of the propensity score regressions (\code{DeltaA}, \code{A}, 
+and \code{DeltaY}). To use the same library for each of the regressions (or 
+if there is no missing data in \code{A} nor \code{Y}), a single library may 
+be input. See \code{link{SuperLearner::SuperLearner}} for details on how 
+super learner libraries can be specified.}
 
 \item{glm_g}{A list of characters describing the formulas to be used
-for each of the propensity score regressions (\code{DeltaA}, \code{A}, and \code{DeltaY}). To use the same
-formula for each of the regressions (or if there is no missing data in \code{A} nor \code{Y}), 
-a single character formula may be input.}
+for each of the propensity score regressions (\code{DeltaA}, \code{A}, and 
+\code{DeltaY}). To use the same formula for each of the regressions (or if 
+there is no missing data in \code{A} nor \code{Y}), a single character 
+formula may be input.}
 
-\item{SL_Qr}{A vector of characters or a list describing the Super Learner library to be used 
-for the reduced-dimension outcome regression.}
+\item{SL_Qr}{A vector of characters or a list describing the Super Learner 
+library to be used for the reduced-dimension outcome regression.}
 
-\item{glm_Qr}{A character describing a formula to be used in the call to \code{glm} for reduced-dimension outcome regression. Ignored
-if \code{SL_Qr!=NULL}. The formula should use the variable name \code{'gn'}.}
+\item{glm_Qr}{A character describing a formula to be used in the call to 
+\code{glm} for reduced-dimension outcome regression. Ignored if 
+\code{SL_Qr!=NULL}. The formula should use the variable name \code{'gn'}.}
 
-\item{returnModels}{A boolean indicating whether to return model fits for the propensity score
-and reduced-dimension regressions.}
+\item{returnModels}{A boolean indicating whether to return model fits for the 
+propensity score and reduced-dimension regressions.}
 
 \item{verbose}{A boolean indicating whether to print status updates.}
 
-\item{maxIter}{A numeric that sets the maximum number of iterations the TMLE can perform in its fluctuation step.}
+\item{maxIter}{A numeric that sets the maximum number of iterations the TMLE 
+can perform in its fluctuation step.}
 
-\item{tolIC}{A numeric that defines the stopping criteria based on the empirical mean
-of the scores of the fluctuation submodels submodels. Setting to \code{"default"}}
+\item{tolIC}{A numeric that defines the stopping criteria based on the 
+empirical mean of the influence function.}
 
-\item{tolg}{A numeric indicating the minimum value for estimates of the propensity score.}
+\item{tolg}{A numeric indicating the minimum value for estimates of the 
+propensity score.}
 
-\item{cvFolds}{A numeric equal to the number of folds to be used in cross-validated fitting of 
-nuisance parameters. If \code{cvFolds = 1}, no cross-validation is used.}
+\item{cvFolds}{A numeric equal to the number of folds to be used in 
+cross-validated fitting of nuisance parameters. If \code{cvFolds = 1}, no 
+cross-validation is used.}
 
 \item{parallel}{A boolean indicating whether to use \code{foreach}
-to estimate nuisance parameters in parallel. Only useful if there is a registered parallel
-backend and \code{cvFolds > 1}.}
+to estimate nuisance parameters in parallel. Only useful if there is a 
+registered parallel backend and \code{cvFolds > 1}.}
 
 \item{...}{Other options (not currently used).}
 }
@@ -73,33 +86,28 @@ backend and \code{cvFolds > 1}.}
 An object of class \code{"adaptive_iptw"}.
 \describe{
  \item{\code{iptw_tmle}}{A \code{list} of point estimates and 
-       covariance matrix for the IPTW estimator based on a targeted propensity 
-		  score. }
- \item{\code{iptw_tmle_nuisance}}{A \code{list} of the final TMLE estimates of the
-       propensity score (\code{$gnStar}) and reduced-dimension regression (\code{$QrnStar}) 
-		  evaluated at the observed data values.}
- \item{\code{iptw_os}}{A \code{list} of point estimates and covariance matrix for the
-		  one-step correct IPTW estimator.}
+       covariance matrix for the IPTW estimator based on a targeted 
+       propensity score. }
+ \item{\code{iptw_tmle_nuisance}}{A \code{list} of the final TMLE estimates 
+       of the propensity score (\code{$gnStar}) and reduced-dimension 
+       regression (\code{$QrnStar}) evaluated at the observed data values.}
+ \item{\code{iptw_os}}{A \code{list} of point estimates and covariance matrix 
+       for the one-step correct IPTW estimator.}
  \item{\code{iptw_os_nuisance}}{A \code{list} of the initial estimates of the
-       propensity score and reduced-dimension regression evaluated at the observed data values.}
- \item{\code{iptw}}{A \code{list} of point estimates for the standard IPTW estimator. No
-		  estimate of the covariance matrix is provided because theory does not support asymptotic
-		  Normality of the IPTW estimator if super learning is used to estimate the propensity score.}
- \item{\code{aiptw}}{A \code{list} of doubly-robust point estimates and non-doubly-robust
-       covariance matrix for the standard AIPTW estimator.}
- \item{\code{gcomp}}{A \code{list} of non-doubly-robust point estimates and non-doubly-robust
-       covariance matrix for the standard G-computation estimator. If super learner is used
-       there is no guarantee of correct inference for this estimator.}
- \item{\code{QnMod}}{The fitted object for the outcome regression. Returns \code{NULL}
-       if \code{returnModels = FALSE}.}
- \item{\code{gnMod}}{The fitted object for the propensity score. Returns \code{NULL} if
-       \code{returnModels = FALSE}.}
- \item{\code{QrnMod}}{The fitted object for the reduced-dimension regression that guards 
-       against misspecification of the outcome regression. Returns \code{NULL} if 
-       \code{returnModels = FALSE}.}
+       propensity score and reduced-dimension regression evaluated at the 
+       observed data values.}
+ \item{\code{iptw}}{A \code{list} of point estimates for the standard IPTW 
+       estimator. No estimate of the covariance matrix is provided because 
+       theory does not support asymptotic Normality of the IPTW estimator if 
+       super learning is used to estimate the propensity score.}
+ \item{\code{gnMod}}{The fitted object for the propensity score. Returns 
+       \code{NULL} if \code{returnModels = FALSE}.}
+ \item{\code{QrnMod}}{The fitted object for the reduced-dimension regression 
+       that guards against misspecification of the outcome regression. 
+       Returns \code{NULL} if \code{returnModels = FALSE}.}
  \item{\code{a_0}}{The treatment levels that were requested for computation of 
        covariate-adjusted means.}
- \item{\code{call}}{The call to \code{adaptive_iptw}}
+ \item{\code{call}}{The call to \code{adaptive_iptw}.}
 }
 }
 \description{

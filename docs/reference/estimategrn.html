@@ -110,60 +110,66 @@ fluctuations.</p>
     </tr>
     <tr>
       <th>A</th>
-      <td><p>A vector of binary treatment assignment (assumed to be equal to 0 or 1)</p></td>
+      <td><p>A vector of binary treatment assignment (assumed to be equal to 0 or
+1).</p></td>
     </tr>
     <tr>
       <th>W</th>
-      <td><p>A <code>data.frame</code> of named covariates</p></td>
+      <td><p>A <code>data.frame</code> of named covariates.</p></td>
     </tr>
     <tr>
       <th>DeltaA</th>
-      <td><p>Indicator of missing treatment (assumed to be equal to 0 if missing 1 if observed)</p></td>
+      <td><p>Indicator of missing treatment (assumed to be equal to 0 if 
+missing 1 if observed).</p></td>
     </tr>
     <tr>
       <th>DeltaY</th>
-      <td><p>Indicator of missing outcome (assumed to be equal to 0 if missing 1 if observed)</p></td>
+      <td><p>Indicator of missing outcome (assumed to be equal to 0 if 
+missing 1 if observed).</p></td>
     </tr>
     <tr>
       <th>Qn</th>
-      <td><p>A list of outcome regression estimates evaluated on observed data</p></td>
+      <td><p>A list of outcome regression estimates evaluated on observed data.</p></td>
     </tr>
     <tr>
       <th>gn</th>
-      <td><p>A list of propensity regression estimates evaluated on observed data</p></td>
+      <td><p>A list of propensity regression estimates evaluated on observed 
+data.</p></td>
     </tr>
     <tr>
       <th>SL_gr</th>
-      <td><p>A vector of characters or a list describing the Super Learner library to be used 
-for the second reduced-dimension regression.</p></td>
+      <td><p>A vector of characters or a list describing the Super Learner 
+library to be used for the reduced-dimension propensity score.</p></td>
     </tr>
     <tr>
       <th>tolg</th>
-      <td><p>A numeric indicating the minimum value for estimates of the propensity score.</p></td>
+      <td><p>A numeric indicating the minimum value for estimates of the 
+propensity score.</p></td>
     </tr>
     <tr>
       <th>glm_gr</th>
-      <td><p>A character describing a formula to be used in the call to <code>glm</code> for the second reduced-dimension regression. Ignored
-if <code>SL_gr!=NULL</code>.</p></td>
+      <td><p>A character describing a formula to be used in the call to 
+<code>glm</code> for the second reduced-dimension regression. Ignored if 
+<code>SL_gr!=NULL</code>.</p></td>
     </tr>
     <tr>
       <th>a_0</th>
-      <td><p>A list of fixed treatment values</p></td>
+      <td><p>A list of fixed treatment values .</p></td>
     </tr>
     <tr>
       <th>reduction</th>
-      <td><p>A character equal to <code>"univariate"</code> for a univariate misspecification correction or <code>"bivariate"</code>
-for the bivariate version.</p></td>
+      <td><p>A character equal to <code>'univariate'</code> for a univariate 
+misspecification correction or <code>'bivariate'</code> for the bivariate version.</p></td>
     </tr>
     <tr>
       <th>returnModels</th>
-      <td><p>A boolean indicating whether to return model fits for the outcome regression, propensity score,
-and reduced-dimension regressions.</p></td>
+      <td><p>A boolean indicating whether to return model fits for the 
+outcome regression, propensity score, and reduced-dimension regressions.</p></td>
     </tr>
     <tr>
       <th>validRows</th>
-      <td><p>A <code>list</code> of length <code>cvFolds</code> containing the row indexes
-of observations to include in validation fold.</p></td>
+      <td><p>A <code>list</code> of length <code>cvFolds</code> containing the row 
+indexes of observations to include in validation fold.</p></td>
     </tr>
     </table>
     

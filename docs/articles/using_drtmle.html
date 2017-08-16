@@ -91,7 +91,7 @@ Atlanta, Georgia, 30322, U.S.A.<br><a href="mailto:benkeser@emory.edu">benkeser@
 <h1 class="hasAnchor">
 <a href="#introduction" class="anchor"></a>Introduction </h1>
 <p>In many fields researchers are interested in assessing the population-level effect of a particular treatment on an outcome of interest. The treatment might correspond to a drug, a potentially harmful exposure exposure, or a policy intervention. Often, the treatment may not be randomized due to ethical or logistical reasons. This has sparked great interest in developing statistical methodology to estimate population-level effects from observational data. Estimation of these effects often requires accounting for putative confounding factors, that is, factors related to whether a participant receives treatment and to the participant’s outcome. In many settings, researchers measure many potential confounders, for example using administrative databases or genetic sequencing technology. Due to the curse-of-dimensionality, common statistical estimation techniques are not feasible for such high-dimensional data without restrictive modeling assumptions. When these assumptions are violated, estimates of the population-level effect of a treatment may have large bias.</p>
-<p>This has sparked an interest in using adaptive estimation techniques from the machine learning literature to control for high-dimensional confounders when estimating treatment effects. However, facilitating proper inference (e.g., confidence intervals and hypothesis tests) about estimates of effects based on adaptive estimators is challenging. In particular, standard causal inference techniques, including both G-computation (GCOMP) estimators <span class="citation">(Robins 1986)</span> and inverse probability of treatment weighted (IPTW) estimators <span class="citation">(Horvitz and D 1952,<span class="citation">Robins, Hernan, and Brumback (2000)</span>)</span>, fail to yield valid inference for common estimators of effects. More complex proposals have been developed that <em>are capable</em> of utilizing adaptive methods to control for confounding while still yielding valid inference. These techniques include augmented inverse probability of treatment estimation (AIPTW) <span class="citation">(Robins, Rotnitzky, and Zhao 1994)</span> and targeted minimum loss-based estimation (TMLE) <span class="citation">(van der Laan and Rubin 2006)</span>. Under assumptions, these estimators have limiting normal distributions with estimable variance. The asymptotic variance estimates then serve as the basis for constructing confidence intervals and hypothesis tests.</p>
+<p>This has sparked an interest in using adaptive estimation techniques from the machine learning literature to control for high-dimensional confounders when estimating treatment effects. However, facilitating proper inference (e.g., confidence intervals and hypothesis tests) about estimates of effects based on adaptive estimators is challenging. In particular, standard causal inference techniques, including both G-computation (GCOMP) estimators <span class="citation">(Robins 1986)</span> and inverse probability of treatment weighted (IPTW) estimators <span class="citation">(Horvitz and Thompson 1952, <span class="citation">Robins, Hernan, and Brumback (2000)</span>)</span>, fail to yield valid inference for common estimators of effects. More complex proposals have been developed that <em>are capable</em> of utilizing adaptive methods to control for confounding while still yielding valid inference. These techniques include augmented inverse probability of treatment estimation (AIPTW) <span class="citation">(Robins, Rotnitzky, and Zhao 1994)</span> and targeted minimum loss-based estimation (TMLE) <span class="citation">(van der Laan and Rubin 2006)</span>. Under assumptions, these estimators have limiting normal distributions with estimable variance. The asymptotic variance estimates then serve as the basis for constructing confidence intervals and hypothesis tests.</p>
 <p>As an intermediate step, the AIPTW and TMLE estimators require estimation of two key nuisance parameters: the probability of treatment as a function of confounders (the propensity score, hereafter referred to as the <em>PS</em>) and the average outcome as a function of confounders and treatment (the outcome regression, <em>OR</em>). In addition to their desirable inferential properties, AIPTW and TMLE estimators also enjoy the property of double robustness. That is, the estimators are consistent for the population-level effect of interest if either of the PS or OR is consistently estimated. This property gives the AIPTW and TMLE estimators a natural appeal: inconsistency in the estimation of one nuisance parameter may be mitigated by the consistent estimation of the other. As such, these estimators have increased in popularity in recent years. However, recent work has shown that the double robustness property does not necessarily extend to inferential properties about these estimators when adaptive estimators of the PS and OR are used <span class="citation">(van der Laan 2014,<span class="citation">Benkeser et al. (2017)</span>)</span>. Instead, valid inference requires consistent estimation of <em>both</em> the PS <em>and</em> the OR. van der Laan (2014) proposed new TMLE estimators have an asymptotic normal sampling distribution with estimable variance under consistent estimation of <em>either</em> the PS <em>or</em> the OR, paving the way for inference that is doubly-robust. Benkeser et al. (2017) proposed modifications of these estimators with similar robustness properties and illustrated their practical performance.</p>
 <p>The two proposed procedures that yield doubly-robust inference are quite involved, notably involving iterative estimation of additional, complex nuisance parameters. The <code>drtmle</code> package was motivated by the need for a user-friendly tool to implement these methods. The package implements the TMLE estimators of population-level effects proposed in van der Laan (2014) and Benkeser et al. (2017), as well as several extensions including cross-validated targeted minimum loss-based estimators (CVTMLE). Additionally, <code>drtmle</code> implements an IPTW estimator that overcomes shortcomings of existing IPTW implementations with respect to statistical inference. In particular, the estimator allows an adaptive estimator of the PS to be used in construction of the IPTW estimator, while yielding valid statistical inference about population-level effects. Both the TMLE and IPTW estimators implemented in the <code>drtmle</code> package are capable of estimating population-level effects for discrete-valued treatments and the package provides convenient utilities for constructing confidence intervals and hypothesis tests about contrasts of the mean outcome under different levels of treatment. This document explains some of the key concepts underlying doubly-robust inference and illustrates usage of the <code>drtmle</code> package.</p>
 </div>
@@ -343,8 +343,8 @@ f^{-1}\bigl\{ f(h(\psi_n)) \pm z_{1-\alpha/2} \nabla f(h(\psi_n))^T \Sigma_n \na
 <pre><code>## $drtmle
 ##                         zstat  pval
 ## H0:E[Y(1)]-E[Y(0)]=0.05 1.754 0.079</code></pre>
-<p>The <code>wald_test</code> method also allows for user-specified contrasts to be tested using syntax similar to the <code>ci</code> method. The only difference syntactically is that it is not strictly necessary to specify <code>f_inv</code>, as the hypothesis test is performed on the transformed scale. That is, we can generally test the null hypothesis that <span class="math inline">\(f(h(\psi_0))\)</span> equals <span class="math inline">\(f_0\)</span> (a value passed to <code>null</code>) using the Wald statistic <span class="math display">\[
-Z_n := \frac{n^{1/2}\{f(h(\psi_n)) - f_0\}}{\nabla f(h(\psi_n))^T \Sigma_n \nabla f(h(\psi_n))} \ . 
+<p>The <code>wald_test</code> method also allows for user-specified contrasts to be tested using syntax similar to the <code>ci</code> method. The only difference syntactically is that it is not strictly necessary to specify <code>f_inv</code>, as the hypothesis test is performed on the transformed scale. That is, we can generally test the null hypothesis that <span class="math inline">\(f(h(\psi_0))\)</span> equals <span class="math inline">\(f_0\)</span> (the function <span class="math inline">\(f\)</span> applied to the value passed to <code>null</code>) using the Wald statistic <span class="math display">\[
+Z_n := \frac{\{f(h(\psi_n)) - f_0\}}{\nabla f(h(\psi_n))^T \Sigma_n \nabla f(h(\psi_n))} \ . 
 \]</span> We can use the <code>riskRatio</code> contrast defined previously to test the null hypothesis that <span class="math inline">\(\psi_0(1)/\psi_0(0) = 1\)</span>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/wald_test.html">wald_test</a></span>(npreg_fit, <span class="dt">contrast =</span> riskRatio, <span class="dt">null =</span> <span class="dv">1</span>)</code></pre></div>
 <pre><code>## $drtmle
@@ -478,19 +478,27 @@ glm_fit_multiA                         </code></pre></div>
                  <span class="dt">SL_Q =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.glm.interaction"</span>, <span class="st">"SL.mean"</span>), 
                  <span class="dt">SL_gr =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.gam"</span>, <span class="st">"SL.mean"</span>),
                  <span class="dt">SL_Qr =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.gam"</span>, <span class="st">"SL.mean"</span>), 
-                 <span class="dt">stratify =</span> <span class="ot">FALSE</span>, <span class="dt">cvFolds =</span> <span class="dv">2</span>)
-cv_sl_fit</code></pre></div>
+                 <span class="dt">stratify =</span> <span class="ot">FALSE</span>, <span class="dt">cvFolds =</span> <span class="dv">2</span>, <span class="dt">a_0 =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>))</code></pre></div>
+<pre><code>## Warning in (function (a, train_g, train_Q, valid_g, valid_Q) : Only one
+## unique value of gn0. Using empirical average as Qr estimate.</code></pre>
+<pre><code>## Warning in (function (a, train_g, train_Q, valid_g, valid_Q) : Only one
+## unique value of gn0. Using empirical average as Qr estimate.</code></pre>
+<pre><code>## Warning in (function (a, train_g, train_Q, valid_g, valid_Q) : Only one
+## unique value of gn0. Using empirical average as Qr estimate.</code></pre>
+<pre><code>## Warning in (function (a, train_g, train_Q, valid_g, valid_Q) : Only one
+## unique value of gn0. Using empirical average as Qr estimate.</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cv_sl_fit</code></pre></div>
 <pre><code>## $est
 ##            
-## 1 0.7399367
-## 2 0.8235722
-## 0 0.4856500
+## 0 0.4663770
+## 1 0.7415991
+## 2 0.8134379
 ## 
 ## $cov
-##               1             2             0
-## 1  2.177750e-03  4.167262e-05 -0.0001227814
-## 2  4.167262e-05  2.501640e-03 -0.0001080690
-## 0 -1.227814e-04 -1.080690e-04  0.0152309916</code></pre>
+##               0             1             2
+## 0  0.0149598005 -1.042380e-04 -1.330231e-04
+## 1 -0.0001042380  2.313687e-03 -1.931894e-05
+## 2 -0.0001330231 -1.931894e-05  2.382663e-03</code></pre>
 <p>Cross validation may significantly increase computation time necessary for running <code>drtmle</code>. Parallelized regression fitting is available by setting <code>parallel = TRUE</code>, which allows for use of the <code>foreach</code> package <span class="citation">(Revolution Analytics and Weston 2015b)</span> to parallelize the estimation of the OR, PS, and reduced dimension regressions. The function <code>foreach</code> assumes that a a parallel back-end is registered before running <code>drtmle</code>. The appropriate back-end is system-specific, but below we demonstrate registration with a back-end based on the <code>doParallel</code> <span class="citation">(Revolution Analytics and Weston 2015a)</span> and <code>snow</code> packages <span class="citation">(<span class="citeproc-not-found" data-reference-id="snowPackage"><strong>???</strong></span>)</span>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(doParallel)
 workers &lt;-<span class="st"> </span><span class="kw">makeCluster</span>(<span class="dv">2</span>, <span class="dt">type=</span><span class="st">"SOCK"</span>)
@@ -502,18 +510,19 @@ pcv_sl_fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/
                  <span class="dt">SL_Qr =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.gam"</span>, <span class="st">"SL.mean"</span>), 
                  <span class="dt">stratify =</span> <span class="ot">FALSE</span>, <span class="dt">a_0 =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>), 
                  <span class="dt">cvFolds =</span> <span class="dv">2</span>, <span class="dt">parallel =</span> <span class="ot">TRUE</span>)
+<span class="kw">stopCluster</span>(workers)
 pcv_sl_fit</code></pre></div>
 <pre><code>## $est
 ##            
-## 0 0.5328126
-## 1 0.7322246
-## 2 0.7779488
+## 0 0.5586285
+## 1 0.7144881
+## 2 0.8126004
 ## 
 ## $cov
-##              0             1             2
-## 0 21.621215245 -2.171922e-03 -1.330147e-03
-## 1 -0.002171922  2.446749e-03  5.762116e-05
-## 2 -0.001330147  5.762116e-05  3.574122e-03</code></pre>
+##               0            1             2
+## 0  0.0755590234 3.112384e-04 -3.589351e-03
+## 1  0.0003112384 2.972487e-03  4.104641e-05
+## 2 -0.0035893506 4.104641e-05  5.032581e-01</code></pre>
 </div>
 </div>
 <div id="inference-for-iptw-using-adaptive-ps-estimators" class="section level1">
@@ -552,7 +561,7 @@ npreg_iptw_multiA                                   </code></pre></div>
 <h1 class="hasAnchor">
 <a href="#discussion" class="anchor"></a>Discussion</h1>
 <p>The <code>drtmle</code> package was designed to provide a user-friendly implementation of the TMLE algorithm that facilitates doubly-robust inference about marginal means and average treatment effects. While the theory underlying doubly-robust inference is complex, the implementation of the methods only requires users to provide the data and specify how to estimate regressions. While estimation of the OR and PS is familiar to those familiar with causal inference-related estimation, the reduced-dimension regressions may appear strange. Indeed, it is difficult to provide intuition for these parameters and more difficult to determine what scientific background knowledge might guide users in how to estimate these regression parameters. Therefore, we recommended estimating these quantities adaptively, e.g., with the super learner. The super learner library should contain several relatively smooth estimators such as <code>SL.mean</code>, <code>SL.glm</code>, and <code>SL.gam</code>. In particular, including <code>SL.mean</code> (an unadjusted generalized linear model) may be important due to the fact that, when the OR and PS are consistently estimated, the reduced-dimension regressions are identically equal to zero. Thus, this unadjusted regression estimator may do a good job estimating the reduced-dimension regressions in situations where the OR and PS are estimated well. In addition to relatively smooth estimators, we recommend additionally including several adaptive estimators such as <code>SL.npreg</code> or <code>SL.earth</code>.</p>
-<p>Planned extensions of the <code>drtmle</code> package include extensions of longitudinal settings involving treatments at multiple time points and inclusion of the collaborative targeted maximum likelihood estimator (CTMLE) of van der Laan (2014) that also facilitates collaborative, doubly-robust inference.</p>
+<p>Planned extensions of the <code>drtmle</code> package include extensions of longitudinal settings involving treatments at multiple time points and inclusion of the collaborative targeted maximum likelihood estimator (CTMLE) of van der Laan (2014) that also facilitates collaborative doubly-robust inference.</p>
 </div>
 <div id="session-info" class="section level1">
 <h1 class="hasAnchor">
@@ -570,24 +579,21 @@ npreg_iptw_multiA                                   </code></pre></div>
 ## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
 ## 
 ## attached base packages:
-## [1] parallel  splines   stats     graphics  grDevices utils     datasets 
-## [8] methods   base     
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] doParallel_1.0.10   iterators_1.0.8     gam_1.14-4         
-## [4] foreach_1.4.3       quadprog_1.5-5      nloptr_1.0.4       
-## [7] SuperLearner_2.0-22 nnls_1.4            drtmle_0.0.0.9000  
+## [1] SuperLearner_2.0-22 nnls_1.4            drtmle_0.0.0.9000  
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] Rcpp_0.12.11       knitr_1.16         magrittr_1.5      
-##  [4] cubature_1.3-8     lattice_0.20-35    plyr_1.8.4        
-##  [7] stringr_1.2.0      tools_3.4.1        grid_3.4.1        
-## [10] snow_0.4-2         quantreg_5.33      htmltools_0.3.6   
-## [13] MatrixModels_0.4-1 yaml_2.1.14        rprojroot_1.2     
-## [16] digest_0.6.12      Matrix_1.2-10      codetools_0.2-15  
-## [19] evaluate_0.10.1    rmarkdown_1.6      np_0.60-3         
-## [22] stringi_1.1.5      compiler_3.4.1     backports_1.1.0   
-## [25] boot_1.3-19        SparseM_1.77</code></pre>
+##  [4] cubature_1.3-8     lattice_0.20-35    foreach_1.4.3     
+##  [7] plyr_1.8.4         stringr_1.2.0      tools_3.4.1       
+## [10] grid_3.4.1         quantreg_5.33      htmltools_0.3.6   
+## [13] iterators_1.0.8    MatrixModels_0.4-1 yaml_2.1.14       
+## [16] rprojroot_1.2      digest_0.6.12      Matrix_1.2-10     
+## [19] codetools_0.2-15   evaluate_0.10.1    rmarkdown_1.6     
+## [22] np_0.60-3          stringi_1.1.5      compiler_3.4.1    
+## [25] backports_1.1.0    boot_1.3-19        SparseM_1.77</code></pre>
 <div id="refs" class="references">
 <div id="ref-benkeser:2017:biometrika">
 <p>Benkeser, D, M Carone, M van der Laan, and P Gilbert. 2017. “Doubly-Robust Nonparametric Inference on the Average Treatment Effect.” <em>Biometrika</em>.</p>
@@ -599,10 +605,10 @@ npreg_iptw_multiA                                   </code></pre></div>
 <p>Hayfield, Tristen, and Jeffrey Racine. 2008. “Nonparametric Econometrics: The Np Package.” <em>Journal of Statistical Software</em> 27 (5). <a href="http://www.jstatsoft.org/v27/i05/" class="uri">http://www.jstatsoft.org/v27/i05/</a>.</p>
 </div>
 <div id="ref-horvitzthompson:1952:jasa">
-<p>Horvitz, D, and Thompson D. 1952. “A Generalization of Sampling Without Replacement from a Finite Universe.” <em>Journal of the American Statistical Association</em> 47 (260): 663–85. doi:<a href="https://doi.org/10.1080/01621459.1952.10483446">10.1080/01621459.1952.10483446</a>.</p>
+<p>Horvitz, D, and D Thompson. 1952. “A Generalization of Sampling Without Replacement from a Finite Universe.” <em>Journal of the American Statistical Association</em> 47 (260): 663–85. doi:<a href="https://doi.org/10.1080/01621459.1952.10483446">10.1080/01621459.1952.10483446</a>.</p>
 </div>
 <div id="ref-SuperLearnerPackage">
-<p>Polley, E, E LeDell, C Kennedy, S Lendle, and M van der Laan. 2017. <em>SuperLearner: Super Learner Prediction</em>. <a href="http://CRAN.R-project.org/package=SuperLearner" class="uri">http://CRAN.R-project.org/package=SuperLearner</a>.</p>
+<p>Polley, E, E LeDell, C Kennedy, S Lendle, and M van der Laan. 2017. <em>SuperLearner: Super Learner Prediction</em>. <a href="https://CRAN.R-project.org/package=SuperLearner" class="uri">https://CRAN.R-project.org/package=SuperLearner</a>.</p>
 </div>
 <div id="ref-porter:2011:ijb">
 <p>Porter, K, S Gruber, van der Laan M, and J Sekhon. 2011. “The Relative Performance of Targeted Maximum Likelihood Estimators.” <em>International Journal of Biostatistics</em> 7 (1). doi:<a href="https://doi.org/10.2202/1557-4679.1308">10.2202/1557-4679.1308</a>.</p>
