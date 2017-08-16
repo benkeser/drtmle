@@ -474,38 +474,30 @@ glm_fit_multiA                         </code></pre></div>
 <a href="#cross-validated-regression-estimates" class="anchor"></a>Cross-validated regression estimates</h2>
 <p>When considering adaptive estimation techniques, one runs the risk of overfitting the initial regressions. While the cross validation used by super learning attempts to guard against overfitting, there are no guarantees in finite-samples. To definitively avoid such overfitting, one can use cross-validated estimates of the regression parameters. Theoretically, the use of cross-validated regression weakens the assumptions necessary to achieve asymptotic normality <span class="citation">(Zheng and van der Laan 2010)</span>. This is true of the regular TMLE and AIPTW, as well as of the TMLE estimator with doubly-robust inference. The <code>drtmle</code> function implements cross-validated estimation of the regression parameters through the <code>cvFolds</code> option, as shown in the code below, where we continue with the multi-level treatment example.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cv_sl_fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/drtmle.html">drtmle</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">family =</span> <span class="kw">binomial</span>(),
-                 <span class="dt">SL_g =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.glm.interaction"</span>, <span class="st">"SL.mean"</span>), 
-                 <span class="dt">SL_Q =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.glm.interaction"</span>, <span class="st">"SL.mean"</span>), 
+                 <span class="dt">SL_g =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.glm.interaction"</span>, <span class="st">"SL.gam"</span>), 
+                 <span class="dt">SL_Q =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.glm.interaction"</span>, <span class="st">"SL.gam"</span>), 
                  <span class="dt">SL_gr =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.gam"</span>, <span class="st">"SL.mean"</span>),
                  <span class="dt">SL_Qr =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.gam"</span>, <span class="st">"SL.mean"</span>), 
-                 <span class="dt">stratify =</span> <span class="ot">FALSE</span>, <span class="dt">cvFolds =</span> <span class="dv">2</span>, <span class="dt">a_0 =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>))</code></pre></div>
-<pre><code>## Warning in (function (a, train_g, train_Q, valid_g, valid_Q) : Only one
-## unique value of gn0. Using empirical average as Qr estimate.</code></pre>
-<pre><code>## Warning in (function (a, train_g, train_Q, valid_g, valid_Q) : Only one
-## unique value of gn0. Using empirical average as Qr estimate.</code></pre>
-<pre><code>## Warning in (function (a, train_g, train_Q, valid_g, valid_Q) : Only one
-## unique value of gn0. Using empirical average as Qr estimate.</code></pre>
-<pre><code>## Warning in (function (a, train_g, train_Q, valid_g, valid_Q) : Only one
-## unique value of gn0. Using empirical average as Qr estimate.</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cv_sl_fit</code></pre></div>
+                 <span class="dt">stratify =</span> <span class="ot">FALSE</span>, <span class="dt">cvFolds =</span> <span class="dv">2</span>, <span class="dt">a_0 =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>))
+cv_sl_fit</code></pre></div>
 <pre><code>## $est
 ##            
-## 0 0.4663770
-## 1 0.7415991
-## 2 0.8134379
+## 0 0.5049180
+## 1 0.7427418
+## 2 0.7991881
 ## 
 ## $cov
 ##               0             1             2
-## 0  0.0149598005 -1.042380e-04 -1.330231e-04
-## 1 -0.0001042380  2.313687e-03 -1.931894e-05
-## 2 -0.0001330231 -1.931894e-05  2.382663e-03</code></pre>
+## 0  0.0161444894 -1.471091e-04 -2.003336e-04
+## 1 -0.0001471091  2.344629e-03 -1.210073e-05
+## 2 -0.0002003336 -1.210073e-05  8.789989e-03</code></pre>
 <p>Cross validation may significantly increase computation time necessary for running <code>drtmle</code>. Parallelized regression fitting is available by setting <code>parallel = TRUE</code>, which allows for use of the <code>foreach</code> package <span class="citation">(Revolution Analytics and Weston 2015b)</span> to parallelize the estimation of the OR, PS, and reduced dimension regressions. The function <code>foreach</code> assumes that a a parallel back-end is registered before running <code>drtmle</code>. The appropriate back-end is system-specific, but below we demonstrate registration with a back-end based on the <code>doParallel</code> <span class="citation">(Revolution Analytics and Weston 2015a)</span> and <code>snow</code> packages <span class="citation">(<span class="citeproc-not-found" data-reference-id="snowPackage"><strong>???</strong></span>)</span>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(doParallel)
 workers &lt;-<span class="st"> </span><span class="kw">makeCluster</span>(<span class="dv">2</span>, <span class="dt">type=</span><span class="st">"SOCK"</span>)
 <span class="kw"><a href="http://www.rdocumentation.org/packages/doParallel/topics/registerDoParallel">registerDoParallel</a></span>(workers)
 pcv_sl_fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/drtmle.html">drtmle</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">family =</span> <span class="kw">binomial</span>(),
-                 <span class="dt">SL_g =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.glm.interaction"</span>,<span class="st">"SL.mean"</span>), 
-                 <span class="dt">SL_Q =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.glm.interaction"</span>,<span class="st">"SL.mean"</span>), 
+                 <span class="dt">SL_g =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.glm.interaction"</span>,<span class="st">"SL.gam"</span>), 
+                 <span class="dt">SL_Q =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.glm.interaction"</span>,<span class="st">"SL.gam"</span>), 
                  <span class="dt">SL_gr =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.gam"</span>, <span class="st">"SL.mean"</span>),
                  <span class="dt">SL_Qr =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.gam"</span>, <span class="st">"SL.mean"</span>), 
                  <span class="dt">stratify =</span> <span class="ot">FALSE</span>, <span class="dt">a_0 =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>), 
@@ -514,15 +506,15 @@ pcv_sl_fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/
 pcv_sl_fit</code></pre></div>
 <pre><code>## $est
 ##            
-## 0 0.5586285
-## 1 0.7144881
-## 2 0.8126004
+## 0 0.4769713
+## 1 0.7161489
+## 2 0.8057649
 ## 
 ## $cov
-##               0            1             2
-## 0  0.0755590234 3.112384e-04 -3.589351e-03
-## 1  0.0003112384 2.972487e-03  4.104641e-05
-## 2 -0.0035893506 4.104641e-05  5.032581e-01</code></pre>
+##               0             1             2
+## 0  6.752682e-01 -2.240854e-05  1.202662e-04
+## 1 -2.240854e-05  4.301132e-03 -2.312473e-05
+## 2  1.202662e-04 -2.312473e-05  2.820297e-02</code></pre>
 </div>
 </div>
 <div id="inference-for-iptw-using-adaptive-ps-estimators" class="section level1">
@@ -579,21 +571,24 @@ npreg_iptw_multiA                                   </code></pre></div>
 ## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
 ## 
 ## attached base packages:
-## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## [1] parallel  splines   stats     graphics  grDevices utils     datasets 
+## [8] methods   base     
 ## 
 ## other attached packages:
-## [1] SuperLearner_2.0-22 nnls_1.4            drtmle_0.0.0.9000  
+## [1] doParallel_1.0.10   iterators_1.0.8     gam_1.14-4         
+## [4] foreach_1.4.3       quadprog_1.5-5      nloptr_1.0.4       
+## [7] SuperLearner_2.0-22 nnls_1.4            drtmle_0.0.0.9000  
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] Rcpp_0.12.11       knitr_1.16         magrittr_1.5      
-##  [4] cubature_1.3-8     lattice_0.20-35    foreach_1.4.3     
-##  [7] plyr_1.8.4         stringr_1.2.0      tools_3.4.1       
-## [10] grid_3.4.1         quantreg_5.33      htmltools_0.3.6   
-## [13] iterators_1.0.8    MatrixModels_0.4-1 yaml_2.1.14       
-## [16] rprojroot_1.2      digest_0.6.12      Matrix_1.2-10     
-## [19] codetools_0.2-15   evaluate_0.10.1    rmarkdown_1.6     
-## [22] np_0.60-3          stringi_1.1.5      compiler_3.4.1    
-## [25] backports_1.1.0    boot_1.3-19        SparseM_1.77</code></pre>
+##  [4] cubature_1.3-8     lattice_0.20-35    plyr_1.8.4        
+##  [7] stringr_1.2.0      tools_3.4.1        grid_3.4.1        
+## [10] snow_0.4-2         quantreg_5.33      htmltools_0.3.6   
+## [13] MatrixModels_0.4-1 yaml_2.1.14        rprojroot_1.2     
+## [16] digest_0.6.12      Matrix_1.2-10      codetools_0.2-15  
+## [19] evaluate_0.10.1    rmarkdown_1.6      np_0.60-3         
+## [22] stringi_1.1.5      compiler_3.4.1     backports_1.1.0   
+## [25] boot_1.3-19        SparseM_1.77</code></pre>
 <div id="refs" class="references">
 <div id="ref-benkeser:2017:biometrika">
 <p>Benkeser, D, M Carone, M van der Laan, and P Gilbert. 2017. “Doubly-Robust Nonparametric Inference on the Average Treatment Effect.” <em>Biometrika</em>.</p>
