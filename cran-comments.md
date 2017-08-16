@@ -1,6 +1,6 @@
 ## Resubmission 
 This is a resubmission. In this version I have:
-* Added short examples to all exported functions. All examples run locally in under 5 seconds. 
+* Added short examples to all exported functions and shortened existing examples. All examples now run locally, on travis-ci, and on Appveyor and in under 5 seconds. 
 
 
 ## Test environments
