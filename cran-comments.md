@@ -1,3 +1,7 @@
+## Resubmission 
+This is a resubmission. In this version I have:
+* Added a reference and doi in the Description field of the DESCRIPTION file. 
+
 ## Test environments
 * local macOS / OS X install, R 3.4.1
 * ubuntu 12.04 (on travis-ci), R 3.3.2
