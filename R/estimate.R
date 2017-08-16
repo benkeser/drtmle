@@ -9,8 +9,10 @@
 #' @param W A \code{data.frame} of named covariates
 #' @param stratify A \code{boolean} indicating whether to estimate the missing outcome regression separately
 #' for observations with \code{A} equal to 0/1 (if \code{TRUE}) or to pool across \code{A} (if \code{FALSE}).
-#' @param SL_g A vector of characters or a list describing the Super Learner library to be used 
-#' for the propensity score !!!!! TO DO: Add new description.
+#' @param SL_g A vector of characters describing the super learner library to be used
+#' for each of the regression (\code{DeltaA}, \code{A}, and \code{DeltaY}). To use the same
+#' regression for each of the regressions (or if there is no missing data in \code{A} nor \code{Y}), 
+#' a single library may be input. 
 #' @param tolg A numeric indicating the minimum value for estimates of the propensity score.
 #' @param verbose A boolean indicating whether to print status updates.
 #' @param returnModels A boolean indicating whether to return model fits for the outcome regression, propensity score,

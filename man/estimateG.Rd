@@ -16,8 +16,10 @@ estimateG(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg, stratify = FALSE,
 
 \item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if missing 1 if observed)}
 
-\item{SL_g}{A vector of characters or a list describing the Super Learner library to be used 
-for the propensity score !!!!! TO DO: Add new description.}
+\item{SL_g}{A vector of characters describing the super learner library to be used
+for each of the regression (\code{DeltaA}, \code{A}, and \code{DeltaY}). To use the same
+regression for each of the regressions (or if there is no missing data in \code{A} nor \code{Y}), 
+a single library may be input.}
 
 \item{glm_g}{A character describing a formula to be used in the call to \code{glm} for the propensity score}
 

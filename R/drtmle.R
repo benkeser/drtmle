@@ -14,16 +14,21 @@ globalVariables(c("v", "%dopar%"))
 #' for different values of \code{A} (if \code{TRUE}) or to pool across \code{A} (if \code{FALSE}).
 #' @param SL_Q A vector of characters or a list describing the Super Learner library to be used 
 #' for the outcome regression. See \code{link{SuperLearner::SuperLearner}} for details.
-#' @param SL_g A vector of characters or a list describing the Super Learner library to be used 
-#' for the propensity score. See \code{link{SuperLearner::SuperLearner}} for details.
+#' @param SL_g A vector of characters describing the super learner library to be used
+#' for each of the propensity score regressions (\code{DeltaA}, \code{A}, and \code{DeltaY}). To use the same
+#' library for each of the regressions (or if there is no missing data in \code{A} nor \code{Y}), 
+#' a single library may be input. See \code{link{SuperLearner::SuperLearner}} for details on how super 
+#' learner libraries can be specified.
 #' @param SL_Qr A vector of characters or a list describing the Super Learner library to be used 
 #' for the reduced-dimension outcome regression. 
 #' @param SL_gr A vector of characters or a list describing the Super Learner library to be used 
 #' for the second reduced-dimension propensity score. 
 #' @param glm_Q A character describing a formula to be used in the call to \code{glm} for the outcome regression. Ignored
 #' if \code{SL_Q!=NULL}.
-#' @param glm_g A character describing a formula to be used in the call to \code{glm} for the propensity score. Ignored
-#' if \code{SL_g!=NULL}.
+#' @param glm_g A list of characters describing the formulas to be used
+#' for each of the propensity score regressions (\code{DeltaA}, \code{A}, and \code{DeltaY}). To use the same
+#' formula for each of the regressions (or if there is no missing data in \code{A} nor \code{Y}), 
+#' a single character formula may be input.
 #' @param glm_Qr A character describing a formula to be used in the call to \code{glm} for reduced-dimension outcome regression. Ignored
 #' if \code{SL_Qr!=NULL}. The formula should use the variable name \code{'gn'}.
 #' @param glm_gr A character describing a formula to be used in the call to \code{glm} for the reduced-dimension propensity score. Ignored
@@ -123,7 +128,9 @@ drtmle <- function(Y, A, W,
                    DeltaA = as.numeric(!is.na(A)),
                    DeltaY = as.numeric(!is.na(Y)),
                    a_0 = unique(A[!is.na(A)]),
-                   family = stats::binomial(),
+                   family = if(all(Y %in% c(0,1))){
+                    stats::binomial()
+                   }else{ stats::gaussian() },
                    stratify = TRUE,
                    SL_Q = NULL, SL_g = NULL,
                    SL_Qr = NULL, SL_gr = NULL,
@@ -176,7 +183,6 @@ drtmle <- function(Y, A, W,
   }
   # obtain list of propensity score fits
   gnMod <- gnValid[seq(2, length(gnValid), 2)]
-  # TO DO: Add reasonable names to gnMod?
 
   #-------------------------------
   # estimate outcome regression
@@ -205,7 +211,6 @@ drtmle <- function(Y, A, W,
   }
   # obtain list of outcome regression fits
   QnMod <- QnValid[seq(2,length(QnValid),2)]
-  # TO DO: Add reasonable names to QnMod?
   
   # naive g-computation estimate
   psi_n <- lapply(Qn, mean)
@@ -246,7 +251,6 @@ drtmle <- function(Y, A, W,
     }
     # obtain list of reduced dimension regression fits
     QrnMod <- QrnValid[seq(2,length(QrnValid),2)]
-    # TO DO: Add reasonable names to QrnMod?
 
     Dngo <- eval_Dstar_g(A = A, DeltaY = DeltaY, 
                          DeltaA = DeltaA, Qrn = Qrn, gn = gn, a_0 = a_0)
@@ -279,7 +283,6 @@ drtmle <- function(Y, A, W,
     }
     # obtain list of outcome regression fits
     grnMod <- grnValid[seq(2,length(grnValid),2)]
-    # TO DO: Add reasonable names to grnMod?
 
     # evaluate extra piece of influence function
     DnQo <- eval_Dstar_Q(A = A, Y = Y, DeltaY = DeltaY, 
@@ -353,7 +356,6 @@ drtmle <- function(Y, A, W,
       }
       # obtain list of outcome regression fits
       grnMod <- grnValid[seq(2,length(grnValid),2)]
-      # TO DO: Add reasonable names to grnMod?
 
       if(Qsteps==1){
         QnStarOut <- fluctuateQ(Y=Y, A=A, W=W, DeltaA = DeltaA, DeltaY = DeltaY, 
@@ -407,7 +409,6 @@ drtmle <- function(Y, A, W,
       }      
       # obtain list of reduced dimension regression fits
       QrnMod <- QrnValid[seq(2,length(QrnValid),2)]
-      # TO DO: Add reasonable names to QrnMod?
     }
     
     # get fluctuation parameters
@@ -460,9 +461,8 @@ drtmle <- function(Y, A, W,
                         Qn = QnStar, gn = gnStar, psi_n = psi_t, a_0 = a_0)
   PnDnoStar <- lapply(DnoStar, mean)
   
-  # TO DO: Update this (list should be longer)
-  DnQoStar <- list(rep(0, n))
-  DngoStar <- list(rep(0, n))
+  DnQoStar <- rep(list(rep(0, n)), length(a_0))
+  DngoStar <- rep(list(rep(0, n)), length(a_0))
   
   if("g" %in% guard){
     DnQoStar <- eval_Dstar_Q(A = A, Y = Y, DeltaY = DeltaY, 

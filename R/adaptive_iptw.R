@@ -13,12 +13,17 @@ globalVariables(c("v", "%dopar%"))
 #' for observations with different levels of \code{A} (if \code{TRUE}) or to pool across \code{A} (if \code{FALSE}).
 #' @param family A \code{family} object equal to either \code{binomial()} or \code{gaussian()}, 
 #' to be passed to the \code{SuperLearner} or \code{glm} function.
-#' @param SL_g A vector of characters or a list describing the Super Learner library to be used 
-#' for the propensity score. See \code{link{SuperLearner::SuperLearner}} for details.
+#' @param SL_g A vector of characters describing the super learner library to be used
+#' for each of the propensity score regressions (\code{DeltaA}, \code{A}, and \code{DeltaY}). To use the same
+#' library for each of the regressions (or if there is no missing data in \code{A} nor \code{Y}), 
+#' a single library may be input. See \code{link{SuperLearner::SuperLearner}} for details on how super 
+#' learner libraries can be specified.
 #' @param SL_Qr A vector of characters or a list describing the Super Learner library to be used 
 #' for the reduced-dimension outcome regression. 
-#' @param glm_g A character describing a formula to be used in the call to \code{glm} for the propensity score. Ignored
-#' if \code{SL_g!=NULL}.
+#' @param glm_g A list of characters describing the formulas to be used
+#' for each of the propensity score regressions (\code{DeltaA}, \code{A}, and \code{DeltaY}). To use the same
+#' formula for each of the regressions (or if there is no missing data in \code{A} nor \code{Y}), 
+#' a single character formula may be input.
 #' @param glm_Qr A character describing a formula to be used in the call to \code{glm} for reduced-dimension outcome regression. Ignored
 #' if \code{SL_Qr!=NULL}. The formula should use the variable name \code{'gn'}.
 #' @param maxIter A numeric that sets the maximum number of iterations the TMLE can perform in its fluctuation step.
@@ -139,7 +144,6 @@ adaptive_iptw <- function(W, A, Y,
   }
   # obtain list of propensity score fits
   gnMod <- gnValid[seq(2, length(gnValid), 2)]
-  # TO DO: Add reasonable names to gnMod?
 
  	# compute iptw estimator
 	psi_n <- mapply(a = split(a_0, 1:length(a_0)),g=gn, function(a,g){
@@ -183,7 +187,6 @@ adaptive_iptw <- function(W, A, Y,
   }
   # obtain list of propensity score fits
   QrnMod <- QrnValid[seq(2,length(QrnValid),2)]
-  # TO DO: Add reasonable names to QrnMod?
 
   Dngo <- eval_Diptw_g(A = A, DeltaA = DeltaA, DeltaY = DeltaY, 
                        Qrn = Qrn, gn = gn, a_0 = a_0)

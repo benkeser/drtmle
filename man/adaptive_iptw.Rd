@@ -31,11 +31,16 @@ to be passed to the \code{SuperLearner} or \code{glm} function.}
 
 \item{a_0}{A vector of treatment levels at which to compute the adjusted mean outcome.}
 
-\item{SL_g}{A vector of characters or a list describing the Super Learner library to be used 
-for the propensity score. See \code{link{SuperLearner::SuperLearner}} for details.}
+\item{SL_g}{A vector of characters describing the super learner library to be used
+for each of the propensity score regressions (\code{DeltaA}, \code{A}, and \code{DeltaY}). To use the same
+library for each of the regressions (or if there is no missing data in \code{A} nor \code{Y}), 
+a single library may be input. See \code{link{SuperLearner::SuperLearner}} for details on how super 
+learner libraries can be specified.}
 
-\item{glm_g}{A character describing a formula to be used in the call to \code{glm} for the propensity score. Ignored
-if \code{SL_g!=NULL}.}
+\item{glm_g}{A list of characters describing the formulas to be used
+for each of the propensity score regressions (\code{DeltaA}, \code{A}, and \code{DeltaY}). To use the same
+formula for each of the regressions (or if there is no missing data in \code{A} nor \code{Y}), 
+a single character formula may be input.}
 
 \item{SL_Qr}{A vector of characters or a list describing the Super Learner library to be used 
 for the reduced-dimension outcome regression.}

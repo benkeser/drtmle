@@ -5,13 +5,13 @@
 \title{TMLE estimate of the average treatment effect with doubly-robust inference}
 \usage{
 drtmle(Y, A, W, DeltaA = as.numeric(!is.na(A)),
-  DeltaY = as.numeric(!is.na(Y)), a_0 = unique(A[!is.na(A)]),
-  family = stats::binomial(), stratify = TRUE, SL_Q = NULL, SL_g = NULL,
-  SL_Qr = NULL, SL_gr = NULL, glm_Q = NULL, glm_g = NULL,
-  glm_Qr = NULL, glm_gr = NULL, guard = c("Q", "g"),
-  reduction = "univariate", returnModels = FALSE, cvFolds = 1,
-  maxIter = 3, tolIC = 1/length(Y), tolg = 0.01, verbose = FALSE,
-  Qsteps = 2, parallel = FALSE, ...)
+  DeltaY = as.numeric(!is.na(Y)), a_0 = unique(A[!is.na(A)]), family = if
+  (all(Y \%in\% c(0, 1))) {     stats::binomial() } else {     stats::gaussian()
+  }, stratify = TRUE, SL_Q = NULL, SL_g = NULL, SL_Qr = NULL,
+  SL_gr = NULL, glm_Q = NULL, glm_g = NULL, glm_Qr = NULL,
+  glm_gr = NULL, guard = c("Q", "g"), reduction = "univariate",
+  returnModels = FALSE, cvFolds = 1, maxIter = 3, tolIC = 1/length(Y),
+  tolg = 0.01, verbose = FALSE, Qsteps = 2, parallel = FALSE, ...)
 }
 \arguments{
 \item{Y}{numeric of continuous or binary outcomes.}
@@ -35,8 +35,11 @@ for different values of \code{A} (if \code{TRUE}) or to pool across \code{A} (if
 \item{SL_Q}{A vector of characters or a list describing the Super Learner library to be used 
 for the outcome regression. See \code{link{SuperLearner::SuperLearner}} for details.}
 
-\item{SL_g}{A vector of characters or a list describing the Super Learner library to be used 
-for the propensity score. See \code{link{SuperLearner::SuperLearner}} for details.}
+\item{SL_g}{A vector of characters describing the super learner library to be used
+for each of the propensity score regressions (\code{DeltaA}, \code{A}, and \code{DeltaY}). To use the same
+library for each of the regressions (or if there is no missing data in \code{A} nor \code{Y}), 
+a single library may be input. See \code{link{SuperLearner::SuperLearner}} for details on how super 
+learner libraries can be specified.}
 
 \item{SL_Qr}{A vector of characters or a list describing the Super Learner library to be used 
 for the reduced-dimension outcome regression.}
@@ -47,8 +50,10 @@ for the second reduced-dimension propensity score.}
 \item{glm_Q}{A character describing a formula to be used in the call to \code{glm} for the outcome regression. Ignored
 if \code{SL_Q!=NULL}.}
 
-\item{glm_g}{A character describing a formula to be used in the call to \code{glm} for the propensity score. Ignored
-if \code{SL_g!=NULL}.}
+\item{glm_g}{A list of characters describing the formulas to be used
+for each of the propensity score regressions (\code{DeltaA}, \code{A}, and \code{DeltaY}). To use the same
+formula for each of the regressions (or if there is no missing data in \code{A} nor \code{Y}), 
+a single character formula may be input.}
 
 \item{glm_Qr}{A character describing a formula to be used in the call to \code{glm} for reduced-dimension outcome regression. Ignored
 if \code{SL_Qr!=NULL}. The formula should use the variable name \code{'gn'}.}

@@ -17,7 +17,7 @@ preamble: >
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{drtmle: Doubly-Robust Inference in R}
   %\VignetteEncoding{UTF-8}
 bibliography: refs.bib
 ---
@@ -30,7 +30,7 @@ bibliography: refs.bib
 
 In many fields researchers are interested in assessing the population-level effect of a particular treatment on an outcome of interest. The treatment might correspond to a drug, a potentially harmful exposure exposure, or a policy intervention. Often, the treatment may not be randomized due to ethical or logistical reasons. This has sparked great interest in developing statistical methodology to estimate population-level effects from observational data. Estimation of these effects often requires accounting for putative confounding factors, that is, factors related to whether a participant receives treatment and to the participant's outcome. In many settings, researchers measure many potential confounders, for example using administrative databases or genetic sequencing technology. Due to the curse-of-dimensionality, common statistical estimation techniques are not feasible for such high-dimensional data without restrictive modeling assumptions. When these assumptions are violated, estimates of the population-level effect of a treatment may have large bias.
 
-This has sparked an interest in using adaptive estimation techniques from the machine learning literature to control for high-dimensional confounders when estimating treatment effects. However, facilitating proper inference (e.g., confidence intervals and hypothesis tests) about estimates of effects based on adaptive estimators is challenging. In particular, standard causal inference techniques, including both G-computation (GCOMP) estimators [@robins:1986:mathmod] and inverse probability of treatment weighted (IPTW) estimators [@horvitzthompson:1952:jasa,@robins:2000:epi], fail to yield valid inference for common estimators of effects. More complex proposals have been developed that *are capable* of utilizing adaptive methods to control for confounding while still yielding valid inference. These techniques include augmented inverse probability of treatment estimation (AIPTW) [@robins:1994:jasa] and targeted minimum loss-based estimation (TMLE) [@vdlrubin:2006:ijb]. Under assumptions, these estimators have limiting normal distributions with estimable variance. The asymptotic variance estimates then serve as the basis for constructing confidence intervals and hypothesis tests.
+This has sparked an interest in using adaptive estimation techniques from the machine learning literature to control for high-dimensional confounders when estimating treatment effects. However, facilitating proper inference (e.g., confidence intervals and hypothesis tests) about estimates of effects based on adaptive estimators is challenging. In particular, standard causal inference techniques, including both G-computation (GCOMP) estimators [@robins:1986:mathmod] and inverse probability of treatment weighted (IPTW) estimators [@horvitzthompson:1952:jasa, @robins:2000:epi], fail to yield valid inference for common estimators of effects. More complex proposals have been developed that *are capable* of utilizing adaptive methods to control for confounding while still yielding valid inference. These techniques include augmented inverse probability of treatment estimation (AIPTW) [@robins:1994:jasa] and targeted minimum loss-based estimation (TMLE) [@vdlrubin:2006:ijb]. Under assumptions, these estimators have limiting normal distributions with estimable variance. The asymptotic variance estimates then serve as the basis for constructing confidence intervals and hypothesis tests.
 
 As an intermediate step, the AIPTW and TMLE estimators require estimation of two key nuisance parameters: the probability of treatment as a function of confounders (the propensity score, hereafter referred to as the *PS*) and the average outcome as a function of confounders and treatment (the outcome regression, *OR*). In addition to their desirable inferential properties, AIPTW and TMLE estimators also enjoy the property of double robustness. That is, the estimators are consistent for the population-level effect of interest if either of the PS or OR is consistently estimated. This property gives the AIPTW and TMLE estimators a natural appeal: inconsistency in the estimation of one nuisance parameter may be mitigated by the consistent estimation of the other. As such, these estimators have increased in popularity in recent years. However, recent work has shown that the double robustness property does not necessarily extend to inferential properties about these estimators when adaptive estimators of the PS and OR are used [@vdl:2014:ijb,@benkeser:2017:biometrika]. Instead, valid inference requires consistent estimation of *both* the PS *and* the OR. van der Laan (2014) proposed new TMLE estimators have an asymptotic normal sampling distribution with estimable variance under consistent estimation of *either* the PS *or* the OR, paving the way for inference that is doubly-robust. Benkeser et al. (2017) proposed modifications of these estimators with similar robustness properties and illustrated their practical performance. 
 
@@ -262,8 +262,8 @@ wald_test(npreg_fit, contrast = c(1, -1))
 wald_test(npreg_fit, contrast = c(1, -1), null = 0.05)
 ```
 
-The `wald_test` method also allows for user-specified contrasts to be tested using syntax similar to the `ci` method. The only difference syntactically is that it is not strictly necessary to specify `f_inv`, as the hypothesis test is performed on the transformed scale. That is, we can generally test the null hypothesis that $f(h(\psi_0))$ equals $f_0$ (a value passed to `null`) using the Wald statistic $$
-Z_n := \frac{n^{1/2}\{f(h(\psi_n)) - f_0\}}{\nabla f(h(\psi_n))^T \Sigma_n \nabla f(h(\psi_n))} \ . 
+The `wald_test` method also allows for user-specified contrasts to be tested using syntax similar to the `ci` method. The only difference syntactically is that it is not strictly necessary to specify `f_inv`, as the hypothesis test is performed on the transformed scale. That is, we can generally test the null hypothesis that $f(h(\psi_0))$ equals $f_0$ (the function $f$ applied to the value passed to `null`) using the Wald statistic $$
+Z_n := \frac{\{f(h(\psi_n)) - f_0\}}{\nabla f(h(\psi_n))^T \Sigma_n \nabla f(h(\psi_n))} \ . 
 $$
 We can use the `riskRatio` contrast defined previously to test the null hypothesis that $\psi_0(1)/\psi_0(0) = 1$. 
 
@@ -398,7 +398,7 @@ cv_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
                  SL_Q = c("SL.glm", "SL.glm.interaction", "SL.mean"), 
                  SL_gr = c("SL.glm", "SL.gam", "SL.mean"),
                  SL_Qr = c("SL.glm", "SL.gam", "SL.mean"), 
-                 stratify = FALSE, cvFolds = 2)
+                 stratify = FALSE, cvFolds = 2, a_0 = c(0,1,2))
 cv_sl_fit
 ```
 
@@ -415,6 +415,7 @@ pcv_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
                  SL_Qr = c("SL.glm", "SL.gam", "SL.mean"), 
                  stratify = FALSE, a_0 = c(0,1,2), 
                  cvFolds = 2, parallel = TRUE)
+stopCluster(workers)
 pcv_sl_fit
 ```
 
@@ -449,7 +450,7 @@ As with `drtmle`, the `adaptive_iptw` function allows missing data in `A` and `Y
 
 The `drtmle` package was designed to provide a user-friendly implementation of the TMLE algorithm that facilitates doubly-robust inference about marginal means and average treatment effects. While the theory underlying doubly-robust inference is complex, the implementation of the methods only requires users to provide the data and specify how to estimate regressions. While estimation of the OR and PS is familiar to those familiar with causal inference-related estimation, the reduced-dimension regressions may appear strange. Indeed, it is difficult to provide intuition for these parameters and more difficult to determine what scientific background knowledge might guide users in how to estimate these regression parameters. Therefore, we recommended estimating these quantities adaptively, e.g., with the super learner. The super learner library should contain several relatively smooth estimators such as `SL.mean`, `SL.glm`, and `SL.gam`. In particular, including `SL.mean` (an unadjusted generalized linear model) may be important due to the fact that, when the OR and PS are consistently estimated, the reduced-dimension regressions are identically equal to zero. Thus, this unadjusted regression estimator may do a good job estimating the reduced-dimension regressions in situations where the OR and PS are estimated well. In addition to relatively smooth estimators, we recommend additionally including several adaptive estimators such as `SL.npreg` or `SL.earth`. 
 
-Planned extensions of the `drtmle` package include extensions of longitudinal settings involving treatments at multiple time points and inclusion of the collaborative targeted maximum likelihood estimator (CTMLE) of van der Laan (2014) that also facilitates collaborative, doubly-robust inference. 
+Planned extensions of the `drtmle` package include extensions of longitudinal settings involving treatments at multiple time points and inclusion of the collaborative targeted maximum likelihood estimator (CTMLE) of van der Laan (2014) that also facilitates collaborative doubly-robust inference. 
 
 # Session Info
 
