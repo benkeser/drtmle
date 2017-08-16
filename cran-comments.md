@@ -1,6 +1,7 @@
 ## Resubmission 
 This is a resubmission. In this version I have:
-* Added a _correct_ reference and doi in the Description field of the DESCRIPTION file. 
+* Added short examples to all exported functions. All examples run locally in under 5 seconds. 
+
 
 ## Test environments
 * local macOS / OS X install, R 3.4.1

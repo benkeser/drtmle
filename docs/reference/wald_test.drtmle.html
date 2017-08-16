@@ -158,18 +158,18 @@ confidence intervals of the specified level.</p>
 <span class='fu'>library</span>(<span class='no'>SuperLearner</span>)
 <span class='co'># simulate data</span>
 <span class='fu'>set.seed</span>(<span class='fl'>123456</span>)
-<span class='no'>n</span> <span class='kw'>&lt;-</span> <span class='fl'>200</span>
+<span class='no'>n</span> <span class='kw'>&lt;-</span> <span class='fl'>100</span>
 <span class='no'>W</span> <span class='kw'>&lt;-</span> <span class='fu'>data.frame</span>(<span class='kw'>W1</span> <span class='kw'>=</span> <span class='fu'>runif</span>(<span class='no'>n</span>), <span class='kw'>W2</span> <span class='kw'>=</span> <span class='fu'>rnorm</span>(<span class='no'>n</span>))
 <span class='no'>A</span> <span class='kw'>&lt;-</span> <span class='fu'>rbinom</span>(<span class='no'>n</span>,<span class='fl'>1</span>,<span class='fu'>plogis</span>(<span class='no'>W</span>$<span class='no'>W1</span> - <span class='no'>W</span>$<span class='no'>W2</span>))
 <span class='no'>Y</span> <span class='kw'>&lt;-</span> <span class='fu'>rbinom</span>(<span class='no'>n</span>, <span class='fl'>1</span>, <span class='fu'>plogis</span>(<span class='no'>W</span>$<span class='no'>W1</span>*<span class='no'>W</span>$<span class='no'>W2</span>*<span class='no'>A</span>))
-<span class='co'># fit drtmle</span>
+<span class='co'># fit drtmle with maxIter = 1 so runs fast</span>
 <span class='no'>fit1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='drtmle.html'>drtmle</a></span>(<span class='kw'>W</span> <span class='kw'>=</span> <span class='no'>W</span>, <span class='kw'>A</span> <span class='kw'>=</span> <span class='no'>A</span>, <span class='kw'>Y</span> <span class='kw'>=</span> <span class='no'>Y</span>, <span class='kw'>a_0</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>1</span>,<span class='fl'>0</span>),
             <span class='kw'>family</span><span class='kw'>=</span><span class='fu'>binomial</span>(),
             <span class='kw'>stratify</span><span class='kw'>=</span><span class='fl'>FALSE</span>,
-            <span class='kw'>SL_Q</span><span class='kw'>=</span><span class='fu'>c</span>(<span class='st'>"SL.glm"</span>,<span class='st'>"SL.mean"</span>,<span class='st'>"SL.step"</span>),
-            <span class='kw'>SL_g</span><span class='kw'>=</span><span class='fu'>c</span>(<span class='st'>"SL.glm"</span>,<span class='st'>"SL.mean"</span>,<span class='st'>"SL.step"</span>),
-            <span class='kw'>SL_Qr</span><span class='kw'>=</span><span class='st'>"SL.npreg"</span>,
-            <span class='kw'>SL_gr</span><span class='kw'>=</span><span class='st'>"SL.npreg"</span>)
+            <span class='kw'>SL_Q</span><span class='kw'>=</span><span class='fu'>c</span>(<span class='st'>"SL.glm"</span>,<span class='st'>"SL.mean"</span>,<span class='st'>"SL.glm.interaction"</span>),
+            <span class='kw'>SL_g</span><span class='kw'>=</span><span class='fu'>c</span>(<span class='st'>"SL.glm"</span>,<span class='st'>"SL.mean"</span>,<span class='st'>"SL.glm.interaction"</span>),
+            <span class='kw'>SL_Qr</span><span class='kw'>=</span><span class='st'>"SL.glm"</span>,
+            <span class='kw'>SL_gr</span><span class='kw'>=</span><span class='st'>"SL.glm"</span>, <span class='kw'>maxIter</span> <span class='kw'>=</span> <span class='fl'>1</span>)
 <span class='co'># get hypothesis test that each mean = 0.5</span>
 <span class='no'>test_mean</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='wald_test.html'>wald_test</a></span>(<span class='no'>fit1</span>, <span class='kw'>null</span> <span class='kw'>=</span> <span class='fl'>0.5</span>)
 
@@ -181,7 +181,7 @@ confidence intervals of the specified level.</p>
                    <span class='kw'>f_inv</span> <span class='kw'>=</span> <span class='kw'>function</span>(<span class='no'>eff</span>){ <span class='fu'>exp</span>(<span class='no'>eff</span>) },
                    <span class='kw'>h</span> <span class='kw'>=</span> <span class='kw'>function</span>(<span class='no'>est</span>){ <span class='no'>est</span>[<span class='fl'>1</span>]/<span class='no'>est</span>[<span class='fl'>2</span>] },
                    <span class='kw'>fh_grad</span> <span class='kw'>=</span>  <span class='kw'>function</span>(<span class='no'>est</span>){ <span class='fu'>c</span>(<span class='fl'>1</span>/<span class='no'>est</span>[<span class='fl'>1</span>],-<span class='fl'>1</span>/<span class='no'>est</span>[<span class='fl'>2</span>]) })
-<span class='no'>ci_RR</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ci.html'>ci</a></span>(<span class='no'>fit1</span>, <span class='kw'>contrast</span> <span class='kw'>=</span> <span class='no'>myContrast</span>, <span class='kw'>null</span> <span class='kw'>=</span> <span class='fl'>1</span>)</div></pre>
+<span class='no'>test_RR</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='wald_test.html'>wald_test</a></span>(<span class='no'>fit1</span>, <span class='kw'>contrast</span> <span class='kw'>=</span> <span class='no'>myContrast</span>, <span class='kw'>null</span> <span class='kw'>=</span> <span class='fl'>1</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

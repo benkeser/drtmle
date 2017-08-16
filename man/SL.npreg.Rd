@@ -4,7 +4,8 @@
 \alias{SL.npreg}
 \title{Super learner wrapper for kernel regression}
 \usage{
-SL.npreg(Y, X, newX, family, obsWeights, rangeThresh = 1e-07, ...)
+SL.npreg(Y, X, newX, family = gaussian(), obsWeights = rep(1, length(Y)),
+  rangeThresh = 1e-07, ...)
 }
 \arguments{
 \item{Y}{A vector of outcomes.}
@@ -26,4 +27,13 @@ returns the empirical average of the outcomes. Used for computational expediency
 Kernel regression based on the \href{https://CRAN.R-project.org/package=np}{np}
 package. Uses leave-one-out cross-validation to fit a kernel regression. 
 See \code{?npreg} for more details.
+}
+\examples{
+# simulate data
+set.seed(1234)
+n <- 100
+X <- data.frame(X1 = rnorm(n))
+Y <- X$X1 + rnorm(n)
+# fit npreg
+fit <- SL.npreg(Y = Y, X = X, newX = X)
 }

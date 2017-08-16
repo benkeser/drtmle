@@ -155,11 +155,11 @@ confidence intervals of the specified level.</p>
 <span class='fu'>library</span>(<span class='no'>SuperLearner</span>)
 <span class='co'># simulate data</span>
 <span class='fu'>set.seed</span>(<span class='fl'>123456</span>)
-<span class='no'>n</span> <span class='kw'>&lt;-</span> <span class='fl'>150</span>
+<span class='no'>n</span> <span class='kw'>&lt;-</span> <span class='fl'>100</span>
 <span class='no'>W</span> <span class='kw'>&lt;-</span> <span class='fu'>data.frame</span>(<span class='kw'>W1</span> <span class='kw'>=</span> <span class='fu'>runif</span>(<span class='no'>n</span>), <span class='kw'>W2</span> <span class='kw'>=</span> <span class='fu'>rnorm</span>(<span class='no'>n</span>))
 <span class='no'>A</span> <span class='kw'>&lt;-</span> <span class='fu'>rbinom</span>(<span class='no'>n</span>,<span class='fl'>1</span>,<span class='fu'>plogis</span>(<span class='no'>W</span>$<span class='no'>W1</span> - <span class='no'>W</span>$<span class='no'>W2</span>))
 <span class='no'>Y</span> <span class='kw'>&lt;-</span> <span class='fu'>rbinom</span>(<span class='no'>n</span>, <span class='fl'>1</span>, <span class='fu'>plogis</span>(<span class='no'>W</span>$<span class='no'>W1</span>*<span class='no'>W</span>$<span class='no'>W2</span>*<span class='no'>A</span>))
-<span class='co'># fit drtmle</span>
+<span class='co'># fit drtmle with maxIter = 1 to run fast</span>
 <span class='no'>fit1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='drtmle.html'>drtmle</a></span>(<span class='kw'>W</span> <span class='kw'>=</span> <span class='no'>W</span>, <span class='kw'>A</span> <span class='kw'>=</span> <span class='no'>A</span>, <span class='kw'>Y</span> <span class='kw'>=</span> <span class='no'>Y</span>, <span class='kw'>a_0</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>1</span>,<span class='fl'>0</span>),
             <span class='kw'>family</span><span class='kw'>=</span><span class='fu'>binomial</span>(),
             <span class='kw'>stratify</span><span class='kw'>=</span><span class='fl'>FALSE</span>,

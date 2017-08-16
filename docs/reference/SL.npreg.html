@@ -99,7 +99,8 @@ package. Uses leave-one-out cross-validation to fit a kernel regression.
 See <code>?npreg</code> for more details.</p>
     
 
-    <pre class="usage"><span class='fu'>SL.npreg</span>(<span class='no'>Y</span>, <span class='no'>X</span>, <span class='no'>newX</span>, <span class='no'>family</span>, <span class='no'>obsWeights</span>, <span class='kw'>rangeThresh</span> <span class='kw'>=</span> <span class='fl'>1e-07</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>SL.npreg</span>(<span class='no'>Y</span>, <span class='no'>X</span>, <span class='no'>newX</span>, <span class='kw'>family</span> <span class='kw'>=</span> <span class='fu'>gaussian</span>(), <span class='kw'>obsWeights</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>, <span class='fu'>length</span>(<span class='no'>Y</span>)),
+  <span class='kw'>rangeThresh</span> <span class='kw'>=</span> <span class='fl'>1e-07</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
@@ -136,12 +137,22 @@ returns the empirical average of the outcomes. Used for computational expediency
     </table>
     
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='co'># simulate data</span>
+<span class='fu'>set.seed</span>(<span class='fl'>1234</span>)
+<span class='no'>n</span> <span class='kw'>&lt;-</span> <span class='fl'>100</span>
+<span class='no'>X</span> <span class='kw'>&lt;-</span> <span class='fu'>data.frame</span>(<span class='kw'>X1</span> <span class='kw'>=</span> <span class='fu'>rnorm</span>(<span class='no'>n</span>))
+<span class='no'>Y</span> <span class='kw'>&lt;-</span> <span class='no'>X</span>$<span class='no'>X1</span> + <span class='fu'>rnorm</span>(<span class='no'>n</span>)
+<span class='co'># fit npreg</span>
+<span class='no'>fit</span> <span class='kw'>&lt;-</span> <span class='fu'>SL.npreg</span>(<span class='kw'>Y</span> <span class='kw'>=</span> <span class='no'>Y</span>, <span class='kw'>X</span> <span class='kw'>=</span> <span class='no'>X</span>, <span class='kw'>newX</span> <span class='kw'>=</span> <span class='no'>X</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-                </ul>
+            
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
   </div>
 </div>

@@ -48,11 +48,11 @@ Confidence intervals for drtmle objects
 library(SuperLearner)
 # simulate data
 set.seed(123456)
-n <- 150
+n <- 100
 W <- data.frame(W1 = runif(n), W2 = rnorm(n))
 A <- rbinom(n,1,plogis(W$W1 - W$W2))
 Y <- rbinom(n, 1, plogis(W$W1*W$W2*A))
-# fit drtmle
+# fit drtmle with maxIter = 1 to run fast
 fit1 <- drtmle(W = W, A = A, Y = Y, a_0 = c(1,0),
             family=binomial(),
             stratify=FALSE,
