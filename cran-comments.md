@@ -1,6 +1,6 @@
 ## Resubmission 
 This is a resubmission. In this version I have:
-* Added a reference and doi in the Description field of the DESCRIPTION file. 
+* Added a _correct_ reference and doi in the Description field of the DESCRIPTION file. 
 
 ## Test environments
 * local macOS / OS X install, R 3.4.1
