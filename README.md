@@ -22,9 +22,17 @@ The package additionally includes methods for computing valid confidence interva
 Installation
 ------------
 
--   Install the most recent *stable release*: `devtools::install_github("benkeser/drtmle")`
+Install the current stable release from [CRAN](https://cran.r-project.org/) via
 
--   To contribute, install the *development version*: `devtools::install_github("benkeser/drtmle", ref = "develop")`
+``` r
+install.packages("drtmle")
+```
+
+A developmental release may be installed from GitHub via [`devtools`](https://www.rstudio.com/products/rpackages/devtools/) with:
+
+``` r
+devtools::install_github("benkeser/drtmle")
+```
 
 ------------------------------------------------------------------------
 
