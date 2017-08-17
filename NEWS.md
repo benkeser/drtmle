@@ -1,3 +1,7 @@
+August 17, 2017
+* Version 1.0.0 released on CRAN.
+* Version 1.0.0.9000 released on GitHub.
+
 August 15, 2017:
 * Version 1.0.0 ready for CRAN release. 
 
