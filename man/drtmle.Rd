@@ -11,7 +11,8 @@ drtmle(Y, A, W, DeltaA = as.numeric(!is.na(A)),
   SL_gr = NULL, glm_Q = NULL, glm_g = NULL, glm_Qr = NULL,
   glm_gr = NULL, guard = c("Q", "g"), reduction = "univariate",
   returnModels = FALSE, cvFolds = 1, maxIter = 3, tolIC = 1/length(Y),
-  tolg = 0.01, verbose = FALSE, Qsteps = 2, parallel = FALSE, ...)
+  tolg = 0.01, verbose = FALSE, Qsteps = 2, parallel = FALSE,
+  Qn = NULL, gn = NULL, ...)
 }
 \arguments{
 \item{Y}{numeric of continuous or binary outcomes.}
@@ -114,6 +115,22 @@ more stable in simulations and is the default.}
 \item{parallel}{A boolean indicating whether to use \code{foreach}
 to estimate nuisance parameters in parallel. Only useful if there is a 
 registered parallel backend and \code{cvFolds > 1}.}
+
+\item{Qn}{An optional list of outcome regression estimates. If specified, 
+the function will ignore the nuisance parameter estimation specified by 
+\code{SL_Q} and \code{glm_Q}. The entries in the list should correspond to 
+the outcome regression evaluated at \code{A} and the observed values of \code{W},
+with order determined by the input to \code{a_0} (e.g., if \code{a_0 = c(0,1)} then
+\code{Qn[[1]]} should be outcome regression at \code{A} = 0 and \code{Qn[[2]]} should
+be outcome regression at \code{A} = 1).}
+
+\item{gn}{An optional list of propensity score estimates. If specified, 
+the function will ignore the nuisance parameter estimation specified by 
+\code{SL_g} and \code{glm_g}. The entries in the list should correspond to 
+the propensity for the observed values of \code{W},
+with order determined by the input to \code{a_0} (e.g., if \code{a_0 = c(0,1)} then
+\code{gn[[1]]} should be propensity of \code{A} = 0 and \code{Qn[[2]]} should
+be propensity of \code{A} = 1).}
 
 \item{...}{Other options (not currently used).}
 }

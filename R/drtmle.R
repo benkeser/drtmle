@@ -77,6 +77,20 @@ globalVariables(c("v", "%dopar%"))
 #' @param parallel A boolean indicating whether to use \code{foreach}
 #' to estimate nuisance parameters in parallel. Only useful if there is a 
 #' registered parallel backend and \code{cvFolds > 1}.
+#' @param Qn An optional list of outcome regression estimates. If specified, 
+#' the function will ignore the nuisance parameter estimation specified by 
+#' \code{SL_Q} and \code{glm_Q}. The entries in the list should correspond to 
+#' the outcome regression evaluated at \code{A} and the observed values of \code{W},
+#' with order determined by the input to \code{a_0} (e.g., if \code{a_0 = c(0,1)} then
+#' \code{Qn[[1]]} should be outcome regression at \code{A} = 0 and \code{Qn[[2]]} should
+#' be outcome regression at \code{A} = 1). 
+#' @param gn An optional list of propensity score estimates. If specified, 
+#' the function will ignore the nuisance parameter estimation specified by 
+#' \code{SL_g} and \code{glm_g}. The entries in the list should correspond to 
+#' the propensity for the observed values of \code{W},
+#' with order determined by the input to \code{a_0} (e.g., if \code{a_0 = c(0,1)} then
+#' \code{gn[[1]]} should be propensity of \code{A} = 0 and \code{Qn[[2]]} should
+#' be propensity of \code{A} = 1). 
 #' @param ... Other options (not currently used).
 #' 
 #' @return An object of class \code{"drtmle"}.
@@ -168,6 +182,8 @@ drtmle <- function(Y, A, W,
                    verbose = FALSE,
                    Qsteps = 2,
                    parallel = FALSE,
+                   Qn = NULL,
+                   gn = NULL,
                    ...){
   call <- match.call()
   # if cvFolds non-null split data into cvFolds pieces
@@ -180,62 +196,64 @@ drtmle <- function(Y, A, W,
   #-------------------------------
   # estimate propensity score
   #-------------------------------
-  if(!parallel){
-    gnOut <- lapply(X = validRows, FUN = estimateG,
-                    A = A, W = W, DeltaA = DeltaA, DeltaY = DeltaY,
-                    tolg = tolg, verbose = verbose, stratify = stratify,
-                    returnModels = returnModels, SL_g = SL_g,
-                    glm_g = glm_g, a_0 = a_0)
-  }else{
-    gnOut <- foreach::foreach(v = 1:cvFolds, .packages = "SuperLearner") %dopar% 
-    {
-      estimateG(A = A, W = W, DeltaA = DeltaA, DeltaY = DeltaY, 
-                tolg = tolg, verbose = verbose, stratify = stratify,
-                returnModels = returnModels, SL_g = SL_g,
-                glm_g = glm_g, a_0 = a_0, validRows = validRows[[v]])
+  if(is.null(gn)){
+    if(!parallel){
+      gnOut <- lapply(X = validRows, FUN = estimateG,
+                      A = A, W = W, DeltaA = DeltaA, DeltaY = DeltaY,
+                      tolg = tolg, verbose = verbose, stratify = stratify,
+                      returnModels = returnModels, SL_g = SL_g,
+                      glm_g = glm_g, a_0 = a_0)
+    }else{
+      gnOut <- foreach::foreach(v = 1:cvFolds, .packages = "SuperLearner") %dopar% 
+      {
+        estimateG(A = A, W = W, DeltaA = DeltaA, DeltaY = DeltaY, 
+                  tolg = tolg, verbose = verbose, stratify = stratify,
+                  returnModels = returnModels, SL_g = SL_g,
+                  glm_g = glm_g, a_0 = a_0, validRows = validRows[[v]])
+      }
     }
-  }
 
-  # # re-order predictions
-  gnValid <- unlist(gnOut, recursive = FALSE, use.names = FALSE)
-  gnUnOrd <- do.call(Map, c(c, gnValid[seq(1, length(gnValid), 2)]))
-  gn <- vector(mode = "list", length = length(a_0))
-  for(i in 1:length(a_0)){
-    gn[[i]] <- rep(NA, n)
-    gn[[i]][unlist(validRows)] <- gnUnOrd[[i]]
+    # # re-order predictions
+    gnValid <- unlist(gnOut, recursive = FALSE, use.names = FALSE)
+    gnUnOrd <- do.call(Map, c(c, gnValid[seq(1, length(gnValid), 2)]))
+    gn <- vector(mode = "list", length = length(a_0))
+    for(i in 1:length(a_0)){
+      gn[[i]] <- rep(NA, n)
+      gn[[i]][unlist(validRows)] <- gnUnOrd[[i]]
+    }
+    # obtain list of propensity score fits
+    gnMod <- gnValid[seq(2, length(gnValid), 2)]
   }
-  # obtain list of propensity score fits
-  gnMod <- gnValid[seq(2, length(gnValid), 2)]
-
   #-------------------------------
   # estimate outcome regression
   #-------------------------------
-  if(!parallel){
-    QnOut <- lapply(X = validRows, FUN = estimateQ,
-                    Y = Y, A = A, W = W, DeltaA = DeltaA, DeltaY = DeltaY,
-                    verbose = verbose, returnModels = returnModels, 
-                    SL_Q = SL_Q, a_0 = a_0, stratify = stratify, 
-                    glm_Q = glm_Q, family = family)
-  }else{
-    QnOut <- foreach::foreach(v = 1:cvFolds, .packages = "SuperLearner") %dopar% 
-    {
-      estimateQ(Y = Y, A = A, W = W, DeltaA = DeltaA, DeltaY = DeltaY,
-                verbose = verbose, returnModels = returnModels, 
-                SL_Q = SL_Q, a_0 = a_0, glm_Q = glm_Q, family = family, 
-                stratify = stratify, validRows = validRows[[v]])
+  if(is.null(Qn)){
+    if(!parallel){
+      QnOut <- lapply(X = validRows, FUN = estimateQ,
+                      Y = Y, A = A, W = W, DeltaA = DeltaA, DeltaY = DeltaY,
+                      verbose = verbose, returnModels = returnModels, 
+                      SL_Q = SL_Q, a_0 = a_0, stratify = stratify, 
+                      glm_Q = glm_Q, family = family)
+    }else{
+      QnOut <- foreach::foreach(v = 1:cvFolds, .packages = "SuperLearner") %dopar% 
+      {
+        estimateQ(Y = Y, A = A, W = W, DeltaA = DeltaA, DeltaY = DeltaY,
+                  verbose = verbose, returnModels = returnModels, 
+                  SL_Q = SL_Q, a_0 = a_0, glm_Q = glm_Q, family = family, 
+                  stratify = stratify, validRows = validRows[[v]])
+      }
     }
+    # re-order predictions
+    QnValid <- unlist(QnOut, recursive = FALSE, use.names = FALSE)
+    QnUnOrd <- do.call(Map, c(c, QnValid[seq(1,length(QnValid),2)]))
+    Qn <- vector(mode = "list", length = length(a_0))
+    for(i in 1:length(a_0)){
+      Qn[[i]] <- rep(NA, n)
+      Qn[[i]][unlist(validRows)] <- QnUnOrd[[i]]
+    }
+    # obtain list of outcome regression fits
+    QnMod <- QnValid[seq(2,length(QnValid),2)]
   }
-  # re-order predictions
-  QnValid <- unlist(QnOut, recursive = FALSE, use.names = FALSE)
-  QnUnOrd <- do.call(Map, c(c, QnValid[seq(1,length(QnValid),2)]))
-  Qn <- vector(mode = "list", length = length(a_0))
-  for(i in 1:length(a_0)){
-    Qn[[i]] <- rep(NA, n)
-    Qn[[i]][unlist(validRows)] <- QnUnOrd[[i]]
-  }
-  # obtain list of outcome regression fits
-  QnMod <- QnValid[seq(2,length(QnValid),2)]
-  
   # naive g-computation estimate
   psi_n <- lapply(Qn, mean)
   
