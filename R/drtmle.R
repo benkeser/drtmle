@@ -194,8 +194,8 @@ drtmle <- function(Y, A, W,
     stopifnot(length(cvFolds) == length(Y))
     # comes in as vector of fold assignments
     # split up into a list of id's
-    validRows <- sapply(sort(unique(validRows)), function(f){ 
-      which(validRows == f) 
+    validRows <- sapply(sort(unique(folds)), function(f){ 
+      which(folds == f) 
     })
   }else if(cvFolds!=1){
     # split data up
