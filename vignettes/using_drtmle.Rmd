@@ -9,7 +9,28 @@ author: |
     | benkeser@emory.edu
 title: '`drtmle`: Doubly-Robust Inference in R'
 abstract: >
-  Inverse probability of treatment weighted estimators and doubly-robust estimators (including augmented inverse probability of treatment weight and targeted minimum loss-based estimators) are widely used in causal inference to estimate and draw inference about the average effect of a treatment. As an intermediate step, these estimators require estimation of key nuisance parameters, which are often regression functions. Typically, regressions are estimated using maximum likelihood and parametric models. Confidence intervals and p-values may be computed based on standard asymptotic results, such as the central limit theorem and the delta method. However, in high-dimensional settings maximum likelihood estimation often breaks down and standard procedures no longer yield correct inference. Instead, we may rely on adaptive estimators of nuisance parameters to construct flexible regression estimators. However, use of adaptive estimators poses a challenge for performing statistical inference about an estimated treatment effect. While doubly-robust estimators facilitate inference when *all* relevant regression functions are consistently estimated, the same cannot be said when at least one estimator is inconsistent. `drtmle` is a recently developed R package that implements doubly-robust confidence intervals and hypothesis tests about targeted minimum loss-based estimates of the average treatment effect. The package additionally implements an inverse probability of treatment weighted estimator that yields valid inference even when the probability of treatment is estimated via adaptive methods.
+  Inverse probability of treatment weighted estimators and doubly-robust
+  estimators (including augmented inverse probability of treatment weight and
+  targeted minimum loss-based estimators) are widely used in causal inference to
+  estimate and draw inference about the average effect of a treatment. As an
+  intermediate step, these estimators require estimation of key nuisance
+  parameters, which are often regression functions. Typically, regressions are
+  estimated using maximum likelihood and parametric models. Confidence intervals
+  and p-values may be computed based on standard asymptotic results, such as the
+  central limit theorem and the delta method. However, in high-dimensional
+  settings maximum likelihood estimation often breaks down and standard
+  procedures no longer yield correct inference. Instead, we may rely on adaptive
+  estimators of nuisance parameters to construct flexible regression estimators.
+  However, use of adaptive estimators poses a challenge for performing
+  statistical inference about an estimated treatment effect. While doubly-robust
+  estimators facilitate inference when *all* relevant regression functions are
+  consistently estimated, the same cannot be said when at least one estimator is
+  inconsistent. `drtmle` is a recently developed R package that implements
+  doubly-robust confidence intervals and hypothesis tests about targeted minimum
+  loss-based estimates of the average treatment effect. The package additionally
+  implements an inverse probability of treatment weighted estimator that yields
+  valid inference even when the probability of treatment is estimated via
+  adaptive methods.
 preamble: >
   \usepackage{amsmath}
 # documentclass: jss
@@ -404,45 +425,70 @@ continue with the multi-level treatment example.
 
 ```{r, cache = TRUE}
 cv_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
-                 SL_g = c("SL.glm", "SL.glm.interaction", "SL.gam"),
-                 SL_Q = c("SL.glm", "SL.glm.interaction", "SL.gam"),
-                 SL_gr = c("SL.glm", "SL.gam", "SL.mean"),
-                 SL_Qr = c("SL.glm", "SL.gam", "SL.mean"),
-                 stratify = FALSE, cvFolds = 2, a_0 = c(0,1,2))
+                    SL_g = c("SL.glm", "SL.glm.interaction", "SL.gam"),
+                    SL_Q = c("SL.glm", "SL.glm.interaction", "SL.gam"),
+                    SL_gr = c("SL.glm", "SL.gam", "SL.mean"),
+                    SL_Qr = c("SL.glm", "SL.gam", "SL.mean"),
+                    stratify = FALSE, cvFolds = 2, a_0 = c(0, 1, 2))
 cv_sl_fit
 ```
 
 Cross-validation may significantly increase the computation time necessary for
 running `drtmle`. Parallelized regression fitting is available by setting the
-option `parallel = TRUE`, which allows for use of the `foreach` package
-[@foreachPackage], alongside the `future` and `doFuture` packages [], to
-parallelize the estimation of the OR, PS, and reduced-dimension regressions. The
-function `foreach` assumes that a parallel back-end is registered before running
-`drtmle`. The appropriate back-end is system-specific, but below we demonstrate
-registration with a back-end based on the `doParallel` [@doParallelPackage] and
-`snow` packages [@snowPackage].
+option `parallel = TRUE`. Since, internally, all computations are carried out
+using futures (with the API provided by the "future" R package), setting this
+option amounts only to parallelizing with futures across a standard foreach loop
+structure, which is accomplished by combining the `foreach`, `future`, and
+`doFuture` R packages [@foreachPackage, @futurePackage, @dofuturePackage].
+Selecting this option results in parallelization of the estimation of the OR,
+PS, and reduced-dimension regressions.
+
+If no adjustments are made prior to invoking the `drtmle` function, futures are
+computed using the `multiprocess` option, which performs computations in forked
+R processes (if the OS allows -- i.e., non-Windows systems) or spawns and uses
+background R sessions on the current machine. The setup also allows users to
+specify appropriate system-specific back-ends that may better suit their problem
+using the `future.batchtools` package [@futurebatchtoolsPackage]. Below we
+demonstrate registration using an ad-hoc cluster on the local system. The choice
+of back-end is completely flexible, and submission of the job to a wide variety
+of schedulers (e.g., SLURM, TORQUE, etc.) is also permitted; interested readers
+are invited to consult the documentation of the `future.batchtools` package for
+further information.
 
 ```{r, cache = TRUE, message = FALSE}
-library(doParallel)
-workers <- makeCluster(2, type="SOCK")
-registerDoParallel(workers)
+library(parallel)
+library(future.batchtools)
+cl <- makeCluster(2, type = "SOCK")
+plan(cluster, workers = cl)
 pcv_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
-                 SL_g = c("SL.glm", "SL.glm.interaction","SL.gam"), 
-                 SL_Q = c("SL.glm", "SL.glm.interaction","SL.gam"), 
-                 SL_gr = c("SL.glm", "SL.gam", "SL.mean"),
-                 SL_Qr = c("SL.glm", "SL.gam", "SL.mean"), 
-                 stratify = FALSE, a_0 = c(0,1,2), 
-                 cvFolds = 2, parallel = TRUE)
-stopCluster(workers)
+                     SL_g = c("SL.glm", "SL.glm.interaction","SL.gam"),
+                     SL_Q = c("SL.glm", "SL.glm.interaction","SL.gam"),
+                     SL_gr = c("SL.glm", "SL.gam", "SL.mean"),
+                     SL_Qr = c("SL.glm", "SL.gam", "SL.mean"),
+                     stratify = FALSE, a_0 = c(0,1,2),
+                     cvFolds = 2, parallel = TRUE)
 pcv_sl_fit
 ```
 
 # Inference for IPTW using adaptive PS estimators \section{inference_iptw}
 
-Doubly-robust estimators of marginal means are appealing in their robustness and efficiency properties. However, researchers may prefer the IPTW estimator for its intuitive derivation and implementation. Heretofore, inference for IPTW estimators precluded the use of adaptive estimators of the PS. However, van der Laan (2014) proposed modified IPTW estimators that allow for adaptive PS estimation. Similarly as above, this estimator is based on an additional regression parameter, $\tilde{Q}_{r,0n}(a,w) := E_0\{Y \mid A = a, g_n(W)=g_n(w)\}$, that is the regression of the outcome $Y$ on the estimated propensity amongst observations with $A=a$. The author showed that if $g_n^*(a \mid w)$, an estimator of the propensity for treatment $A=a$, satisfied that $$
-  \frac{1}{n} \sum\limits_{i=1}^n \frac{\tilde{Q}_{r,0}(a,W_i)}{g_n(a \mid W = W_i)} \ \{ I(A_i = a) - g_n(a \mid W = W_i)\} = 0 \ , 
-$$
-then the IPTW estimator based on $g_n^*$ has an asymptotic normal distribution with an estimable variance. van der Laan (2014) proposed a TMLE algorithm that mapped an initial PS estimate into an estimate that satisfies this key equation and variance estimators that can be used to generate Wald-style confidence intervals and hypothesis tests. 
+Doubly-robust estimators of marginal means are appealing in their robustness and
+efficiency properties. However, researchers may prefer the IPTW estimator for
+its intuitive derivation and implementation. Heretofore, inference for IPTW
+estimators precluded the use of adaptive estimators of the PS. However, van der
+Laan (2014) proposed modified IPTW estimators that allow for adaptive PS
+estimation. Similarly as above, this estimator is based on an additional
+regression parameter, $\tilde{Q}_{r,0n}(a,w) := E_0\{Y \mid A = a, g_n(W) =
+g_n(w)\}$, that is the regression of the outcome $Y$ on the estimated propensity
+amongst observations with $A=a$. The author showed that if $g_n^*(a \mid w)$, an
+estimator of the propensity for treatment $A=a$, satisfied that
+$$ \frac{1}{n} \sum\limits_{i=1}^n \frac{\tilde{Q}_{r,0}(a,W_i)}{g_n(a \mid W =
+W_i)} \ \{ I(A_i = a) - g_n(a \mid W = W_i)\} = 0 \ ,$$
+then the IPTW estimator based on $g_n^*$ has an asymptotic normal distribution
+with an estimable variance. In fact, van der Laan (2014) proposed a TMLE
+algorithm that mapped an initial PS estimate into an estimate that satisfies
+this key equation and variance estimators that can be used to generate
+Wald-style confidence intervals and hypothesis tests.
 
 An estimator with equivalent asymptotic properties based on a PS estimate, $g_n(a \mid w)$, can be computed as $$
   \psi_{n,IPTW}(a) = \psi_{n,IPTW}(a) - \frac{1}{n} \sum\limits_{i=1}^n \frac{\tilde{Q}_{r,0}(a,W_i)}{g_n(a \mid W = W_i)} \ \{ I(A_i = a) - g_n(a \mid W = W_i)\} \ . 

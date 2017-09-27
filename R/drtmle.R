@@ -183,8 +183,8 @@ drtmle <- function(Y, A, W,
   if (!parallel) {
     future::plan(future::sequential)
   } else {
+    doFuture::registerDoFuture()
     if (all(c("sequential", "uniprocess") %in% class(future::plan()))) {
-      doFuture::registerDoFuture()
       future::plan(future::multiprocess)
     }
   }
