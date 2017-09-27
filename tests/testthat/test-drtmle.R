@@ -1,7 +1,6 @@
 # install.packages("~/Dropbox/R/drtmle",repos=NULL,type="source")
 library(drtmle)
 library(SuperLearner)
-library(foreach)
 context("Testing drtmle function")
 test_that("drtmle executes as expected with parallel = TRUE", {
 	set.seed(123456)
@@ -14,14 +13,14 @@ test_that("drtmle executes as expected with parallel = TRUE", {
 	# all GLMs + stratify
 	fit1 <- drtmle(W = W, A = A, Y = Y, 
 	               parallel = TRUE, 
-                   family=gaussian(),
-                      stratify=TRUE,
-                      glm_Q="W1 + W2",
-                      glm_g="W1 + W2",
-                      glm_Qr="gn",
-                      glm_gr="Qn",
-                      guard=c("Q","g"),
-                      reduction="univariate")
+                       family=gaussian(),
+                       stratify=TRUE,
+                       glm_Q="W1 + W2",
+                       glm_g="W1 + W2",
+                       glm_Qr="gn",
+                       glm_gr="Qn",
+                       guard=c("Q","g"),
+                       reduction="univariate")
 
 	expect_true(is.numeric(fit1$gcomp$est))
 	expect_true(is.numeric(fit1$tmle$est))
@@ -395,3 +394,4 @@ test_that("drtmle executes as expected with stratify = FALSE", {
 	expect_true(is.numeric(fit9$aiptw_c$cov))
 
 })
+

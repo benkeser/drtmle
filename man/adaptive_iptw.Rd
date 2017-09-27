@@ -76,9 +76,12 @@ propensity score.}
 cross-validated fitting of nuisance parameters. If \code{cvFolds = 1}, no
 cross-validation is used.}
 
-\item{parallel}{A boolean indicating whether to use \code{foreach}
-to estimate nuisance parameters in parallel. Only useful if there is a
-registered parallel backend and \code{cvFolds > 1}.}
+\item{parallel}{A boolean indicating whether to use parallelization based on
+\code{foreach}, \code{future}, and \code{doFuture} to estimate nuisance
+parameters in parallel. Only useful if \code{cvFolds > 1}. By default, a
+\code{multiprocess} evaluation scheme is invoked, using forked R processes
+(if supported on the OS) and background R sessions otherwise. Users may also
+register their own backends using the \code{future.batchtools} package.}
 
 \item{...}{Other options (not currently used).}
 }
