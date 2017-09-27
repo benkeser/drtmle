@@ -24,8 +24,9 @@ Suggests:
     gam,
     quadprog,
     nloptr,
+    future.batchtools,
     parallel,
-    future.batchtools
+    snow
 License: MIT + file LICENSE
 URL: https://github.com/benkeser/drtmle
 BugReports: https://github.com/benkeser/drtmle/issues

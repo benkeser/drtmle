@@ -895,8 +895,9 @@ are invited to consult the documentation of the `future.batchtools` package for
 further information.
 
 ```{r, cache = TRUE, message = FALSE}
-library(parallel)
 library(future.batchtools)
+library(parallel)
+library(snow) # for SOCK-tyep clusters
 cl <- makeCluster(2, type = "SOCK")
 plan(cluster, workers = cl)
 pcv_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
