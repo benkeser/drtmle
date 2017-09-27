@@ -73,7 +73,9 @@ globalVariables(c("v", "%dopar%"))
 #' more stable in simulations and is the default. 
 #' @param cvFolds A numeric equal to the number of folds to be used in 
 #' cross-validated fitting of nuisance parameters. If \code{cvFolds = 1}, no 
-#' cross-validation is used.
+#' cross-validation is used. Alternatively, \code{cvFolds} may be entered as a 
+#' vector of fold assignments for observations, in which case its length should be
+#' the same length as \code{Y}. 
 #' @param parallel A boolean indicating whether to use \code{foreach}
 #' to estimate nuisance parameters in parallel. Only useful if there is a 
 #' registered parallel backend and \code{cvFolds > 1}.
@@ -188,9 +190,18 @@ drtmle <- function(Y, A, W,
   call <- match.call()
   # if cvFolds non-null split data into cvFolds pieces
   n <- length(Y)
-  if(cvFolds!=1){
+  if(length(cvFolds) > 1){
+    stopifnot(length(cvFolds) == length(Y))
+    # comes in as vector of fold assignments
+    # split up into a list of id's
+    validRows <- sapply(sort(unique(validRows)), function(f){ 
+      which(validRows == f) 
+    })
+  }else if(cvFolds!=1){
+    # split data up
     validRows <- split(sample(1:n), rep(1:cvFolds, length = n))       
   }else{
+    # no cross-validation
     validRows <- list(1:n)
   }
   #-------------------------------

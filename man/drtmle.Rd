@@ -93,7 +93,9 @@ and reduced-dimension regressions.}
 
 \item{cvFolds}{A numeric equal to the number of folds to be used in 
 cross-validated fitting of nuisance parameters. If \code{cvFolds = 1}, no 
-cross-validation is used.}
+cross-validation is used. Alternatively, \code{cvFolds} may be entered as a 
+vector of fold assignments for observations, in which case its length should be
+the same length as \code{Y}.}
 
 \item{maxIter}{A numeric that sets the maximum number of iterations the TMLE 
 can perform in its fluctuation step.}
