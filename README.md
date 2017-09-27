@@ -36,22 +36,22 @@ devtools::install_github("benkeser/drtmle")
 
 ------------------------------------------------------------------------
 
-Use
----
+Usage
+-----
 
-### Doubly-robust inference for average treatment effect
+### Doubly-robust inference for the average treatment effect
 
-Suppose the data consist of a vector of baseline covariates (`W`), a multi-level treatment assignment (`A`), and a continuous or binary-valued outcome (`Y`). The function `drtmle` may be used to estimate *E*\[*E*(*Y*|*A* = *a*<sub>0</sub>, *W*)\] for user-selected values of *a*<sub>0</sub> (via option `a_0`). The resulting targeted minimum loss-based estimates are doubly robust with respect to both consistency and asymptotic normality. The function computes doubly robust covariance estimates that can be used to construct doubly robust confidence intervals for marginal means and contrasts between means. A simple example on simulated data is shown below. We refer users to the vignette for more information and further examples.
+Suppose the data consist of a vector of baseline covariates (`W`), a multi-level treatment assignment (`A`), and a continuous or binary-valued outcome (`Y`). The function `drtmle` may be used to estimate *E*\[*E*(*Y* ∣ *A* = *a*<sub>0</sub>, *W*)\] for user-selected values of *a*<sub>0</sub> (via option `a_0`). The resulting targeted minimum loss-based estimates are doubly robust with respect to both consistency and asymptotic normality. The function computes doubly robust covariance estimates that can be used to construct doubly robust confidence intervals for marginal means and contrasts between means. A simple example on simulated data is shown below. We refer users to the vignette for more information and further examples.
 
 ``` r
 # load packages
 library(drtmle, quietly = TRUE)
 #> drtmle: TMLE with doubly robust inference
-#> Version: 0.0.0.9000
+#> Version: 1.0.2
 library(SuperLearner, quietly = TRUE)
 #> Super Learner
-#> Version: 2.0-22
-#> Package created on 2017-07-18
+#> Version: 2.0-23-9000
+#> Package created on 2017-07-20
 
 # simulate simple data structure
 set.seed(1234)
@@ -63,13 +63,13 @@ Y <- rbinom(n, 1, plogis(-2 + W$W1 - 2*W$W2 + A))
 # estimate the covariate-adjusted marginal mean for A = 1 and A = 0
 # here, we do not properly estimate the propensity score
 fit1 <- drtmle(W = W, A = A, Y = Y, # input data
-              a_0 = c(0,1), # return estimates for A = 0 and A = 1
-              SL_Q = "SL.npreg", # use kernel regression for E(Y | A=a, W)
-              glm_g = "W1 + W2", # use misspecified main terms glm for E(A | W)
-              SL_Qr = "SL.npreg", # use kernel regression to guard against
-                                  # misspecification of outcome regression
-              SL_gr = "SL.npreg" # use kernel regression to guard against 
-                                 # misspecification of propensity score
+               a_0 = c(0, 1), # return estimates for A = 0 and A = 1
+               SL_Q = "SL.npreg", # use kernel regression for E(Y | A = a, W)
+               glm_g = "W1 + W2", # use misspecified main terms glm for E(A | W)
+               SL_Qr = "SL.npreg", # use kernel regression to guard against
+                                   # misspecification of outcome regression
+               SL_gr = "SL.npreg" # use kernel regression to guard against
+                                  # misspecification of propensity score
               )
 # print the output
 fit1
@@ -93,7 +93,7 @@ ci_fit1
 #> 1 0.216 0.140 0.291
 
 # get confidence intervals for ate
-ci_ate1 <- ci(fit1,contrast = c(-1,1))
+ci_ate1 <- ci(fit1,contrast = c(-1, 1))
 # print the output
 ci_ate1
 #> $drtmle
@@ -106,10 +106,10 @@ ci_ate1
 The package additionally includes a function for computing valid confidence intervals about an inverse probability of treatment weight (IPTW) estimator when super learning is used to estimate the propensity score.
 
 ``` r
-# fit iptw 
-fit2 <- adaptive_iptw(Y = Y, A = A, W = W, a_0 = c(0,1),
-               SL_g = c("SL.glm","SL.mean","SL.step.interaction"),
-               SL_Qr = "SL.npreg")
+# fit iptw
+fit2 <- adaptive_iptw(Y = Y, A = A, W = W, a_0 = c(0, 1),
+                      SL_g = c("SL.glm", "SL.mean", "SL.step.interaction"),
+                      SL_Qr = "SL.npreg")
 #> Loading required package: nloptr
 # print the output
 fit2
@@ -133,7 +133,7 @@ ci_fit2
 #> 1 0.194 -0.008 0.397
 
 # compute a confidence interval for the ate
-ci_ate2 <- ci(fit2, contrast = c(-1,1))
+ci_ate2 <- ci(fit2, contrast = c(-1, 1))
 # print the output
 ci_ate2
 #> $iptw_tmle
@@ -157,8 +157,10 @@ After using the `drtmle` R package, please cite the following:
 
         @article{benkeser2017improved,
           year  = {2017},
-          author = {Benkeser, David C and Carone, Marco and van der Laan, Mark J and Gilbert, Peter B},
-          title = {Doubly-robust nonparametric inference on the average treatment effect},
+          author = {Benkeser, David C and Carone, Marco and van der Laan, Mark J
+            and Gilbert, Peter B},
+          title = {Doubly-robust nonparametric inference on the average
+            treatment effect},
           journal = {Biometrika}
         }
 
