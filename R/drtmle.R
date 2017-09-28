@@ -67,19 +67,35 @@ globalVariables(c("v"))
 #' propensity score.
 #' @param verbose A boolean indicating whether to print status updates.
 #' @param Qsteps A numeric equal to 1 or 2 indicating whether the fluctuation
-#' submodel for the outcome regression
-#' should be fit using a single minimization (\code{Qsteps = 1}) or a
-#' backfitting-type minimization (\code{Qsteps=2}). The latter was found to be
-#' more stable in simulations and is the default.
+#' submodel for the outcome regression should be fit using a single minimization
+#' (\code{Qsteps = 1}) or a backfitting-type minimization (\code{Qsteps=2}). The
+#' latter was found to be more stable in simulations and is the default.
 #' @param cvFolds A numeric equal to the number of folds to be used in
 #' cross-validated fitting of nuisance parameters. If \code{cvFolds = 1}, no
-#' cross-validation is used.
+#' cross-validation is used. Alternatively, \code{cvFolds} may be entered as a
+#' vector of fold assignments for observations, in which case its length should
+#' be the same length as \code{Y}.
 #' @param parallel A boolean indicating whether to use parallelization based on
 #' \code{foreach}, \code{future}, and \code{doFuture} to estimate nuisance
 #' parameters in parallel. Only useful if \code{cvFolds > 1}. By default, a
 #' \code{multiprocess} evaluation scheme is invoked, using forked R processes
 #' (if supported on the OS) and background R sessions otherwise. Users may also
 #' register their own backends using the \code{future.batchtools} package.
+#' @param Qn An optional list of outcome regression estimates. If specified, the
+#' function will ignore the nuisance parameter estimation specified by
+#' \code{SL_Q} and \code{glm_Q}. The entries in the list should correspond to
+#' the outcome regression evaluated at \code{A} and the observed values of
+#' \code{W}, with order determined by the input to \code{a_0} (e.g., if
+#' \code{a_0 = c(0, 1)} then \code{Qn[[1]]} should be outcome regression at
+#' \code{A} = 0 and \code{Qn[[2]]} should be outcome regression at
+#' \code{A} = 1).
+#' @param gn An optional list of propensity score estimates. If specified, the
+#' function will ignore the nuisance parameter estimation specified by
+#' \code{SL_g} and \code{glm_g}. The entries in the list should correspond to
+#' the propensity for the observed values of \code{W}, with order determined by
+#' the input to \code{a_0} (e.g., if \code{a_0 = c(0,1)} then \code{gn[[1]]}
+#' should be propensity of \code{A} = 0 and \code{Qn[[2]]} should be propensity
+#' of \code{A} = 1).
 #' @param ... Other options (not currently used).
 #'
 #' @return An object of class \code{"drtmle"}.
@@ -145,10 +161,10 @@ globalVariables(c("v"))
 #' fit1 <- drtmle(W = W, A = A, Y = Y, a_0 = c(1,0),
 #'                family=binomial(),
 #'                stratify=FALSE,
-#'                SL_Q=c("SL.glm","SL.mean","SL.glm.interaction"),
-#'                SL_g=c("SL.glm","SL.mean","SL.glm.interaction"),
-#'                SL_Qr="SL.glm",
-#'                SL_gr="SL.glm", maxIter = 1)
+#'                SL_Q = c("SL.glm", "SL.mean", "SL.glm.interaction"),
+#'                SL_g = c("SL.glm", "SL.mean", "SL.glm.interaction"),
+#'                SL_Qr = "SL.glm",
+#'                SL_gr = "SL.glm", maxIter = 1)
 
 drtmle <- function(Y, A, W,
                    DeltaA = as.numeric(!is.na(A)),
@@ -172,13 +188,24 @@ drtmle <- function(Y, A, W,
                    verbose = FALSE,
                    Qsteps = 2,
                    parallel = FALSE,
+                   Qn = NULL,
+                   gn = NULL,
                    ...) {
   call <- match.call()
   # if cvFolds non-null split data into cvFolds pieces
   n <- length(Y)
-  if (cvFolds != 1) {
+  if (length(cvFolds) > 1) {
+    stopifnot(length(cvFolds) == length(Y))
+    # comes in as vector of fold assignments
+    # split up into a list of id's
+    validRows <- sapply(sort(unique(cvFolds)), function(f) {
+      which (cvFolds == f)
+    })
+  } else if (cvFolds != 1) {
+    # split data up
     validRows <- split(sample(seq_len(n)), rep(seq_len(cvFolds), length = n))
   } else {
+    # no cross-validation
     validRows <- list(seq_len(n))
   }
   # use futures with foreach if parallel mode
@@ -193,81 +220,83 @@ drtmle <- function(Y, A, W,
   #-------------------------------
   # estimate propensity score
   #-------------------------------
-  if (!parallel) {
-    gnOut <- future::future_lapply(x = validRows, FUN = estimateG, A = A, W = W,
-                                   DeltaA = DeltaA, DeltaY = DeltaY,
-                                   tolg = tolg, verbose = verbose,
-                                   stratify = stratify,
-                                   returnModels = returnModels, SL_g = SL_g,
-                                   glm_g = glm_g, a_0 = a_0)
-  } else {
-    gnOut <- foreach::foreach(v = seq_len(cvFolds),
-                              .packages = "SuperLearner") %dopar%
-    {
-      estimateG(A = A, W = W, DeltaA = DeltaA, DeltaY = DeltaY,
-                tolg = tolg, verbose = verbose, stratify = stratify,
-                returnModels = returnModels, SL_g = SL_g,
-                glm_g = glm_g, a_0 = a_0, validRows = validRows[[v]])
+  if (is.null(gn)) {
+    if (!parallel) {
+      gnOut <- future::future_lapply(x = validRows, FUN = estimateG, A = A,
+                                     W = W, DeltaA = DeltaA, DeltaY = DeltaY,
+                                     tolg = tolg, verbose = verbose,
+                                     stratify = stratify,
+                                     returnModels = returnModels, SL_g = SL_g,
+                                     glm_g = glm_g, a_0 = a_0)
+    } else {
+      gnOut <- foreach::foreach(v = seq_len(cvFolds),
+                              .packages = "SuperLearner") %dopar% {
+        estimateG(A = A, W = W, DeltaA = DeltaA, DeltaY = DeltaY,
+                  tolg = tolg, verbose = verbose, stratify = stratify,
+                  returnModels = returnModels, SL_g = SL_g,
+                  glm_g = glm_g, a_0 = a_0, validRows = validRows[[v]])
+      }
     }
+    # # re-order predictions
+    gnValid <- unlist(gnOut, recursive = FALSE, use.names = FALSE)
+    gnUnOrd <- do.call(Map, c(c, gnValid[seq(1, length(gnValid), 2)]))
+    gn <- vector(mode = "list", length = length(a_0))
+    for(i in seq_along(a_0)){
+      gn[[i]] <- rep(NA, n)
+      gn[[i]][unlist(validRows)] <- gnUnOrd[[i]]
+    }
+    # obtain list of propensity score fits
+    gnMod <- gnValid[seq(2, length(gnValid), 2)]
   }
-
-  # re-order predictions
-  gnValid <- unlist(gnOut, recursive = FALSE, use.names = FALSE)
-  gnUnOrd <- do.call(Map, c(c, gnValid[seq(1, length(gnValid), 2)]))
-  gn <- vector(mode = "list", length = length(a_0))
-  for (i in seq_along(a_0)) {
-    gn[[i]] <- rep(NA, n)
-    gn[[i]][unlist(validRows)] <- gnUnOrd[[i]]
-  }
-  # obtain list of propensity score fits
-  gnMod <- gnValid[seq(2, length(gnValid), 2)]
-
   #-------------------------------
   # estimate outcome regression
   #-------------------------------
-  if (!parallel) {
-    QnOut <- future::future_lapply(x = validRows, FUN = estimateQ, Y = Y, A = A,
-                                   W = W, DeltaA = DeltaA, DeltaY = DeltaY,
-                                   verbose = verbose,
-                                   returnModels = returnModels,
-                                   SL_Q = SL_Q, a_0 = a_0, stratify = stratify, 
-                                   glm_Q = glm_Q, family = family)
-  } else {
-    QnOut <- foreach::foreach(v = seq_len(cvFolds),
-                              .packages = "SuperLearner") %dopar%
-    {
-      estimateQ(Y = Y, A = A, W = W, DeltaA = DeltaA, DeltaY = DeltaY,
-                verbose = verbose, returnModels = returnModels, 
-                SL_Q = SL_Q, a_0 = a_0, glm_Q = glm_Q, family = family, 
-                stratify = stratify, validRows = validRows[[v]])
+  if (is.null(Qn)) {
+    if (!parallel) {
+      QnOut <- future::future_lapply(x = validRows, FUN = estimateQ,
+                                     Y = Y, A = A, W = W,
+                                     DeltaA = DeltaA, DeltaY = DeltaY,
+                                     verbose = verbose,
+                                     returnModels = returnModels,
+                                     SL_Q = SL_Q, a_0 = a_0,
+                                     stratify = stratify,
+                                     glm_Q = glm_Q,
+                                     family = family)
+    } else {
+      QnOut <- foreach::foreach(v = seq_len(cvFolds),
+                                .packages = "SuperLearner") %dopar% {
+        estimateQ(Y = Y, A = A, W = W, DeltaA = DeltaA, DeltaY = DeltaY,
+                  verbose = verbose, returnModels = returnModels,
+                  SL_Q = SL_Q, a_0 = a_0, glm_Q = glm_Q, family = family,
+                  stratify = stratify, validRows = validRows[[v]])
+      }
     }
+    # re-order predictions
+    QnValid <- unlist(QnOut, recursive = FALSE, use.names = FALSE)
+    QnUnOrd <- do.call(Map, c(c, QnValid[seq(1, length(QnValid), 2)]))
+    Qn <- vector(mode = "list", length = length(a_0))
+    for (i in seq_along(a_0)) {
+      Qn[[i]] <- rep(NA, n)
+      Qn[[i]][unlist(validRows)] <- QnUnOrd[[i]]
+    }
+    # obtain list of outcome regression fits
+    QnMod <- QnValid[seq(2, length(QnValid), 2)]
   }
-  # re-order predictions
-  QnValid <- unlist(QnOut, recursive = FALSE, use.names = FALSE)
-  QnUnOrd <- do.call(Map, c(c, QnValid[seq(1, length(QnValid), 2)]))
-  Qn <- vector(mode = "list", length = length(a_0))
-  for (i in seq_along(a_0)) {
-    Qn[[i]] <- rep(NA, n)
-    Qn[[i]][unlist(validRows)] <- QnUnOrd[[i]]
-  }
-  # obtain list of outcome regression fits
-  QnMod <- QnValid[seq(2, length(QnValid), 2)]
- 
   # naive g-computation estimate
-  psi_n <- lapply(Qn, mean)
- 
+  psi_n <- future::future_lapply(Qn, mean)
+
   # estimate influence function
-  Dno <- eval_Dstar(A = A, Y = Y, DeltaY = DeltaY, DeltaA = DeltaA, 
+  Dno <- eval_Dstar(A = A, Y = Y, DeltaY = DeltaY, DeltaA = DeltaA,
                     Qn = Qn, gn = gn, psi_n = psi_n, a_0 = a_0)
- 
+
   # estimate bias correction
   PnDn <- lapply(Dno, mean)
- 
+
   # additional bias terms
   Dngo <- rep(0, n)
   DnQo <- rep(0, n)
   PnDQn <- PnDgn <- 0
- 
+
   if ("Q" %in% guard) {
     if (!parallel) {
       QrnOut <- future::future_lapply(x = validRows, FUN = estimateQrn,
@@ -277,7 +306,7 @@ drtmle <- function(Y, A, W,
                                       family = stats::gaussian(), SL_Qr = SL_Qr,
                                       a_0 = a_0, returnModels = returnModels)
     } else {
-      QrnOut <- foreach::foreach(v = seq_len(cvFolds), 
+      QrnOut <- foreach::foreach(v = seq_len(cvFolds),
                                  .packages = "SuperLearner") %dopar%
       {
         estimateQrn(Y = Y, A = A, W = W, DeltaA = DeltaA, DeltaY = DeltaY,
@@ -331,31 +360,31 @@ drtmle <- function(Y, A, W,
     grnMod <- grnValid[seq(2, length(grnValid), 2)]
 
     # evaluate extra piece of influence function
-    DnQo <- eval_Dstar_Q(A = A, Y = Y, DeltaY = DeltaY, DeltaA = DeltaA, 
-                         Qn = Qn, grn = grn, gn = gn, a_0 = a_0, 
+    DnQo <- eval_Dstar_Q(A = A, Y = Y, DeltaY = DeltaY, DeltaA = DeltaA,
+                         Qn = Qn, grn = grn, gn = gn, a_0 = a_0,
                          reduction = reduction)
     PnDQn <- future::future_lapply(DnQo, mean)
   }
- 
+
   # one step estimates
-  psi_o1 <- mapply(a = psi_n, b = PnDn, SIMPLIFY = FALSE, 
+  psi_o1 <- mapply(a = psi_n, b = PnDn, SIMPLIFY = FALSE,
                    FUN = function(a, b){ a + b })
   psi_o <- mapply(a = psi_n, b = PnDn, c = PnDQn, d = PnDgn, SIMPLIFY = FALSE,
-                  FUN = function(a, b, c, d){ a + b - c - d }) 
- 
+                  FUN = function(a, b, c, d){ a + b - c - d })
+
   # covariance for one step
   Dno1Mat <- matrix(unlist(Dno), nrow = n, ncol = length(a_0))
-  DnoMat <- matrix(unlist(Dno) - unlist(DnQo) - unlist(Dngo), 
+  DnoMat <- matrix(unlist(Dno) - unlist(DnQo) - unlist(Dngo),
                    nrow = n, ncol = length(a_0))
- 
+
   cov_o1 <- stats::cov(Dno1Mat) / n
   cov_o <- stats::cov(DnoMat) / n
- 
+
   # initialize fluctuations
   QnStar <- Qn
   if ("g" %in% guard) grnStar <- grn
   if ("Q" %in% guard) QrnStar <- Qrn
-  gnStar <- gn; 
+  gnStar <- gn;
   PnDQnStar <- PnDgnStar <- PnDnoStar <- Inf
   eps <- list(Inf)
   ct <- 0
@@ -368,8 +397,8 @@ drtmle <- function(Y, A, W,
     # re-estimate Qrn
     if ("Q" %in% guard) {
       # fluctuate gnStar
-      gnStarOut <- fluctuateG(Y = Y, A = A, W = W, DeltaA = DeltaA, 
-                              DeltaY = DeltaY, a_0 = a_0, tolg = tolg, 
+      gnStarOut <- fluctuateG(Y = Y, A = A, W = W, DeltaA = DeltaA,
+                              DeltaY = DeltaY, a_0 = a_0, tolg = tolg,
                               gn = gnStar, Qrn = QrnStar)
       gnStar <- plyr::llply(gnStarOut, function(x){ unlist(x$est) })
       epsg <- plyr::laply(gnStarOut, function(x){ x$eps })
@@ -468,43 +497,43 @@ drtmle <- function(Y, A, W,
       for (i in seq_along(a_0)) {
         QrnStar[[i]] <- rep(NA, n)
         QrnStar[[i]][unlist(validRows)] <- QrnUnOrd[[i]]
-      } 
+      }
       # obtain list of reduced dimension regression fits
-      QrnMod <- QrnValid[seq(2,length(QrnValid),2)]
+      QrnMod <- QrnValid[seq(2, length(QrnValid), 2)]
     }
 
     # get fluctuation parameters
     eps <- c(epsQ, epsg)
- 
+
     # tmle estimates
     psi_t <- future::future_lapply(QnStar, mean)
 
     # calculate influence functions
-    DnoStar <- eval_Dstar(A = A, Y = Y, DeltaY = DeltaY, DeltaA = DeltaA, 
+    DnoStar <- eval_Dstar(A = A, Y = Y, DeltaY = DeltaY, DeltaA = DeltaA,
                     Qn = QnStar, gn = gnStar, psi_n = psi_t, a_0 = a_0)
     PnDnoStar <- future::future_lapply(DnoStar, mean)
- 
+
     if ("g" %in% guard) {
-      DnQoStar <- eval_Dstar_Q(A = A, Y = Y, DeltaY = DeltaY, 
+      DnQoStar <- eval_Dstar_Q(A = A, Y = Y, DeltaY = DeltaY,
                          DeltaA = DeltaA, Qn = QnStar, grn = grnStar, gn = gn,
                          a_0 = a_0, reduction = reduction)
       PnDQnStar <- future::future_lapply(DnQoStar, mean)
     }
     if ("Q" %in% guard) {
-      DngoStar <- eval_Dstar_g(A = A, DeltaY = DeltaY, DeltaA = DeltaA, 
+      DngoStar <- eval_Dstar_g(A = A, DeltaY = DeltaY, DeltaA = DeltaA,
                                Qrn = QrnStar, gn = gnStar, a_0 = a_0)
       PnDgnStar <- future::future_lapply(DngoStar, mean)
     }
     if (verbose) {
       cat("TMLE Iteration", ct, "=", round(unlist(eps), 5), "\n")
-      cat("Mean of IC       =", round(c(unlist(PnDnoStar), 
-                                        unlist(PnDQnStar), 
+      cat("Mean of IC       =", round(c(unlist(PnDnoStar),
+                                        unlist(PnDQnStar),
                                         unlist(PnDgnStar)), 10),"\n")
     }
   }
- 
+
   # standard tmle fluctuations
-  QnStar1Out <- fluctuateQ1(Y = Y, A = A, W = W, DeltaA = DeltaA, 
+  QnStar1Out <- fluctuateQ1(Y = Y, A = A, W = W, DeltaA = DeltaA,
                             DeltaY = DeltaY, Qn = Qn, gn = gn, a_0 = a_0)
   # could potentially parallelize with future since plyr uses foreach internally
   QnStar1 <- plyr::llply(QnStar1Out, function(x){ unlist(x[[1]]) })
@@ -528,7 +557,7 @@ drtmle <- function(Y, A, W,
   DngoStar <- rep(list(rep(0, n)), length(a_0))
 
   if ("g" %in% guard) {
-    DnQoStar <- eval_Dstar_Q(A = A, Y = Y, DeltaY = DeltaY, 
+    DnQoStar <- eval_Dstar_Q(A = A, Y = Y, DeltaY = DeltaY,
                        DeltaA = DeltaA, Qn = QnStar, grn = grnStar, gn = gn,
                        a_0 = a_0, reduction = reduction)
     PnDQnStar <- future::future_lapply(DnQoStar, mean)
@@ -559,7 +588,7 @@ drtmle <- function(Y, A, W,
               a_0 = a_0, call = call)
 
   # tack on models if requested
-  if(returnModels){
+  if (returnModels) {
     out$QnMod <- QnMod
     out$gnMod <- gnMod
     out$QrnMod <- QrnMod

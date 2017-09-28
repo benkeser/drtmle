@@ -3,6 +3,7 @@ library(drtmle)
 library(SuperLearner)
 context("Testing drtmle function")
 test_that("drtmle executes as expected with parallel = TRUE", {
+  skip_on_os("windows") # Windows doesn't support multicore (esp. Appveyor CI)
 	set.seed(123456)
 	n <- 200
 	W <- data.frame(W1 = runif(n), W2 = rnorm(n))
@@ -11,8 +12,8 @@ test_that("drtmle executes as expected with parallel = TRUE", {
 
 	# univariate reduction with
 	# all GLMs + stratify
-	fit1 <- drtmle(W = W, A = A, Y = Y, 
-	               parallel = TRUE, 
+	fit1 <- drtmle(W = W, A = A, Y = Y,
+	               parallel = TRUE,
                        family=gaussian(),
                        stratify=TRUE,
                        glm_Q="W1 + W2",
@@ -43,7 +44,7 @@ test_that("drtmle executes as expected with stratify = TRUE", {
 
 	# univariate reduction with
 	# all GLMs + stratify
-	fit1 <- drtmle(W = W, A = A, Y = Y, 
+	fit1 <- drtmle(W = W, A = A, Y = Y,
                    family=gaussian(),
                       stratify=TRUE,
                       glm_Q="W1 + W2",
@@ -64,9 +65,9 @@ test_that("drtmle executes as expected with stratify = TRUE", {
 	expect_true(is.numeric(fit1$aiptw_c$est))
 	expect_true(is.numeric(fit1$aiptw_c$cov))
 
-	# bivariate reduction with 
-	# all GLMs + stratify 
-	fit2 <- drtmle(W = W, A = A, Y = Y, 
+	# bivariate reduction with
+	# all GLMs + stratify
+	fit2 <- drtmle(W = W, A = A, Y = Y,
                    family=gaussian(),
                       stratify=TRUE,
                       glm_Q="W1 + W2",
@@ -87,9 +88,9 @@ test_that("drtmle executes as expected with stratify = TRUE", {
 	expect_true(is.numeric(fit2$aiptw_c$est))
 	expect_true(is.numeric(fit2$aiptw_c$cov))
 
-	# univariate reduction with 
+	# univariate reduction with
 	# all SL + stratify
-	fit3 <- drtmle(W = W, A = A, Y = Y, 
+	fit3 <- drtmle(W = W, A = A, Y = Y,
                family=gaussian(),
                   stratify=TRUE,
                   SL_Q=c("SL.glm","SL.step"),
@@ -109,9 +110,9 @@ test_that("drtmle executes as expected with stratify = TRUE", {
 	expect_true(is.numeric(fit3$aiptw_c$est))
 	expect_true(is.numeric(fit3$aiptw_c$cov))
 
-	#bivariate reduction with 
+	#bivariate reduction with
 	# all SL + stratify
-	fit4 <- drtmle(W = W, A = A, Y = Y, 
+	fit4 <- drtmle(W = W, A = A, Y = Y,
            family=gaussian(),
               stratify=TRUE,
               SL_Q=c("SL.glm","SL.step"),
@@ -130,9 +131,9 @@ test_that("drtmle executes as expected with stratify = TRUE", {
 	expect_true(is.numeric(fit4$aiptw$cov))
 	expect_true(is.numeric(fit4$aiptw_c$est))
 	expect_true(is.numeric(fit4$aiptw_c$cov))
-	# bivariate reduction with 
+	# bivariate reduction with
 	# single SL + stratify
-	fit5 <- drtmle(W = W, A = A, Y = Y, 
+	fit5 <- drtmle(W = W, A = A, Y = Y,
            family=gaussian(),
               stratify=TRUE,
               SL_Q="SL.glm",
@@ -151,9 +152,9 @@ test_that("drtmle executes as expected with stratify = TRUE", {
 	expect_true(is.numeric(fit5$aiptw$cov))
 	expect_true(is.numeric(fit5$aiptw_c$est))
 	expect_true(is.numeric(fit5$aiptw_c$cov))
-	# univariate reduction with 
+	# univariate reduction with
 	# single SL + stratify
-	fit6 <- drtmle(W = W, A = A, Y = Y, 
+	fit6 <- drtmle(W = W, A = A, Y = Y,
            family=gaussian(),
               stratify=TRUE,
               SL_Q="SL.glm",
@@ -187,7 +188,7 @@ test_that("drtmle executes as expected with stratify = FALSE", {
 
 	# univariate reduction with
 	# all GLMs + stratify
-	fit1 <- drtmle(W = W, A = A, Y = Y, 
+	fit1 <- drtmle(W = W, A = A, Y = Y,
                    family=gaussian(),
                       stratify=FALSE,
                       glm_Q="W1 + W2",
@@ -208,9 +209,9 @@ test_that("drtmle executes as expected with stratify = FALSE", {
 	expect_true(is.numeric(fit1$aiptw_c$est))
 	expect_true(is.numeric(fit1$aiptw_c$cov))
 
-	# bivariate reduction with 
-	# all GLMs + stratify 
-	fit2 <- drtmle(W = W, A = A, Y = Y, 
+	# bivariate reduction with
+	# all GLMs + stratify
+	fit2 <- drtmle(W = W, A = A, Y = Y,
                    family=gaussian(),
                       stratify=FALSE,
                       glm_Q="W1 + W2",
@@ -231,9 +232,9 @@ test_that("drtmle executes as expected with stratify = FALSE", {
 	expect_true(is.numeric(fit2$aiptw_c$est))
 	expect_true(is.numeric(fit2$aiptw_c$cov))
 
-	# univariate reduction with 
+	# univariate reduction with
 	# all SL + stratify
-	fit3 <- drtmle(W = W, A = A, Y = Y, 
+	fit3 <- drtmle(W = W, A = A, Y = Y,
                family=gaussian(),
                   stratify=FALSE,
                   SL_Q=c("SL.glm","SL.step"),
@@ -253,9 +254,9 @@ test_that("drtmle executes as expected with stratify = FALSE", {
 	expect_true(is.numeric(fit3$aiptw_c$est))
 	expect_true(is.numeric(fit3$aiptw_c$cov))
 
-	#bivariate reduction with 
+	#bivariate reduction with
 	# all SL + stratify
-	fit4 <- drtmle(W = W, A = A, Y = Y, 
+	fit4 <- drtmle(W = W, A = A, Y = Y,
            family=gaussian(),
               stratify=FALSE,
               SL_Q=c("SL.glm","SL.step"),
@@ -274,9 +275,9 @@ test_that("drtmle executes as expected with stratify = FALSE", {
 	expect_true(is.numeric(fit4$aiptw$cov))
 	expect_true(is.numeric(fit4$aiptw_c$est))
 	expect_true(is.numeric(fit4$aiptw_c$cov))
-	# bivariate reduction with 
+	# bivariate reduction with
 	# single SL + stratify
-	fit5 <- drtmle(W = W, A = A, Y = Y, 
+	fit5 <- drtmle(W = W, A = A, Y = Y,
            family=gaussian(),
               stratify=FALSE,
               SL_Q="SL.glm",
@@ -295,9 +296,9 @@ test_that("drtmle executes as expected with stratify = FALSE", {
 	expect_true(is.numeric(fit5$aiptw$cov))
 	expect_true(is.numeric(fit5$aiptw_c$est))
 	expect_true(is.numeric(fit5$aiptw_c$cov))
-	# univariate reduction with 
+	# univariate reduction with
 	# single SL + stratify
-	fit6 <- drtmle(W = W, A = A, Y = Y, 
+	fit6 <- drtmle(W = W, A = A, Y = Y,
            family=gaussian(),
               stratify=FALSE,
               SL_Q="SL.glm",
@@ -317,9 +318,9 @@ test_that("drtmle executes as expected with stratify = FALSE", {
 	expect_true(is.numeric(fit6$aiptw_c$est))
 	expect_true(is.numeric(fit6$aiptw_c$cov))
 
-	# univariate reduction with 
+	# univariate reduction with
 	# single SL + stratify + Qsteps = 1
-	fit7 <- drtmle(W = W, A = A, Y = Y, 
+	fit7 <- drtmle(W = W, A = A, Y = Y,
            family=gaussian(),
               stratify=FALSE,
               SL_Q="SL.glm",
@@ -340,9 +341,9 @@ test_that("drtmle executes as expected with stratify = FALSE", {
 	expect_true(is.numeric(fit7$aiptw_c$est))
 	expect_true(is.numeric(fit7$aiptw_c$cov))
 
-	# bivariate reduction with 
+	# bivariate reduction with
 	# single SL + stratify + Qsteps = 1
-	fit8 <- drtmle(W = W, A = A, Y = Y, 
+	fit8 <- drtmle(W = W, A = A, Y = Y,
            family=gaussian(),
               stratify=FALSE,
               SL_Q="SL.glm",
@@ -364,7 +365,7 @@ test_that("drtmle executes as expected with stratify = FALSE", {
 	expect_true(is.numeric(fit8$aiptw_c$cov))
 
 	# give one a go with family = binomial()
-	# bivariate reduction with 
+	# bivariate reduction with
 	# single SL + stratify + Qsteps = 1
 	set.seed(123456)
 	n <- 200
@@ -372,7 +373,7 @@ test_that("drtmle executes as expected with stratify = FALSE", {
 	A <- rbinom(n,1,plogis(W$W1 - W$W2))
 	Y <- rbinom(n, 1, plogis(W$W1*W$W2*A))
 
-	fit9 <- drtmle(W = W, A = A, Y = Y, 
+	fit9 <- drtmle(W = W, A = A, Y = Y,
            family=binomial(),
               stratify=FALSE,
               SL_Q="SL.glm",
@@ -394,4 +395,3 @@ test_that("drtmle executes as expected with stratify = FALSE", {
 	expect_true(is.numeric(fit9$aiptw_c$cov))
 
 })
-

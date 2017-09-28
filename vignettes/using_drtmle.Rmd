@@ -61,8 +61,8 @@ and to the participant's outcome. In many settings, researchers measure many
 potential confounders, for example using administrative databases or genetic
 sequencing technology. Due to the curse-of-dimensionality, common statistical
 estimation techniques are not feasible for such high-dimensional data without
-restrictive modeling assumptions. When these assumptions are violated, estimates
-of the population-level effect of a treatment may have large bias.
+restrictive modeling assumptions. When these assumptions are violated,
+estimates of the population-level effect of a treatment may have large bias.
 
 This has sparked an interest in using adaptive estimation techniques from the
 machine learning literature to control for high-dimensional confounders when
@@ -115,12 +115,12 @@ implementations with respect to statistical inference. In particular, the
 estimator allows an adaptive estimator of the PS to be used in construction of
 the IPTW estimator, while yielding valid statistical inference about
 population-level effects. Both the TMLE and IPTW estimators implemented in the
-`drtmle` package are capable of estimating  population-level effects for
+`drtmle` package are capable of estimating population-level effects for
 discrete-valued treatments and the package  provides convenient utilities for
 constructing confidence intervals and hypothesis tests about contrasts of the
 mean outcome under different levels of treatment. This document explains some
 of the key concepts underlying doubly-robust inference and  illustrates usage
-of the `drtmle` package.
+of the `drtmle` package. 
 
 # Definition and estimators of the average treatment effect
 
@@ -1003,4 +1003,3 @@ collaborative targeted maximum likelihood estimator (CTMLE) of van der Laan
 ```{r}
 sessionInfo()
 ```
-

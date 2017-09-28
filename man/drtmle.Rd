@@ -11,7 +11,8 @@ drtmle(Y, A, W, DeltaA = as.numeric(!is.na(A)),
   SL_gr = NULL, glm_Q = NULL, glm_g = NULL, glm_Qr = NULL,
   glm_gr = NULL, guard = c("Q", "g"), reduction = "univariate",
   returnModels = FALSE, cvFolds = 1, maxIter = 3, tolIC = 1/length(Y),
-  tolg = 0.01, verbose = FALSE, Qsteps = 2, parallel = FALSE, ...)
+  tolg = 0.01, verbose = FALSE, Qsteps = 2, parallel = FALSE,
+  Qn = NULL, gn = NULL, ...)
 }
 \arguments{
 \item{Y}{numeric of continuous or binary outcomes.}
@@ -92,7 +93,9 @@ and reduced-dimension regressions.}
 
 \item{cvFolds}{A numeric equal to the number of folds to be used in
 cross-validated fitting of nuisance parameters. If \code{cvFolds = 1}, no
-cross-validation is used.}
+cross-validation is used. Alternatively, \code{cvFolds} may be entered as a
+vector of fold assignments for observations, in which case its length should
+be the same length as \code{Y}.}
 
 \item{maxIter}{A numeric that sets the maximum number of iterations the TMLE 
 can perform in its fluctuation step.}
@@ -106,10 +109,9 @@ propensity score.}
 \item{verbose}{A boolean indicating whether to print status updates.}
 
 \item{Qsteps}{A numeric equal to 1 or 2 indicating whether the fluctuation
-submodel for the outcome regression
-should be fit using a single minimization (\code{Qsteps = 1}) or a
-backfitting-type minimization (\code{Qsteps=2}). The latter was found to be
-more stable in simulations and is the default.}
+submodel for the outcome regression should be fit using a single minimization
+(\code{Qsteps = 1}) or a backfitting-type minimization (\code{Qsteps=2}). The
+latter was found to be more stable in simulations and is the default.}
 
 \item{parallel}{A boolean indicating whether to use parallelization based on
 \code{foreach}, \code{future}, and \code{doFuture} to estimate nuisance
@@ -117,6 +119,23 @@ parameters in parallel. Only useful if \code{cvFolds > 1}. By default, a
 \code{multiprocess} evaluation scheme is invoked, using forked R processes
 (if supported on the OS) and background R sessions otherwise. Users may also
 register their own backends using the \code{future.batchtools} package.}
+
+\item{Qn}{An optional list of outcome regression estimates. If specified, the
+function will ignore the nuisance parameter estimation specified by
+\code{SL_Q} and \code{glm_Q}. The entries in the list should correspond to
+the outcome regression evaluated at \code{A} and the observed values of
+\code{W}, with order determined by the input to \code{a_0} (e.g., if
+\code{a_0 = c(0, 1)} then \code{Qn[[1]]} should be outcome regression at
+\code{A} = 0 and \code{Qn[[2]]} should be outcome regression at
+\code{A} = 1).}
+
+\item{gn}{An optional list of propensity score estimates. If specified, the
+function will ignore the nuisance parameter estimation specified by
+\code{SL_g} and \code{glm_g}. The entries in the list should correspond to
+the propensity for the observed values of \code{W}, with order determined by
+the input to \code{a_0} (e.g., if \code{a_0 = c(0,1)} then \code{gn[[1]]}
+should be propensity of \code{A} = 0 and \code{Qn[[2]]} should be propensity
+of \code{A} = 1).}
 
 \item{...}{Other options (not currently used).}
 }
@@ -178,8 +197,8 @@ Y <- rbinom(n, 1, plogis(W$W1*W$W2*A))
 fit1 <- drtmle(W = W, A = A, Y = Y, a_0 = c(1,0),
                family=binomial(),
                stratify=FALSE,
-               SL_Q=c("SL.glm","SL.mean","SL.glm.interaction"),
-               SL_g=c("SL.glm","SL.mean","SL.glm.interaction"),
-               SL_Qr="SL.glm",
-               SL_gr="SL.glm", maxIter = 1)
+               SL_Q = c("SL.glm", "SL.mean", "SL.glm.interaction"),
+               SL_g = c("SL.glm", "SL.mean", "SL.glm.interaction"),
+               SL_Qr = "SL.glm",
+               SL_gr = "SL.glm", maxIter = 1)
 }
