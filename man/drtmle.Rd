@@ -17,164 +17,167 @@ drtmle(Y, A, W, DeltaA = as.numeric(!is.na(A)),
 \arguments{
 \item{Y}{numeric of continuous or binary outcomes.}
 
-\item{A}{A vector of discrete-valued treatment assignment (assumed to be 
+\item{A}{A vector of discrete-valued treatment assignment (assumed to be
 equal to 0 or 1).}
 
 \item{W}{A \code{data.frame} of named covariates.}
 
-\item{DeltaA}{A vector of missing treatment indicator (assumed to be equal to 
+\item{DeltaA}{A vector of missing treatment indicator (assumed to be equal to
 0 if missing 1 if observed).}
 
-\item{DeltaY}{A vector of missing outcome indicator (assumed to be equal to 0 
+\item{DeltaY}{A vector of missing outcome indicator (assumed to be equal to 0
 if missing 1 if observed).}
 
-\item{a_0}{A vector of fixed treatment values at which to return marginal 
+\item{a_0}{A vector of fixed treatment values at which to return marginal
 mean estimates.}
 
-\item{family}{A \code{family} object equal to either \code{binomial()} or 
-\code{gaussian()}, to be passed to the \code{SuperLearner} or \code{glm} 
+\item{family}{A \code{family} object equal to either \code{binomial()} or
+\code{gaussian()}, to be passed to the \code{SuperLearner} or \code{glm}
 function.}
 
-\item{stratify}{A \code{boolean} indicating whether to estimate the outcome 
-regression separately for different values of \code{A} (if \code{TRUE}) or to 
+\item{stratify}{A \code{boolean} indicating whether to estimate the outcome
+regression separately for different values of \code{A} (if \code{TRUE}) or to
 pool across \code{A} (if \code{FALSE}).}
 
-\item{SL_Q}{A vector of characters or a list describing the Super Learner 
-library to be used for the outcome regression. See 
+\item{SL_Q}{A vector of characters or a list describing the Super Learner
+library to be used for the outcome regression. See
 \code{link{SuperLearner::SuperLearner}} for details.}
 
-\item{SL_g}{A vector of characters describing the super learner library to be 
-used for each of the propensity score regressions (\code{DeltaA}, \code{A}, 
-and \code{DeltaY}). To use the same library for each of the regressions (or 
-if there is no missing data in \code{A} nor \code{Y}), a single library may 
-be input. See \code{link{SuperLearner::SuperLearner}} for details on how 
+\item{SL_g}{A vector of characters describing the super learner library to be
+used for each of the propensity score regressions (\code{DeltaA}, \code{A},
+and \code{DeltaY}). To use the same library for each of the regressions (or
+if there is no missing data in \code{A} nor \code{Y}), a single library may
+be input. See \code{link{SuperLearner::SuperLearner}} for details on how
 super learner libraries can be specified.}
 
-\item{SL_Qr}{A vector of characters or a list describing the Super Learner 
+\item{SL_Qr}{A vector of characters or a list describing the Super Learner
 library to be used for the reduced-dimension outcome regression.}
 
-\item{SL_gr}{A vector of characters or a list describing the Super Learner 
+\item{SL_gr}{A vector of characters or a list describing the Super Learner
 library to be used for the second reduced-dimension propensity score.}
 
-\item{glm_Q}{A character describing a formula to be used in the call to 
+\item{glm_Q}{A character describing a formula to be used in the call to
 \code{glm} for the outcome regression. Ignored if \code{SL_Q!=NULL}.}
 
 \item{glm_g}{A list of characters describing the formulas to be used
-for each of the propensity score regressions (\code{DeltaA}, \code{A}, and 
-\code{DeltaY}). To use the same formula for each of the regressions (or if 
-there is no missing data in \code{A} nor \code{Y}), a single character 
+for each of the propensity score regressions (\code{DeltaA}, \code{A}, and
+\code{DeltaY}). To use the same formula for each of the regressions (or if
+there is no missing data in \code{A} nor \code{Y}), a single character
 formula may be input.}
 
-\item{glm_Qr}{A character describing a formula to be used in the call to 
-\code{glm} for reduced-dimension outcome regression. Ignored if 
+\item{glm_Qr}{A character describing a formula to be used in the call to
+\code{glm} for reduced-dimension outcome regression. Ignored if
 \code{SL_Qr!=NULL}. The formula should use the variable name \code{'gn'}.}
 
-\item{glm_gr}{A character describing a formula to be used in the call to 
-\code{glm} for the reduced-dimension propensity score. Ignored if 
+\item{glm_gr}{A character describing a formula to be used in the call to
+\code{glm} for the reduced-dimension propensity score. Ignored if
 \code{SL_gr!=NULL}. The formula should use the variable name \code{'Qn'} and 
 \code{'gn'} if \code{reduction='bivariate'} and \code{'Qn'} otherwise.}
 
 \item{guard}{A character vector indicating what pattern of misspecifications 
-to guard against. If \code{guard} contains \code{"Q"}, then the TMLE guards 
-against misspecification of the outcome regression by estimating the 
-reduced-dimension outcome regression specified by \code{glm_Qr} or 
-\code{SL_Qr}. If \code{guard} contains \code{"g"} then the TMLE 
-(additionally) guards against misspecification of the propensity score by 
+to guard against. If \code{guard} contains \code{"Q"}, then the TMLE guards
+against misspecification of the outcome regression by estimating the
+reduced-dimension outcome regression specified by \code{glm_Qr} or
+\code{SL_Qr}. If \code{guard} contains \code{"g"} then the TMLE
+(additionally) guards against misspecification of the propensity score by
 estimating the reduced-dimension propensity score specified by \code{glm_gr} 
 or \code{SL_gr}.}
 
-\item{reduction}{A character equal to \code{"univariate"} for a univariate 
+\item{reduction}{A character equal to \code{"univariate"} for a univariate
 misspecification correction (default) or \code{"bivariate"}
 for the bivariate version.}
 
-\item{returnModels}{A boolean indicating whether to return model fits for the 
+\item{returnModels}{A boolean indicating whether to return model fits for the
 outcome regression, propensity score,
 and reduced-dimension regressions.}
 
-\item{cvFolds}{A numeric equal to the number of folds to be used in 
-cross-validated fitting of nuisance parameters. If \code{cvFolds = 1}, no 
-cross-validation is used. Alternatively, \code{cvFolds} may be entered as a 
-vector of fold assignments for observations, in which case its length should be
-the same length as \code{Y}.}
+\item{cvFolds}{A numeric equal to the number of folds to be used in
+cross-validated fitting of nuisance parameters. If \code{cvFolds = 1}, no
+cross-validation is used. Alternatively, \code{cvFolds} may be entered as a
+vector of fold assignments for observations, in which case its length should
+be the same length as \code{Y}.}
 
 \item{maxIter}{A numeric that sets the maximum number of iterations the TMLE 
 can perform in its fluctuation step.}
 
-\item{tolIC}{A numeric that defines the stopping criteria based on the 
+\item{tolIC}{A numeric that defines the stopping criteria based on the
 empirical mean of the influence function.}
 
-\item{tolg}{A numeric indicating the minimum value for estimates of the 
+\item{tolg}{A numeric indicating the minimum value for estimates of the
 propensity score.}
 
 \item{verbose}{A boolean indicating whether to print status updates.}
 
-\item{Qsteps}{A numeric equal to 1 or 2 indicating whether the fluctuation 
-submodel for the outcome regression
-should be fit using a single minimization (\code{Qsteps = 1}) or a 
-backfitting-type minimization (\code{Qsteps=2}). The latter was found to be 
-more stable in simulations and is the default.}
+\item{Qsteps}{A numeric equal to 1 or 2 indicating whether the fluctuation
+submodel for the outcome regression should be fit using a single minimization
+(\code{Qsteps = 1}) or a backfitting-type minimization (\code{Qsteps=2}). The
+latter was found to be more stable in simulations and is the default.}
 
-\item{parallel}{A boolean indicating whether to use \code{foreach}
-to estimate nuisance parameters in parallel. Only useful if there is a 
-registered parallel backend and \code{cvFolds > 1}.}
+\item{parallel}{A boolean indicating whether to use parallelization based on
+\code{foreach}, \code{future}, and \code{doFuture} to estimate nuisance
+parameters in parallel. Only useful if \code{cvFolds > 1}. By default, a
+\code{multiprocess} evaluation scheme is invoked, using forked R processes
+(if supported on the OS) and background R sessions otherwise. Users may also
+register their own backends using the \code{future.batchtools} package.}
 
-\item{Qn}{An optional list of outcome regression estimates. If specified, 
-the function will ignore the nuisance parameter estimation specified by 
-\code{SL_Q} and \code{glm_Q}. The entries in the list should correspond to 
-the outcome regression evaluated at \code{A} and the observed values of \code{W},
-with order determined by the input to \code{a_0} (e.g., if \code{a_0 = c(0,1)} then
-\code{Qn[[1]]} should be outcome regression at \code{A} = 0 and \code{Qn[[2]]} should
-be outcome regression at \code{A} = 1).}
+\item{Qn}{An optional list of outcome regression estimates. If specified, the
+function will ignore the nuisance parameter estimation specified by
+\code{SL_Q} and \code{glm_Q}. The entries in the list should correspond to
+the outcome regression evaluated at \code{A} and the observed values of
+\code{W}, with order determined by the input to \code{a_0} (e.g., if
+\code{a_0 = c(0, 1)} then \code{Qn[[1]]} should be outcome regression at
+\code{A} = 0 and \code{Qn[[2]]} should be outcome regression at
+\code{A} = 1).}
 
-\item{gn}{An optional list of propensity score estimates. If specified, 
-the function will ignore the nuisance parameter estimation specified by 
-\code{SL_g} and \code{glm_g}. The entries in the list should correspond to 
-the propensity for the observed values of \code{W},
-with order determined by the input to \code{a_0} (e.g., if \code{a_0 = c(0,1)} then
-\code{gn[[1]]} should be propensity of \code{A} = 0 and \code{Qn[[2]]} should
-be propensity of \code{A} = 1).}
+\item{gn}{An optional list of propensity score estimates. If specified, the
+function will ignore the nuisance parameter estimation specified by
+\code{SL_g} and \code{glm_g}. The entries in the list should correspond to
+the propensity for the observed values of \code{W}, with order determined by
+the input to \code{a_0} (e.g., if \code{a_0 = c(0,1)} then \code{gn[[1]]}
+should be propensity of \code{A} = 0 and \code{Qn[[2]]} should be propensity
+of \code{A} = 1).}
 
 \item{...}{Other options (not currently used).}
 }
 \value{
 An object of class \code{"drtmle"}.
 \describe{
- \item{\code{drtmle}}{A \code{list} of doubly-robust point estimates and 
+ \item{\code{drtmle}}{A \code{list} of doubly-robust point estimates and
        a doubly-robust covariance matrix}
- \item{\code{nuisance_drtmle}}{A \code{list} of the final TMLE estimates of 
-       the outcome regression (\code{$QnStar}), propensity score 
+ \item{\code{nuisance_drtmle}}{A \code{list} of the final TMLE estimates of
+       the outcome regression (\code{$QnStar}), propensity score
        (\code{$gnStar}), and reduced-dimension regressions (\code{$QrnStar}, 
        \code{$grnStar}) evaluated at the observed data values.}
- \item{\code{ic_drtmle}}{A \code{list} of the empirical mean of the efficient 
+ \item{\code{ic_drtmle}}{A \code{list} of the empirical mean of the efficient
        influence function (\code{$eif}) and the extra pieces of the influence
-       function resulting from misspecification. All should be smaller than 
+       function resulting from misspecification. All should be smaller than
        \code{tolIC} (unless \code{maxIter} was reached first).}
- \item{\code{aiptw_c}}{A \code{list} of doubly-robust point estimates and 
-       a non-doubly-robust covariance matrix. Theory does not guarantee 
+ \item{\code{aiptw_c}}{A \code{list} of doubly-robust point estimates and
+       a non-doubly-robust covariance matrix. Theory does not guarantee
        performance of inference for these estimators, but simulation studies 
        showed they often perform adequately.}
  \item{\code{nuisance_aiptw}}{A \code{list} of the initial estimates of the
-       outcome regression, propensity score, and reduced-dimension 
+       outcome regression, propensity score, and reduced-dimension
        regressions evaluated at the observed data values.}
- \item{\code{tmle}}{A \code{list} of doubly-robust point estimates and 
+ \item{\code{tmle}}{A \code{list} of doubly-robust point estimates and
        non-doubly-robust covariance for the standard TMLE estimator.}
- \item{\code{aiptw}}{A \code{list} of doubly-robust point estimates and 
+ \item{\code{aiptw}}{A \code{list} of doubly-robust point estimates and
        non-doubly-robust covariance matrix for the standard AIPTW estimator.}
- \item{\code{gcomp}}{A \code{list} of non-doubly-robust point estimates and 
-       non-doubly-robust covariance matrix for the standard G-computation 
-       estimator. If super learner is used there is no guarantee of correct 
+ \item{\code{gcomp}}{A \code{list} of non-doubly-robust point estimates and
+       non-doubly-robust covariance matrix for the standard G-computation
+       estimator. If super learner is used there is no guarantee of correct
        inference for this estimator.}
- \item{\code{QnMod}}{The fitted object for the outcome regression. Returns 
+ \item{\code{QnMod}}{The fitted object for the outcome regression. Returns
        \code{NULL} if \code{returnModels = FALSE}.}
- \item{\code{gnMod}}{The fitted object for the propensity score. Returns 
+ \item{\code{gnMod}}{The fitted object for the propensity score. Returns
        \code{NULL} if \code{returnModels = FALSE}.}
  \item{\code{QrnMod}}{The fitted object for the reduced-dimension regression 
-       that guards against misspecification of the outcome regression. 
+       that guards against misspecification of the outcome regression.
        Returns \code{NULL} if \code{returnModels = FALSE}.}
  \item{\code{grnMod}}{The fitted object for the reduced-dimension regression 
        that guards against misspecification of the propensity score. Returns 
        \code{NULL} if \code{returnModels = FALSE}.}
- \item{\code{a_0}}{The treatment levels that were requested for computation 
+ \item{\code{a_0}}{The treatment levels that were requested for computation
        of covariate-adjusted means.}
 }
 }
@@ -194,8 +197,8 @@ Y <- rbinom(n, 1, plogis(W$W1*W$W2*A))
 fit1 <- drtmle(W = W, A = A, Y = Y, a_0 = c(1,0),
                family=binomial(),
                stratify=FALSE,
-               SL_Q=c("SL.glm","SL.mean","SL.glm.interaction"),
-               SL_g=c("SL.glm","SL.mean","SL.glm.interaction"),
-               SL_Qr="SL.glm",
-               SL_gr="SL.glm", maxIter = 1)
+               SL_Q = c("SL.glm", "SL.mean", "SL.glm.interaction"),
+               SL_g = c("SL.glm", "SL.mean", "SL.glm.interaction"),
+               SL_Qr = "SL.glm",
+               SL_gr = "SL.glm", maxIter = 1)
 }

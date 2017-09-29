@@ -4,4 +4,6 @@
 simulation/*
 README.html
 vignettes/*.html
+vignettes/using_drtmle_cache/*
 JSS/*
+
