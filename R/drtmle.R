@@ -539,8 +539,8 @@ drtmle <- function(Y, A, W,
   QnStar1 <- plyr::llply(QnStar1Out, function(x){ unlist(x[[1]]) })
 
   # tmle estimates
-  psi_t <- future::future_lapply(QnStar, mean)
-  psi_t1 <- future::future_lapply(QnStar1, mean)
+  psi_t <- lapply(QnStar, mean)
+  psi_t1 <- lapply(QnStar1, mean)
 
   # covariance for tmle
   Dno1Star <- eval_Dstar(A = A, Y = Y, DeltaA = DeltaA, DeltaY = DeltaY,
@@ -551,7 +551,7 @@ drtmle <- function(Y, A, W,
   # covariance for drtmle
   DnoStar <- eval_Dstar(A = A, Y = Y, DeltaA = DeltaA, DeltaY = DeltaY,
                         Qn = QnStar, gn = gnStar, psi_n = psi_t, a_0 = a_0)
-  PnDnoStar <- future::future_lapply(DnoStar, mean)
+  PnDnoStar <- lapply(DnoStar, mean)
 
   DnQoStar <- rep(list(rep(0, n)), length(a_0))
   DngoStar <- rep(list(rep(0, n)), length(a_0))
@@ -560,12 +560,12 @@ drtmle <- function(Y, A, W,
     DnQoStar <- eval_Dstar_Q(A = A, Y = Y, DeltaY = DeltaY,
                        DeltaA = DeltaA, Qn = QnStar, grn = grnStar, gn = gn,
                        a_0 = a_0, reduction = reduction)
-    PnDQnStar <- future::future_lapply(DnQoStar, mean)
+    PnDQnStar <- lapply(DnQoStar, mean)
   }
   if ("Q" %in% guard) {
     DngoStar <- eval_Dstar_g(A = A, DeltaY = DeltaY, DeltaA = DeltaA,
                              Qrn = QrnStar, gn = gnStar, a_0 = a_0)
-    PnDgnStar <- future::future_lapply(DngoStar, mean)
+    PnDgnStar <- lapply(DngoStar, mean)
   }
 
   DnoStarMat <- matrix(unlist(DnoStar) - unlist(DnQoStar) - unlist(DngoStar),
@@ -577,8 +577,8 @@ drtmle <- function(Y, A, W,
                                      QrnStar = QrnStar, grnStar = grn,
                                      meanIC = unlist(c(PnDnoStar, PnDQnStar,
                                                        PnDgnStar))),
-              ic_drtmle = list(eif = PnDnoStar, missQ = PnDgnStar,
-                               missg = PnDQnStar),
+              ic_drtmle = list(mean_eif = PnDnoStar, mean_missQ = PnDgnStar,
+                               mean_missg = PnDQnStar, if = DnoStarMat),
               aiptw_c = list(est = unlist(psi_o),cov=cov_o),
               nuisance_aiptw_c = list(Qn = Qn, gn = gn, Qrn = Qrn, grn = grn),
               tmle = list(est = unlist(psi_t1),cov = cov_t1),
