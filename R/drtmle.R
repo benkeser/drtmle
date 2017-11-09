@@ -146,7 +146,7 @@ globalVariables(c("v"))
 #' @importFrom foreach foreach "%dopar%"
 #' @importFrom future plan sequential multiprocess future_lapply
 #' @importFrom doFuture registerDoFuture
-#' @importFrom future.batchtools batchjobs_slurm batchtools_lsf batchtools_sge
+#' @importFrom future.batchtools batchtools_slurm batchtools_lsf batchtools_sge
 #' batchtools_torque batchtools_openlava
 #' @importFrom stats cov
 #'
@@ -225,7 +225,7 @@ drtmle <- function(Y, A, W,
     } else if (!is.null(future_hpc)) {
       set_future_hpc <- parse(text = paste0("future.batchtools", "::",
                                             future_hpc))
-      future::plan(future.batchtools::eval(set_future_hpc))
+      future::plan(eval(set_future_hpc))
     }
   }
   #-------------------------------

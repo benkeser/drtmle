@@ -12,7 +12,7 @@ drtmle(Y, A, W, DeltaA = as.numeric(!is.na(A)),
   glm_gr = NULL, guard = c("Q", "g"), reduction = "univariate",
   returnModels = FALSE, cvFolds = 1, maxIter = 3, tolIC = 1/length(Y),
   tolg = 0.01, verbose = FALSE, Qsteps = 2, parallel = FALSE,
-  Qn = NULL, gn = NULL, ...)
+  future_hpc = NULL, Qn = NULL, gn = NULL, ...)
 }
 \arguments{
 \item{Y}{numeric of continuous or binary outcomes.}
@@ -119,6 +119,10 @@ parameters in parallel. Only useful if \code{cvFolds > 1}. By default, a
 \code{multiprocess} evaluation scheme is invoked, using forked R processes
 (if supported on the OS) and background R sessions otherwise. Users may also
 register their own backends using the \code{future.batchtools} package.}
+
+\item{future_hpc}{A character string identifying a high-performance computing
+backend to be used with parallelization. This should match exactly one of the
+options available from the \code{future.batchtools} package.}
 
 \item{Qn}{An optional list of outcome regression estimates. If specified, the
 function will ignore the nuisance parameter estimation specified by
