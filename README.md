@@ -15,7 +15,7 @@ Description
 
 `drtmle` is an R package that computes marginal means of an outcome under fixed levels of a treatment. The package computes targeted minimum loss-based (TMLE) estimators that are doubly robust, not only with respect to consistency, but also with respect to asymptotic normality, as discussed in [Benkeser, et al (2017)](https://doi.org/10.1093/biomet/asx053). This property facilitates construction of doubly-robust confidence intervals and hypothesis tests.
 
-The package additionally includes methods for computing valid confidence intervals for an inverse probability of treatment weighted (IPTW) estimator of the average treatment effect when the propensity score is estimated via super learning, as discussed in [van der Laan, 2014](https://www.degruyter.com/downloadpdf/j/ijb.2014.10.issue-1/ijb-2012-0038/ijb-2012-0038.pdf).
+The package additionally includes methods for computing valid confidence intervals for an inverse probability of treatment weighted (IPTW) estimator of the average treatment effect when the propensity score is estimated via super learning, as discussed in [van der Laan (2014)](https://www.degruyter.com/downloadpdf/j/ijb.2014.10.issue-1/ijb-2012-0038/ijb-2012-0038.pdf).
 
 ------------------------------------------------------------------------
 
@@ -157,7 +157,26 @@ If you encounter any bugs or have any specific feature requests, please [file an
 Citation
 --------
 
-After using the `drtmle` R package, please cite the following: @Manual{drtmlepackage, title = {drtmle: Doubly-Robust Nonparametric Estimation and Inference}, author = {David Benkeser}, note = {R package version 1.0.0}, doi = {10.5281/zenodo.844836}, } @article{benkeser2017improved, year = {2017}, author = {Benkeser, David C and Carone, Marco and van der Laan, Mark J and Gilbert, Peter B}, title = {Doubly-robust nonparametric inference on the average treatment effect}, journal = {Biometrika}, volume = {104}, number = {4}, pages = {863–880}, doi = {10.1093/biomet/asx053} }
+After using the `drtmle` R package, please cite the following:
+
+    @Manual{drtmlepackage,
+      title = {drtmle: Doubly-Robust Nonparametric Estimation and Inference},
+      author = {David Benkeser},
+      note = {R package version 1.0.0},
+      doi = {10.5281/zenodo.844836},
+    }
+
+    @article{benkeser2017improved,
+      year  = {2017},
+      author = {Benkeser, David C and Carone, Marco and van der Laan, Mark J
+        and Gilbert, Peter B},
+      title = {Doubly-robust nonparametric inference on the average
+        treatment effect},
+      journal = {Biometrika},
+      volume = {104}, number = {4},
+      pages = {863–880},
+      doi = {10.1093/biomet/asx053}
+    }
 
 ------------------------------------------------------------------------
 
