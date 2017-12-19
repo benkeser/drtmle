@@ -876,30 +876,29 @@ Cross-validation may significantly increase the computation time necessary for
 running `drtmle`. Parallelized regression fitting is available by setting the
 option `parallel = TRUE`. Since, internally, all computations are carried out
 using futures (with the API provided by the "future" R package), setting this
-option amounts only to parallelizing with futures across a standard foreach loop
-structure, which is accomplished by combining the `foreach`, `future`, and
-`doFuture` R packages [@foreachPackage, @futurePackage, @dofuturePackage].
-Selecting this option results in parallelization of the estimation of the OR,
-PS, and reduced-dimension regressions.
+option amounts only to parallelizing with futures [@futurePackage] via 
+`future::lapply`. Selecting this option results in parallelization of the 
+estimation of the OR, PS, and reduced-dimension regressions.
 
 If no adjustments are made prior to invoking the `drtmle` function, futures are
 computed using the `multiprocess` option, which performs computations in forked
-R processes (if the OS allows -- i.e., non-Windows systems) or spawns and uses
+R processes (non-Windows systems) or spawns and uses
 background R sessions on the current machine. The setup also allows users to
 specify appropriate system-specific back-ends that may better suit their problem
 using the `future.batchtools` package [@futurebatchtoolsPackage]. Below we
 demonstrate registration using an ad-hoc cluster on the local system. The choice
-of back-end is completely flexible, and submission of the job to a wide variety
-of schedulers (e.g., SLURM, TORQUE, etc.) is also permitted; interested readers
+of back-end is flexible, and submission of the job to a wide variety
+of schedulers (e.g., SLURM, TORQUE, etc.) is also permitted. Interested readers
 are invited to consult the documentation of the `future.batchtools` package for
 further information.
 
 ```{r, cache = TRUE, message = FALSE}
 library(future.batchtools)
 library(parallel)
-library(snow) # for SOCK-tyep clusters
+library(snow) # for SOCK-type clusters
 cl <- makeCluster(2, type = "SOCK")
 plan(cluster, workers = cl)
+clusterEvalQ(cl, library("SuperLearner"))
 pcv_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
                      SL_g = c("SL.glm", "SL.glm.interaction","SL.gam"),
                      SL_Q = c("SL.glm", "SL.glm.interaction","SL.gam"),

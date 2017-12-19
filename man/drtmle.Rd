@@ -17,8 +17,7 @@ drtmle(Y, A, W, DeltaA = as.numeric(!is.na(A)),
 \arguments{
 \item{Y}{A \code{numeric} continuous or binary outcomes.}
 
-\item{A}{A \code{numeric} vector of discrete-valued treatment assignment (assumed to be
-equal to 0 or 1).}
+\item{A}{A \code{numeric} vector of discrete-valued treatment assignment.}
 
 \item{W}{A \code{data.frame} of named covariates.}
 

@@ -1,8 +1,3 @@
-## Resubmission 
-This is a resubmission. In this version I have:
-* Added short examples to all exported functions and shortened existing examples. All examples now run locally, on travis-ci, and on Appveyor and in under 5 seconds. 
-
-
 ## Test environments
 * local macOS / OS X install, R 3.4.1
 * ubuntu 12.04 (on travis-ci), R 3.3.2

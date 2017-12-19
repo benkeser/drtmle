@@ -1,17 +1,15 @@
-globalVariables(c("v"))
-
 #' Compute asymptotically linear IPTW estimators with super learning
 #' for the propensity score
 #'
 #' @param W A \code{data.frame} of named covariates
-#' @param A A vector of binary treatment assignment (assumed to be equal to 0 or
+#' @param A A \code{numeric} vector of binary treatment assignment (assumed to be equal to 0 or
 #'  1)
-#' @param Y A numeric of continuous or binary outcomes.
-#' @param DeltaY Indicator of missing outcome (assumed to be equal to 0 if
+#' @param Y A \code{numeric} numeric of continuous or binary outcomes.
+#' @param DeltaY A \code{numeric} indicator of missing outcome (assumed to be equal to 0 if
 #' missing 1 if observed)
-#' @param DeltaA Indicator of missing treatment (assumed to be equal to 0 if
+#' @param DeltaA A \code{numeric} indicator of missing treatment (assumed to be equal to 0 if
 #' missing 1 if observed)
-#' @param a_0 A vector of fixed treatment values at which to return marginal
+#' @param a_0 A vector of \code{numeric} treatment values at which to return marginal
 #' mean estimates.
 #' @param stratify A \code{boolean} indicating whether to estimate the missing
 #' outcome regression separately
@@ -49,7 +47,7 @@ globalVariables(c("v"))
 #' cross-validated fitting of nuisance parameters. If \code{cvFolds = 1}, no
 #' cross-validation is used.
 #' @param parallel A boolean indicating whether to use parallelization based on
-#' \code{foreach}, \code{future}, and \code{doFuture} to estimate nuisance
+#' \code{future} to estimate nuisance
 #' parameters in parallel. Only useful if \code{cvFolds > 1}. By default, a
 #' \code{multiprocess} evaluation scheme is invoked, using forked R processes
 #' (if supported on the OS) and background R sessions otherwise. Users may also
@@ -83,7 +81,6 @@ globalVariables(c("v"))
 #' }
 #'
 #' @importFrom plyr llply laply
-#' @importFrom foreach foreach "%dopar%"
 #' @importFrom future plan future_lapply
 #' @importFrom doFuture registerDoFuture
 #' @importFrom stats cov
@@ -142,24 +139,13 @@ adaptive_iptw <- function(W, A, Y,
   #-------------------------------
   # estimate propensity score
   #-------------------------------
-  if (!parallel) {
-    gnOut <- future::future_lapply(x = validRows, FUN = estimateG,
-                                   A = A, W = W,
-                                   DeltaA = DeltaA, DeltaY = DeltaY,
-                                   tolg = tolg, verbose = verbose,
-                                   returnModels = returnModels,
-                                   SL_g = SL_g, glm_g = glm_g,
-                                   a_0 = a_0, stratify = stratify)
-  } else {
-    gnOut <- foreach::foreach(v = seq_len(cvFolds),
-                              .packages = "SuperLearner") %dopar%
-    {
-      estimateG(A = A, W = W, DeltaA = DeltaA, DeltaY = DeltaY,
-                tolg = tolg, verbose = verbose,stratify = stratify,
-                returnModels = returnModels, SL_g = SL_g,
-                glm_g = glm_g, a_0 = a_0, validRows = validRows[[v]])
-    }
-  }
+  gnOut <- future::future_lapply(x = validRows, FUN = estimateG,
+                                 A = A, W = W,
+                                 DeltaA = DeltaA, DeltaY = DeltaY,
+                                 tolg = tolg, verbose = verbose,
+                                 returnModels = returnModels,
+                                 SL_g = SL_g, glm_g = glm_g,
+                                 a_0 = a_0, stratify = stratify)
   # re-order predictions
   gnValid <- unlist(gnOut, recursive = FALSE, use.names = FALSE)
   gnUnOrd <- do.call(Map, c(c, gnValid[seq(1, length(gnValid), 2)]))
@@ -185,26 +171,16 @@ adaptive_iptw <- function(W, A, Y,
   #-------------------------------------
   # estimate reduced dimension Q
   #-------------------------------------
-    # note that NULL is input to estimateQrn -- internally the function
-    # assign Qn = 0 for all a_0 because estimateQrn estimates the regression
-    # of Y - Qn on gn (which is needed for drtmle), while here we just need
-    # the regression of Y on gn.
-  if (!parallel) {
-    QrnOut <- future::future_lapply(x = validRows, FUN = estimateQrn,
-                                    Y = Y, A = A, W = W,
-                                    DeltaA = DeltaA, DeltaY = DeltaY,
-                                    Qn = NULL, gn = gn, glm_Qr = glm_Qr,
-                                    family = family, SL_Qr = SL_Qr, a_0 = a_0,
-                                    returnModels = returnModels)
-  } else {
-    QrnOut <- foreach::foreach(v = seq_len(cvFolds),
-                               .packages = "SuperLearner") %dopar% {
-      estimateQrn(Y = Y, A = A, W = W, DeltaA = DeltaA, DeltaY = DeltaY,
-                  Qn = NULL, gn = gn, glm_Qr = glm_Qr, family = family,
-                  SL_Qr = SL_Qr, a_0 = a_0, returnModels = returnModels,
-                  validRows = validRows[[v]])
-    }
-  }
+  # note that NULL is input to estimateQrn -- internally the function
+  # assign Qn = 0 for all a_0 because estimateQrn estimates the regression
+  # of Y - Qn on gn (which is needed for drtmle), while here we just need
+  # the regression of Y on gn.
+  QrnOut <- future::future_lapply(x = validRows, FUN = estimateQrn,
+                                  Y = Y, A = A, W = W,
+                                  DeltaA = DeltaA, DeltaY = DeltaY,
+                                  Qn = NULL, gn = gn, glm_Qr = glm_Qr,
+                                  family = family, SL_Qr = SL_Qr, a_0 = a_0,
+                                  returnModels = returnModels)
 
   # re-order predictions
   QrnValid <- unlist(QrnOut, recursive = FALSE, use.names = FALSE)
@@ -219,7 +195,7 @@ adaptive_iptw <- function(W, A, Y,
 
   Dngo <- eval_Diptw_g(A = A, DeltaA = DeltaA, DeltaY = DeltaY,
                        Qrn = Qrn, gn = gn, a_0 = a_0)
-  PnDgn <- future::future_lapply(Dngo, mean)
+  PnDgn <- lapply(Dngo, mean)
 
   # one-step iptw estimator
   psi.o <- mapply(a = psi_n, b = PnDgn, SIMPLIFY = FALSE,
@@ -242,23 +218,13 @@ adaptive_iptw <- function(W, A, Y,
     gnStar <- plyr::llply(gnStarOut, function(x){ unlist(x$est) })
     eps <- plyr::laply(gnStarOut, function(x){ x$eps })
     # re-estimate reduced dimension regression
-    if (!parallel) {
-      QrnStarOut <- future::future_lapply(x = validRows, FUN = estimateQrn,
-                                          Y = Y, A = A, W = W,
-                                          DeltaA = DeltaA, DeltaY = DeltaY,
-                                          Qn = NULL, gn = gnStar,
-                                          glm_Qr = glm_Qr, family = family,
-                                          SL_Qr = SL_Qr, a_0 = a_0,
-                                          returnModels = returnModels)
-    } else {
-      QrnStarOut <- foreach::foreach(v = seq_len(cvFolds),
-                                     .packages = "SuperLearner") %dopar% {
-        estimateQrn(Y = Y, A = A, W = W, DeltaA = DeltaA, DeltaY = DeltaY,
-                    Qn = NULL, gn = gnStar, glm_Qr = glm_Qr, family = family,
-                    SL_Qr = SL_Qr, a_0 = a_0, returnModels = returnModels,
-                    validRows = validRows[[v]])
-      }
-    }
+    QrnStarOut <- future::future_lapply(x = validRows, FUN = estimateQrn,
+                                        Y = Y, A = A, W = W,
+                                        DeltaA = DeltaA, DeltaY = DeltaY,
+                                        Qn = NULL, gn = gnStar,
+                                        glm_Qr = glm_Qr, family = family,
+                                        SL_Qr = SL_Qr, a_0 = a_0,
+                                        returnModels = returnModels)
     # re-order predictions
     QrnValid <- unlist(QrnStarOut, recursive = FALSE, use.names = FALSE)
     QrnUnOrd <- do.call(Map, c(c, QrnValid[seq(1, length(QrnValid), 2)]))

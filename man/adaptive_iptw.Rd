@@ -15,15 +15,15 @@ adaptive_iptw(W, A, Y, DeltaY = as.numeric(!is.na(Y)),
 \arguments{
 \item{W}{A \code{data.frame} of named covariates}
 
-\item{A}{A vector of binary treatment assignment (assumed to be equal to 0 or
+\item{A}{A \code{numeric} vector of binary treatment assignment (assumed to be equal to 0 or
 1)}
 
-\item{Y}{A numeric of continuous or binary outcomes.}
+\item{Y}{A \code{numeric} numeric of continuous or binary outcomes.}
 
-\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if
+\item{DeltaY}{A \code{numeric} indicator of missing outcome (assumed to be equal to 0 if
 missing 1 if observed)}
 
-\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if
+\item{DeltaA}{A \code{numeric} indicator of missing treatment (assumed to be equal to 0 if
 missing 1 if observed)}
 
 \item{stratify}{A \code{boolean} indicating whether to estimate the missing
@@ -35,7 +35,7 @@ pool across \code{A} (if \code{FALSE}).}
 \code{gaussian()}, to be passed to the \code{SuperLearner} or \code{glm}
 function.}
 
-\item{a_0}{A vector of fixed treatment values at which to return marginal
+\item{a_0}{A vector of \code{numeric} treatment values at which to return marginal
 mean estimates.}
 
 \item{SL_g}{A vector of characters describing the super learner library to be
@@ -77,7 +77,7 @@ cross-validated fitting of nuisance parameters. If \code{cvFolds = 1}, no
 cross-validation is used.}
 
 \item{parallel}{A boolean indicating whether to use parallelization based on
-\code{foreach}, \code{future}, and \code{doFuture} to estimate nuisance
+\code{future} to estimate nuisance
 parameters in parallel. Only useful if \code{cvFolds > 1}. By default, a
 \code{multiprocess} evaluation scheme is invoked, using forked R processes
 (if supported on the OS) and background R sessions otherwise. Users may also

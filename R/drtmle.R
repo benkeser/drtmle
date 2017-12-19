@@ -1,8 +1,7 @@
 #' TMLE estimate of the average treatment effect with doubly-robust inference
 #'
 #' @param W A \code{data.frame} of named covariates.
-#' @param A A \code{numeric} vector of discrete-valued treatment assignment (assumed to be
-#' equal to 0 or 1).
+#' @param A A \code{numeric} vector of discrete-valued treatment assignment.
 #' @param Y A \code{numeric} continuous or binary outcomes.
 #' @param DeltaY A \code{numeric} vector of missing outcome indicator (assumed to be equal to 0
 #' if missing 1 if observed).
