@@ -15,20 +15,20 @@ drtmle(Y, A, W, DeltaA = as.numeric(!is.na(A)),
   Qn = NULL, gn = NULL, ...)
 }
 \arguments{
-\item{Y}{numeric of continuous or binary outcomes.}
+\item{Y}{A \code{numeric} continuous or binary outcomes.}
 
-\item{A}{A vector of discrete-valued treatment assignment (assumed to be
+\item{A}{A \code{numeric} vector of discrete-valued treatment assignment (assumed to be
 equal to 0 or 1).}
 
 \item{W}{A \code{data.frame} of named covariates.}
 
-\item{DeltaA}{A vector of missing treatment indicator (assumed to be equal to
+\item{DeltaA}{A \code{numeric} vector of missing treatment indicator (assumed to be equal to
 0 if missing 1 if observed).}
 
-\item{DeltaY}{A vector of missing outcome indicator (assumed to be equal to 0
+\item{DeltaY}{A \code{numeric} vector of missing outcome indicator (assumed to be equal to 0
 if missing 1 if observed).}
 
-\item{a_0}{A vector of fixed treatment values at which to return marginal
+\item{a_0}{A \code{numeric} vector of fixed treatment values at which to return marginal
 mean estimates.}
 
 \item{family}{A \code{family} object equal to either \code{binomial()} or
@@ -88,8 +88,7 @@ misspecification correction (default) or \code{"bivariate"}
 for the bivariate version.}
 
 \item{returnModels}{A boolean indicating whether to return model fits for the
-outcome regression, propensity score,
-and reduced-dimension regressions.}
+outcome regression, propensity score, and reduced-dimension regressions.}
 
 \item{cvFolds}{A numeric equal to the number of folds to be used in
 cross-validated fitting of nuisance parameters. If \code{cvFolds = 1}, no
@@ -114,9 +113,9 @@ submodel for the outcome regression should be fit using a single minimization
 latter was found to be more stable in simulations and is the default.}
 
 \item{parallel}{A boolean indicating whether to use parallelization based on
-\code{foreach}, \code{future}, and \code{doFuture} to estimate nuisance
-parameters in parallel. Only useful if \code{cvFolds > 1}. By default, a
-\code{multiprocess} evaluation scheme is invoked, using forked R processes
+\code{future} when estimating nuisance parameters. 
+Only useful if \code{cvFolds > 1}. By default, a \code{multiprocess} evaluation 
+scheme is invoked, using forked R processes
 (if supported on the OS) and background R sessions otherwise. Users may also
 register their own backends using the \code{future.batchtools} package.}
 
@@ -151,7 +150,9 @@ An object of class \code{"drtmle"}.
  \item{\code{ic_drtmle}}{A \code{list} of the empirical mean of the efficient
        influence function (\code{$eif}) and the extra pieces of the influence
        function resulting from misspecification. All should be smaller than
-       \code{tolIC} (unless \code{maxIter} was reached first).}
+       \code{tolIC} (unless \code{maxIter} was reached first). Also includes
+       a matrix of the influence function at the estimated nuisance parameters
+       evaluated at the observed data.}
  \item{\code{aiptw_c}}{A \code{list} of doubly-robust point estimates and
        a non-doubly-robust covariance matrix. Theory does not guarantee
        performance of inference for these estimators, but simulation studies 
@@ -193,7 +194,10 @@ n <- 100
 W <- data.frame(W1 = runif(n), W2 = rnorm(n))
 A <- rbinom(n,1,plogis(W$W1 - W$W2))
 Y <- rbinom(n, 1, plogis(W$W1*W$W2*A))
-# fit drtmle with maxIter = 1 to run fast
+# A quick example of drtmle:
+# We note that more flexible super learner libraries
+# are available, and that we recommend the user use more flexible
+# libraries for SL_Qr and SL_gr for general use. 
 fit1 <- drtmle(W = W, A = A, Y = Y, a_0 = c(1,0),
                family=binomial(),
                stratify=FALSE,

@@ -115,10 +115,12 @@ test_that("Fail safe kicks in",{
     #----------------------------------------------
   grbg <- fluctuateQ2(Y, A, W, DeltaY, DeltaA, 
                       Qn, gn, grn, a_0, reduction, coefTol=0)
+  # set tolerance threshold 
+  tol <- 1e-4
   # should just return Qn 
-  expect_true(all(grbg[[1]]$est == Qn[[1]]))
+  expect_true(all(grbg[[1]]$est - Qn[[1]] < tol))
 
   grbg2 <- fluctuateQ(Y, A, W, DeltaY, DeltaA, 
                       Qn, gn, grn, a_0, reduction, coefTol=0)
-  expect_true(all(grbg2[[1]]$est == Qn[[1]]))
+  expect_true(all(grbg2[[1]]$est - Qn[[1]] < tol))
 })
