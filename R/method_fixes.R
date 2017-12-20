@@ -22,7 +22,7 @@ method.CC_LS_mod <- function()
                 bvec = bvec, meq = 1)
             invisible(fit)
         }
-        colDup <- which(duplicated(Z, MARGIN = 2))
+        colDup <- which(duplicated(round(Z, 8), MARGIN = 2))
         modZ <- Z
         if(length(colDup) > 0){
         	warning(paste0("Algorithm ", colDup, " is duplicated. Setting weight to 0."))
@@ -72,7 +72,7 @@ method.CC_nloglik_mod <- function ()
     }
     computeCoef = function(Z, Y, libraryNames, obsWeights, control, 
         verbose, ...) {
-        colDup <- which(duplicated(Z, MARGIN = 2))
+        colDup <- which(duplicated(round(Z, 8), MARGIN = 2))
         modZ <- Z
         if(length(colDup) > 0){
             warning(paste0("Algorithm ", colDup, " is duplicated. Setting weight to 0."))
