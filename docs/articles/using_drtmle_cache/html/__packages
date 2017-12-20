@@ -8,3 +8,6 @@ foreach
 gam
 iterators
 doParallel
+future
+future.batchtools
+snow

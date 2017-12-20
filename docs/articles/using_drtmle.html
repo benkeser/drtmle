@@ -30,7 +30,7 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="..//index.html">
+  <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
@@ -54,7 +54,14 @@
   <a href="../news/index.html">News</a>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/benkeser/drtmle">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -68,141 +75,124 @@
     <div class="page-header toc-ignore">
       <h1>
 <code>drtmle</code>: Doubly-Robust Inference in R</h1>
-                        <h4 class="author"></h4>
-<p>David Benkeser<br>
-Emory University<br>
-Department of Biostatistics and Bioinformatics<br>
-1518 Clifton Road, NE<br>
-Mailstop: 002-3AA<br>
-Atlanta, Georgia, 30322, U.S.A.<br><a href="mailto:benkeser@emory.edu">benkeser@emory.edu</a></p>
+                        <h4 class="author"><div class="line-block">David Benkeser
+Emory University
+Department of Biostatistics and Bioinformatics
+1518 Clifton Road, NE
+Mailstop: 002-3AA
+Atlanta, Georgia, 30322, U.S.A.
+<a href="mailto:benkeser@emory.edu">benkeser@emory.edu</a>
+</div></h4>
             
           </div>
 
     
         <div class="abstract">
       <p class="abstract">Abstract</p>
-      <p>Inverse probability of treatment weighted estimators and doubly-robust estimators (including augmented inverse probability of treatment weight and targeted minimum loss-based estimators) are widely used in causal inference to estimate and draw inference about the average effect of a treatment. As an intermediate step, these estimators require estimation of key nuisance parameters, which are often regression functions. Typically, regressions are estimated using maximum likelihood and parametric models. Confidence intervals and p-values may be computed based on standard asymptotic results, such as the central limit theorem and the delta method. However, in high-dimensional settings maximum likelihood estimation often breaks down and standard procedures no longer yield correct inference. Instead, we may rely on adaptive estimators of nuisance parameters to construct flexible regression estimators. However, use of adaptive estimators poses a challenge for performing statistical inference about an estimated treatment effect. While doubly-robust estimators facilitate inference when <em>all</em> relevant regression functions are consistently estimated, the same cannot be said when at least one estimator is inconsistent. <code>drtmle</code> is a recently developed R package that implements doubly-robust confidence intervals and hypothesis tests about targeted minimum loss-based estimates of the average treatment effect. The package additionally implements an inverse probability of treatment weighted estimator that yields valid inference even when the probability of treatment is estimated via adaptive methods.</p>
+      Inverse probability of treatment weighted estimators and doubly-robust estimators (including augmented inverse probability of treatment weight and targeted minimum loss-based estimators) are widely used in causal inference to estimate and draw inference about the average effect of a treatment. As an intermediate step, these estimators require estimation of key nuisance parameters, which are often regression functions. Typically, regressions are estimated using maximum likelihood and parametric models. Confidence intervals and p-values may be computed based on standard asymptotic results, such as the central limit theorem and the delta method. However, in high-dimensional settings maximum likelihood estimation often breaks down and standard procedures no longer yield correct inference. Instead, we may rely on adaptive estimators of nuisance parameters to construct flexible regression estimators. However, use of adaptive estimators poses a challenge for performing statistical inference about an estimated treatment effect. While doubly-robust estimators facilitate inference when <em>all</em> relevant regression functions are consistently estimated, the same cannot be said when at least one estimator is inconsistent. <code>drtmle</code> is a recently developed R package that implements doubly-robust confidence intervals and hypothesis tests about targeted minimum loss-based estimates of the average treatment effect. The package additionally implements an inverse probability of treatment weighted estimator that yields valid inference even when the probability of treatment is estimated via adaptive methods.
     </div>
     
 <div class="contents">
-<script type="text/x-mathjax-config"> 
-  MathJax.Hub.Config({ TeX: { equationNumbers: {autoNumber: "AMS"} } });       
-</script><div id="introduction" class="section level1">
-<h1 class="hasAnchor">
-<a href="#introduction" class="anchor"></a>Introduction </h1>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { equationNumbers: {autoNumber: "AMS"} } });
+</script><section id="introduction" class="level1"><h1>Introduction </h1>
 <p>In many fields researchers are interested in assessing the population-level effect of a particular treatment on an outcome of interest. The treatment might correspond to a drug, a potentially harmful exposure exposure, or a policy intervention. Often, the treatment may not be randomized due to ethical or logistical reasons. This has sparked great interest in developing statistical methodology to estimate population-level effects from observational data. Estimation of these effects often requires accounting for putative confounding factors, that is, factors related to whether a participant receives treatment and to the participant’s outcome. In many settings, researchers measure many potential confounders, for example using administrative databases or genetic sequencing technology. Due to the curse-of-dimensionality, common statistical estimation techniques are not feasible for such high-dimensional data without restrictive modeling assumptions. When these assumptions are violated, estimates of the population-level effect of a treatment may have large bias.</p>
-<p>This has sparked an interest in using adaptive estimation techniques from the machine learning literature to control for high-dimensional confounders when estimating treatment effects. However, facilitating proper inference (e.g., confidence intervals and hypothesis tests) about estimates of effects based on adaptive estimators is challenging. In particular, standard causal inference techniques, including both G-computation (GCOMP) estimators <span class="citation">(Robins 1986)</span> and inverse probability of treatment weighted (IPTW) estimators <span class="citation">(Horvitz and Thompson 1952, <span class="citation">Robins, Hernan, and Brumback (2000)</span>)</span>, fail to yield valid inference for common estimators of effects. More complex proposals have been developed that <em>are capable</em> of utilizing adaptive methods to control for confounding while still yielding valid inference. These techniques include augmented inverse probability of treatment estimation (AIPTW) <span class="citation">(Robins, Rotnitzky, and Zhao 1994)</span> and targeted minimum loss-based estimation (TMLE) <span class="citation">(van der Laan and Rubin 2006)</span>. Under assumptions, these estimators have limiting normal distributions with estimable variance. The asymptotic variance estimates then serve as the basis for constructing confidence intervals and hypothesis tests.</p>
-<p>As an intermediate step, the AIPTW and TMLE estimators require estimation of two key nuisance parameters: the probability of treatment as a function of confounders (the propensity score, hereafter referred to as the <em>PS</em>) and the average outcome as a function of confounders and treatment (the outcome regression, <em>OR</em>). In addition to their desirable inferential properties, AIPTW and TMLE estimators also enjoy the property of double robustness. That is, the estimators are consistent for the population-level effect of interest if either of the PS or OR is consistently estimated. This property gives the AIPTW and TMLE estimators a natural appeal: inconsistency in the estimation of one nuisance parameter may be mitigated by the consistent estimation of the other. As such, these estimators have increased in popularity in recent years. However, recent work has shown that the double robustness property does not necessarily extend to inferential properties about these estimators when adaptive estimators of the PS and OR are used <span class="citation">(van der Laan 2014,<span class="citation">Benkeser et al. (2017)</span>)</span>. Instead, valid inference requires consistent estimation of <em>both</em> the PS <em>and</em> the OR. van der Laan (2014) proposed new TMLE estimators have an asymptotic normal sampling distribution with estimable variance under consistent estimation of <em>either</em> the PS <em>or</em> the OR, paving the way for inference that is doubly-robust. Benkeser et al. (2017) proposed modifications of these estimators with similar robustness properties and illustrated their practical performance.</p>
+<p>This has sparked an interest in using adaptive estimation techniques from the machine learning literature to control for high-dimensional confounders when estimating treatment effects. However, facilitating proper inference (e.g., confidence intervals and hypothesis tests) about estimates of effects based on adaptive estimators is challenging. In particular, standard causal inference techniques, including both G-computation (GCOMP) estimators <span class="citation" data-cites="robins:1986:mathmod">(Robins 1986)</span> and inverse probability of treatment weighted (IPTW) estimators <span class="citation" data-cites="horvitzthompson:1952:jasa">(Horvitz and Thompson 1952, <span class="citation" data-cites="robins:2000:epi">Robins, Hernan, and Brumback (2000)</span>)</span>, fail to yield valid inference for common estimators of effects. More complex proposals have been developed that <em>are capable</em> of utilizing adaptive methods to control for confounding while still yielding valid inference. These techniques include augmented inverse probability of treatment estimation (AIPTW) <span class="citation" data-cites="robins:1994:jasa">(Robins, Rotnitzky, and Zhao 1994)</span> and targeted minimum loss-based estimation (TMLE) <span class="citation" data-cites="vdlrubin:2006:ijb">(van der Laan and Rubin 2006)</span>. Under assumptions, these estimators have limiting normal distributions with estimable variance. The asymptotic variance estimates then serve as the basis for constructing confidence intervals and hypothesis tests.</p>
+<p>As an intermediate step, the AIPTW and TMLE estimators require estimation of two key nuisance parameters: the probability of treatment as a function of confounders (the propensity score, hereafter referred to as the <em>PS</em>) and the average outcome as a function of confounders and treatment (the outcome regression, <em>OR</em>). In addition to their desirable inferential properties, AIPTW and TMLE estimators also enjoy the property of double robustness. That is, the estimators are consistent for the population-level effect of interest if either of the PS or OR is consistently estimated. This property gives the AIPTW and TMLE estimators a natural appeal: inconsistency in the estimation of one nuisance parameter may be mitigated by the consistent estimation of the other. As such, these estimators have increased in popularity in recent years. However, recent work has shown that the double robustness property does not necessarily extend to inferential properties about these estimators when adaptive estimators of the PS and OR are used <span class="citation" data-cites="vdl:2014:ijb">(van der Laan 2014,<span class="citation" data-cites="benkeser:2017:biometrika">Benkeser et al. (2017)</span>)</span>. Instead, valid inference requires consistent estimation of <em>both</em> the PS <em>and</em> the OR. van der Laan (2014) proposed new TMLE estimators have an asymptotic normal sampling distribution with estimable variance under consistent estimation of <em>either</em> the PS <em>or</em> the OR, paving the way for inference that is doubly-robust. Benkeser et al. (2017) proposed modifications of these estimators with similar robustness properties and illustrated their practical performance.</p>
 <p>The two proposed procedures that yield doubly-robust inference are quite involved, notably involving iterative estimation of additional, complex nuisance parameters. The <code>drtmle</code> package was motivated by the need for a user-friendly tool to implement these methods. The package implements the TMLE estimators of population-level effects proposed in van der Laan (2014) and Benkeser et al. (2017), as well as several extensions including cross-validated targeted minimum loss-based estimators (CVTMLE). Additionally, <code>drtmle</code> implements an IPTW estimator that overcomes shortcomings of existing IPTW implementations with respect to statistical inference. In particular, the estimator allows an adaptive estimator of the PS to be used in construction of the IPTW estimator, while yielding valid statistical inference about population-level effects. Both the TMLE and IPTW estimators implemented in the <code>drtmle</code> package are capable of estimating population-level effects for discrete-valued treatments and the package provides convenient utilities for constructing confidence intervals and hypothesis tests about contrasts of the mean outcome under different levels of treatment. This document explains some of the key concepts underlying doubly-robust inference and illustrates usage of the <code>drtmle</code> package.</p>
-</div>
-<div id="definition-and-estimators-of-the-average-treatment-effect" class="section level1">
-<h1 class="hasAnchor">
-<a href="#definition-and-estimators-of-the-average-treatment-effect" class="anchor"></a>Definition and estimators of the average treatment effect</h1>
-<div id="parameters-of-interest" class="section level2">
-<h2 class="hasAnchor">
-<a href="#parameters-of-interest" class="anchor"></a>Parameters of interest </h2>
-Suppose the observed data consist of <span class="math inline">\(n\)</span> independent and identically distributed copies of the random variable <span class="math inline">\(O = (W,A,Y) \sim P_0\)</span>. Here, <span class="math inline">\(W\)</span> is a vector of baseline covariates, <span class="math inline">\(A\in\{0,1\}\)</span> is a binary (for the sake of simplicity) treatment, <span class="math inline">\(Y\)</span> is an outcome, and <span class="math inline">\(P_0\)</span> is the true data-generating distribution. The parameters of interest are
-<span class="math display">\[\begin{equation} 
-\psi_0(a) = E_0\{\bar{Q}(a,W)\} = \int \bar{Q}_0(a,w) dQ_{W,0}(w) \ , \ \mbox{for} \ a = 0,1 \ , 
+</section><section id="definition-and-estimators-of-the-average-treatment-effect" class="level1"><h1>Definition and estimators of the average treatment effect</h1>
+<section id="parameters-of-interest" class="level2"><h2>Parameters of interest </h2>
+<p>Suppose the observed data consist of <span class="math inline">\(n\)</span> independent and identically distributed copies of the random variable <span class="math inline">\(O = (W,A,Y) \sim P_0\)</span>. Here, <span class="math inline">\(W\)</span> is a vector of baseline covariates, <span class="math inline">\(A\in\{0,1\}\)</span> is a binary (for the sake of simplicity) treatment, <span class="math inline">\(Y\)</span> is an outcome, and <span class="math inline">\(P_0\)</span> is the true data-generating distribution. The parameters of interest are <span class="math display">\[\begin{equation}
+\psi_0(a) = E_0\{\bar{Q}(a,W)\} = \int \bar{Q}_0(a,w) dQ_{W,0}(w) \ , \
+\mbox{for} \ a = 0,1 \ ,
 \label{parameterDef}
-\end{equation}\]</span>
-<p>where <span class="math inline">\(\bar{Q}_0(a,w)=E_0 \left(Y \mid A=a, W=w\right)\)</span> is the so-called outcome regression and <span class="math inline">\(Q_W(w)=Pr_0\left(W\leq w\right)\)</span> is the distribution function of the covariates. The value <span class="math inline">\(\psi_0(a)\)</span> represents the marginal (i.e., population-level)treatment-specific average outcome, hereafter referred to as the <em>marginal mean</em> under treatment <span class="math inline">\(A=a\)</span>. The marginal effect of the treatment on the outcome can be assessed by comparing marginal means under different treatment levels. For example, the average treatment effect is often defined as <span class="math inline">\(\psi_0 := \psi_0(1) - \psi_0(0)\)</span>. Under additional assumptions, these parameters have richer interpretations as mean counterfactual outcomes under the different treatments and contrasts between these means define causal effects.</p>
-</div>
-<div id="g-computation-estimators" class="section level2">
-<h2 class="hasAnchor">
-<a href="#g-computation-estimators" class="anchor"></a>G-computation estimators </h2>
-An estimator of <span class="math inline">\(\psi_0(a)\)</span> may be motivated directly by (1). Suppose we have available an estimate of the OR, <span class="math inline">\(\bar{Q}_n\)</span>, and an estimate of the distribution function of baseline covariates, <span class="math inline">\(Q_{W,n}\)</span>. An estimator of <span class="math inline">\(\psi_0(a)\)</span> may be obtained by plugging these into (1), <span class="math inline">\(\psi_n(a) = \int \bar{Q}_0(a,w) dQ_{W,n}(w).\)</span> Often the empirical distribution function of covariates is used so that this estimator can be equivalently written as
-<span class="math display">\[\begin{equation*} 
-\psi_{n,GCOMP}(a) = \frac{1}{n}\sum\limits_{i=1}^n \bar{Q}_n(a, W_i) \ . 
-\end{equation*}\]</span>
-<p>This estimator is commonly referred to as the G-computation (GCOMP) estimator. Inference for GCOMP estimators based on parametric OR estimators may be facilitated through the nonparametric bootstrap. However, if adaptive approaches are used to estimate the OR, inference may not be available without further modification to the estimator.</p>
-</div>
-<div id="inverse-probability-of-treatment-estimators" class="section level2">
-<h2 class="hasAnchor">
-<a href="#inverse-probability-of-treatment-estimators" class="anchor"></a>Inverse probability of treatment estimators </h2>
-An alternative estimator of the treatment-specific population-level mean may be obtained by noting that (1) can be equivalently written as
-<span class="math display">\[\begin{align}
+\end{equation}
+wh\]</span>ere <span class="math inline">\(\bar{Q}_0(a,w)=E_0 \left(Y \mid A=a, W=w\right)\)</span> is the so-called outcome regression and <span class="math inline">\(Q_W(w)=Pr_0\left(W\leq w\right)\)</span> is the distribution function of the covariates. The value <span class="math inline">\(\psi_0(a)\)</span> represents the marginal (i.e., population-level)treatment-specific average outcome, hereafter referred to as the <em>marginal mean</em> under treatment <span class="math inline">\(A=a\)</span>. The marginal effect of the treatment on the outcome can be assessed by comparing marginal means under different treatment levels. For example, the average treatment effect is often defined as <span class="math inline">\(\psi_0 := \psi_0(1) - \psi_0(0)\)</span>. Under additional assumptions, these parameters have richer interpretations as mean counterfactual outcomes under the different treatments and contrasts between these means define causal effects.</p>
+</section><section id="g-computation-estimators" class="level2"><h2>G-computation estimators </h2>
+<p>An estimator of <span class="math inline">\(\psi_0(a)\)</span> may be motivated directly by (1). Suppose we have available an estimate of the OR, <span class="math inline">\(\bar{Q}_n\)</span>, and an estimate of the distribution function of baseline covariates, <span class="math inline">\(Q_{W,n}\)</span>. An estimator of <span class="math inline">\(\psi_0(a)\)</span> may be obtained by plugging these into (1), <span class="math inline">\(\psi_n(a) = \int \bar{Q}_0(a,w) dQ_{W,n}(w).\)</span> Often the empirical distribution function of covariates is used so that this estimator can be equivalently written as <span class="math display">\[\begin{equation*}
+\psi_{n,GCOMP}(a) = \frac{1}{n}\sum\limits_{i=1}^n \bar{Q}_n(a, W_i) \ .
+\end{equation*}
+\]</span>This estimator is commonly referred to as the G-computation (GCOMP) estimator. Inference for GCOMP estimators based on parametric OR estimators may be facilitated through the nonparametric bootstrap. However, if adaptive approaches are used to estimate the OR, inference may not be available without further modification to the estimator.</p>
+</section><section id="inverse-probability-of-treatment-estimators" class="level2"><h2>Inverse probability of treatment estimators </h2>
+<p>An alternative estimator of the treatment-specific population-level mean may be obtained by noting that (1) can be equivalently written as <span class="math display">\[\begin{align}
 E_0\{\bar{Q}(a,W)\} &amp;= E_0\{E_0(Y \mid A = a, W)\} \notag \\
-          &amp;= E_0\biggl\{\frac{I(A=a)}{Pr_0(A = a \mid W)} E_0(Y \mid A = a, W)\biggr\} \notag  \\
-          &amp;= E_0\biggl\{\frac{I(A=a)}{Pr_0(A = a \mid W)} E_0(Y \mid A, W)\biggr\} \notag  \\ 
-          &amp;= E_0\biggl\{\frac{I(A=a)}{Pr_0(A = a \mid W)} Y \biggr\} \ . \label{iptwID}
-\end{align}\]</span>
-We use <span class="math inline">\(g_0(a \mid W) := Pr_0(A = a \mid W)\)</span> to denote the propensity score. Suppose we had available <span class="math inline">\(g_n\)</span>, an estimate of the PS. Equation (2) motivates the estimator
-<span class="math display">\[\begin{equation*}
-\psi_{n,IPTW}(a) := \frac{1}{n}\sum\limits_{i=1}^n \frac{I(A_i = a)}{g_n(a \mid W_i)} Y_i \ , 
-\end{equation*}\]</span>
-<p>which is referred to as the inverse probability of treatment (IPTW) estimator. Inference for IPTW estimators based on parametric PS estimators may be facilitated through the nonparametric bootstrap. If adaptive approaches are used to estimate the PS, inference may not be available without further modification of the propensity score estimator, as we discuss below.</p>
-</div>
-<div id="doubly-robust-estimators" class="section level2">
-<h2 class="hasAnchor">
-<a href="#doubly-robust-estimators" class="anchor"></a>Doubly-robust estimators </h2>
+          &amp;= E_0\biggl\{\frac{I(A=a)}{Pr_0(A = a \mid W)} E_0(Y \mid A = a,
+          W)\biggr\} \notag  \\
+          &amp;= E_0\biggl\{\frac{I(A=a)}{Pr_0(A = a \mid W)} E_0(Y \mid A,
+          W)\biggr\} \notag  \\
+          &amp;= E_0\biggl\{\frac{I(A=a)}{Pr_0(A = a \mid W)} Y \biggr\} \ .
+          \label{iptwID}
+\end{align}
+\]</span>We use <span class="math inline">\(g_0(a \mid W) := Pr_0(A = a \mid W)\)</span> to denote the propensity score. Suppose we had available <span class="math inline">\(g_n\)</span>, an estimate of the PS. Equation (2) motivates the estimator <span class="math display">\[\begin{equation*}
+\psi_{n,IPTW}(a) := \frac{1}{n}\sum\limits_{i=1}^n \frac{I(A_i = a)}{g_n(a \mid
+W_i)} Y_i \ ,
+\end{equation*}
+\]</span>which is referred to as the inverse probability of treatment (IPTW) estimator. Inference for IPTW estimators based on parametric PS estimators may be facilitated through the nonparametric bootstrap. If adaptive approaches are used to estimate the PS, inference may not be available without further modification of the propensity score estimator, as we discuss below.</p>
+</section><section id="doubly-robust-estimators" class="level2"><h2>Doubly-robust estimators </h2>
 <p>The GCOMP and IPTW estimators suffer from two important shortcomings. The first is a lack of robustness. That is, validity of GCOMP estimators relies on consistent estimation of the OR, while validity of the IPTW relies on consistent estimation of the PS. In practice, we may not know which of the OR or PS is simpler to consistently estimate and thus may not know which of the two estimators to prefer. Furthermore, if adaptive estimators (e.g., based on machine learning) are used to estimate the OR or PS, then the GCOMP and IPTW estimators lack a basis for statistical inference.</p>
-This motivates a new class of estimators that combine both the GCOMP and IPTW estimators. One example is the augmented IPTW (AIPTW) estimator
-<span class="math display">\[\begin{equation*}
-\psi_{n,AIPTW}(a) = \psi_{n,IPTW}(a) + \frac{1}{n} \sum\limits_{i=1}^n \biggl\{ 1 - \frac{I(A_i = a)}{g_n(a \mid W_i)} \biggr\} \  \bar{Q}_n(a, W_i) \ , 
-\end{equation*}\]</span>
-which adds an augmentation term to the IPTW estimator. Equivalently, the estimator can be viewed as adding an augmentation to the GCOMP estimator
-<span class="math display">\[\begin{equation} \label{oneStepEst}
-\psi_{n,AIPTW}(a) = \psi_{n,GCOMP}(a) + \frac{1}{n} \sum\limits_{i=1}^n \frac{I(A_i = a)}{g_n(a \mid W_i)} \{Y_i - \bar{Q}_n(a,W_i)\} \ . 
-\end{equation}\]</span>
-<p>The AIPTW estimator overcomes the two limitations of the GCOMP and IPTW estimators. The estimator exhibits double-robustness in that it is consistent for <span class="math inline">\(\psi_0(a)\)</span> if either <span class="math inline">\(\bar{Q}_n\)</span> is consistent for the true OR <em>or</em> <span class="math inline">\(g_n\)</span> is consistent for the true PS. Furthermore, if both the OR and PS are consistently estimated and regularity conditions hold, one can establish a limiting normal distribution for the AIPTW estimator. Simple estimators of the variance of this limiting distribution can be derived that may be used to construct Wald-style confidence intervals and hypothesis tests.</p>
-A more recent proposal to improve robustness and inferential properties of the GCOMP and IPTW estimators utilizes targeted minimum loss-based estimation (TMLE). TMLE is a general methodology that may be used to modify an estimator of a regression function in such a way so as to ensure that the modified estimator satisfies user-selected equations. In the present problem, one can show that if an estimator of the OR <span class="math inline">\(\bar{Q}_n^*\)</span> satisfies
-<span class="math display">\[\begin{equation} \label{meanEIFZero}
-  \frac{1}{n} \sum\limits_{i=1}^n \frac{I(A_i = a)}{g_n(a \mid W_i)} \{Y_i - \bar{Q}_n^*(a, W_i)\} = 0 \ , 
-\end{equation}\]</span>
-<p>then the GCOMP estimator based on <span class="math inline">\(\bar{Q}_n^*\)</span> will have the same asymptotic properties as the AIPTW estimator. That is, the estimator will be doubly-robust and, provided both the OR and PS are consistently estimated and regularity conditions are satisfied, will have a normal limiting distribution. TMLE provides a means of mapping an initial estimator of the OR into an estimator that satisfies (4). In addition to possessing the desirable asymptotic properties, TMLE estimators have been shown to outperform AIPTW estimators in finite samples <span class="citation">(Porter et al. 2011)</span>. We refer readers to van der Laan and Rose (2011) for more about TMLE <span class="citation">(van der Laan and Rose 2011})</span></p>
-</div>
-</div>
-<div id="doubly-robust-inference" class="section level1">
-<h1 class="hasAnchor">
-<a href="#doubly-robust-inference" class="anchor"></a>Doubly-robust inference </h1>
+<p>This motivates a new class of estimators that combine both the GCOMP and IPTW estimators. One example is the augmented IPTW (AIPTW) estimator <span class="math display">\[\begin{equation*}
+\psi_{n,AIPTW}(a) = \psi_{n,IPTW}(a) + \frac{1}{n} \sum\limits_{i=1}^n \biggl\{
+1 - \frac{I(A_i = a)}{g_n(a \mid W_i)} \biggr\} \  \bar{Q}_n(a, W_i) \ ,
+\end{equation*}
+wh\]</span>ich adds an augmentation term to the IPTW estimator. Equivalently, the estimator can be viewed as adding an augmentation to the GCOMP estimator <span class="math display">\[\begin{equation} \label{oneStepEst}
+\psi_{n,AIPTW}(a) = \psi_{n,GCOMP}(a) + \frac{1}{n} \sum\limits_{i=1}^n
+\frac{I(A_i = a)}{g_n(a \mid W_i)} \{Y_i - \bar{Q}_n(a,W_i)\} \ .
+\end{equation}
+\]</span>The AIPTW estimator overcomes the two limitations of the GCOMP and IPTW estimators. The estimator exhibits double-robustness in that it is consistent for <span class="math inline">\(\psi_0(a)\)</span> if either <span class="math inline">\(\bar{Q}_n\)</span> is consistent for the true OR <em>or</em> <span class="math inline">\(g_n\)</span> is consistent for the true PS. Furthermore, if both the OR and PS are consistently estimated and regularity conditions hold, one can establish a limiting normal distribution for the AIPTW estimator. Simple estimators of the variance of this limiting distribution can be derived that may be used to construct Wald-style confidence intervals and hypothesis tests.</p>
+<p>A more recent proposal to improve robustness and inferential properties of the GCOMP and IPTW estimators utilizes targeted minimum loss-based estimation (TMLE). TMLE is a general methodology that may be used to modify an estimator of a regression function in such a way so as to ensure that the modified estimator satisfies user-selected equations. In the present problem, one can show that if an estimator of the OR <span class="math inline">\(\bar{Q}_n^*\)</span> satisfies <span class="math display">\[\begin{equation}
+\label{meanEIFZero}
+  \frac{1}{n} \sum\limits_{i=1}^n \frac{I(A_i = a)}{g_n(a \mid W_i)} \{Y_i -
+  \bar{Q}_n^*(a, W_i)\} = 0 \ ,
+\end{equation}
+\]</span>then the GCOMP estimator based on <span class="math inline">\(\bar{Q}_n^*\)</span> will have the same asymptotic properties as the AIPTW estimator. That is, the estimator will be doubly-robust and, provided both the OR and PS are consistently estimated and regularity conditions are satisfied, will have a normal limiting distribution. TMLE provides a means of mapping an initial estimator of the OR into an estimator that satisfies (4). In addition to possessing the desirable asymptotic properties, TMLE estimators have been shown to outperform AIPTW estimators in finite samples <span class="citation" data-cites="porter:2011:ijb">(Porter et al. 2011)</span>. We refer readers to van der Laan and Rose (2011) for more about TMLE <span class="citation" data-cites="tlbook:2011">(van der Laan and Rose 2011})</span></p>
+</section></section><section id="doubly-robust-inference" class="level1"><h1>Doubly-robust inference </h1>
 <p>van der Laan (2014) demonstrated that the double robustness property of AIPTW and TMLE estimators does not extend to their normal limiting distribution if adaptive estimators of the OR and PS are used to construct the estimators. However, in settings with high-dimensional and continuous-valued covariates, adaptive estimation is likely necessary in order to obtain a consistent estimate of either the OR or PS, and thus may be necessary to obtain minimally biased estimates of the marginal means of interest. van der Laan (2014) derived modified TMLE estimators that are doubly-robust not only with respect to consistency, but also with respect to asymptotic normality. Furthermore, he provided closed-form, doubly-robust variance estimators that may be used to construct doubly-robust confidence intervals and hypothesis tests. Benkeser et al. (2017) proposed simplifications of the van der Laan (2014) estimators and demonstrated the practical performance of estimators via simulation.</p>
-The key to the theory underlying these results is finding estimators of the OR and PS that simultaneously satisfy equation (4) in addition to two additional equations. These equations involve additional regression parameters that we refer to as the reduced outcome regression (R-OR) and the reduced propensity score (R-PS), defined respectively as
-<span class="math display">\[\begin{align*}
-  \bar{Q}_{r,0n}(a,w) &amp;:= E_{0}\bigl\{Y - \bar{Q}_n(W) \mid A = a, g_n(W)=g_n(w)\bigr\} \\ 
-  g_{r,0n}(a \mid w) &amp;:= Pr_0\left\{A = a \mid \bar{Q}_n(W)=\bar{Q}_n(w), g_n(W)=g_n(w)\right\} \ . 
-\end{align*}\]</span>
-<p>In words, the R-OR is the regression of the residual from the outcome regression onto the estimated PS amongst observations with <span class="math inline">\(A = a\)</span>, while the R-PS is the propensity for treatment <span class="math inline">\(A = a\)</span> given the estimated OR and PS. We note that a key feature of these reduced-dimension regressions is that they are low-dimensional regardless of the dimension of <span class="math inline">\(W\)</span> and they do not depend on the true OR nor PS. Thus, these regressions may be consistently estimated at reasonably fast rates irrespective of the dimension of <span class="math inline">\(W\)</span> and irrespective of whether the OR or PS are consistently estimated. Based on these reduced-dimension regressions, van der Laan (2014) showed that if estimates of the OR <span class="math inline">\(\bar{Q}_n^*\)</span>, PS <span class="math inline">\(g_n^*\)</span>, R-OR <span class="math inline">\(\bar{Q}_{r,n}^*\)</span>, and R-PS <span class="math inline">\(g_{r,n}^*\)</span> satisfied <span class="math display">\[ 
+<p>The key to the theory underlying these results is finding estimators of the OR and PS that simultaneously satisfy equation (4) in addition to two additional equations. These equations involve additional regression parameters that we refer to as the reduced outcome regression (R-OR) and the reduced propensity score (R-PS), defined respectively as <span class="math display">\[\begin{align*}
+  \bar{Q}_{r,0n}(a,w) &amp;:= E_{0}\bigl\{Y - \bar{Q}_n(W) \mid A = a,
+  g_n(W)=g_n(w)\bigr\} \\
+  g_{r,0n}(a \mid w) &amp;:= Pr_0\left\{A = a \mid \bar{Q}_n(W)=\bar{Q}_n(w),
+  g_n(W)=g_n(w)\right\} \ .
+\end{align*}
+\]</span>In words, the R-OR is the regression of the residual from the outcome regression onto the estimated PS amongst observations with <span class="math inline">\(A = a\)</span>, while the R-PS is the propensity for treatment <span class="math inline">\(A = a\)</span> given the estimated OR and PS. We note that a key feature of these reduced-dimension regressions is that they are low-dimensional regardless of the dimension of <span class="math inline">\(W\)</span> and they do not depend on the true OR nor PS. Thus, these regressions may be consistently estimated at reasonably fast rates irrespective of the dimension of <span class="math inline">\(W\)</span> and irrespective of whether the OR or PS are consistently estimated. Based on these reduced-dimension regressions, van der Laan (2014) showed that if estimates of the OR <span class="math inline">\(\bar{Q}_n^*\)</span>, PS <span class="math inline">\(g_n^*\)</span>, R-OR <span class="math inline">\(\bar{Q}_{r,n}^*\)</span>, and R-PS <span class="math inline">\(g_{r,n}^*\)</span> satisfied <span class="math display">\[
 \begin{align}
-&amp; \frac{1}{n} \sum\limits_{i=1}^n  \frac{I(A_i = a)}{g_n^*(a \mid W_i)} \{Y_i - \bar{Q}_n^*(a,W_i)\} = 0 \ , \label{tmleEIFSolve} \\
-&amp;\frac{1}{n} \sum\limits_{i=1}^n \frac{\bar{Q}_{r,n}(a, W_i)}{g_n(a \mid W_i)} \{I(A_i = a) - g_n^*(a \mid W_i)\} = 0 \ , \ \mbox{and} \label{tmleAsolve} \\
-&amp;\frac{1}{n} \sum\limits_{i=1}^n \frac{I(A_i = a)}{g_{r,n}^*(a \mid W_i)} \biggl\{\frac{g_{r,n}^*(a \mid W_i) - g_n^*(a \mid W_i)}{g_n^*(a \mid W_i)} \biggr\} \{Y_i - \bar{Q}_n^*(a, W_i) \} = 0 \ , \label{tmleQsolve}
+&amp; \frac{1}{n} \sum\limits_{i=1}^n  \frac{I(A_i = a)}{g_n^*(a \mid W_i)} \{Y_i -
+\bar{Q}_n^*(a,W_i)\} = 0 \  , \label{tmleEIFSolve} \\
+&amp;\frac{1}{n} \sum\limits_{i=1}^n \frac{\bar{Q}_{r,n}(a, W_i)}{g_n(a \mid W_i)}
+\{I(A_i = a) - g_n^*(a \mid W_i)\} = 0 \  , \  \mbox{and} \label{tmleAsolve} \\
+&amp;\frac{1}{n} \sum\limits_{i=1}^n \frac{I(A_i = a)}{g_{r,n}^*(a \mid W_i)}
+\biggl\{\frac{g_{r,n}^*(a \mid W_i) - g_n^*(a \mid W_i)}{g_n^*(a \mid W_i)}
+\biggr\} \{Y_i - \bar{Q}_n^*(a, W_i) \} = 0 \  , \label{tmleQsolve}
 \end{align}
 \]</span> then the GCOMP estimator based on <span class="math inline">\(\bar{Q}_n^*\)</span> would be doubly-robust not only with respect to consistency, but also with respect to its limiting distribution. The author additionally proposed a TMLE algorithm to map initial estimates of the OR, PS, R-OR, and R-PS into estimates that satisfy these key equations.</p>
-Benkeser et al. (2017) demonstrated alternative equations that can be satisfied to achieve this form of double-robustness. In particular, they formulated an alternative version of the R-PS,
-<span class="math display">\[\begin{align*}
-g_{r,0,1}(a \mid w) := Pr_0\{A = a \mid \bar{Q}_n(W) = \bar{Q}_n(w) \} \ , 
-\end{align*}\]</span>
-which we refer to as R-PS1. They also introduced an additional regression of a weighted residual from the PS on the OR,
-<span class="math display">\[\begin{align*}
-g_{r,0,2}(a \mid w) := E_0\biggl\{\frac{I(A = a) - g_n(a \mid W)}{g_n(a \mid W)} \ \bigg\vert \ \bar{Q}_n(W) = \bar{Q}_n(w) \biggr\} \ ,
-\end{align*}\]</span>
-<p>which we refer to as R-PS2. The key feature of R-PS1 and R-PS2 is that they are both univariate regressions, while R-PS is a bivariate regression. Benkeser and colleagues suggested that this may make R-PS1 and R-PS2 easier to estimate consistently than R-PS. Further, they showed that if estimators or the OR, PS, and R-OR satisfy equations (5)-(6), and if additionally, estimators of the OR, R-PS-1 <span class="math inline">\(g_{r,n,1}^*\)</span>, and R-PS-2 <span class="math inline">\(g_{r,n,2}^*\)</span> satisfy <span class="math display">\[ 
-\frac{1}{n} \sum\limits_{i=1}^n \frac{I(A_i = a)}{g_{r,n,1}^*(a \mid W_i)} g_{r,n,2}^*(a \mid W_i) \ \{Y_i - \bar{Q}_n^*(a,W_i)\} = 0 \ , 
+<p>Benkeser et al. (2017) demonstrated alternative equations that can be satisfied to achieve this form of double-robustness. In particular, they formulated an alternative version of the R-PS, <span class="math display">\[\begin{align*}
+g_{r,0,1}(a \mid w) := Pr_0\{A = a \mid \bar{Q}_n(W) = \bar{Q}_n(w) \} \ ,
+\end{align*}
+\]</span>which we refer to as R-PS1. They also introduced an additional regression of a weighted residual from the PS on the OR, <span class="math display">\[\begin{align*}
+g_{r,0,2}(a \mid w) := E_0\biggl\{\frac{I(A = a) - g_n(a \mid W)}{g_n(a \mid
+W)} \ \bigg\vert \ \bar{Q}_n(W) = \bar{Q}_n(w) \biggr\} \ ,
+\end{align*}
+wh\]</span>ich we refer to as R-PS2. The key feature of R-PS1 and R-PS2 is that they are both univariate regressions, while R-PS is a bivariate regression. Benkeser and colleagues suggested that this may make R-PS1 and R-PS2 easier to estimate consistently than R-PS. Further, they showed that if estimators or the OR, PS, and R-OR satisfy equations (5)-(6), and if additionally, estimators of the OR, R-PS-1 <span class="math inline">\(g_{r,n,1}^*\)</span>, and R-PS-2 <span class="math inline">\(g_{r,n,2}^*\)</span> satisfy <span class="math display">\[
+\frac{1}{n} \sum\limits_{i=1}^n \frac{I(A_i = a)}{g_{r,n,1}^*(a \mid W_i)}
+g_{r,n,2}^*(a \mid W_i) \  \{Y_i - \bar{Q}_n^*(a,W_i)\} = 0 \  ,
 \]</span> then the GCOMP estimator based on this <span class="math inline">\(\bar{Q}_n^*\)</span> also enjoys a doubly-robust limiting distribution. Benkeser et al. (2017) provided a TMLE algorithm that produced such estimates and provided closed-form, doubly-robust variance estimates.</p>
 <p> In the previous section, we introduced AIPTW and TMLE as two methods for constructing doubly-robust (with respect to consistency) estimators of our parameter of interest. Theoretically, these two frameworks are closely related and practically the two estimators are generally seen as competitors for estimating marginal means. In equation (3), we were able to generate a doubly-robust estimator by adding a term to the GCOMP estimator. This term is exactly the left-hand-side of the key equation (4), the key equation that is solved by the standard TMLE. This is no coincidence; this term is crucial in studying the asymptotic properties of the GCOMP, AIPTW, and TMLE estimators (for discussion, see Benkeser et al. (2017) Section 2.2). Recall that a TMLE estimator achieves doubly-robust consistency by satisfying equation (4), while the AIPTW achieves doubly-robust consistency by combining the GCOMP estimator with the left-hand-side of this term. Now, we have argued that a TMLE estimator may achieve doubly-robust limiting behavior if it additionally satisfies equations (6) and (7). It is thus sensible to wonder whether an AIPTW-style estimator could be constructed by combining the left-hand-side of these two additional equations with the AIPTW estimator. Benkeser and colleagues showed that, surprisingly, this AIPTW-style estimator does not achieve the same doubly-robust properties as the TMLE estimator. Thus, while AIPTW and TMLE are generally competitors for producing estimators doubly-robust with respect to consistency, for doubly-robust inference, TMLE is preferred.</p>
-</div>
-<div id="implementation-of-doubly-robust-inference" class="section level1">
-<h1 class="hasAnchor">
-<a href="#implementation-of-doubly-robust-inference" class="anchor"></a>Implementation of doubly-robust inference </h1>
+</section><section id="implementation-of-doubly-robust-inference" class="level1"><h1>Implementation of doubly-robust inference </h1>
 <p>The main function of the package is the eponymous <code>drtmle</code> function. This function estimates the treatment-specific marginal mean for user-specified levels of a discrete-valued treatment and computes a doubly-robust covariance matrix for these estimates. The <code>drtmle</code> function implements either the estimators of van der Laan (2014) (if <code>reduction = "bivariate"</code>) or the improved estimators of Benkeser et al. (2017) (<code>reduction = "univariate"</code>). The package includes utility functions for combining these estimates into estimates of average treatment effects, as well as other contrasts, as discussed below.</p>
-<p>The main data arguments for <code>drtmle</code> are <code>W, A, Y</code>, which, as above, represent the covariates, a discrete-valued treatment, and an outcome, respectively. Missing data are allowed in <code>A</code> and <code>Y</code>; this is discussed further in a section below. Beyond the data arguments, it is necessary to specify how to estimate each of the OR, PS, R-OR, and R-PS (or R-PS1, R-PS2). The package provides flexibility in how these regression parameters may be estimated. Once the user has specified the data arguments and how to estimate each regression parameter, the function proceeds as follows: 1. estimate the OR via the internal <code>estimateQ</code> function; 2. estimate the PS via the internal <code>estimateG</code> function; 3. estimate reduced-dimension regression via <code>estimateQrn</code> and <code>estimategrn</code>functions; 4. iteratively modify initial estimates of the OR and PS via the <code>fluctuateQ</code> and <code>fluctuateG</code> functions until equations (5)-(7) are approximately solved; 5. compute the TMLE estimates and covariance estimates based on the final OR. We refer interested readers to Benkeser et al. (2017) for a theoretical derivation of how the iterative modification of initial OR and PS is performed.</p>
+<p>The main data arguments for <code>drtmle</code> are <code>W, A, Y</code>, which, as above, represent the covariates, a discrete-valued treatment, and an outcome, respectively. Missing data are allowed in <code>A</code> and <code>Y</code>; this is discussed further in a section below. Beyond the data arguments, it is necessary to specify how to estimate each of the OR, PS, R-OR, and R-PS (or R-PS1, R-PS2). The package provides flexibility in how these regression parameters may be estimated. Once the user has specified the data arguments and how to estimate each regression parameter, the function proceeds as follows: 1. estimate the OR via the internal <code>estimateQ</code> function; 2. estimate the PS via the internal <code>estimateG</code> function; 3. estimate reduced-dimension regression via <code>estimateQrn</code> and <code>estimategrn</code> functions; 4. iteratively modify initial estimates of the OR and PS via the <code>fluctuateQ</code> and <code>fluctuateG</code> functions until equations (5)-(7) are approximately solved; 5. compute the TMLE estimates and covariance estimates based on the final OR. We refer interested readers to Benkeser et al. (2017) for a theoretical derivation of how the iterative modification of initial OR and PS is performed.</p>
 <p>In addition to returning doubly-robust parameter and covariance estimates, the <code>drtmle</code> function returns estimates of the GCOMP, AIPTW, standard TMLE, and the modified AIPTW estimator discussed in the remark above. While doubly-robust inference based on these estimators is not available, the estimators are provided for comparison. In the following subsections, we look at various options for making calls to <code>drtmle</code>.</p>
-<div id="estimating-regressions" class="section level2">
-<h2 class="hasAnchor">
-<a href="#estimating-regressions" class="anchor"></a>Estimating regressions </h2>
-<p>While the estimators computed by <code>drtmle</code> are consistent and asymptotically normal under inconsistent estimation of either the OR or PS, it is nevertheless advisable to strive for consistent estimation of <em>both</em> the OR and PS. If both of the regression parameters are consistently estimated then the estimators computed by <code>drtmle</code> achieve the nonparametric efficiency bound, resulting in narrower confidence intervals and more powerful hypothesis tests. In order that the estimates of the OR and PS have the greatest chance of consistency, the <code>drtmle</code> function facilitates estimation using adaptive estimation techniques. In fact, there are three ways to estimate each of the regression parameters: generalized linear models, super learning, and a user-specified estimation technique. We demonstrate each of these approaches in turn on a simple simulated data set. The true parameter values of interest are <span class="math inline">\(\psi_0(0)=\)</span> 0.62 and <span class="math inline">\(\psi_0(1)=\)</span> 0.72.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">1234</span>)
-n &lt;-<span class="st"> </span><span class="dv">200</span>
-W &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">W1 =</span> <span class="kw">runif</span>(n), <span class="dt">W2 =</span> <span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.5</span>))
-A &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="kw">plogis</span>(W$W1 +<span class="st"> </span>W$W2))
-Y &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="kw">plogis</span>(W$W1 +<span class="st"> </span>W$W2*A))</code></pre></div>
+<section id="estimating-regressions" class="level2"><h2>Estimating regressions </h2>
+<p>While the estimators computed by <code>drtmle</code> are consistent and asymptotically normal under inconsistent estimation of either the OR or PS, it is nevertheless advisable to strive for consistent estimation of <em>both</em> the OR and PS. If both of the regression parameters are consistently estimated then the estimators computed by <code>drtmle</code> achieve the nonparametric efficiency bound, resulting in narrower confidence intervals and more powerful hypothesis tests. In order that the estimates of the OR and PS have the greatest chance of consistency, the <code>drtmle</code> function facilitates estimation using adaptive estimation techniques. In fact, there are three ways to estimate each of the regression parameters: generalized linear models, super learning, and a user-specified estimation technique. We demonstrate each of these approaches in turn on a simple simulated data set. The true parameter values of interest are <span class="math inline">\(\psi_0(0)=\)</span> <code>r round(EY0,2)</code> and <span class="math inline">\(\psi_0(1)=\)</span> 0.72.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">1234</span>)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2">n &lt;-<span class="st"> </span><span class="dv">200</span></a>
+<a class="sourceLine" id="cb1-3" data-line-number="3">W &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">W1 =</span> <span class="kw">runif</span>(n), <span class="dt">W2 =</span> <span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.5</span>))</a>
+<a class="sourceLine" id="cb1-4" data-line-number="4">A &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="kw">plogis</span>(W<span class="op">$</span>W1 <span class="op">+</span><span class="st"> </span>W<span class="op">$</span>W2))</a>
+<a class="sourceLine" id="cb1-5" data-line-number="5">Y &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="kw">plogis</span>(W<span class="op">$</span>W1 <span class="op">+</span><span class="st"> </span>W<span class="op">$</span>W2<span class="op">*</span>A))</a></code></pre></div>
 <p>Generalized linear models are perhaps the most popular means of estimating regression functions. Because of this legacy, these estimators have been included as an option for estimating the regression parameters. The user specifies the right-hand-side of a regression formula as a character in the <code>glm_Q</code>, <code>glm_g</code>, <code>glm_Qr</code>, and <code>glm_gr</code> options to estimate the OR, PS, R-OR, and R-PS. These regressions are fit by calling the <code>glm</code> function in base R. Thus, the model specification should be able to be parsed as a valid formula, as required by <code>glm</code>. Recall that the R-OR parameter involves a regression onto the estimated propensity. Thus, the formula that is input via <code>glm_Qr</code> should assume data with a single column named <code>"gn"</code>. Similarly, the R-PS1 and R-PS2 that are computed for the estimators of Benkeser et al. (2017) (the default estimators, computed whenever <code>reduction = "univariate"</code>) involve regressions onto the estimated outcome regression. Thus, the formula <code>glm_gr</code> should assume data with a single column named <code>"Qn"</code> if <code>reduction = "univariate"</code>. If instead, the estimators of van der Laan (2014) are preferred, we can set the option <code>reduction = "bivariate"</code> and input a <code>glm_gr</code> formula that assumes data with two columns named <code>"Qn"</code> and <code>"gn"</code>.</p>
 <p>The code below illustrates how generalized linear models can be used to estimate the regression parameters. In this call to <code>drtmle</code>, we specify <code>family = binomial()</code> so that logistic regression is used to estimate the OR. We specify <code>stratify = FALSE</code> to indicate that we wish to fit a single OR to estimate <span class="math inline">\(\bar{Q}_0(A,W)\)</span>, as opposed to fitting two separate regressions to estimate <span class="math inline">\(\bar{Q}_0(1,W)\)</span> and <span class="math inline">\(\bar{Q}_0(0,W)\)</span>. If the former fitting is specified, then the OR regression is fit using a data frame that contains <code>W</code> and <code>A</code>. Thus, both <code>colnames(W)</code> and <code>"A"</code> may appear in <code>glm_Q</code>. However, if <code>stratify = TRUE</code> then the OR model is fit separately in observations with <span class="math inline">\(A = 1\)</span> and <span class="math inline">\(A = 0\)</span>. In this case, the <code>glm_Q</code> option may not include <code>"A"</code>. We illustrate non-stratified regression for both the univariate and bivariate reductions.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glm_fit_uni &lt;-<span class="st"> </span><span class="kw"><a href="../reference/drtmle.html">drtmle</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">family =</span> <span class="kw">binomial</span>(),
-                      <span class="dt">glm_g =</span> <span class="st">"W1 + W2"</span>, <span class="dt">glm_Q =</span> <span class="st">"W1 + W2*A"</span>, 
-                      <span class="dt">glm_gr =</span> <span class="st">"Qn"</span>, <span class="dt">glm_Qr =</span> <span class="st">"gn"</span>, <span class="dt">stratify =</span> <span class="ot">FALSE</span>)
-glm_fit_uni</code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">glm_fit_uni &lt;-<span class="st"> </span><span class="kw"><a href="../reference/drtmle.html">drtmle</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">family =</span> <span class="kw">binomial</span>(),</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2">                      <span class="dt">glm_g =</span> <span class="st">"W1 + W2"</span>, <span class="dt">glm_Q =</span> <span class="st">"W1 + W2*A"</span>,</a>
+<a class="sourceLine" id="cb2-3" data-line-number="3">                      <span class="dt">glm_gr =</span> <span class="st">"Qn"</span>, <span class="dt">glm_Qr =</span> <span class="st">"gn"</span>, <span class="dt">stratify =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb2-4" data-line-number="4">glm_fit_uni</a></code></pre></div>
 <pre><code>## $est
 ##            
 ## 1 0.7111238
@@ -212,11 +202,11 @@ glm_fit_uni</code></pre></div>
 ##               1             0
 ## 1  1.741869e-03 -1.006289e-05
 ## 0 -1.006289e-05  4.081532e-03</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glm_fit_biv &lt;-<span class="st"> </span><span class="kw"><a href="../reference/drtmle.html">drtmle</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">family =</span> <span class="kw">binomial</span>(),
-                      <span class="dt">glm_g =</span> <span class="st">"W1 + W2"</span>, <span class="dt">glm_Q =</span> <span class="st">"W1 + W2*A"</span>, 
-                      <span class="dt">glm_gr =</span> <span class="st">"Qn"</span>, <span class="dt">glm_Qr =</span> <span class="st">"gn"</span>, <span class="dt">stratify =</span> <span class="ot">FALSE</span>,
-                      <span class="dt">reduction =</span> <span class="st">"bivariate"</span>)
-glm_fit_biv</code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">glm_fit_biv &lt;-<span class="st"> </span><span class="kw"><a href="../reference/drtmle.html">drtmle</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">family =</span> <span class="kw">binomial</span>(),</a>
+<a class="sourceLine" id="cb4-2" data-line-number="2">                      <span class="dt">glm_g =</span> <span class="st">"W1 + W2"</span>, <span class="dt">glm_Q =</span> <span class="st">"W1 + W2*A"</span>,</a>
+<a class="sourceLine" id="cb4-3" data-line-number="3">                      <span class="dt">glm_gr =</span> <span class="st">"Qn"</span>, <span class="dt">glm_Qr =</span> <span class="st">"gn"</span>, <span class="dt">stratify =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb4-4" data-line-number="4">                      <span class="dt">reduction =</span> <span class="st">"bivariate"</span>)</a>
+<a class="sourceLine" id="cb4-5" data-line-number="5">glm_fit_biv</a></code></pre></div>
 <pre><code>## $est
 ##            
 ## 1 0.7111231
@@ -226,15 +216,17 @@ glm_fit_biv</code></pre></div>
 ##               1             0
 ## 1  1.709464e-03 -1.523075e-05
 ## 0 -1.523075e-05  3.593222e-03</code></pre>
-<p>Super learning is a loss-based ensemble machine learning technique <span class="citation">(van der Laan, Polley, and Hubbard 2007)</span> that is a generalization of stacking and stacked regression <span class="citation">(Wolpert 1992)</span>breiman:1996:ml}. The user specifies many potential candidate regression estimators, referred to as a <em>library</em> of candidate estimators, and the super learner algorithm estimates the convex combination of regression estimators that minimizes <span class="math inline">\(V\)</span>-fold cross-validated risk based on a user-selected loss function. Oracle inequalities show that the super learner estimate performs essentially as well as the unknown best convex combination of the candidate estimators <span class="citation">(Vaart, Dudoit, and van der Laan 2006)</span>. Thus, the methodology may be seen as an asymptotically optimal way of performing estimator selection. Practically, the super learner provides the best chance for obtaining a consistent estimator for both the OR and PS, and thereby an efficient estimator of the marginal means of interest.</p>
-<p>Super learning is implemented in the R package <code>SuperLearner</code> <span class="citation">(Polley et al. 2017)</span> and <code>drtmle</code> provides the option to utilize super learning for estimation of the OR, PS, and reduced-dimension regressions via the <code>SL_Q</code>, <code>SL_g</code>, <code>SL_Qr</code>, and <code>SL_gr</code> options. When calling <code>drtmle</code> either the generalized linear model options for regression modeling or the super learner options should be invoked. If both are called, the function will default to the super learner option. The inputs to the super learner options are passed to the <code>SL.library</code> argument of the <code>SuperLearner</code> function of the <code>SuperLearner</code> package. We refer readers to the <code>SuperLearner</code> help file for information on how to properly specify a super learner library. In the code below, we illustrate a call to <code>drtmle</code> with a relatively simple library. For the OR and PS, the library includes a main-terms generalized linear model (via the function <code>SL.glm</code> from <code>SuperLearner</code>), a stepwise generalized linear model with two-way interaction terms (<code>SL.step.interaction</code>), and an unadjusted generalized linear model (<code>SL.mean</code>). For the reduced dimension regressions we use a super learner library with a main terms generalized linear model (<code>SL.glm</code>), a generalized additive model (<code>SL.gam</code>, which utilizes the <code>gam</code> package <span class="citation">(Hastie 2017)</span>) and an unadjusted generalized linear model (<code>SL.mean</code>).</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sl_fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/drtmle.html">drtmle</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">family =</span> <span class="kw">binomial</span>(),
-                 <span class="dt">SL_g =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.step.interaction"</span>,<span class="st">"SL.mean"</span>), 
-                 <span class="dt">SL_Q =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.step.interaction"</span>,<span class="st">"SL.mean"</span>), 
-                 <span class="dt">SL_gr =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.gam"</span>, <span class="st">"SL.mean"</span>),
-                 <span class="dt">SL_Qr =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.gam"</span>, <span class="st">"SL.mean"</span>), 
-                 <span class="dt">stratify =</span> <span class="ot">FALSE</span>)
-sl_fit</code></pre></div>
+<p>Super learning is a loss-based ensemble machine learning technique <span class="citation" data-cites="vdl:2007:statapp">(van der Laan, Polley, and Hubbard 2007)</span> that is a generalization of stacking and stacked regression <span class="citation" data-cites="wolpert:1992:nnet">(Wolpert 1992)</span>breiman:1996:ml}. The user specifies many potential candidate regression estimators, referred to as a <em>library</em> of candidate estimators, and the super learner algorithm estimates the convex combination of regression estimators that minimizes <span class="math inline">\(V\)</span>-fold cross-validated risk based on a user-selected loss function. Oracle inequalities show that the super learner estimate performs essentially as well as the unknown best convex combination of the candidate estimators <span class="citation" data-cites="vdvaart:2006:statdec">(Vaart, Dudoit, and van der Laan 2006)</span>. Thus, the methodology may be seen as an asymptotically optimal way of performing estimator selection. Practically, the super learner provides the best chance for obtaining a consistent estimator for both the OR and PS, and thereby an efficient estimator of the marginal means of interest.</p>
+<p>Super learning is implemented in the R package <code>SuperLearner</code> <span class="citation" data-cites="SuperLearnerPackage">(Polley et al. 2017)</span> and <code>drtmle</code> provides the option to utilize super learning for estimation of the OR, PS, and reduced-dimension regressions via the <code>SL_Q</code>, <code>SL_g</code>, <code>SL_Qr</code>, and <code>SL_gr</code> options. When calling <code>drtmle</code> either the generalized linear model options for regression modeling or the super learner options should be invoked. If both are called, the function will default to the super learner option. The inputs to the super learner options are passed to the <code>SL.library</code> argument of the <code>SuperLearner</code> function of the <code>SuperLearner</code> package. We refer readers to the <code>SuperLearner</code> help file for information on how to properly specify a super learner library. In the code below, we illustrate a call to <code>drtmle</code> with a relatively simple library. For the OR and PS, the library includes a main-terms generalized linear model (via the function <code>SL.glm</code> from <code>SuperLearner</code>), a stepwise generalized linear model with two-way interaction terms (<code>SL.step.interaction</code>), and an unadjusted generalized linear model (<code>SL.mean</code>). For the reduced dimension regressions we use a super learner library with a main terms generalized linear model (<code>SL.glm</code>), a generalized additive model (<code>SL.gam</code>, which utilizes the <code>gam</code> package <span class="citation" data-cites="gamPackage">(Hastie 2017)</span>) and an unadjusted generalized linear model (<code>SL.mean</code>).</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">sl_fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/drtmle.html">drtmle</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">family =</span> <span class="kw">binomial</span>(),</a>
+<a class="sourceLine" id="cb6-2" data-line-number="2">                 <span class="dt">SL_g =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.step.interaction"</span>,<span class="st">"SL.mean"</span>),</a>
+<a class="sourceLine" id="cb6-3" data-line-number="3">                 <span class="dt">SL_Q =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.step.interaction"</span>,<span class="st">"SL.mean"</span>),</a>
+<a class="sourceLine" id="cb6-4" data-line-number="4">                 <span class="dt">SL_gr =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.gam"</span>, <span class="st">"SL.mean"</span>),</a>
+<a class="sourceLine" id="cb6-5" data-line-number="5">                 <span class="dt">SL_Qr =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.gam"</span>, <span class="st">"SL.mean"</span>),</a>
+<a class="sourceLine" id="cb6-6" data-line-number="6">                 <span class="dt">stratify =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<pre><code>## Warning in method$computeCoef(Z = Z, Y = Y, libraryNames = libraryNames, :
+## Algorithm 2 is duplicated. Setting weight to 0.</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">sl_fit</a></code></pre></div>
 <pre><code>## $est
 ##            
 ## 1 0.7117610
@@ -244,35 +236,41 @@ sl_fit</code></pre></div>
 ##               1             0
 ## 1  1.735153e-03 -1.988588e-07
 ## 0 -1.988588e-07  4.051478e-03</code></pre>
-<p>The <code>drtmle</code> package also allows users to pass in their own functions for estimating regression parameters via the <code>SL_</code> options. These functions must be formatted properly for compatibility with <code>drtmle</code>. The necessary formatting is identical the formatting required for writing a <code>SuperLearner</code> wrapper (see <code><a href="http://www.rdocumentation.org/packages/SuperLearner/topics/write.SL.template">SuperLearner::write.SL.template()</a></code>). The <code>drtmle</code> package includes <code>SL.npreg</code>, which is an example of how a user can specify a function for estimating regression parameters. This functions fits a kernel regression estimator using the <code>np</code> package <span class="citation">(Hayfield and Racine 2008)</span>. Below we show the source code for this function.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">SL.npreg</code></pre></div>
-<pre><code>## function (Y, X, newX, family, obsWeights, rangeThresh = 1e-07, 
-##     ...) 
+<p>The <code>drtmle</code> package also allows users to pass in their own functions for estimating regression parameters via the <code>SL_</code> options. These functions must be formatted properly for compatibility with <code>drtmle</code>. The necessary formatting is identical the formatting required for writing a <code>SuperLearner</code> wrapper (see <code><a href="http://www.rdocumentation.org/packages/SuperLearner/topics/write.SL.template">SuperLearner::write.SL.template()</a></code>). The <code>drtmle</code> package includes <code>SL.npreg</code>, which is an example of how a user can specify a function for estimating regression parameters. This functions fits a kernel regression estimator using the <code>np</code> package <span class="citation" data-cites="npPackage">(Hayfield and Racine 2008)</span>. Below we show the source code for this function.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">SL.npreg</a></code></pre></div>
+<pre><code>## function (Y, X, newX, family = gaussian(), 
+##                       obsWeights = rep(1, length(Y)), 
+##                       rangeThresh=1e-7, ...) 
 ## {
-##     options(np.messages = FALSE)
-##     if (abs(diff(range(Y))) &lt;= rangeThresh) {
-##         thisMod &lt;- glm(Y ~ 1, data = X)
-##     }
-##     else {
-##         bw &lt;- np::npregbw(stats::as.formula(paste("Y ~", paste(names(X), 
-##             collapse = "+"))), data = X, ftol = 0.01, tol = 0.01, 
-##             remin = FALSE)
-##         thisMod &lt;- np::npreg(bw)
-##     }
-##     pred &lt;- stats::predict(thisMod, newdata = newX)
-##     fit &lt;- list(object = thisMod)
-##     class(fit) &lt;- "SL.npreg"
-##     out &lt;- list(pred = pred, fit = fit)
-##     return(out)
+##   # turn off annoying messages
+##   options(np.messages = FALSE)
+##   # check range threshold
+##   if(abs(diff(range(Y))) &lt;= rangeThresh){
+##     thisMod &lt;- glm(Y ~ 1, data = X)
+##   }else{
+##     # bandwidth selection
+##     bw &lt;- np::npregbw(stats::as.formula(
+##             paste("Y ~", paste(names(X), collapse = "+"))), data = X,
+##           ftol=0.01, tol=0.01, remin=FALSE)
+##   
+##     # fit the kernel regression
+##     thisMod &lt;- np::npreg(bw)
+##   }
+##   
+##   pred &lt;- stats::predict(thisMod, newdata = newX)
+##   fit &lt;- list(object = thisMod)
+##   class(fit) &lt;- "SL.npreg"
+##   out &lt;- list(pred = pred, fit = fit)
+##   return(out)
 ## }
 ## &lt;environment: namespace:drtmle&gt;</code></pre>
 <p>In the above code, we see that a user-specified function should have options <code>Y, X, newX, family, obsWeights, ...</code>, along with other options specific to the function. The option <code>Y</code> corresponds to the outcome of the regression and <code>X</code> to the variables onto which the outcome is regressed. The option <code>newX</code> should be of the same class and dimension as <code>X</code> and is meant to contain new values of variables at which to evaluate the regression fit. The <code>family</code> and <code>obsWeights</code> options are not strictly necessary (indeed, they are not used by <code>SL.npreg</code>), they are useful to include if one wishes to utilize the function as part of a super learner library. The <code>SL.npreg</code> function proceeds by checking whether there is sufficient variation in <code>Y</code> to even both fitting the kernel regression (as specified by option <code>rangeThresh</code>), and if so, fits a kernel regression with cross-validated bandwidth selection via the <code>npregbw</code> function. The output is then formatted in a specific way so that <code>drtmle</code> is able to retrieve the appropriate objects from the fitted regression. In particular the output should be a list with named objects <code>pred</code> and <code>fit</code>; the former including predictions made from the fitted regression on <code>newX</code>, the latter including any information that may be needed to predict new values based on the fitted object. A class is assigned to the <code>fit</code> object, so that an S3 <code>predict</code> method may later be used to predict new values based on the fitted regression object. The user must also specify this <code>predict</code> method. Use <code>drtmle:::predict.SL.npreg</code> to view the simple <code>predict</code> method for <code>SL.npreg</code>.</p>
 <p>In the code below, we demonstrate a call to <code>drtmle</code> with <code>SL.npreg</code> used to estimate each nuisance parameter. Here, we also illustrate the use of <code>stratify = TRUE</code>, which fits a separate kernel regression of <span class="math inline">\(Y\)</span> onto <span class="math inline">\(W\)</span> in observations with <span class="math inline">\(A = 1\)</span> and <span class="math inline">\(A = 0\)</span>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">npreg_fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/drtmle.html">drtmle</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">family =</span> <span class="kw">binomial</span>(),
-                    <span class="dt">SL_g =</span> <span class="st">"SL.npreg"</span>, <span class="dt">SL_Q =</span> <span class="st">"SL.npreg"</span>, 
-                    <span class="dt">SL_gr =</span> <span class="st">"SL.npreg"</span>, <span class="dt">SL_Qr =</span> <span class="st">"SL.npreg"</span>,
-                    <span class="dt">stratify =</span> <span class="ot">TRUE</span>)
-npreg_fit                    </code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">npreg_fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/drtmle.html">drtmle</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">family =</span> <span class="kw">binomial</span>(),</a>
+<a class="sourceLine" id="cb12-2" data-line-number="2">                    <span class="dt">SL_g =</span> <span class="st">"SL.npreg"</span>, <span class="dt">SL_Q =</span> <span class="st">"SL.npreg"</span>,</a>
+<a class="sourceLine" id="cb12-3" data-line-number="3">                    <span class="dt">SL_gr =</span> <span class="st">"SL.npreg"</span>, <span class="dt">SL_Qr =</span> <span class="st">"SL.npreg"</span>,</a>
+<a class="sourceLine" id="cb12-4" data-line-number="4">                    <span class="dt">stratify =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb12-5" data-line-number="5">npreg_fit</a></code></pre></div>
 <pre><code>## $est
 ##            
 ## 1 0.7159621
@@ -282,96 +280,85 @@ npreg_fit                    </code></pre></div>
 ##               1             0
 ## 1  1.676100e-03 -1.043798e-05
 ## 0 -1.043798e-05  3.927620e-03</code></pre>
-</div>
-<div id="confidence-intervals" class="section level2">
-<h2 class="hasAnchor">
-<a href="#confidence-intervals" class="anchor"></a>Confidence intervals </h2>
+</section><section id="confidence-intervals" class="level2"><h2>Confidence intervals </h2>
 <p>The <code>drtmle</code> package contains methods that compute doubly-robust confidence intervals. The <code>ci</code> method computes confidence intervals about the estimated marginal means in a fitted <code>drtmle</code> object, in addition to contrasts between those means. By default the method gives confidence intervals about each mean.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/ci.html">ci</a></span>(npreg_fit)</code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="kw"><a href="../reference/ci.html">ci</a></span>(npreg_fit)</a></code></pre></div>
 <pre><code>## $drtmle
 ##     est   cil   ciu
 ## 1 0.716 0.636 0.796
 ## 0 0.534 0.412 0.657</code></pre>
 <p>Alternatively the <code>contrast</code> option allows users to specify a linear combination of marginal means, which can be used to estimate the average treatment effect as we show below.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/ci.html">ci</a></span>(npreg_fit, <span class="dt">contrast =</span> <span class="kw">c</span>(<span class="dv">1</span>,-<span class="dv">1</span>))</code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1"><span class="kw"><a href="../reference/ci.html">ci</a></span>(npreg_fit, <span class="dt">contrast =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>))</a></code></pre></div>
 <pre><code>## $drtmle
 ##                   est   cil   ciu
 ## E[Y(1)]-E[Y(0)] 0.182 0.035 0.329</code></pre>
 <p>The <code>contrast</code> option can also be input as a list of functions in order to compute a confidence interval for a user-specified contrast. For example, we might be interested in the risk ratio <span class="math inline">\(\psi_0(1) / \psi_0(0)\)</span>. When constructing Wald style confidence intervals for ratios, it is common to compute the interval on the log scale and back-transform. That is, the confidence interval is of the form <span class="math display">\[
-\mbox{exp}\biggl[\mbox{log}\biggl\{ \frac{\psi_0(1)}{\psi_0(0)} \biggr\} \pm z_{1-\alpha/2} \sigma^{\text{log}}_n \biggr] \ , 
+\mbox{exp}\biggl[\mbox{log}\biggl\{ \frac{\psi_0(1)}{\psi_0(0)} \biggr\} \pm
+z_{1-\alpha/2} \sigma^{\text{log}}_n \biggr] \  ,
 \]</span> where <span class="math inline">\(\sigma^{\text{log}}_n\)</span> is the estimated standard error on the log-scale. By the delta method, an estimate of this standard error is given by <span class="math display">\[
-\sigma^{\text{log}}_n = \nabla g(\psi_n)^T \Sigma_n \nabla g(\psi_n), 
+\sigma^{\text{log}}_n = \nabla g(\psi_n)^T \Sigma_n \nabla g(\psi_n),
 \]</span> where <span class="math inline">\(\Sigma_n\)</span> is the doubly-robust covariance matrix estimate output from <code>drtmle</code> and <span class="math inline">\(\nabla g(\psi)\)</span> is the gradient of <span class="math inline">\(\mbox{log}\{\psi(1)/\psi(0)\}\)</span>. To obtain this confidence interval, we may use the following code.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">riskRatio &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">f =</span> function(eff){ <span class="kw">log</span>(eff) },
-                  <span class="dt">f_inv =</span> function(eff){ <span class="kw">exp</span>(eff) },
-                  <span class="dt">h =</span> function(est){ est[<span class="dv">1</span>]/est[<span class="dv">2</span>] },
-                  <span class="dt">fh_grad =</span>  function(est){ <span class="kw">c</span>(<span class="dv">1</span>/est[<span class="dv">1</span>],-<span class="dv">1</span>/est[<span class="dv">2</span>]) })
-<span class="kw"><a href="../reference/ci.html">ci</a></span>(npreg_fit, <span class="dt">contrast =</span> riskRatio)</code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1">riskRatio &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">f =</span> <span class="cf">function</span>(eff){ <span class="kw">log</span>(eff) },</a>
+<a class="sourceLine" id="cb18-2" data-line-number="2">                  <span class="dt">f_inv =</span> <span class="cf">function</span>(eff){ <span class="kw">exp</span>(eff) },</a>
+<a class="sourceLine" id="cb18-3" data-line-number="3">                  <span class="dt">h =</span> <span class="cf">function</span>(est){ est[<span class="dv">1</span>]<span class="op">/</span>est[<span class="dv">2</span>] },</a>
+<a class="sourceLine" id="cb18-4" data-line-number="4">                  <span class="dt">fh_grad =</span>  <span class="cf">function</span>(est){ <span class="kw">c</span>(<span class="dv">1</span><span class="op">/</span>est[<span class="dv">1</span>],<span class="op">-</span><span class="dv">1</span><span class="op">/</span>est[<span class="dv">2</span>]) })</a>
+<a class="sourceLine" id="cb18-5" data-line-number="5"><span class="kw"><a href="../reference/ci.html">ci</a></span>(npreg_fit, <span class="dt">contrast =</span> riskRatio)</a></code></pre></div>
 <pre><code>## $drtmle
 ##                est   cil   ciu
 ## user contrast 1.34 1.037 1.731</code></pre>
 <p>More generally this method of inputting the <code>contrast</code> option to the <code>ci</code> method can be used to compute confidence intervals of the form <span class="math display">\[
-f^{-1}\bigl\{ f(h(\psi_n)) \pm z_{1-\alpha/2} \nabla f(h(\psi_n))^T \Sigma_n \nabla f(h(\psi_n)) \bigr\} \ , 
+f^{-1}\bigl\{ f(h(\psi_n)) \pm z_{1-\alpha/2} \nabla f(h(\psi_n))^T \Sigma_n
+\nabla f(h(\psi_n)) \bigr\} \  ,
 \]</span> where <span class="math inline">\(f\)</span> (<code>contrast$f</code>) is the transformation of the confidence interval, <span class="math inline">\(f^{-1}\)</span> (<code>contrast$f_inv</code>) is the back-transformation of the interval, <span class="math inline">\(h\)</span> (<code>contrast$h</code>) is the contrast of marginal means, and <span class="math inline">\(\nabla f(h(\psi_n))\)</span> (<code>contrast$fh_grad</code>) defines the gradient of the transformed contrast at the estimated marginal means.</p>
 <p>We note that this method of computing confidence intervals can also be used to obtain a transformed confidence interval for a particular marginal mean. For example, in our running example <span class="math inline">\(Y\)</span> is binary. Thus, we might wish to enforce that our confidence interval be computed on a scale which ensures that the confidence limits are bounded between zero and one. To that end, we can consider an interval of the form construct an interval on the logit scale and back-transform, <span class="math display">\[
-\mbox{expit}\biggl[ \mbox{log}\biggl\{ \frac{\psi_n(1)}{1 - \psi_n(1)} \biggr\} \pm z_{1-\alpha/2} \sigma^{\text{logit}}_n \biggr] \ .
+\mbox{expit}\biggl[ \mbox{log}\biggl\{ \frac{\psi_n(1)}{1 - \psi_n(1)} \biggr\}
+\pm z_{1-\alpha/2} \sigma^{\text{logit}}_n \biggr] \  .
 \]</span> This confidence interval may be implemented as follows.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">logitMean &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">f =</span> function(eff){ <span class="kw">qlogis</span>(eff) },
-                  <span class="dt">f_inv =</span> function(eff){ <span class="kw">plogis</span>(eff) },
-                  <span class="dt">h =</span> function(est){ est[<span class="dv">1</span>] }, 
-                  <span class="dt">fh_grad =</span> function(est){ <span class="kw">c</span>(<span class="dv">1</span>/(est[<span class="dv">1</span>] -<span class="st"> </span>est[<span class="dv">1</span>]^<span class="dv">2</span>), <span class="dv">0</span>) })
-<span class="kw"><a href="../reference/ci.html">ci</a></span>(npreg_fit, <span class="dt">contrast =</span> logitMean)</code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1">logitMean &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">f =</span> <span class="cf">function</span>(eff){ <span class="kw">qlogis</span>(eff) },</a>
+<a class="sourceLine" id="cb20-2" data-line-number="2">                  <span class="dt">f_inv =</span> <span class="cf">function</span>(eff){ <span class="kw">plogis</span>(eff) },</a>
+<a class="sourceLine" id="cb20-3" data-line-number="3">                  <span class="dt">h =</span> <span class="cf">function</span>(est){ est[<span class="dv">1</span>] },</a>
+<a class="sourceLine" id="cb20-4" data-line-number="4">                  <span class="dt">fh_grad =</span> <span class="cf">function</span>(est){ <span class="kw">c</span>(<span class="dv">1</span><span class="op">/</span>(est[<span class="dv">1</span>] <span class="op">-</span><span class="st"> </span>est[<span class="dv">1</span>]<span class="op">^</span><span class="dv">2</span>), <span class="dv">0</span>) })</a>
+<a class="sourceLine" id="cb20-5" data-line-number="5"><span class="kw"><a href="../reference/ci.html">ci</a></span>(npreg_fit, <span class="dt">contrast =</span> logitMean)</a></code></pre></div>
 <pre><code>## $drtmle
 ##                 est   cil   ciu
 ## user contrast 0.716 0.629 0.789</code></pre>
-</div>
-<div id="hypothesis-tests" class="section level2">
-<h2 class="hasAnchor">
-<a href="#hypothesis-tests" class="anchor"></a>Hypothesis tests </h2>
+</section><section id="hypothesis-tests" class="level2"><h2>Hypothesis tests </h2>
 <p>Doubly-robust Wald-style hypothesis tests may be implemented using the <code>wald_test</code> method. As with confidence intervals, there are three options for testing. First, we may test the null hypothesis that the marginal means equal a fixed value (or values). Below, we test the null hypothesis that <span class="math inline">\(\psi_0(1) = 0.5\)</span> and that <span class="math inline">\(\psi_0(0) = 0.6\)</span> by inputting a vector to the <code>null</code> option.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/wald_test.html">wald_test</a></span>(npreg_fit, <span class="dt">null =</span> <span class="kw">c</span>(<span class="fl">0.5</span>, <span class="fl">0.6</span>))</code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1"><span class="kw"><a href="../reference/wald_test.html">wald_test</a></span>(npreg_fit, <span class="dt">null =</span> <span class="kw">c</span>(<span class="fl">0.5</span>, <span class="fl">0.6</span>))</a></code></pre></div>
 <pre><code>## $drtmle
 ##                  zstat  pval
 ## H0: E[Y(1)]=0.5  5.275 0.000
 ## H0: E[Y(0)]=0.6 -1.046 0.296</code></pre>
 <p>As with the <code>ci</code> method, the <code>wald_test</code> method allows users to test linear combinations of marginal means by inputting a vector of ones and negative ones in the <code>contrast</code> option. We can use this to test the null hypothesis of no average treatment effect or to test the null hypothesis that the average treatment effect equals 0.05 (by specifying the <code>null</code> option)</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/wald_test.html">wald_test</a></span>(npreg_fit, <span class="dt">contrast =</span> <span class="kw">c</span>(<span class="dv">1</span>, -<span class="dv">1</span>))</code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1"><span class="kw"><a href="../reference/wald_test.html">wald_test</a></span>(npreg_fit, <span class="dt">contrast =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">-1</span>))</a></code></pre></div>
 <pre><code>## $drtmle
 ##                      zstat  pval
 ## H0:E[Y(1)]-E[Y(0)]=0  2.42 0.016</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/wald_test.html">wald_test</a></span>(npreg_fit, <span class="dt">contrast =</span> <span class="kw">c</span>(<span class="dv">1</span>, -<span class="dv">1</span>), <span class="dt">null =</span> <span class="fl">0.05</span>)</code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1"><span class="kw"><a href="../reference/wald_test.html">wald_test</a></span>(npreg_fit, <span class="dt">contrast =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">-1</span>), <span class="dt">null =</span> <span class="fl">0.05</span>)</a></code></pre></div>
 <pre><code>## $drtmle
 ##                         zstat  pval
 ## H0:E[Y(1)]-E[Y(0)]=0.05 1.754 0.079</code></pre>
 <p>The <code>wald_test</code> method also allows for user-specified contrasts to be tested using syntax similar to the <code>ci</code> method. The only difference syntactically is that it is not strictly necessary to specify <code>f_inv</code>, as the hypothesis test is performed on the transformed scale. That is, we can generally test the null hypothesis that <span class="math inline">\(f(h(\psi_0))\)</span> equals <span class="math inline">\(f_0\)</span> (the function <span class="math inline">\(f\)</span> applied to the value passed to <code>null</code>) using the Wald statistic <span class="math display">\[
-Z_n := \frac{\{f(h(\psi_n)) - f_0\}}{\nabla f(h(\psi_n))^T \Sigma_n \nabla f(h(\psi_n))} \ . 
+Z_n := \frac{\{f(h(\psi_n)) - f_0\}}{\nabla f(h(\psi_n))^T \Sigma_n \nabla
+f(h(\psi_n))} \  .
 \]</span> We can use the <code>riskRatio</code> contrast defined previously to test the null hypothesis that <span class="math inline">\(\psi_0(1)/\psi_0(0) = 1\)</span>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/wald_test.html">wald_test</a></span>(npreg_fit, <span class="dt">contrast =</span> riskRatio, <span class="dt">null =</span> <span class="dv">1</span>)</code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" data-line-number="1"><span class="kw"><a href="../reference/wald_test.html">wald_test</a></span>(npreg_fit, <span class="dt">contrast =</span> riskRatio, <span class="dt">null =</span> <span class="dv">1</span>)</a></code></pre></div>
 <pre><code>## $drtmle
 ##                       zstat  pval
 ## H0: user contrast = 1 2.238 0.025</code></pre>
-</div>
-<div id="missing-data" class="section level2">
-<h2 class="hasAnchor">
-<a href="#missing-data" class="anchor"></a>Missing data </h2>
-The <code>drtmle</code> function supports missing data in <code>A</code> and <code>Y</code>. Such missing data are common in practice and, if ignored, can bias estimates of the marginal means of interest. The estimators previously discussed can be modified to allow this missingness to depend on covariates. Let <span class="math inline">\(\Delta_A\)</span> and <span class="math inline">\(\Delta_Y\)</span> be indicators that <span class="math inline">\(A\)</span> and <span class="math inline">\(Y\)</span> are observed, respectively. We can redefine the OR to be <span class="math inline">\(\bar{Q}_n(a,w) := E(\Delta_Y Y \mid \Delta_A A = a, \Delta_A = 1, \Delta_Y = 1, W = w)\)</span> and similarly redefine the PS to be
-<span class="math display">\[\begin{aligned}
-g_0(a \mid w) &amp;= Pr_0(\Delta_A = 1, \Delta_A A = a, \Delta_Y = 1 \mid W = w) \notag \\
-&amp;= Pr_0(\Delta_A = 1 \mid W) Pr_0(\Delta_A A = a \mid \Delta_A = 1, W = w) \label{modPS} \\
-&amp;\hspace{1.5in} Pr_0(\Delta_Y = 1 \mid \Delta_A = 1, \Delta_A A = a, W = w) \ . 
-\end{aligned}\]</span>
-<p>We introduce missing values to <code>A</code> and <code>Y</code> in our running example.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">DeltaA &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="kw">plogis</span>(<span class="dv">2</span> +<span class="st"> </span>W$W1))
-DeltaY &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="kw">plogis</span>(<span class="dv">2</span> +<span class="st"> </span>W$W2 +<span class="st"> </span>A))
-A[DeltaA ==<span class="st"> </span><span class="dv">0</span>] &lt;-<span class="st"> </span><span class="ot">NA</span>
-Y[DeltaY ==<span class="st"> </span><span class="dv">0</span>] &lt;-<span class="st"> </span><span class="ot">NA</span></code></pre></div>
+</section><section id="missing-data" class="level2"><h2>Missing data </h2>
+<p>The <code>drtmle</code> function supports missing data in <code>A</code> and <code>Y</code>. Such missing data are common in practice and, if ignored, can bias estimates of the marginal means of interest. The estimators previously discussed can be modified to allow this missingness to depend on covariates. Let <span class="math inline">\(\Delta_A\)</span> and <span class="math inline">\(\Delta_Y\)</span> be indicators that <span class="math inline">\(A\)</span> and <span class="math inline">\(Y\)</span> are observed, respectively. We can redefine the OR to be <span class="math inline">\(\bar{Q}_n(a,w) := E(\Delta_Y Y \mid \Delta_A A = a, \Delta_A = 1, \Delta_Y = 1, W = w)\)</span> and similarly redefine the PS to be \begin{aligned} g_0(a w) &amp;= Pr_0(_A = 1, _A A = a, _Y = 1 W = w) \ &amp;= Pr_0(_A = 1 W) Pr_0(_A A = a _A = 1, W = w)  \ &amp; Pr_0(_Y = 1 _A = 1, _A A = a, W = w)  . \end{aligned} We introduce missing values to <code>A</code> and <code>Y</code> in our running example.</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" data-line-number="1">DeltaA &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="kw">plogis</span>(<span class="dv">2</span> <span class="op">+</span><span class="st"> </span>W<span class="op">$</span>W1))</a>
+<a class="sourceLine" id="cb30-2" data-line-number="2">DeltaY &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="kw">plogis</span>(<span class="dv">2</span> <span class="op">+</span><span class="st"> </span>W<span class="op">$</span>W2 <span class="op">+</span><span class="st"> </span>A))</a>
+<a class="sourceLine" id="cb30-3" data-line-number="3">A[DeltaA <span class="op">==</span><span class="st"> </span><span class="dv">0</span>] &lt;-<span class="st"> </span><span class="ot">NA</span></a>
+<a class="sourceLine" id="cb30-4" data-line-number="4">Y[DeltaY <span class="op">==</span><span class="st"> </span><span class="dv">0</span>] &lt;-<span class="st"> </span><span class="ot">NA</span></a></code></pre></div>
 <p>The only modification of the call to <code>drtmle</code> is in how the PS estimation is performed. The options <code>glm_g</code> and <code>SL_g</code> are still used to fit generalized linear models or a super learner, respectively. However, the code allows for separate regression fits for each of the three components of the PS in (8). To perform separate generalized linear model fits for each of the three components, <code>glm_g</code> should be a named list with entries <code>"DeltaA"</code>, <code>"A"</code>, and <code>"DeltaY"</code>. Respectively these should provide a regression formula for the regression of <span class="math inline">\(\Delta_A\)</span> on <span class="math inline">\(W\)</span>, <span class="math inline">\(A\)</span> on <span class="math inline">\(W\)</span> in observations with <span class="math inline">\(\Delta_A = 1\)</span>, and a regression of <span class="math inline">\(\Delta_Y\)</span> on <span class="math inline">\(W\)</span> and <span class="math inline">\(A\)</span> in observations with <span class="math inline">\(\Delta_A = \Delta_Y = 1\)</span> (if <code>stratify = FALSE</code>) or a regression of <span class="math inline">\(\Delta_Y\)</span> on <span class="math inline">\(W\)</span> to be fit in observations with <span class="math inline">\(\Delta_A = \Delta_Y = 1\)</span> and <span class="math inline">\(A = a\)</span> for each <span class="math inline">\(a\)</span> specified in option <code>a_0</code> (if <code>stratify = TRUE</code>). If only a single formula is passed to <code>glm_g</code>, it is used for each of the three regressions. We illustrate a call to <code>drtmle</code> with missing data and generalized linear model fits below.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glm_fit_wNAs &lt;-<span class="st"> </span><span class="kw"><a href="../reference/drtmle.html">drtmle</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">stratify =</span> <span class="ot">FALSE</span>,
-                       <span class="dt">glm_g =</span> <span class="kw">list</span>(<span class="dt">DeltaA =</span> <span class="st">"W1 + W2"</span>, <span class="dt">A =</span> <span class="st">"W1 + W2"</span>, 
-                                    <span class="dt">DeltaY =</span> <span class="st">"W1 + W2 + A"</span>),
-                       <span class="dt">glm_Q =</span> <span class="st">"W1 + W2*A"</span>, <span class="dt">glm_Qr =</span> <span class="st">"gn"</span>,
-                       <span class="dt">glm_gr =</span> <span class="st">"Qn"</span>, <span class="dt">family =</span> <span class="kw">binomial</span>())
-glm_fit_wNAs</code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" data-line-number="1">glm_fit_wNAs &lt;-<span class="st"> </span><span class="kw"><a href="../reference/drtmle.html">drtmle</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">stratify =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb31-2" data-line-number="2">                       <span class="dt">glm_g =</span> <span class="kw">list</span>(<span class="dt">DeltaA =</span> <span class="st">"W1 + W2"</span>, <span class="dt">A =</span> <span class="st">"W1 + W2"</span>,</a>
+<a class="sourceLine" id="cb31-3" data-line-number="3">                                    <span class="dt">DeltaY =</span> <span class="st">"W1 + W2 + A"</span>),</a>
+<a class="sourceLine" id="cb31-4" data-line-number="4">                       <span class="dt">glm_Q =</span> <span class="st">"W1 + W2*A"</span>, <span class="dt">glm_Qr =</span> <span class="st">"gn"</span>,</a>
+<a class="sourceLine" id="cb31-5" data-line-number="5">                       <span class="dt">glm_gr =</span> <span class="st">"Qn"</span>, <span class="dt">family =</span> <span class="kw">binomial</span>())</a>
+<a class="sourceLine" id="cb31-6" data-line-number="6">glm_fit_wNAs</a></code></pre></div>
 <pre><code>## $est
 ##            
 ## 1 0.6981474
@@ -382,12 +369,12 @@ glm_fit_wNAs</code></pre></div>
 ## 1  1.946403e-03 -3.229221e-05
 ## 0 -3.229221e-05  5.040662e-03</code></pre>
 <p>It is possible to mix generalized linear models and super learning when fitting each of the components of the PS. In the below example we use the wrapper function <code>SL.glm</code>, which fits a main terms logistic regression, to fit the regression of <span class="math inline">\(\Delta_A\)</span> on <span class="math inline">\(W\)</span>, use <code>SL.npreg</code> to fit the regression of <span class="math inline">\(A\)</span> on <span class="math inline">\(W\)</span>, and use a super learner with library <code>SL.glm</code>, <code>SL.mean</code>, and <code>SL.gam</code> to fit the regression of <span class="math inline">\(Delta_Y\)</span> on <span class="math inline">\(W\)</span> and <span class="math inline">\(A\)</span>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mixed_fit_wNAs &lt;-<span class="st"> </span><span class="kw"><a href="../reference/drtmle.html">drtmle</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">stratify =</span> <span class="ot">FALSE</span>,
-                         <span class="dt">SL_g =</span> <span class="kw">list</span>(<span class="dt">DeltaA =</span> <span class="st">"SL.glm"</span>, <span class="dt">A =</span> <span class="st">"SL.npreg"</span>, 
-                         <span class="dt">DeltaY =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.mean"</span>, <span class="st">"SL.gam"</span>)),
-                         <span class="dt">glm_Q =</span> <span class="st">"W1 + W2*A"</span>, <span class="dt">glm_Qr =</span> <span class="st">"gn"</span>,
-                         <span class="dt">glm_gr =</span> <span class="st">"Qn"</span>, <span class="dt">family =</span> <span class="kw">binomial</span>())
-mixed_fit_wNAs                         </code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" data-line-number="1">mixed_fit_wNAs &lt;-<span class="st"> </span><span class="kw"><a href="../reference/drtmle.html">drtmle</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">stratify =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb33-2" data-line-number="2">                         <span class="dt">SL_g =</span> <span class="kw">list</span>(<span class="dt">DeltaA =</span> <span class="st">"SL.glm"</span>, <span class="dt">A =</span> <span class="st">"SL.npreg"</span>,</a>
+<a class="sourceLine" id="cb33-3" data-line-number="3">                         <span class="dt">DeltaY =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.mean"</span>, <span class="st">"SL.gam"</span>)),</a>
+<a class="sourceLine" id="cb33-4" data-line-number="4">                         <span class="dt">glm_Q =</span> <span class="st">"W1 + W2*A"</span>, <span class="dt">glm_Qr =</span> <span class="st">"gn"</span>,</a>
+<a class="sourceLine" id="cb33-5" data-line-number="5">                         <span class="dt">glm_gr =</span> <span class="st">"Qn"</span>, <span class="dt">family =</span> <span class="kw">binomial</span>())</a>
+<a class="sourceLine" id="cb33-6" data-line-number="6">mixed_fit_wNAs</a></code></pre></div>
 <pre><code>## $est
 ##            
 ## 1 0.7015883
@@ -397,24 +384,21 @@ mixed_fit_wNAs                         </code></pre></div>
 ##               1             0
 ## 1  1.915531e-03 -3.342393e-05
 ## 0 -3.342393e-05  4.837798e-03</code></pre>
-</div>
-<div id="multi-level-treatments" class="section level2">
-<h2 class="hasAnchor">
-<a href="#multi-level-treatments" class="anchor"></a>Multi-level treatments</h2>
+</section><section id="multi-level-treatments" class="level2"><h2>Multi-level treatments</h2>
 <p>So far in our examples, we have only considered binary treatments. However, <code>drtmle</code> is equipped to handle treatments with an arbitrary number of discrete values. Suppose that <span class="math inline">\(A\)</span> assumes values in a set <span class="math inline">\(\mathcal{A}\)</span>, the PS regression estimation is modified to ensure that <span class="math display">\[
-  \sum\limits_{a \in \mathcal{A}} g_n(a \mid w) = 1 \ \mbox{for all $w$} \ . 
+  \sum\limits_{a \in \mathcal{A}} g_n(a \mid w) = 1 \  \mbox{for all $w$} \  .
 \]</span> If this condition is true, we say that the estimates of the PS are compatible. Many regression methodologies that have been developed work well with binary outcomes, but have not been extended to multi-level outcomes. To ensure that users of <code>drtmle</code> have access to the large number of binary regression techniques when estimating the PS, we have taken an alternative approach to estimation of the propensity for each level of the treatment. Specifically, rather than fitting a single multinomial-type regression, we fit a series of binomial regressions. As a concrete example, consider the case of no missing data and where <span class="math inline">\(\mathcal{A} = \{0,1,2\}\)</span>. We can ensure compatible estimates of the PS by generating an estimate <span class="math inline">\(g_n(0 \mid w)\)</span> of <span class="math inline">\(Pr_0(A = 0 \mid W = w)\)</span> and <span class="math inline">\(\tilde{g}_n(1 \mid w)\)</span> of <span class="math inline">\(Pr_0(A = 1 \mid A &gt; 0, W = w)\)</span>. The latter estimate may be generated by regression <span class="math inline">\(I(A = 1)\)</span> on <span class="math inline">\(W\)</span> in observations with <span class="math inline">\(A &gt; 0\)</span>. Because the outcome is binary, this regression may be estimated using any technique suitable for binary outcomes. By simple rules of conditional probability, we know that <span class="math inline">\(g_0(1 \mid w) = Pr_0(A = 1 \mid A &gt; 0, W = w)\{1 - Pr_0(A = 0 \mid W)\}\)</span> and thus an estimate of <span class="math inline">\(g_0(1 \mid w)\)</span> can be computed as <span class="math inline">\(g_n(1 \mid w) = \tilde{g}_n(1 \mid w) \{1 - g_n(0 \mid w)\}\)</span>. Finally, we let <span class="math inline">\(g_n(2 \mid w) = 1 - g_n(0 \mid w) - g_n(1 \mid w)\)</span>, which ensures compatibility of the estimates for each level of covariates. This approach generalizes to an arbitrary number of treatment levels. Below, we provide an illustration using simulated data with a treatment that has three levels. The true parameter values in this simulation are <span class="math inline">\(\psi_0(0)=\)</span> 0.62, <span class="math inline">\(\psi_0(1)=\)</span> 0.72, and <span class="math inline">\(\psi_0(2)=\)</span> 0.77.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">1234</span>)
-n &lt;-<span class="st"> </span><span class="dv">200</span>
-W &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">W1 =</span> <span class="kw">runif</span>(n), <span class="dt">W2 =</span> <span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.5</span>))
-A &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">2</span>, <span class="kw">plogis</span>(W$W1 +<span class="st"> </span>W$W2))
-Y &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="kw">plogis</span>(W$W1 +<span class="st"> </span>W$W2*A))</code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">1234</span>)</a>
+<a class="sourceLine" id="cb35-2" data-line-number="2">n &lt;-<span class="st"> </span><span class="dv">200</span></a>
+<a class="sourceLine" id="cb35-3" data-line-number="3">W &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">W1 =</span> <span class="kw">runif</span>(n), <span class="dt">W2 =</span> <span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.5</span>))</a>
+<a class="sourceLine" id="cb35-4" data-line-number="4">A &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">2</span>, <span class="kw">plogis</span>(W<span class="op">$</span>W1 <span class="op">+</span><span class="st"> </span>W<span class="op">$</span>W2))</a>
+<a class="sourceLine" id="cb35-5" data-line-number="5">Y &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="kw">plogis</span>(W<span class="op">$</span>W1 <span class="op">+</span><span class="st"> </span>W<span class="op">$</span>W2<span class="op">*</span>A))</a></code></pre></div>
 <p>The multi-level PS can still be estimated using any of the three techniques discussed previously. Here, we illustrate with simple generalized linear models.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glm_fit_multiA &lt;-<span class="st"> </span><span class="kw"><a href="../reference/drtmle.html">drtmle</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">stratify =</span> <span class="ot">FALSE</span>,
-                         <span class="dt">glm_g =</span> <span class="st">"W1 + W2"</span>, <span class="dt">glm_Q =</span> <span class="st">"W1 + W2*A"</span>,
-                         <span class="dt">glm_gr =</span> <span class="st">"Qn"</span>, <span class="dt">glm_Qr =</span> <span class="st">"gn"</span>, 
-                         <span class="dt">family =</span> <span class="kw">binomial</span>(), <span class="dt">a_0 =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>))
-glm_fit_multiA                         </code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" data-line-number="1">glm_fit_multiA &lt;-<span class="st"> </span><span class="kw"><a href="../reference/drtmle.html">drtmle</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">stratify =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb36-2" data-line-number="2">                         <span class="dt">glm_g =</span> <span class="st">"W1 + W2"</span>, <span class="dt">glm_Q =</span> <span class="st">"W1 + W2*A"</span>,</a>
+<a class="sourceLine" id="cb36-3" data-line-number="3">                         <span class="dt">glm_gr =</span> <span class="st">"Qn"</span>, <span class="dt">glm_Qr =</span> <span class="st">"gn"</span>,</a>
+<a class="sourceLine" id="cb36-4" data-line-number="4">                         <span class="dt">family =</span> <span class="kw">binomial</span>(), <span class="dt">a_0 =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb36-5" data-line-number="5">glm_fit_multiA</a></code></pre></div>
 <pre><code>## $est
 ##            
 ## 0 0.4563335
@@ -428,58 +412,55 @@ glm_fit_multiA                         </code></pre></div>
 ## 2 -6.660173e-05  6.376441e-05  2.531909e-03</code></pre>
 <p>Above, we used the option <code>a_0</code> to specify the levels of the treatment at which we were interested in estimating marginal means. There is no need for <code>a_0</code> to contain all unique values of <code>A</code>. For example, certain levels of the treatment may not be of scientific interest, but nevertheless we would like to use these data to help estimate the OR and PS (by setting <code>stratify = FALSE</code>).</p>
 <p>The confidence interval and testing procedures extend to multi-level treatments with minor modifications. We can still obtain a confidence interval and hypothesis test for each of the marginal means by not specifying a <code>contrast</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/ci.html">ci</a></span>(glm_fit_multiA)</code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" data-line-number="1"><span class="kw"><a href="../reference/ci.html">ci</a></span>(glm_fit_multiA)</a></code></pre></div>
 <pre><code>## $drtmle
 ##     est   cil   ciu
 ## 0 0.456 0.218 0.695
 ## 1 0.736 0.644 0.827
 ## 2 0.796 0.697 0.895</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/wald_test.html">wald_test</a></span>(glm_fit_multiA, <span class="dt">null =</span> <span class="kw">c</span>(<span class="fl">0.4</span>, <span class="fl">0.5</span>, <span class="fl">0.6</span>))</code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" data-line-number="1"><span class="kw"><a href="../reference/wald_test.html">wald_test</a></span>(glm_fit_multiA, <span class="dt">null =</span> <span class="kw">c</span>(<span class="fl">0.4</span>, <span class="fl">0.5</span>, <span class="fl">0.6</span>))</a></code></pre></div>
 <pre><code>## $drtmle
 ##                 zstat  pval
 ## H0: E[Y(0)]=0.4 0.462 0.644
 ## H0: E[Y(1)]=0.5 5.051 0.000
 ## H0: E[Y(2)]=0.6 3.896 0.000</code></pre>
 <p>Alternatively, we can specify a <code>contrast</code> to estimate confidence intervals about the average treatment effect of <span class="math inline">\(A=1\)</span> vs. <span class="math inline">\(A=0\)</span>. Calls to <code>wald_test</code> can also be made.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/ci.html">ci</a></span>(glm_fit_multiA, <span class="dt">contrast =</span> <span class="kw">c</span>(-<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>))</code></pre></div>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" data-line-number="1"><span class="kw"><a href="../reference/ci.html">ci</a></span>(glm_fit_multiA, <span class="dt">contrast =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>))</a></code></pre></div>
 <pre><code>## $drtmle
 ##                   est   cil   ciu
 ## E[Y(1)]-E[Y(0)] 0.279 0.023 0.536</code></pre>
-<p>Similarly, we can compute confidence intervals comparing the average treatment effect of <span class="math inline">\(A=2\)</span> vs. <span class="math inline">\(A = 0\)</span>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/ci.html">ci</a></span>(glm_fit_multiA, <span class="dt">contrast =</span> <span class="kw">c</span>(-<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>))</code></pre></div>
+<p>Similarly, we can compute confidence intervals comparing the average treatment effect of <span class="math inline">\(A = 2\)</span> vs. <span class="math inline">\(A = 0\)</span>.</p>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" data-line-number="1"><span class="kw"><a href="../reference/ci.html">ci</a></span>(glm_fit_multiA, <span class="dt">contrast =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>))</a></code></pre></div>
 <pre><code>## $drtmle
 ##                  est  cil   ciu
 ## E[Y(2)]-E[Y(0)] 0.34 0.08 0.599</code></pre>
-<p>The user-specified contrasts are also available. For example, we can modify the <code>riskRatio</code> object we used previously for a two-level treatment to compute the risk ratio comparing <span class="math inline">\(A=1\)</span> to <span class="math inline">\(A=0\)</span> and comparing <span class="math inline">\(A=2\)</span> to <span class="math inline">\(A=0\)</span>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">riskRatio_1v0 &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">f =</span> function(eff){ <span class="kw">log</span>(eff) },
-                      <span class="dt">f_inv =</span> function(eff){ <span class="kw">exp</span>(eff) },
-                      <span class="dt">h =</span> function(est){ est[<span class="dv">2</span>]/est[<span class="dv">1</span>] },
-                      <span class="dt">fh_grad =</span>  function(est){ <span class="kw">c</span>(<span class="dv">1</span>/est[<span class="dv">2</span>], -<span class="dv">1</span>/est[<span class="dv">1</span>], <span class="dv">0</span>) })
-<span class="kw"><a href="../reference/ci.html">ci</a></span>(glm_fit_multiA, <span class="dt">contrast =</span> riskRatio_1v0)</code></pre></div>
+<p>The user-specified contrasts are also available. For example, we can modify the <code>riskRatio</code> object we used previously for a two-level treatment to compute the risk ratio comparing <span class="math inline">\(A=1\)</span> to <span class="math inline">\(A=0\)</span> and comparing <span class="math inline">\(A = 2\)</span> to <span class="math inline">\(A = 0\)</span>.</p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" data-line-number="1">riskRatio_1v0 &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">f =</span> <span class="cf">function</span>(eff){ <span class="kw">log</span>(eff) },</a>
+<a class="sourceLine" id="cb46-2" data-line-number="2">                      <span class="dt">f_inv =</span> <span class="cf">function</span>(eff){ <span class="kw">exp</span>(eff) },</a>
+<a class="sourceLine" id="cb46-3" data-line-number="3">                      <span class="dt">h =</span> <span class="cf">function</span>(est){ est[<span class="dv">2</span>]<span class="op">/</span>est[<span class="dv">1</span>] },</a>
+<a class="sourceLine" id="cb46-4" data-line-number="4">                      <span class="dt">fh_grad =</span>  <span class="cf">function</span>(est){ <span class="kw">c</span>(<span class="dv">1</span><span class="op">/</span>est[<span class="dv">2</span>], <span class="dv">-1</span><span class="op">/</span>est[<span class="dv">1</span>], <span class="dv">0</span>) })</a>
+<a class="sourceLine" id="cb46-5" data-line-number="5"><span class="kw"><a href="../reference/ci.html">ci</a></span>(glm_fit_multiA, <span class="dt">contrast =</span> riskRatio_1v0)</a></code></pre></div>
 <pre><code>## $drtmle
 ##                 est cil   ciu
 ## user contrast 1.612 1.1 2.363</code></pre>
 <p>Similarly, we can compute confidence intervals for the risk ratio comparing the marginal mean for <span class="math inline">\(A=2\)</span> to <span class="math inline">\(A=1\)</span>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">riskRatio_2v0 &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">f =</span> function(eff){ <span class="kw">log</span>(eff) },
-                      <span class="dt">f_inv =</span> function(eff){ <span class="kw">exp</span>(eff) },
-                      <span class="dt">h =</span> function(est){ est[<span class="dv">3</span>]/est[<span class="dv">1</span>] },
-                      <span class="dt">fh_grad =</span>  function(est){ <span class="kw">c</span>(<span class="dv">0</span>, -<span class="dv">1</span>/est[<span class="dv">1</span>], <span class="dv">1</span>/est[<span class="dv">3</span>]) })
-<span class="kw"><a href="../reference/ci.html">ci</a></span>(glm_fit_multiA, <span class="dt">contrast =</span> riskRatio_2v0)</code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" data-line-number="1">riskRatio_2v0 &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">f =</span> <span class="cf">function</span>(eff){ <span class="kw">log</span>(eff) },</a>
+<a class="sourceLine" id="cb48-2" data-line-number="2">                      <span class="dt">f_inv =</span> <span class="cf">function</span>(eff){ <span class="kw">exp</span>(eff) },</a>
+<a class="sourceLine" id="cb48-3" data-line-number="3">                      <span class="dt">h =</span> <span class="cf">function</span>(est){ est[<span class="dv">3</span>]<span class="op">/</span>est[<span class="dv">1</span>] },</a>
+<a class="sourceLine" id="cb48-4" data-line-number="4">                      <span class="dt">fh_grad =</span>  <span class="cf">function</span>(est){ <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">-1</span><span class="op">/</span>est[<span class="dv">1</span>], <span class="dv">1</span><span class="op">/</span>est[<span class="dv">3</span>]) })</a>
+<a class="sourceLine" id="cb48-5" data-line-number="5"><span class="kw"><a href="../reference/ci.html">ci</a></span>(glm_fit_multiA, <span class="dt">contrast =</span> riskRatio_2v0)</a></code></pre></div>
 <pre><code>## $drtmle
 ##                 est   cil   ciu
 ## user contrast 1.744 1.382 2.202</code></pre>
-</div>
-<div id="cross-validated-regression-estimates" class="section level2">
-<h2 class="hasAnchor">
-<a href="#cross-validated-regression-estimates" class="anchor"></a>Cross-validated regression estimates</h2>
-<p>When considering adaptive estimation techniques, one runs the risk of overfitting the initial regressions. While the cross validation used by super learning attempts to guard against overfitting, there are no guarantees in finite-samples. To definitively avoid such overfitting, one can use cross-validated estimates of the regression parameters. Theoretically, the use of cross-validated regression weakens the assumptions necessary to achieve asymptotic normality <span class="citation">(Zheng and van der Laan 2010)</span>. This is true of the regular TMLE and AIPTW, as well as of the TMLE estimator with doubly-robust inference. The <code>drtmle</code> function implements cross-validated estimation of the regression parameters through the <code>cvFolds</code> option, as shown in the code below, where we continue with the multi-level treatment example.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cv_sl_fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/drtmle.html">drtmle</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">family =</span> <span class="kw">binomial</span>(),
-                 <span class="dt">SL_g =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.glm.interaction"</span>, <span class="st">"SL.gam"</span>), 
-                 <span class="dt">SL_Q =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.glm.interaction"</span>, <span class="st">"SL.gam"</span>), 
-                 <span class="dt">SL_gr =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.gam"</span>, <span class="st">"SL.mean"</span>),
-                 <span class="dt">SL_Qr =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.gam"</span>, <span class="st">"SL.mean"</span>), 
-                 <span class="dt">stratify =</span> <span class="ot">FALSE</span>, <span class="dt">cvFolds =</span> <span class="dv">2</span>, <span class="dt">a_0 =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>))
-cv_sl_fit</code></pre></div>
+</section><section id="cross-validated-regression-estimates" class="level2"><h2>Cross-validated regression estimates</h2>
+<p>When considering adaptive estimation techniques, one runs the risk of overfitting the initial regressions. While the cross validation used by super learning attempts to guard against overfitting, there are no guarantees in finite-samples. To definitively avoid such overfitting, one can use cross-validated estimates of the regression parameters. Theoretically, the use of cross-validated regression weakens the assumptions necessary to achieve asymptotic normality <span class="citation" data-cites="zheng:2010:working">(Zheng and van der Laan 2010)</span>. This is true of the regular TMLE and AIPTW, as well as of the TMLE estimator with doubly-robust inference. The <code>drtmle</code> function implements cross-validated estimation of the regression parameters through the <code>cvFolds</code> option, as shown in the code below, where we continue with the multi-level treatment example.</p>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" data-line-number="1">cv_sl_fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/drtmle.html">drtmle</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">family =</span> <span class="kw">binomial</span>(),</a>
+<a class="sourceLine" id="cb50-2" data-line-number="2">                    <span class="dt">SL_g =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.glm.interaction"</span>, <span class="st">"SL.gam"</span>),</a>
+<a class="sourceLine" id="cb50-3" data-line-number="3">                    <span class="dt">SL_Q =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.glm.interaction"</span>, <span class="st">"SL.gam"</span>),</a>
+<a class="sourceLine" id="cb50-4" data-line-number="4">                    <span class="dt">SL_gr =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.gam"</span>, <span class="st">"SL.mean"</span>),</a>
+<a class="sourceLine" id="cb50-5" data-line-number="5">                    <span class="dt">SL_Qr =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.gam"</span>, <span class="st">"SL.mean"</span>),</a>
+<a class="sourceLine" id="cb50-6" data-line-number="6">                    <span class="dt">stratify =</span> <span class="ot">FALSE</span>, <span class="dt">cvFolds =</span> <span class="dv">2</span>, <span class="dt">a_0 =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb50-7" data-line-number="7">cv_sl_fit</a></code></pre></div>
 <pre><code>## $est
 ##            
 ## 0 0.5049180
@@ -491,49 +472,56 @@ cv_sl_fit</code></pre></div>
 ## 0  0.0161444894 -1.471091e-04 -2.003336e-04
 ## 1 -0.0001471091  2.344629e-03 -1.210073e-05
 ## 2 -0.0002003336 -1.210073e-05  8.789989e-03</code></pre>
-<p>Cross validation may significantly increase computation time necessary for running <code>drtmle</code>. Parallelized regression fitting is available by setting <code>parallel = TRUE</code>, which allows for use of the <code>foreach</code> package <span class="citation">(Revolution Analytics and Weston 2015b)</span> to parallelize the estimation of the OR, PS, and reduced dimension regressions. The function <code>foreach</code> assumes that a a parallel back-end is registered before running <code>drtmle</code>. The appropriate back-end is system-specific, but below we demonstrate registration with a back-end based on the <code>doParallel</code> <span class="citation">(Revolution Analytics and Weston 2015a)</span> and <code>snow</code> packages <span class="citation">(<span class="citeproc-not-found" data-reference-id="snowPackage"><strong>???</strong></span>)</span>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(doParallel)
-workers &lt;-<span class="st"> </span><span class="kw">makeCluster</span>(<span class="dv">2</span>, <span class="dt">type=</span><span class="st">"SOCK"</span>)
-<span class="kw"><a href="http://www.rdocumentation.org/packages/doParallel/topics/registerDoParallel">registerDoParallel</a></span>(workers)
-pcv_sl_fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/drtmle.html">drtmle</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">family =</span> <span class="kw">binomial</span>(),
-                 <span class="dt">SL_g =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.glm.interaction"</span>,<span class="st">"SL.gam"</span>), 
-                 <span class="dt">SL_Q =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.glm.interaction"</span>,<span class="st">"SL.gam"</span>), 
-                 <span class="dt">SL_gr =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.gam"</span>, <span class="st">"SL.mean"</span>),
-                 <span class="dt">SL_Qr =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.gam"</span>, <span class="st">"SL.mean"</span>), 
-                 <span class="dt">stratify =</span> <span class="ot">FALSE</span>, <span class="dt">a_0 =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>), 
-                 <span class="dt">cvFolds =</span> <span class="dv">2</span>, <span class="dt">parallel =</span> <span class="ot">TRUE</span>)
-<span class="kw">stopCluster</span>(workers)
-pcv_sl_fit</code></pre></div>
+<p>Cross-validation may significantly increase the computation time necessary for running <code>drtmle</code>. Parallelized regression fitting is available by setting the option <code>parallel = TRUE</code>. Since, internally, all computations are carried out using futures (with the API provided by the “future” R package), setting this option amounts only to parallelizing with futures <span class="citation" data-cites="futurePackage">(Bengtsson 2017b)</span> via <code>future::lapply</code>. Selecting this option results in parallelization of the estimation of the OR, PS, and reduced-dimension regressions.</p>
+<p>If no adjustments are made prior to invoking the <code>drtmle</code> function, futures are computed using the <code>multiprocess</code> option, which performs computations in forked R processes (non-Windows systems) or spawns and uses background R sessions on the current machine. The setup also allows users to specify appropriate system-specific back-ends that may better suit their problem using the <code>future.batchtools</code> package <span class="citation" data-cites="futurebatchtoolsPackage">(Bengtsson 2017a)</span>. Below we demonstrate registration using an ad-hoc cluster on the local system. The choice of back-end is flexible, and submission of the job to a wide variety of schedulers (e.g., SLURM, TORQUE, etc.) is also permitted. Interested readers are invited to consult the documentation of the <code>future.batchtools</code> package for further information.</p>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb52-1" data-line-number="1"><span class="kw">library</span>(future.batchtools)</a>
+<a class="sourceLine" id="cb52-2" data-line-number="2"><span class="kw">library</span>(parallel)</a>
+<a class="sourceLine" id="cb52-3" data-line-number="3"><span class="kw">library</span>(snow) <span class="co"># for SOCK-type clusters</span></a>
+<a class="sourceLine" id="cb52-4" data-line-number="4">cl &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/parallel/topics/makeCluster">makeCluster</a></span>(<span class="dv">2</span>, <span class="dt">type =</span> <span class="st">"SOCK"</span>)</a>
+<a class="sourceLine" id="cb52-5" data-line-number="5"><span class="kw">plan</span>(cluster, <span class="dt">workers =</span> cl)</a>
+<a class="sourceLine" id="cb52-6" data-line-number="6"><span class="kw"><a href="http://www.rdocumentation.org/packages/parallel/topics/clusterApply">clusterEvalQ</a></span>(cl, <span class="kw">library</span>(<span class="st">"SuperLearner"</span>))</a></code></pre></div>
+<pre><code>## [[1]]
+##  [1] "SuperLearner" "nnls"         "snow"         "methods"     
+##  [5] "stats"        "graphics"     "grDevices"    "utils"       
+##  [9] "datasets"     "base"        
+## 
+## [[2]]
+##  [1] "SuperLearner" "nnls"         "snow"         "methods"     
+##  [5] "stats"        "graphics"     "grDevices"    "utils"       
+##  [9] "datasets"     "base"</code></pre>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb54-1" data-line-number="1">pcv_sl_fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/drtmle.html">drtmle</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">family =</span> <span class="kw">binomial</span>(),</a>
+<a class="sourceLine" id="cb54-2" data-line-number="2">                     <span class="dt">SL_g =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.glm.interaction"</span>,<span class="st">"SL.gam"</span>),</a>
+<a class="sourceLine" id="cb54-3" data-line-number="3">                     <span class="dt">SL_Q =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.glm.interaction"</span>,<span class="st">"SL.gam"</span>),</a>
+<a class="sourceLine" id="cb54-4" data-line-number="4">                     <span class="dt">SL_gr =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.gam"</span>, <span class="st">"SL.mean"</span>),</a>
+<a class="sourceLine" id="cb54-5" data-line-number="5">                     <span class="dt">SL_Qr =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.gam"</span>, <span class="st">"SL.mean"</span>),</a>
+<a class="sourceLine" id="cb54-6" data-line-number="6">                     <span class="dt">stratify =</span> <span class="ot">FALSE</span>, <span class="dt">a_0 =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>),</a>
+<a class="sourceLine" id="cb54-7" data-line-number="7">                     <span class="dt">cvFolds =</span> <span class="dv">2</span>, <span class="dt">parallel =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb54-8" data-line-number="8">pcv_sl_fit</a></code></pre></div>
 <pre><code>## $est
 ##            
-## 0 0.4769713
-## 1 0.7161489
-## 2 0.8057649
+## 0 0.5169402
+## 1 0.7219331
+## 2 0.7772422
 ## 
 ## $cov
-##               0             1             2
-## 0  6.752682e-01 -2.240854e-05  1.202662e-04
-## 1 -2.240854e-05  4.301132e-03 -2.312473e-05
-## 2  1.202662e-04 -2.312473e-05  2.820297e-02</code></pre>
-</div>
-</div>
-<div id="inference-for-iptw-using-adaptive-ps-estimators" class="section level1">
-<h1 class="hasAnchor">
-<a href="#inference-for-iptw-using-adaptive-ps-estimators" class="anchor"></a>Inference for IPTW using adaptive PS estimators </h1>
-<p>Doubly-robust estimators of marginal means are appealing in their robustness and efficiency properties. However, researchers may prefer the IPTW estimator for its intuitive derivation and implementation. Heretofore, inference for IPTW estimators precluded the use of adaptive estimators of the PS. However, van der Laan (2014) proposed modified IPTW estimators that allow for adaptive PS estimation. Similarly as above, this estimator is based on an additional regression parameter, <span class="math inline">\(\tilde{Q}_{r,0n}(a,w) := E_0\{Y \mid A = a, g_n(W)=g_n(w)\}\)</span>, that is the regression of the outcome <span class="math inline">\(Y\)</span> on the estimated propensity amongst observations with <span class="math inline">\(A=a\)</span>. The author showed that if <span class="math inline">\(g_n^*(a \mid w)\)</span>, an estimator of the propensity for treatment <span class="math inline">\(A=a\)</span>, satisfied that <span class="math display">\[
-  \frac{1}{n} \sum\limits_{i=1}^n \frac{\tilde{Q}_{r,0}(a,W_i)}{g_n(a \mid W = W_i)} \ \{ I(A_i = a) - g_n(a \mid W = W_i)\} = 0 \ , 
-\]</span> then the IPTW estimator based on <span class="math inline">\(g_n^*\)</span> has an asymptotic normal distribution with an estimable variance. van der Laan (2014) proposed a TMLE algorithm that mapped an initial PS estimate into an estimate that satisfies this key equation and variance estimators that can be used to generate Wald-style confidence intervals and hypothesis tests.</p>
+##               0             1            2
+## 0  3.709697e-02 -5.439244e-05 1.567156e-05
+## 1 -5.439244e-05  3.848506e-03 7.021166e-05
+## 2  1.567156e-05  7.021166e-05 3.360476e-02</code></pre>
+</section></section><section id="inference-for-iptw-using-adaptive-ps-estimators-sectioninference_iptw" class="level1"><h1>Inference for IPTW using adaptive PS estimators \section{inference_iptw}</h1>
+<p>Doubly-robust estimators of marginal means are appealing in their robustness and efficiency properties. However, researchers may prefer the IPTW estimator for its intuitive derivation and implementation. Heretofore, inference for IPTW estimators precluded the use of adaptive estimators of the PS. However, van der Laan (2014) proposed modified IPTW estimators that allow for adaptive PS estimation. Similarly as above, this estimator is based on an additional regression parameter, <span class="math inline">\(\tilde{Q}_{r,0n}(a,w) := E_0\{Y \mid A = a, g_n(W) = g_n(w)\}\)</span>, that is the regression of the outcome <span class="math inline">\(Y\)</span> on the estimated propensity amongst observations with <span class="math inline">\(A=a\)</span>. The author showed that if <span class="math inline">\(g_n^*(a \mid w)\)</span>, an estimator of the propensity for treatment <span class="math inline">\(A=a\)</span>, satisfied that <span class="math display">\[ \frac{1}{n} \sum\limits_{i=1}^n \frac{\tilde{Q}_{r,0}(a,W_i)}{g_n(a \mid W =
+W_i)} \  \{ I(A_i = a) - g_n(a \mid W = W_i)\} = 0 \  ,\]</span> then the IPTW estimator based on <span class="math inline">\(g_n^*\)</span> has an asymptotic normal distribution with an estimable variance. In fact, van der Laan (2014) proposed a TMLE algorithm that mapped an initial PS estimate into an estimate that satisfies this key equation and variance estimators that can be used to generate Wald-style confidence intervals and hypothesis tests.</p>
 <p>An estimator with equivalent asymptotic properties based on a PS estimate, <span class="math inline">\(g_n(a \mid w)\)</span>, can be computed as <span class="math display">\[
-  \psi_{n,IPTW}(a) = \psi_{n,IPTW}(a) - \frac{1}{n} \sum\limits_{i=1}^n \frac{\tilde{Q}_{r,0}(a,W_i)}{g_n(a \mid W = W_i)} \ \{ I(A_i = a) - g_n(a \mid W = W_i)\} \ . 
+  \psi_{n,IPTW}(a) = \psi_{n,IPTW}(a) - \frac{1}{n} \sum\limits_{i=1}^n
+  \frac{\tilde{Q}_{r,0}(a,W_i)}{g_n(a \mid W = W_i)} \  \{ I(A_i = a) - g_n(a
+  \mid W = W_i)\} \  .
 \]</span> Both this estimator and the TMLE-based IPTW estimator above are implemented in <code>drtmle</code>.</p>
-<div id="implementation-of-inference-for-adaptive-iptw" class="section level2">
-<h2 class="hasAnchor">
-<a href="#implementation-of-inference-for-adaptive-iptw" class="anchor"></a>Implementation of inference for adaptive IPTW</h2>
+<section id="implementation-of-inference-for-adaptive-iptw" class="level2"><h2>Implementation of inference for adaptive IPTW</h2>
 <p>The IPTW estimators based on adaptive estimation of the PS are implemented in the <code>adaptive_iptw</code> function. The <code>adaptive_iptw</code> function shares many options with <code>drtmle</code>. However, as the IPTW estimator does not rely on an estimate of the OR, these options are omitted. We continue with the multilevel treatment example.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">npreg_iptw_multiA &lt;-<span class="st"> </span><span class="kw"><a href="../reference/adaptive_iptw.html">adaptive_iptw</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">stratify =</span> <span class="ot">FALSE</span>,
-                                   <span class="dt">SL_g =</span> <span class="st">"SL.npreg"</span>, <span class="dt">SL_Qr =</span> <span class="st">"SL.npreg"</span>, 
-                                   <span class="dt">family =</span> <span class="kw">binomial</span>(), <span class="dt">a_0 =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>))
-npreg_iptw_multiA                                   </code></pre></div>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb56-1" data-line-number="1">npreg_iptw_multiA &lt;-<span class="st"> </span><span class="kw"><a href="../reference/adaptive_iptw.html">adaptive_iptw</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">stratify =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb56-2" data-line-number="2">                                   <span class="dt">SL_g =</span> <span class="st">"SL.npreg"</span>, <span class="dt">SL_Qr =</span> <span class="st">"SL.npreg"</span>,</a>
+<a class="sourceLine" id="cb56-3" data-line-number="3">                                   <span class="dt">family =</span> <span class="kw">binomial</span>(), <span class="dt">a_0 =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb56-4" data-line-number="4">npreg_iptw_multiA</a></code></pre></div>
 <pre><code>## $est
 ##            
 ## 0 0.4646874
@@ -547,25 +535,17 @@ npreg_iptw_multiA                                   </code></pre></div>
 ## 2 -4.361100e-05  2.263188e-05  2.371211e-03</code></pre>
 <p>The <code>"adaptive_iptw"</code> class contains identical methods for computing confidence intervals and Wald tests as the <code>"drtmle"</code> class and we refer readers back to confidence intervals and hypothesis tests section for reminders on the various options for these tests. By default, these methods are implemented for the <code>iptw_tmle</code> estimator of van der Laan (2014). We expect that this estimator will have improved finite-sample behavior relative to <code>iptw_os</code> (the alternative estimator described in the previous subsection), though further study is needed.</p>
 <p>As with <code>drtmle</code>, the <code>adaptive_iptw</code> function allows missing data in <code>A</code> and <code>Y</code>. Similarly, <code>adaptive_iptw</code> also allows for parallelized, cross-validated estimation of the regression parameters via <code>cvFolds</code> and <code>parallel</code> options. As with the estimators implemented in <code>drtmle</code>, cross-validation allows for valid inference under weaker assumptions.</p>
-</div>
-</div>
-<div id="discussion" class="section level1">
-<h1 class="hasAnchor">
-<a href="#discussion" class="anchor"></a>Discussion</h1>
+</section></section><section id="discussion" class="level1"><h1>Discussion</h1>
 <p>The <code>drtmle</code> package was designed to provide a user-friendly implementation of the TMLE algorithm that facilitates doubly-robust inference about marginal means and average treatment effects. While the theory underlying doubly-robust inference is complex, the implementation of the methods only requires users to provide the data and specify how to estimate regressions. While estimation of the OR and PS is familiar to those familiar with causal inference-related estimation, the reduced-dimension regressions may appear strange. Indeed, it is difficult to provide intuition for these parameters and more difficult to determine what scientific background knowledge might guide users in how to estimate these regression parameters. Therefore, we recommended estimating these quantities adaptively, e.g., with the super learner. The super learner library should contain several relatively smooth estimators such as <code>SL.mean</code>, <code>SL.glm</code>, and <code>SL.gam</code>. In particular, including <code>SL.mean</code> (an unadjusted generalized linear model) may be important due to the fact that, when the OR and PS are consistently estimated, the reduced-dimension regressions are identically equal to zero. Thus, this unadjusted regression estimator may do a good job estimating the reduced-dimension regressions in situations where the OR and PS are estimated well. In addition to relatively smooth estimators, we recommend additionally including several adaptive estimators such as <code>SL.npreg</code> or <code>SL.earth</code>.</p>
 <p>Planned extensions of the <code>drtmle</code> package include extensions of longitudinal settings involving treatments at multiple time points and inclusion of the collaborative targeted maximum likelihood estimator (CTMLE) of van der Laan (2014) that also facilitates collaborative doubly-robust inference.</p>
-</div>
-<div id="session-info" class="section level1">
-<h1 class="hasAnchor">
-<a href="#session-info" class="anchor"></a>Session Info</h1>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sessionInfo</span>()</code></pre></div>
-<pre><code>## R version 3.4.1 (2017-06-30)
-## Platform: x86_64-apple-darwin15.6.0 (64-bit)
-## Running under: OS X El Capitan 10.11.6
+</section><section id="session-info" class="level1"><h1>Session Info</h1>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb58-1" data-line-number="1"><span class="kw">sessionInfo</span>()</a></code></pre></div>
+<pre><code>## R version 3.4.3 (2017-11-30)
+## Platform: x86_64-apple-darwin16.7.0 (64-bit)
+## Running under: macOS Sierra 10.12.6
 ## 
 ## Matrix products: default
-## BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
-## LAPACK: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRlapack.dylib
+## BLAS/LAPACK: /usr/local/Cellar/openblas/0.2.20/lib/libopenblasp-r0.2.20.dylib
 ## 
 ## locale:
 ## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
@@ -574,19 +554,28 @@ npreg_iptw_multiA                                   </code></pre></div>
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] SuperLearner_2.0-22 nnls_1.4            drtmle_0.0.0.9000  
+## [1] SuperLearner_2.0-23-9000 nnls_1.4                
+## [3] drtmle_1.0.2            
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] Rcpp_0.12.11       knitr_1.16         magrittr_1.5      
-##  [4] cubature_1.3-8     lattice_0.20-35    foreach_1.4.3     
-##  [7] plyr_1.8.4         stringr_1.2.0      tools_3.4.1       
-## [10] grid_3.4.1         quantreg_5.33      htmltools_0.3.6   
-## [13] iterators_1.0.8    MatrixModels_0.4-1 yaml_2.1.14       
-## [16] rprojroot_1.2      digest_0.6.12      Matrix_1.2-10     
-## [19] codetools_0.2-15   evaluate_0.10.1    rmarkdown_1.6     
-## [22] np_0.60-3          stringi_1.1.5      compiler_3.4.1    
-## [25] backports_1.1.0    boot_1.3-19        SparseM_1.77</code></pre>
+##  [1] Rcpp_0.12.14       knitr_1.17         magrittr_1.5      
+##  [4] lattice_0.20-35    cubature_1.3-11    foreach_1.4.4     
+##  [7] plyr_1.8.4         stringr_1.2.0      globals_0.10.3    
+## [10] tools_3.4.3        grid_3.4.3         parallel_3.4.3    
+## [13] quantreg_5.34      MatrixModels_0.4-1 htmltools_0.3.6   
+## [16] iterators_1.0.9    yaml_2.1.16        rprojroot_1.3-1   
+## [19] digest_0.6.13      Matrix_1.2-12      codetools_0.2-15  
+## [22] evaluate_0.10.1    rmarkdown_1.8      np_0.60-4         
+## [25] stringi_1.1.6      compiler_3.4.3     backports_1.1.2   
+## [28] boot_1.3-20        SparseM_1.77       doFuture_0.6.0    
+## [31] future_1.6.2       listenv_0.6.0</code></pre>
 <div id="refs" class="references">
+<div id="ref-futurebatchtoolsPackage">
+<p>Bengtsson, Henrik. 2017a. <em>future.batchtools: A Future API for Parallel and Distributed Processing Using “Batchtools”</em>. https://cran.r-project.org/web/packages/future.batchtools. <a href="https://github.com/HenrikBengtsson/future.batchtools" class="uri">https://github.com/HenrikBengtsson/future.batchtools</a>.</p>
+</div>
+<div id="ref-futurePackage">
+<p>———. 2017b. <em>future: A Future API for R</em>. https://cran.r-project.org/web/packages/future. <a href="https://github.com/HenrikBengtsson/future" class="uri">https://github.com/HenrikBengtsson/future</a>.</p>
+</div>
 <div id="ref-benkeser:2017:biometrika">
 <p>Benkeser, D, M Carone, M van der Laan, and P Gilbert. 2017. “Doubly-Robust Nonparametric Inference on the Average Treatment Effect.” <em>Biometrika</em>.</p>
 </div>
@@ -597,52 +586,46 @@ npreg_iptw_multiA                                   </code></pre></div>
 <p>Hayfield, Tristen, and Jeffrey Racine. 2008. “Nonparametric Econometrics: The Np Package.” <em>Journal of Statistical Software</em> 27 (5). <a href="http://www.jstatsoft.org/v27/i05/" class="uri">http://www.jstatsoft.org/v27/i05/</a>.</p>
 </div>
 <div id="ref-horvitzthompson:1952:jasa">
-<p>Horvitz, D, and D Thompson. 1952. “A Generalization of Sampling Without Replacement from a Finite Universe.” <em>Journal of the American Statistical Association</em> 47 (260): 663–85. doi:<a href="https://doi.org/10.1080/01621459.1952.10483446">10.1080/01621459.1952.10483446</a>.</p>
+<p>Horvitz, D, and D Thompson. 1952. “A Generalization of Sampling Without Replacement from a Finite Universe.” <em>Journal of the American Statistical Association</em> 47 (260):663–85. <a href="https://doi.org/10.1080/01621459.1952.10483446" class="uri">https://doi.org/10.1080/01621459.1952.10483446</a>.</p>
 </div>
 <div id="ref-SuperLearnerPackage">
 <p>Polley, E, E LeDell, C Kennedy, S Lendle, and M van der Laan. 2017. <em>SuperLearner: Super Learner Prediction</em>. <a href="https://CRAN.R-project.org/package=SuperLearner" class="uri">https://CRAN.R-project.org/package=SuperLearner</a>.</p>
 </div>
 <div id="ref-porter:2011:ijb">
-<p>Porter, K, S Gruber, van der Laan M, and J Sekhon. 2011. “The Relative Performance of Targeted Maximum Likelihood Estimators.” <em>International Journal of Biostatistics</em> 7 (1). doi:<a href="https://doi.org/10.2202/1557-4679.1308">10.2202/1557-4679.1308</a>.</p>
-</div>
-<div id="ref-doParallelPackage">
-<p>Revolution Analytics, and S Weston. 2015a. <em>doParllel: Foreach Parallel Adaptor for the ’Parallel’ Package</em>. <a href="https://CRAN.R-project.org/package=doParallel" class="uri">https://CRAN.R-project.org/package=doParallel</a>.</p>
-</div>
-<div id="ref-foreachPackage">
-<p>———. 2015b. <em>foreach: Provides Foreach Looping Construct for R</em>. <a href="https://CRAN.R-project.org/package=foreach" class="uri">https://CRAN.R-project.org/package=foreach</a>.</p>
+<p>Porter, K, S Gruber, van der Laan M, and J Sekhon. 2011. “The Relative Performance of Targeted Maximum Likelihood Estimators.” <em>International Journal of Biostatistics</em> 7 (1). <a href="https://doi.org/10.2202/1557-4679.1308" class="uri">https://doi.org/10.2202/1557-4679.1308</a>.</p>
 </div>
 <div id="ref-robins:1986:mathmod">
-<p>Robins, J. 1986. “A New Approach to Causal Inference in Mortality Studies with a Sustained Exposure Period –- Application to Control of the Healthy Worker Survivor Effect.” <em>Mathematical Modelling</em> 7 (9–12): 1393–1512. doi:<a href="https://doi.org/10.1016/0270-0255(86)90088-6">10.1016/0270-0255(86)90088-6</a>.</p>
+<p>Robins, J. 1986. “A New Approach to Causal Inference in Mortality Studies with a Sustained Exposure Period –- Application to Control of the Healthy Worker Survivor Effect.” <em>Mathematical Modelling</em> 7 (9–12):1393–1512. <a href="https://doi.org/10.1016/0270-0255(86)90088-6" class="uri">https://doi.org/10.1016/0270-0255(86)90088-6</a>.</p>
 </div>
 <div id="ref-robins:2000:epi">
-<p>Robins, J, M Hernan, and B Brumback. 2000. “Marginal Structural Models and Causal Inference in Epidemiology.” <em>Epidemiology</em> 11 (5): 550–60. doi:<a href="https://doi.org/10.1097/00001648-200009000-00011">10.1097/00001648-200009000-00011</a>.</p>
+<p>Robins, J, M Hernan, and B Brumback. 2000. “Marginal Structural Models and Causal Inference in Epidemiology.” <em>Epidemiology</em> 11 (5):550–60. <a href="https://doi.org/10.1097/00001648-200009000-00011" class="uri">https://doi.org/10.1097/00001648-200009000-00011</a>.</p>
 </div>
 <div id="ref-robins:1994:jasa">
-<p>Robins, J, A Rotnitzky, and L Zhao. 1994. “Estimation of Regression Coefficients When Some Regressors Are Not Always Observed.” <em>Journal of the American Statistical Association</em> 89 (427): 846–66. doi:<a href="https://doi.org/10.1080/01621459.1994.10476818">10.1080/01621459.1994.10476818</a>.</p>
+<p>Robins, J, A Rotnitzky, and L Zhao. 1994. “Estimation of Regression Coefficients When Some Regressors Are Not Always Observed.” <em>Journal of the American Statistical Association</em> 89 (427):846–66. <a href="https://doi.org/10.1080/01621459.1994.10476818" class="uri">https://doi.org/10.1080/01621459.1994.10476818</a>.</p>
 </div>
 <div id="ref-vdvaart:2006:statdec">
-<p>Vaart, A van der, S Dudoit, and M van der Laan. 2006. “Oracle Inequalities for Multi-Fold Cross-Validation.” <em>Statistics and Decisions</em> 24 (3): 351–71. doi:<a href="https://doi.org/10.1524/stnd.2006.24.3.351">10.1524/stnd.2006.24.3.351</a>.</p>
+<p>Vaart, A van der, S Dudoit, and M van der Laan. 2006. “Oracle Inequalities for Multi-Fold Cross-Validation.” <em>Statistics and Decisions</em> 24 (3):351–71. <a href="https://doi.org/10.1524/stnd.2006.24.3.351" class="uri">https://doi.org/10.1524/stnd.2006.24.3.351</a>.</p>
 </div>
 <div id="ref-vdl:2014:ijb">
-<p>van der Laan, M. 2014. “Targeted Estimation of Nuisance Parameters to Obtain Valid Statistical Inference.” <em>International Journal of Biostatistics</em> 10 (1): 29–57. doi:<a href="https://doi.org/10.1515/ijb-2012-0038">10.1515/ijb-2012-0038</a>.</p>
+<p>van der Laan, M. 2014. “Targeted Estimation of Nuisance Parameters to Obtain Valid Statistical Inference.” <em>International Journal of Biostatistics</em> 10 (1):29–57. <a href="https://doi.org/10.1515/ijb-2012-0038" class="uri">https://doi.org/10.1515/ijb-2012-0038</a>.</p>
 </div>
 <div id="ref-tlbook:2011">
-<p>van der Laan, M, and S Rose. 2011. <em>Targeted Learning: Causal Inference for Observational and Experimental Data</em>. Springer New York. doi:<a href="https://doi.org/10.1007/978-1-4419-9782-1">10.1007/978-1-4419-9782-1</a>.</p>
+<p>van der Laan, M, and S Rose. 2011. <em>Targeted Learning: Causal Inference for Observational and Experimental Data</em>. Springer New York. <a href="https://doi.org/10.1007/978-1-4419-9782-1" class="uri">https://doi.org/10.1007/978-1-4419-9782-1</a>.</p>
 </div>
 <div id="ref-vdlrubin:2006:ijb">
-<p>van der Laan, M, and D Rubin. 2006. “Targeted Maximum Likelihood Learning.” <em>International Journal of Biostatistics</em> 2 (1). doi:<a href="https://doi.org/10.2202/1557-4679.1043">10.2202/1557-4679.1043</a>.</p>
+<p>van der Laan, M, and D Rubin. 2006. “Targeted Maximum Likelihood Learning.” <em>International Journal of Biostatistics</em> 2 (1). <a href="https://doi.org/10.2202/1557-4679.1043" class="uri">https://doi.org/10.2202/1557-4679.1043</a>.</p>
 </div>
 <div id="ref-vdl:2007:statapp">
-<p>van der Laan, M, E Polley, and A Hubbard. 2007. “Super Learner.” <em>Statistical Applications in Genetics and Molecular Biology</em> 6 (1). doi:<a href="https://doi.org/10.2202/1544-6115.1309">10.2202/1544-6115.1309</a>.</p>
+<p>van der Laan, M, E Polley, and A Hubbard. 2007. “Super Learner.” <em>Statistical Applications in Genetics and Molecular Biology</em> 6 (1). <a href="https://doi.org/10.2202/1544-6115.1309" class="uri">https://doi.org/10.2202/1544-6115.1309</a>.</p>
 </div>
 <div id="ref-wolpert:1992:nnet">
-<p>Wolpert, D. 1992. “Stacked Generatlization.” <em>Neural Networks</em> 5 (2): 241–59. doi:<a href="https://doi.org/10.1016/S0893-6080(05)80023-1">10.1016/S0893-6080(05)80023-1</a>.</p>
+<p>Wolpert, D. 1992. “Stacked Generalization.” <em>Neural Networks</em> 5 (2):241–59. <a href="https://doi.org/10.1016/S0893-6080(05)80023-1" class="uri">https://doi.org/10.1016/S0893-6080(05)80023-1</a>.</p>
 </div>
 <div id="ref-zheng:2010:working">
 <p>Zheng, W, and M van der Laan. 2010. “Asymptotic Theory for Cross-Validated Targeted Maximum Likelihood Estimation.” <em>U.C. Berkeley Division of Biostatistics Working Paper Series</em>. <a href="http://biostats.bepress.com/ucbbiostat/paper273" class="uri">http://biostats.bepress.com/ucbbiostat/paper273</a>.</p>
 </div>
 </div>
-</div>
+</section>
 </div>
   </div>
 
@@ -672,7 +655,7 @@ npreg_iptw_multiA                                   </code></pre></div>
       </ul>
 </li>
       <li>
-<a href="#inference-for-iptw-using-adaptive-ps-estimators">Inference for IPTW using adaptive PS estimators </a><ul class="nav nav-pills nav-stacked">
+<a href="#inference-for-iptw-using-adaptive-ps-estimators-sectioninference_iptw">Inference for IPTW using adaptive PS estimators \section{inference_iptw}</a><ul class="nav nav-pills nav-stacked">
 <li><a href="#implementation-of-inference-for-adaptive-iptw">Implementation of inference for adaptive IPTW</a></li>
       </ul>
 </li>
