@@ -508,7 +508,7 @@ f(h(\psi_n))} \  .
 ## 0  3.709697e-02 -5.439244e-05 1.567156e-05
 ## 1 -5.439244e-05  3.848506e-03 7.021166e-05
 ## 2  1.567156e-05  7.021166e-05 3.360476e-02</code></pre>
-</section></section><section id="inference-for-iptw-using-adaptive-ps-estimators-sectioninference_iptw" class="level1"><h1>Inference for IPTW using adaptive PS estimators \section{inference_iptw}</h1>
+</section></section><section id="inference-for-iptw-using-adaptive-ps-estimators" class="level1"><h1>Inference for IPTW using adaptive PS estimators </h1>
 <p>Doubly-robust estimators of marginal means are appealing in their robustness and efficiency properties. However, researchers may prefer the IPTW estimator for its intuitive derivation and implementation. Heretofore, inference for IPTW estimators precluded the use of adaptive estimators of the PS. However, van der Laan (2014) proposed modified IPTW estimators that allow for adaptive PS estimation. Similarly as above, this estimator is based on an additional regression parameter, <span class="math inline">\(\tilde{Q}_{r,0n}(a,w) := E_0\{Y \mid A = a, g_n(W) = g_n(w)\}\)</span>, that is the regression of the outcome <span class="math inline">\(Y\)</span> on the estimated propensity amongst observations with <span class="math inline">\(A=a\)</span>. The author showed that if <span class="math inline">\(g_n^*(a \mid w)\)</span>, an estimator of the propensity for treatment <span class="math inline">\(A=a\)</span>, satisfied that <span class="math display">\[ \frac{1}{n} \sum\limits_{i=1}^n \frac{\tilde{Q}_{r,0}(a,W_i)}{g_n(a \mid W =
 W_i)} \  \{ I(A_i = a) - g_n(a \mid W = W_i)\} = 0 \  ,\]</span> then the IPTW estimator based on <span class="math inline">\(g_n^*\)</span> has an asymptotic normal distribution with an estimable variance. In fact, van der Laan (2014) proposed a TMLE algorithm that mapped an initial PS estimate into an estimate that satisfies this key equation and variance estimators that can be used to generate Wald-style confidence intervals and hypothesis tests.</p>
 <p>An estimator with equivalent asymptotic properties based on a PS estimate, <span class="math inline">\(g_n(a \mid w)\)</span>, can be computed as <span class="math display">\[
@@ -655,7 +655,7 @@ W_i)} \  \{ I(A_i = a) - g_n(a \mid W = W_i)\} = 0 \  ,\]</span> then the IPTW e
       </ul>
 </li>
       <li>
-<a href="#inference-for-iptw-using-adaptive-ps-estimators-sectioninference_iptw">Inference for IPTW using adaptive PS estimators \section{inference_iptw}</a><ul class="nav nav-pills nav-stacked">
+<a href="#inference-for-iptw-using-adaptive-ps-estimators">Inference for IPTW using adaptive PS estimators </a><ul class="nav nav-pills nav-stacked">
 <li><a href="#implementation-of-inference-for-adaptive-iptw">Implementation of inference for adaptive IPTW</a></li>
       </ul>
 </li>
