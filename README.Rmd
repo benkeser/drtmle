@@ -32,7 +32,7 @@ __Author:__ [David Benkeser](https://www.benkeserstatistics.com/)
 `drtmle` is an R package that computes marginal means of an outcome under fixed
 levels of a treatment. The package computes targeted minimum loss-based (TMLE)
 estimators that are doubly robust, not only with respect to consistency, but
-also with respect to asymptotic normality, as discussed in [Benkeser, et al (2017)](https://doi.org/10.1093/biomet/asx053). This property
+also with respect to asymptotic normality, as discussed in [Benkeser, et al (2017)](https://academic.oup.com/biomet/article-abstract/104/4/863/4554445). This property
 facilitates construction of doubly-robust confidence intervals and hypothesis
 tests.
 
