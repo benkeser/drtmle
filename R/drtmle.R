@@ -77,6 +77,9 @@
 #' scheme is invoked, using forked R processes
 #' (if supported on the OS) and background R sessions otherwise. Users may also
 #' register their own backends using the \code{future.batchtools} package.
+#' @param future_hpc A character string identifying a high-performance computing
+#' backend to be used with parallelization. This should match exactly one of the
+#' options available from the \code{future.batchtools} package.
 #' @param Qn An optional list of outcome regression estimates. If specified, the
 #' function will ignore the nuisance parameter estimation specified by
 #' \code{SL_Q} and \code{glm_Q}. The entries in the list should correspond to
@@ -140,6 +143,8 @@
 #' @importFrom plyr llply laply
 #' @importFrom future plan sequential multiprocess future_lapply
 #' @importFrom doFuture registerDoFuture
+#' @importFrom future.batchtools batchtools_slurm batchtools_lsf batchtools_sge
+#' batchtools_torque batchtools_openlava
 #' @importFrom stats cov
 #'
 #'
@@ -188,6 +193,7 @@ drtmle <- function(Y, A, W,
                    verbose = FALSE,
                    Qsteps = 2,
                    parallel = FALSE,
+                   future_hpc = NULL,
                    Qn = NULL,
                    gn = NULL,
                    ...) {
@@ -213,8 +219,13 @@ drtmle <- function(Y, A, W,
     future::plan(future::sequential)
   } else {
     doFuture::registerDoFuture()
-    if (all(c("sequential", "uniprocess") %in% class(future::plan()))) {
+    if (all(c("sequential", "uniprocess") %in% class(future::plan())) &
+        is.null(future_hpc)) {
       future::plan(future::multiprocess)
+    } else if (!is.null(future_hpc)) {
+      set_future_hpc <- parse(text = paste0("future.batchtools", "::",
+                                            future_hpc))
+      future::plan(eval(set_future_hpc))
     }
   }
   #-------------------------------

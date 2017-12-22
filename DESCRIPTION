@@ -15,7 +15,8 @@ Imports:
     plyr,
     np,
     future,
-    doFuture
+    doFuture,
+    future.batchtools
 Suggests:
     testthat,
     knitr,
@@ -23,7 +24,6 @@ Suggests:
     gam,
     quadprog,
     nloptr,
-    future.batchtools,
     parallel,
     snow
 License: MIT + file LICENSE
@@ -32,4 +32,4 @@ BugReports: https://github.com/benkeser/drtmle/issues
 Encoding: UTF-8
 LazyData: true
 VignetteBuilder: knitr
-RoxygenNote: 6.0.1
+RoxygenNote: 6.0.1.9000
