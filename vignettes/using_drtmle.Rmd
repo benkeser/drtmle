@@ -909,7 +909,7 @@ pcv_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
 pcv_sl_fit
 ```
 
-# Inference for IPTW using adaptive PS estimators \section{inference_iptw}
+# Inference for IPTW using adaptive PS estimators \label{inference_iptw}
 
 Doubly-robust estimators of marginal means are appealing in their robustness and
 efficiency properties. However, researchers may prefer the IPTW estimator for

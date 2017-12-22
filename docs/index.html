@@ -29,7 +29,7 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="/index.html">
+  <a href="index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
@@ -53,7 +53,14 @@
   <a href="news/index.html">News</a>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/benkeser/drtmle">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -69,9 +76,7 @@
     
     
 <div class="contents">
-<div id="rdrtmle" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#rdrtmle" class="anchor"></a>R/<code>drtmle</code>
+<section id="rdrtmle" class="level1"><div class="page-header"><h1>R/<code>drtmle</code>
 </h1></div>
 
 <blockquote>
@@ -79,146 +84,133 @@
 </blockquote>
 <p><strong>Author:</strong> <a href="https://www.benkeserstatistics.com/">David Benkeser</a></p>
 <hr>
-<div id="description" class="section level2">
-<h2 class="hasAnchor">
-<a href="#description" class="anchor"></a>Description</h2>
-<p><code>drtmle</code> is an R package that computes marginal means of an outcome under fixed levels of a treatment. The package computes targeted minimum loss-based (TMLE) estimators that are doubly robust, not only with respect to consistency, but also with respect to asymptotic normality, as discussed in Benkeser, Carone, van der Laan &amp; Gilbert, 2017 (<em>accepted Biometrika</em>; <a href="http://biostats.bepress.com/ucbbiostat/paper356/">working paper</a>). This property facilitates construction of doubly-robust confidence intervals and hypothesis tests.</p>
-<p>The package additionally includes methods for computing valid confidence intervals for an inverse probability of treatment weighted (IPTW) estimator of the average treatment effect when the propensity score is estimated via super learning, as discussed in <a href="https://www.degruyter.com/downloadpdf/j/ijb.2014.10.issue-1/ijb-2012-0038/ijb-2012-0038.pdf">van der Laan, 2014</a>.</p>
-<hr>
-</div>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
-<ul>
-<li><p>Install the most recent <em>stable release</em>: <code><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">devtools::install_github("benkeser/drtmle")</a></code></p></li>
-<li><p>To contribute, install the <em>development version</em>: <code><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">devtools::install_github("benkeser/drtmle", ref = "develop")</a></code></p></li>
-</ul>
-<hr>
-</div>
-<div id="use" class="section level2">
-<h2 class="hasAnchor">
-<a href="#use" class="anchor"></a>Use</h2>
-<div id="doubly-robust-inference-for-average-treatment-effect" class="section level3">
-<h3 class="hasAnchor">
-<a href="#doubly-robust-inference-for-average-treatment-effect" class="anchor"></a>Doubly-robust inference for average treatment effect</h3>
-<p>Suppose the data consist of a vector of baseline covariates (<code>W</code>), a multi-level treatment assignment (<code>A</code>), and a continuous or binary-valued outcome (<code>Y</code>). The function <code>drtmle</code> may be used to estimate <span class="math inline">\(E[E(Y | A=a_0, W)]\)</span> for user-selected values of <span class="math inline">\(a_0\)</span> (via option <code>a_0</code>). The resulting targeted minimum loss-based estimates are doubly robust with respect to both consistency and asymptotic normality. The function computes doubly robust covariance estimates that can be used to construct doubly robust confidence intervals for marginal means and contrasts between means. A simple example on simulated data is shown below. We refer users to the vignette for more information and further examples.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># load packages</span>
-<span class="kw">library</span>(drtmle, <span class="dt">quietly =</span> <span class="ot">TRUE</span>)
-<span class="co">#&gt; drtmle: TMLE with doubly robust inference</span>
-<span class="co">#&gt; Version: 0.0.0.9000</span>
-<span class="kw">library</span>(SuperLearner, <span class="dt">quietly =</span> <span class="ot">TRUE</span>)
-<span class="co">#&gt; Super Learner</span>
-<span class="co">#&gt; Version: 2.0-22</span>
-<span class="co">#&gt; Package created on 2017-07-18</span>
-
-<span class="co"># simulate simple data structure</span>
-<span class="kw">set.seed</span>(<span class="dv">1234</span>)
-n &lt;-<span class="st"> </span><span class="dv">200</span>
-W &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">W1 =</span> <span class="kw">runif</span>(n,-<span class="dv">2</span>,<span class="dv">2</span>), <span class="dt">W2 =</span> <span class="kw">rbinom</span>(n,<span class="dv">1</span>,<span class="fl">0.5</span>))
-A &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="kw">plogis</span>(-<span class="dv">2</span> +<span class="st"> </span>W$W1 -<span class="st"> </span><span class="dv">2</span>*W$W2))
-Y &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="kw">plogis</span>(-<span class="dv">2</span> +<span class="st"> </span>W$W1 -<span class="st"> </span><span class="dv">2</span>*W$W2 +<span class="st"> </span>A))
-
-<span class="co"># estimate the covariate-adjusted marginal mean for A = 1 and A = 0</span>
-<span class="co"># here, we do not properly estimate the propensity score</span>
-fit1 &lt;-<span class="st"> </span><span class="kw"><a href="reference/drtmle.html">drtmle</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="co"># input data</span>
-              <span class="dt">a_0 =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="co"># return estimates for A = 0 and A = 1</span>
-              <span class="dt">SL_Q =</span> <span class="st">"SL.npreg"</span>, <span class="co"># use kernel regression for E(Y | A=a, W)</span>
-              <span class="dt">glm_g =</span> <span class="st">"W1 + W2"</span>, <span class="co"># use misspecified main terms glm for E(A | W)</span>
-              <span class="dt">SL_Qr =</span> <span class="st">"SL.npreg"</span>, <span class="co"># use kernel regression to guard against</span>
-                                  <span class="co"># misspecification of outcome regression</span>
-              <span class="dt">SL_gr =</span> <span class="st">"SL.npreg"</span> <span class="co"># use kernel regression to guard against </span>
-                                 <span class="co"># misspecification of propensity score</span>
-              )
-<span class="co"># print the output</span>
-fit1
-<span class="co">#&gt; $est</span>
-<span class="co">#&gt;            </span>
-<span class="co">#&gt; 0 0.1403428</span>
-<span class="co">#&gt; 1 0.2158854</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $cov</span>
-<span class="co">#&gt;              0            1</span>
-<span class="co">#&gt; 0 0.0008075554 0.0002582092</span>
-<span class="co">#&gt; 1 0.0002582092 0.0014881480</span>
-
-<span class="co"># get confidence intervals for marginal means</span>
-ci_fit1 &lt;-<span class="st"> </span><span class="kw"><a href="reference/ci.html">ci</a></span>(fit1)
-<span class="co"># print the output</span>
-ci_fit1
-<span class="co">#&gt; $drtmle</span>
-<span class="co">#&gt;     est   cil   ciu</span>
-<span class="co">#&gt; 0 0.140 0.085 0.196</span>
-<span class="co">#&gt; 1 0.216 0.140 0.291</span>
-
-<span class="co"># get confidence intervals for ate</span>
-ci_ate1 &lt;-<span class="st"> </span><span class="kw"><a href="reference/ci.html">ci</a></span>(fit1,<span class="dt">contrast =</span> <span class="kw">c</span>(-<span class="dv">1</span>,<span class="dv">1</span>))
-<span class="co"># print the output</span>
-ci_ate1
-<span class="co">#&gt; $drtmle</span>
-<span class="co">#&gt;                   est    cil   ciu</span>
-<span class="co">#&gt; E[Y(1)]-E[Y(0)] 0.076 -0.007 0.158</span></code></pre></div>
-</div>
-<div id="inference-for-super-learner-based-iptw" class="section level3">
-<h3 class="hasAnchor">
-<a href="#inference-for-super-learner-based-iptw" class="anchor"></a>Inference for super learner-based IPTW</h3>
+<section id="description" class="level2"><h2>Description</h2>
+<p><code>drtmle</code> is an R package that computes marginal means of an outcome under fixed levels of a treatment. The package computes targeted minimum loss-based (TMLE) estimators that are doubly robust, not only with respect to consistency, but also with respect to asymptotic normality, as discussed in <a href="https://doi.org/10.1093/biomet/asx053">Benkeser, et al (2017)</a>. This property facilitates construction of doubly-robust confidence intervals and hypothesis tests.</p>
+<p>The package additionally includes methods for computing valid confidence intervals for an inverse probability of treatment weighted (IPTW) estimator of the average treatment effect when the propensity score is estimated via super learning, as discussed in <a href="https://www.degruyter.com/downloadpdf/j/ijb.2014.10.issue-1/ijb-2012-0038/ijb-2012-0038.pdf">van der Laan (2014)</a>.</p>
+<hr></section><section id="installation" class="level2"><h2>Installation</h2>
+<p>Install the current stable release from <a href="https://cran.r-project.org/">CRAN</a> via</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">"drtmle"</span>)</a></code></pre></div>
+<p>A developmental release may be installed from GitHub via <a href="https://www.rstudio.com/products/rpackages/devtools/"><code>devtools</code></a> with:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"benkeser/drtmle"</span>)</a></code></pre></div>
+<hr></section><section id="usage" class="level2"><h2>Usage</h2>
+<section id="doubly-robust-inference-for-the-average-treatment-effect" class="level3"><h3>Doubly-robust inference for the average treatment effect</h3>
+<p>Suppose the data consist of a vector of baseline covariates (<code>W</code>), a multi-level treatment assignment (<code>A</code>), and a continuous or binary-valued outcome (<code>Y</code>). The function <code>drtmle</code> may be used to estimate <span class="math inline">\(E[E(Y \mid A = a_0, W)]\)</span> for user-selected values of <span class="math inline">\(a_0\)</span> (via option <code>a_0</code>). The resulting targeted minimum loss-based estimates are doubly robust with respect to both consistency and asymptotic normality. The function computes doubly robust covariance estimates that can be used to construct doubly robust confidence intervals for marginal means and contrasts between means. A simple example on simulated data is shown below. We refer users to <a href="https://benkeser.github.io/drtmle/articles/using_drtmle.html">the vignette</a> for more information and further examples.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="co"># load packages</span></a>
+<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="kw">library</span>(drtmle)</a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co">#&gt; drtmle: TMLE with doubly robust inference</span></a>
+<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="co">#&gt; Version: 1.0.2</span></a>
+<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="kw">library</span>(SuperLearner)</a>
+<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co">#&gt; Loading required package: nnls</span></a>
+<a class="sourceLine" id="cb3-7" data-line-number="7"><span class="co">#&gt; Super Learner</span></a>
+<a class="sourceLine" id="cb3-8" data-line-number="8"><span class="co">#&gt; Version: 2.0-23-9000</span></a>
+<a class="sourceLine" id="cb3-9" data-line-number="9"><span class="co">#&gt; Package created on 2017-11-07</span></a>
+<a class="sourceLine" id="cb3-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb3-11" data-line-number="11"><span class="co"># simulate simple data structure</span></a>
+<a class="sourceLine" id="cb3-12" data-line-number="12"><span class="kw">set.seed</span>(<span class="dv">1234</span>)</a>
+<a class="sourceLine" id="cb3-13" data-line-number="13">n &lt;-<span class="st"> </span><span class="dv">200</span></a>
+<a class="sourceLine" id="cb3-14" data-line-number="14">W &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">W1 =</span> <span class="kw">runif</span>(n,<span class="op">-</span><span class="dv">2</span>,<span class="dv">2</span>), <span class="dt">W2 =</span> <span class="kw">rbinom</span>(n,<span class="dv">1</span>,<span class="fl">0.5</span>))</a>
+<a class="sourceLine" id="cb3-15" data-line-number="15">A &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="kw">plogis</span>(<span class="op">-</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>W<span class="op">$</span>W1 <span class="op">-</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>W<span class="op">$</span>W2))</a>
+<a class="sourceLine" id="cb3-16" data-line-number="16">Y &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="kw">plogis</span>(<span class="op">-</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>W<span class="op">$</span>W1 <span class="op">-</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>W<span class="op">$</span>W2 <span class="op">+</span><span class="st"> </span>A))</a>
+<a class="sourceLine" id="cb3-17" data-line-number="17"></a>
+<a class="sourceLine" id="cb3-18" data-line-number="18"><span class="co"># estimate the covariate-adjusted marginal mean for A = 1 and A = 0</span></a>
+<a class="sourceLine" id="cb3-19" data-line-number="19"><span class="co"># here, we do not properly estimate the propensity score</span></a>
+<a class="sourceLine" id="cb3-20" data-line-number="20">fit1 &lt;-<span class="st"> </span><span class="kw"><a href="reference/drtmle.html">drtmle</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="co"># input data</span></a>
+<a class="sourceLine" id="cb3-21" data-line-number="21">               <span class="dt">a_0 =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="co"># return estimates for A = 0 and A = 1</span></a>
+<a class="sourceLine" id="cb3-22" data-line-number="22">               <span class="dt">SL_Q =</span> <span class="st">"SL.npreg"</span>, <span class="co"># use kernel regression for E(Y | A = a, W)</span></a>
+<a class="sourceLine" id="cb3-23" data-line-number="23">               <span class="dt">glm_g =</span> <span class="st">"W1 + W2"</span>, <span class="co"># use misspecified main terms glm for E(A | W)</span></a>
+<a class="sourceLine" id="cb3-24" data-line-number="24">               <span class="dt">SL_Qr =</span> <span class="st">"SL.npreg"</span>, <span class="co"># use kernel regression to guard against</span></a>
+<a class="sourceLine" id="cb3-25" data-line-number="25">                                   <span class="co"># misspecification of outcome regression</span></a>
+<a class="sourceLine" id="cb3-26" data-line-number="26">               <span class="dt">SL_gr =</span> <span class="st">"SL.npreg"</span> <span class="co"># use kernel regression to guard against</span></a>
+<a class="sourceLine" id="cb3-27" data-line-number="27">                                  <span class="co"># misspecification of propensity score</span></a>
+<a class="sourceLine" id="cb3-28" data-line-number="28">              )</a>
+<a class="sourceLine" id="cb3-29" data-line-number="29"><span class="co"># print the output</span></a>
+<a class="sourceLine" id="cb3-30" data-line-number="30">fit1</a>
+<a class="sourceLine" id="cb3-31" data-line-number="31"><span class="co">#&gt; $est</span></a>
+<a class="sourceLine" id="cb3-32" data-line-number="32"><span class="co">#&gt;            </span></a>
+<a class="sourceLine" id="cb3-33" data-line-number="33"><span class="co">#&gt; 0 0.1403428</span></a>
+<a class="sourceLine" id="cb3-34" data-line-number="34"><span class="co">#&gt; 1 0.2158854</span></a>
+<a class="sourceLine" id="cb3-35" data-line-number="35"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb3-36" data-line-number="36"><span class="co">#&gt; $cov</span></a>
+<a class="sourceLine" id="cb3-37" data-line-number="37"><span class="co">#&gt;              0            1</span></a>
+<a class="sourceLine" id="cb3-38" data-line-number="38"><span class="co">#&gt; 0 0.0008075554 0.0002582092</span></a>
+<a class="sourceLine" id="cb3-39" data-line-number="39"><span class="co">#&gt; 1 0.0002582092 0.0014881480</span></a>
+<a class="sourceLine" id="cb3-40" data-line-number="40"></a>
+<a class="sourceLine" id="cb3-41" data-line-number="41"><span class="co"># get confidence intervals for marginal means</span></a>
+<a class="sourceLine" id="cb3-42" data-line-number="42">ci_fit1 &lt;-<span class="st"> </span><span class="kw"><a href="reference/ci.html">ci</a></span>(fit1)</a>
+<a class="sourceLine" id="cb3-43" data-line-number="43"><span class="co"># print the output</span></a>
+<a class="sourceLine" id="cb3-44" data-line-number="44">ci_fit1</a>
+<a class="sourceLine" id="cb3-45" data-line-number="45"><span class="co">#&gt; $drtmle</span></a>
+<a class="sourceLine" id="cb3-46" data-line-number="46"><span class="co">#&gt;     est   cil   ciu</span></a>
+<a class="sourceLine" id="cb3-47" data-line-number="47"><span class="co">#&gt; 0 0.140 0.085 0.196</span></a>
+<a class="sourceLine" id="cb3-48" data-line-number="48"><span class="co">#&gt; 1 0.216 0.140 0.291</span></a>
+<a class="sourceLine" id="cb3-49" data-line-number="49"></a>
+<a class="sourceLine" id="cb3-50" data-line-number="50"><span class="co"># get confidence intervals for ate</span></a>
+<a class="sourceLine" id="cb3-51" data-line-number="51">ci_ate1 &lt;-<span class="st"> </span><span class="kw"><a href="reference/ci.html">ci</a></span>(fit1,<span class="dt">contrast =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb3-52" data-line-number="52"><span class="co"># print the output</span></a>
+<a class="sourceLine" id="cb3-53" data-line-number="53">ci_ate1</a>
+<a class="sourceLine" id="cb3-54" data-line-number="54"><span class="co">#&gt; $drtmle</span></a>
+<a class="sourceLine" id="cb3-55" data-line-number="55"><span class="co">#&gt;                   est    cil   ciu</span></a>
+<a class="sourceLine" id="cb3-56" data-line-number="56"><span class="co">#&gt; E[Y(1)]-E[Y(0)] 0.076 -0.007 0.158</span></a></code></pre></div>
+</section><section id="inference-for-super-learner-based-iptw" class="level3"><h3>Inference for super learner-based IPTW</h3>
 <p>The package additionally includes a function for computing valid confidence intervals about an inverse probability of treatment weight (IPTW) estimator when super learning is used to estimate the propensity score.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># fit iptw </span>
-fit2 &lt;-<span class="st"> </span><span class="kw"><a href="reference/adaptive_iptw.html">adaptive_iptw</a></span>(<span class="dt">Y =</span> Y, <span class="dt">A =</span> A, <span class="dt">W =</span> W, <span class="dt">a_0 =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),
-               <span class="dt">SL_g =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>,<span class="st">"SL.mean"</span>,<span class="st">"SL.step.interaction"</span>),
-               <span class="dt">SL_Qr =</span> <span class="st">"SL.npreg"</span>)
-<span class="co">#&gt; Loading required package: nloptr</span>
-<span class="co"># print the output</span>
-fit2
-<span class="co">#&gt; $est</span>
-<span class="co">#&gt;            </span>
-<span class="co">#&gt; 0 0.1377524</span>
-<span class="co">#&gt; 1 0.1943633</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $cov</span>
-<span class="co">#&gt;              0            1</span>
-<span class="co">#&gt; 0 0.0007623723 0.0002181465</span>
-<span class="co">#&gt; 1 0.0002181465 0.0106635990</span>
-
-<span class="co"># compute a confidence interval for margin means</span>
-ci_fit2 &lt;-<span class="st"> </span><span class="kw"><a href="reference/ci.html">ci</a></span>(fit2)
-<span class="co"># print the output</span>
-ci_fit2
-<span class="co">#&gt; $iptw_tmle</span>
-<span class="co">#&gt;     est    cil   ciu</span>
-<span class="co">#&gt; 0 0.138  0.084 0.192</span>
-<span class="co">#&gt; 1 0.194 -0.008 0.397</span>
-
-<span class="co"># compute a confidence interval for the ate</span>
-ci_ate2 &lt;-<span class="st"> </span><span class="kw"><a href="reference/ci.html">ci</a></span>(fit2, <span class="dt">contrast =</span> <span class="kw">c</span>(-<span class="dv">1</span>,<span class="dv">1</span>))
-<span class="co"># print the output</span>
-ci_ate2
-<span class="co">#&gt; $iptw_tmle</span>
-<span class="co">#&gt;                   est    cil   ciu</span>
-<span class="co">#&gt; E[Y(1)]-E[Y(0)] 0.057 -0.149 0.262</span></code></pre></div>
-<hr>
-</div>
-</div>
-<div id="issues" class="section level2">
-<h2 class="hasAnchor">
-<a href="#issues" class="anchor"></a>Issues</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="co"># fit iptw</span></a>
+<a class="sourceLine" id="cb4-2" data-line-number="2">fit2 &lt;-<span class="st"> </span><span class="kw"><a href="reference/adaptive_iptw.html">adaptive_iptw</a></span>(<span class="dt">Y =</span> Y, <span class="dt">A =</span> A, <span class="dt">W =</span> W, <span class="dt">a_0 =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</a>
+<a class="sourceLine" id="cb4-3" data-line-number="3">                      <span class="dt">SL_g =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.mean"</span>, <span class="st">"SL.step.interaction"</span>),</a>
+<a class="sourceLine" id="cb4-4" data-line-number="4">                      <span class="dt">SL_Qr =</span> <span class="st">"SL.npreg"</span>)</a>
+<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co">#&gt; Loading required package: nloptr</span></a>
+<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt; Warning in method$computeCoef(Z = Z, Y = Y, libraryNames = libraryNames, :</span></a>
+<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co">#&gt; Algorithm 3 is duplicated. Setting weight to 0.</span></a>
+<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co"># print the output</span></a>
+<a class="sourceLine" id="cb4-9" data-line-number="9">fit2</a>
+<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="co">#&gt; $est</span></a>
+<a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co">#&gt;            </span></a>
+<a class="sourceLine" id="cb4-12" data-line-number="12"><span class="co">#&gt; 0 0.1377524</span></a>
+<a class="sourceLine" id="cb4-13" data-line-number="13"><span class="co">#&gt; 1 0.1943633</span></a>
+<a class="sourceLine" id="cb4-14" data-line-number="14"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb4-15" data-line-number="15"><span class="co">#&gt; $cov</span></a>
+<a class="sourceLine" id="cb4-16" data-line-number="16"><span class="co">#&gt;              0            1</span></a>
+<a class="sourceLine" id="cb4-17" data-line-number="17"><span class="co">#&gt; 0 0.0007623723 0.0002181465</span></a>
+<a class="sourceLine" id="cb4-18" data-line-number="18"><span class="co">#&gt; 1 0.0002181465 0.0106635990</span></a>
+<a class="sourceLine" id="cb4-19" data-line-number="19"></a>
+<a class="sourceLine" id="cb4-20" data-line-number="20"><span class="co"># compute a confidence interval for margin means</span></a>
+<a class="sourceLine" id="cb4-21" data-line-number="21">ci_fit2 &lt;-<span class="st"> </span><span class="kw"><a href="reference/ci.html">ci</a></span>(fit2)</a>
+<a class="sourceLine" id="cb4-22" data-line-number="22"><span class="co"># print the output</span></a>
+<a class="sourceLine" id="cb4-23" data-line-number="23">ci_fit2</a>
+<a class="sourceLine" id="cb4-24" data-line-number="24"><span class="co">#&gt; $iptw_tmle</span></a>
+<a class="sourceLine" id="cb4-25" data-line-number="25"><span class="co">#&gt;     est    cil   ciu</span></a>
+<a class="sourceLine" id="cb4-26" data-line-number="26"><span class="co">#&gt; 0 0.138  0.084 0.192</span></a>
+<a class="sourceLine" id="cb4-27" data-line-number="27"><span class="co">#&gt; 1 0.194 -0.008 0.397</span></a>
+<a class="sourceLine" id="cb4-28" data-line-number="28"></a>
+<a class="sourceLine" id="cb4-29" data-line-number="29"><span class="co"># compute a confidence interval for the ate</span></a>
+<a class="sourceLine" id="cb4-30" data-line-number="30">ci_ate2 &lt;-<span class="st"> </span><span class="kw"><a href="reference/ci.html">ci</a></span>(fit2, <span class="dt">contrast =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb4-31" data-line-number="31"><span class="co"># print the output</span></a>
+<a class="sourceLine" id="cb4-32" data-line-number="32">ci_ate2</a>
+<a class="sourceLine" id="cb4-33" data-line-number="33"><span class="co">#&gt; $iptw_tmle</span></a>
+<a class="sourceLine" id="cb4-34" data-line-number="34"><span class="co">#&gt;                   est    cil   ciu</span></a>
+<a class="sourceLine" id="cb4-35" data-line-number="35"><span class="co">#&gt; E[Y(1)]-E[Y(0)] 0.057 -0.149 0.262</span></a></code></pre></div>
+<hr></section></section><section id="issues" class="level2"><h2>Issues</h2>
 <p>If you encounter any bugs or have any specific feature requests, please <a href="https://github.com/benkeser/drtmle/issues">file an issue</a>.</p>
-<hr>
-</div>
-<div id="citation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#citation" class="anchor"></a>Citation</h2>
+<hr></section><section id="citation" class="level2"><h2>Citation</h2>
 <p>After using the <code>drtmle</code> R package, please cite the following:</p>
-<pre><code>    @article{benkeser2017improved,
-      year  = {2017},
-      author = {Benkeser, David C and Carone, Marco and van der Laan, Mark J and Gilbert, Peter B},
-      title = {Doubly-robust nonparametric inference on the average treatment effect},
-      journal = {Biometrika}
-    }</code></pre>
-<hr>
-</div>
-<div id="license" class="section level2">
-<h2 class="hasAnchor">
-<a href="#license" class="anchor"></a>License</h2>
+<pre><code>@Manual{drtmlepackage,
+  title = {drtmle: Doubly-Robust Nonparametric Estimation and Inference},
+  author = {David Benkeser},
+  note = {R package version 1.0.0},
+  doi = {10.5281/zenodo.844836},
+}
+
+@article{benkeser2017improved,
+  year  = {2017},
+  author = {Benkeser, David C and Carone, Marco and van der Laan, Mark J
+    and Gilbert, Peter B},
+  title = {Doubly-robust nonparametric inference on the average
+    treatment effect},
+  journal = {Biometrika},
+  volume = {104}, number = {4},
+  pages = {863–880},
+  doi = {10.1093/biomet/asx053}
+}</code></pre>
+<hr></section><section id="license" class="level2"><h2>License</h2>
 <p>© 2016-2017 <a href="http://www.benkeserstatistics.com">David C. Benkeser</a></p>
 <p>The contents of this repository are distributed under the MIT license. See below for details:</p>
 <pre><code>The MIT License (MIT)
@@ -242,18 +234,27 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.</code></pre>
-</div>
-</div>
+</section></section>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2 class="hasAnchor">
-<a href="#sidebar" class="anchor"></a>License</h2>
+<a href="#sidebar" class="anchor"></a>Links</h2>
+<ul class="list-unstyled">
+<li>Download from CRAN at <br><a href="https://cran.r-project.org/package=drtmle">https://​cran.r-project.org/​package=drtmle</a>
+</li>
+<li>Browse source code at <br><a href="https://github.com/benkeser/drtmle">https://​github.com/​benkeser/​drtmle</a>
+</li>
+<li>Report a bug at <br><a href="https://github.com/benkeser/drtmle/issues">https://​github.com/​benkeser/​drtmle/​issues</a>
+</li>
+</ul>
+<h2>License</h2>
 <p><a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE.html">LICENSE</a></p>
 <h2>Developers</h2>
 <ul class="list-unstyled">
 <li>David Benkeser <br><small class="roles"> Author, maintainer, copyright holder </small> </li>
+<li><a href="authors.html">All authors...</a></li>
 </ul>
 <h2>Dev status</h2>
 <ul class="list-unstyled">
@@ -261,8 +262,10 @@ SOFTWARE.</code></pre>
 <li><a href="https://ci.appveyor.com/project/benkeser/drtmle"><img src="https://ci.appveyor.com/api/projects/status/github/benkeser/drtmle?branch=master&amp;svg=true" alt="AppVeyor Build Status"></a></li>
 <li><a href="https://codecov.io/github/benkeser/drtmle?branch=master"><img src="https://img.shields.io/codecov/c/github/benkeser/drtmle/master.svg" alt="Coverage Status"></a></li>
 <li><a href="http://www.r-pkg.org/pkg/drtmle"><img src="http://www.r-pkg.org/badges/version/drtmle" alt="CRAN"></a></li>
+<li><a href="https://CRAN.R-project.org/package=drtmle"><img src="https://cranlogs.r-pkg.org/badges/drtmle" alt="CRAN downloads"></a></li>
 <li><a href="http://www.repostatus.org/#active"><img src="http://www.repostatus.org/badges/latest/active.svg" alt="Project Status: Active - The project has reached a stable, usable state and is being actively developed."></a></li>
 <li><a href="http://opensource.org/licenses/MIT"><img src="http://img.shields.io/badge/license-MIT-brightgreen.svg" alt="MIT license"></a></li>
+<li><a href="https://zenodo.org/badge/latestdoi/75324341"><img src="https://zenodo.org/badge/75324341.svg" alt="DOI"></a></li>
 </ul>
 </div>
 

@@ -24,6 +24,12 @@ install:
 after_success:
   - Rscript -e 'library(covr); covr::codecov()'
 
+# Install nlopt package to help nloptr install.
+addons:
+  apt:
+    packages:
+      - libnlopt-dev
+
 notifications:
   email:
     on_success: change

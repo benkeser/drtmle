@@ -6,7 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>fluctuateQ2 — fluctuateQ2 • drtmle</title>
+<title>Modification of convex combination least squares method 
+for <code>SuperLearner</code> that doesn't fail with duplicated predictors.
+Issue reported to <code>SuperLearner</code> maintainers. This function will
+be deprecated when a more robust fix in the <code>SuperLearner</code> package
+is implemented. — method.CC_LS_mod • drtmle</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -95,74 +99,28 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>fluctuateQ2</h1>
+    <h1>Modification of convex combination least squares method 
+for <code>SuperLearner</code> that doesn't fail with duplicated predictors.
+Issue reported to <code>SuperLearner</code> maintainers. This function will
+be deprecated when a more robust fix in the <code>SuperLearner</code> package
+is implemented.</h1>
     </div>
 
     
-    <p>Function called internally by drtmle to perform the second fluctuation 
-of the initial estimator of Q (i.e., solves the new estimating eqn that results
-from misspecification of g)</p>
+    <p>Modification of convex combination least squares method 
+for <code>SuperLearner</code> that doesn't fail with duplicated predictors.
+Issue reported to <code>SuperLearner</code> maintainers. This function will
+be deprecated when a more robust fix in the <code>SuperLearner</code> package
+is implemented.</p>
     
 
-    <pre class="usage"><span class='fu'>fluctuateQ2</span>(<span class='no'>Y</span>, <span class='no'>A</span>, <span class='no'>W</span>, <span class='no'>DeltaY</span>, <span class='no'>DeltaA</span>, <span class='no'>Qn</span>, <span class='no'>gn</span>, <span class='no'>grn</span>, <span class='no'>a_0</span>, <span class='no'>reduction</span>,
-  <span class='kw'>coefTol</span> <span class='kw'>=</span> <span class='fl'>1e+05</span>)</pre>
-    
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>Y</th>
-      <td><p>The outcome</p></td>
-    </tr>
-    <tr>
-      <th>A</th>
-      <td><p>The treatment</p></td>
-    </tr>
-    <tr>
-      <th>W</th>
-      <td><p>The covariates</p></td>
-    </tr>
-    <tr>
-      <th>DeltaY</th>
-      <td><p>Indicator of missing outcome (assumed to be equal to 0 if missing 1 if observed)</p></td>
-    </tr>
-    <tr>
-      <th>DeltaA</th>
-      <td><p>Indicator of missing treatment (assumed to be equal to 0 if missing 1 if observed)</p></td>
-    </tr>
-    <tr>
-      <th>Qn</th>
-      <td><p>A list of outcome regression estimates evaluated on observed data</p></td>
-    </tr>
-    <tr>
-      <th>gn</th>
-      <td><p>A list of propensity regression estimates evaluated on observed data</p></td>
-    </tr>
-    <tr>
-      <th>grn</th>
-      <td><p>A list of reduced-dimension regression estimates evaluated on observed data</p></td>
-    </tr>
-    <tr>
-      <th>a_0</th>
-      <td><p>A list of fixed treatment values</p></td>
-    </tr>
-    <tr>
-      <th>reduction</th>
-      <td><p>A character indicating what reduced dimension regression was used.</p></td>
-    </tr>
-    <tr>
-      <th>coefTol</th>
-      <td><p>A tolerance level on the magnitude of the coefficient that flags the
-result as potentially the result of numeric instability.</p></td>
-    </tr>
-    </table>
-    
+    <pre class="usage"><span class='fu'>method.CC_LS_mod</span>()</pre>
+        
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
                 </ul>
 
   </div>

@@ -52,7 +52,7 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="..//index.html">
+  <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
@@ -78,7 +78,12 @@
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/benkeser/drtmle">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
@@ -92,7 +97,7 @@
     <div class="page-header">
       <h1>
         Reference
-        <small>version&nbsp;1.0.0</small>
+        <small>version&nbsp;1.0.2</small>
       </h1>
     </div>
 
@@ -116,7 +121,7 @@
           <td>
             <p><code><a href="adaptive_iptw.html">adaptive_iptw</a></code> </p>
           </td>
-          <td><p>Compute asymptotically linear IPTW estimators with super learning 
+          <td><p>Compute asymptotically linear IPTW estimators with super learning
 for the propensity score</p></td>
         </tr><tr>
           <!--  -->
@@ -222,6 +227,26 @@ misspecification of propensity score</p></td>
             <p><code><a href="fluctuateQ2.html">fluctuateQ2</a></code> </p>
           </td>
           <td><p>fluctuateQ2</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="method.CC_LS_mod.html">method.CC_LS_mod</a></code> </p>
+          </td>
+          <td><p>Modification of convex combination least squares method 
+for <code>SuperLearner</code> that doesn't fail with duplicated predictors.
+Issue reported to <code>SuperLearner</code> maintainers. This function will
+be deprecated when a more robust fix in the <code>SuperLearner</code> package
+is implemented.</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="method.CC_nloglik_mod.html">method.CC_nloglik_mod</a></code> </p>
+          </td>
+          <td><p>Modification of convex combination negative log likelihood method
+for <code>SuperLearner</code> that doesn't fail with duplicated predictors.
+Issue reported to <code>SuperLearner</code> maintainers. This function will
+be deprecated when a more robust fix in the <code>SuperLearner</code> package
+is implemented.</p></td>
         </tr><tr>
           <!--  -->
           <td>
