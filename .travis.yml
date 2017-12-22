@@ -15,9 +15,14 @@ r:
 
 r_github_packages:
   - jimhester/covr
+  
+install:
+  - Rscript -e "if (!require('devtools')) install.packages('devtools')"
+  - Rscript -e "devtools::install_deps(dep = TRUE)"
+  - Rscript -e "devtools::install_github('jimhester/covr')"
 
 after_success:
-  - Rscript -e 'covr::codecov()'
+  - Rscript -e 'library(covr); covr::codecov()'
 
 notifications:
   email:
