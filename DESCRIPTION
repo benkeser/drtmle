@@ -3,11 +3,15 @@ Title: Doubly-Robust Nonparametric Estimation and Inference
 Version: 1.0.2
 Authors@R: c(
     person("David", "Benkeser", email = "benkeser@emory.edu",
-           role = c("aut", "cre","cph")),
-    person("Nima", "Hejazi", email = "nhejazi@berkeley.edu", role = "ctb"))
+           role = c("aut", "cre","cph"),
+           comment = c(ORCID = "0000-0002-1019-8343")),
+    person("Nima", "Hejazi", email = "nhejazi@berkeley.edu",
+           role = "ctb",
+           comment = c(ORCID = "0000-0002-7127-2789")))
 Description: Targeted minimum loss-based estimators of counterfactual means and
     causal effects that are doubly-robust with respect both to consistency and
-    asymptotic normality (Benkeser et al (2017), <doi:10.1093/biomet/asx053>; MJ van der Laan (2014), <doi:10.1515/ijb-2012-0038>).
+    asymptotic normality (Benkeser et al (2017), <doi:10.1093/biomet/asx053>; MJ
+    van der Laan (2014), <doi:10.1515/ijb-2012-0038>).
 Depends:
     R (>= 3.2.0)
 Imports:
