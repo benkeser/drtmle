@@ -34,7 +34,7 @@
 #' @param glm_Qr A character describing a formula to be used in the call to
 #' \code{glm} for reduced-dimension outcome regression. Ignored if
 #' \code{SL_Qr!=NULL}. The formula should use the variable name \code{'gn'}.
-#' @param maxIter A numeric that sets the maximum number of iterations the TMLE 
+#' @param maxIter A numeric that sets the maximum number of iterations the TMLE
 #' can perform in its fluctuation step.
 #' @param tolIC A numeric that defines the stopping criteria based on the
 #' empirical mean of the influence function.
@@ -68,11 +68,11 @@
 #'        observed data values.}
 #'  \item{\code{iptw}}{A \code{list} of point estimates for the standard IPTW
 #'        estimator. No estimate of the covariance matrix is provided because
-#'        theory does not support asymptotic Normality of the IPTW estimator if 
+#'        theory does not support asymptotic Normality of the IPTW estimator if
 #'        super learning is used to estimate the propensity score.}
 #'  \item{\code{gnMod}}{The fitted object for the propensity score. Returns
 #'        \code{NULL} if \code{returnModels = FALSE}.}
-#'  \item{\code{QrnMod}}{The fitted object for the reduced-dimension regression 
+#'  \item{\code{QrnMod}}{The fitted object for the reduced-dimension regression
 #'        that guards against misspecification of the outcome regression.
 #'        Returns \code{NULL} if \code{returnModels = FALSE}.}
 #'  \item{\code{a_0}}{The treatment levels that were requested for computation
@@ -105,9 +105,11 @@ adaptive_iptw <- function(W, A, Y,
                           DeltaY = as.numeric(!is.na(Y)),
                           DeltaA = as.numeric(!is.na(A)),
                           stratify = FALSE,
-                          family = if(all(Y %in% c(0, 1))) {
+                          family = if (all(Y %in% c(0, 1))) {
                             stats::binomial()
-                          } else { stats::gaussian() },
+                          } else {
+                            stats::gaussian()
+                          },
                           a_0 = unique(A[!is.na(A)]),
                           SL_g = NULL, glm_g = NULL,
                           SL_Qr = NULL, glm_Qr = NULL,
@@ -122,7 +124,7 @@ adaptive_iptw <- function(W, A, Y,
   call <- match.call()
   # if cvFolds non-null split data into cvFolds pieces
   n <- length(Y)
-  if (cvFolds !=1 ) {
+  if (cvFolds != 1) {
     validRows <- split(sample(1:n), rep(1:cvFolds, length = n))
   } else {
     validRows <- list(seq_len(n))
@@ -136,16 +138,18 @@ adaptive_iptw <- function(W, A, Y,
       future::plan(future::multiprocess)
     }
   }
-  #-------------------------------
+  # -------------------------------
   # estimate propensity score
-  #-------------------------------
-  gnOut <- future::future_lapply(x = validRows, FUN = estimateG,
-                                 A = A, W = W,
-                                 DeltaA = DeltaA, DeltaY = DeltaY,
-                                 tolg = tolg, verbose = verbose,
-                                 returnModels = returnModels,
-                                 SL_g = SL_g, glm_g = glm_g,
-                                 a_0 = a_0, stratify = stratify)
+  # -------------------------------
+  gnOut <- future::future_lapply(
+    x = validRows, FUN = estimateG,
+    A = A, W = W,
+    DeltaA = DeltaA, DeltaY = DeltaY,
+    tolg = tolg, verbose = verbose,
+    returnModels = returnModels,
+    SL_g = SL_g, glm_g = glm_g,
+    a_0 = a_0, stratify = stratify
+  )
   # re-order predictions
   gnValid <- unlist(gnOut, recursive = FALSE, use.names = FALSE)
   gnUnOrd <- do.call(Map, c(c, gnValid[seq(1, length(gnValid), 2)]))
@@ -159,28 +163,34 @@ adaptive_iptw <- function(W, A, Y,
 
   # compute iptw estimator
   psi_n <- mapply(a = split(a_0, seq_along(a_0)), g = gn, function(a, g) {
-              modA <- A; modA[is.na(A)] <- -999
-              modY <- Y; modY[is.na(Y)] <- -999
-              mean(as.numeric(modA == a & DeltaA == 1 & DeltaY == 1) / g * modY)
-           })
+    modA <- A
+    modA[is.na(A)] <- -999
+    modY <- Y
+    modY[is.na(Y)] <- -999
+    mean(as.numeric(modA == a & DeltaA == 1 & DeltaY == 1) / g * modY)
+  })
 
   # estimate influence function
-  Dno <- eval_Diptw(A = A, Y = Y, DeltaA = DeltaA, DeltaY = DeltaY, gn = gn,
-                    psi_n = psi_n, a_0 = a_0)
+  Dno <- eval_Diptw(
+    A = A, Y = Y, DeltaA = DeltaA, DeltaY = DeltaY, gn = gn,
+    psi_n = psi_n, a_0 = a_0
+  )
 
-  #-------------------------------------
+  # -------------------------------------
   # estimate reduced dimension Q
-  #-------------------------------------
+  # -------------------------------------
   # note that NULL is input to estimateQrn -- internally the function
   # assign Qn = 0 for all a_0 because estimateQrn estimates the regression
   # of Y - Qn on gn (which is needed for drtmle), while here we just need
   # the regression of Y on gn.
-  QrnOut <- future::future_lapply(x = validRows, FUN = estimateQrn,
-                                  Y = Y, A = A, W = W,
-                                  DeltaA = DeltaA, DeltaY = DeltaY,
-                                  Qn = NULL, gn = gn, glm_Qr = glm_Qr,
-                                  family = family, SL_Qr = SL_Qr, a_0 = a_0,
-                                  returnModels = returnModels)
+  QrnOut <- future::future_lapply(
+    x = validRows, FUN = estimateQrn,
+    Y = Y, A = A, W = W,
+    DeltaA = DeltaA, DeltaY = DeltaY,
+    Qn = NULL, gn = gn, glm_Qr = glm_Qr,
+    family = family, SL_Qr = SL_Qr, a_0 = a_0,
+    returnModels = returnModels
+  )
 
   # re-order predictions
   QrnValid <- unlist(QrnOut, recursive = FALSE, use.names = FALSE)
@@ -193,13 +203,19 @@ adaptive_iptw <- function(W, A, Y,
   # obtain list of propensity score fits
   QrnMod <- QrnValid[seq(2, length(QrnValid), 2)]
 
-  Dngo <- eval_Diptw_g(A = A, DeltaA = DeltaA, DeltaY = DeltaY,
-                       Qrn = Qrn, gn = gn, a_0 = a_0)
+  Dngo <- eval_Diptw_g(
+    A = A, DeltaA = DeltaA, DeltaY = DeltaY,
+    Qrn = Qrn, gn = gn, a_0 = a_0
+  )
   PnDgn <- lapply(Dngo, mean)
 
   # one-step iptw estimator
-  psi.o <- mapply(a = psi_n, b = PnDgn, SIMPLIFY = FALSE,
-                  FUN = function(a, b){a - b})
+  psi.o <- mapply(
+    a = psi_n, b = PnDgn, SIMPLIFY = FALSE,
+    FUN = function(a, b) {
+      a - b
+    }
+  )
 
   # targeted g estimator
   gnStar <- gn
@@ -208,23 +224,31 @@ adaptive_iptw <- function(W, A, Y,
   eps <- list(Inf)
   ct <- 0
   # fluctuate
-  while(max(abs(unlist(PnDgnStar))) > tolIC & ct < maxIter) {
+  while (max(abs(unlist(PnDgnStar))) > tolIC & ct < maxIter) {
     ct <- ct + 1
 
     # fluctuate gnStar
-    gnStarOut <- fluctuateG(Y = Y, A = A, W = W, DeltaA = DeltaA,
-                            DeltaY = DeltaY, a_0 = a_0, tolg = tolg,
-                            gn = gnStar, Qrn = QrnStar)
-    gnStar <- plyr::llply(gnStarOut, function(x){ unlist(x$est) })
-    eps <- plyr::laply(gnStarOut, function(x){ x$eps })
+    gnStarOut <- fluctuateG(
+      Y = Y, A = A, W = W, DeltaA = DeltaA,
+      DeltaY = DeltaY, a_0 = a_0, tolg = tolg,
+      gn = gnStar, Qrn = QrnStar
+    )
+    gnStar <- plyr::llply(gnStarOut, function(x) {
+      unlist(x$est)
+    })
+    eps <- plyr::laply(gnStarOut, function(x) {
+      x$eps
+    })
     # re-estimate reduced dimension regression
-    QrnStarOut <- future::future_lapply(x = validRows, FUN = estimateQrn,
-                                        Y = Y, A = A, W = W,
-                                        DeltaA = DeltaA, DeltaY = DeltaY,
-                                        Qn = NULL, gn = gnStar,
-                                        glm_Qr = glm_Qr, family = family,
-                                        SL_Qr = SL_Qr, a_0 = a_0,
-                                        returnModels = returnModels)
+    QrnStarOut <- future::future_lapply(
+      x = validRows, FUN = estimateQrn,
+      Y = Y, A = A, W = W,
+      DeltaA = DeltaA, DeltaY = DeltaY,
+      Qn = NULL, gn = gnStar,
+      glm_Qr = glm_Qr, family = family,
+      SL_Qr = SL_Qr, a_0 = a_0,
+      returnModels = returnModels
+    )
     # re-order predictions
     QrnValid <- unlist(QrnStarOut, recursive = FALSE, use.names = FALSE)
     QrnUnOrd <- do.call(Map, c(c, QrnValid[seq(1, length(QrnValid), 2)]))
@@ -237,45 +261,57 @@ adaptive_iptw <- function(W, A, Y,
     QrnMod <- QrnValid[seq(2, length(QrnValid), 2)]
 
     # compute influence function for fluctuated estimators
-    DngoStar <-  eval_Diptw_g(A = A, DeltaA = DeltaA, DeltaY = DeltaY,
-                              Qrn = QrnStar, gn = gnStar, a_0 = a_0)
+    DngoStar <- eval_Diptw_g(
+      A = A, DeltaA = DeltaA, DeltaY = DeltaY,
+      Qrn = QrnStar, gn = gnStar, a_0 = a_0
+    )
     PnDgnStar <- future::future_lapply(DngoStar, mean)
     if (verbose) {
       cat("TMLE Iteration", ct, "=", round(unlist(eps), 5), "\n")
-      cat("Mean of IC       =", round(unlist(PnDgnStar), 10),"\n")
+      cat("Mean of IC       =", round(unlist(PnDgnStar), 10), "\n")
     }
   }
 
   # compute final tmle-iptw estimate
   # compute iptw estimator
-  psi_nStar <- mapply(a = split(a_0, seq_along(a_0)), g = gnStar,
-                      function(a, g) {
-                        modA <- A; modA[is.na(A)] <- -999
-                        modY <- Y; modY[is.na(Y)] <- -999
-                        mean(as.numeric(modA == a & DeltaA == 1 &
-                                        DeltaY == 1) / g * modY)
-                      })
+  psi_nStar <- mapply(
+    a = split(a_0, seq_along(a_0)), g = gnStar,
+    function(a, g) {
+      modA <- A
+      modA[is.na(A)] <- -999
+      modY <- Y
+      modY[is.na(Y)] <- -999
+      mean(as.numeric(modA == a & DeltaA == 1 &
+        DeltaY == 1) / g * modY)
+    }
+  )
 
   # compute variance estimators
   # original influence function
-  DnoStar <- eval_Diptw(A = A, Y = Y, DeltaA = DeltaA, DeltaY = DeltaY,
-                        gn = gnStar, psi_n = psi_nStar, a_0 = a_0)
+  DnoStar <- eval_Diptw(
+    A = A, Y = Y, DeltaA = DeltaA, DeltaY = DeltaY,
+    gn = gnStar, psi_n = psi_nStar, a_0 = a_0
+  )
 
   # covariance for tmle iptw
-  DnoStarMat <- matrix(unlist(DnoStar) - unlist(DngoStar), nrow = n, 
-                       ncol = length(a_0))
+  DnoStarMat <- matrix(
+    unlist(DnoStar) - unlist(DngoStar), nrow = n,
+    ncol = length(a_0)
+  )
   cov.t <- stats::cov(DnoStarMat) / n
   # covariate for one-step iptw
   DnoMat <- matrix(unlist(Dno) - unlist(Dngo), nrow = n, ncol = length(a_0))
   cov.os <- stats::cov(DnoMat) / n
 
   # output
-  out <- list(iptw_tmle = list(est = unlist(psi_nStar), cov = cov.t),
-              iptw_tmle_nuisance = list(gn = gnStar, QrnStar = QrnStar),
-              iptw_os = list(est = unlist(psi.o), cov = cov.os),
-              iptw_os_nuisance = list(gn = gn, Qrn = Qrn),
-              iptw = list(est = unlist(psi_n)),
-              gnMod = NULL, QrnMod = NULL, a_0 = a_0, call = call)
+  out <- list(
+    iptw_tmle = list(est = unlist(psi_nStar), cov = cov.t),
+    iptw_tmle_nuisance = list(gn = gnStar, QrnStar = QrnStar),
+    iptw_os = list(est = unlist(psi.o), cov = cov.os),
+    iptw_os_nuisance = list(gn = gn, Qrn = Qrn),
+    iptw = list(est = unlist(psi_n)),
+    gnMod = NULL, QrnMod = NULL, a_0 = a_0, call = call
+  )
 
   if (returnModels) {
     out$gnMod <- gnMod
@@ -284,4 +320,3 @@ adaptive_iptw <- function(W, A, Y,
   class(out) <- "adaptive_iptw"
   return(out)
 }
-

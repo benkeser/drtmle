@@ -10,10 +10,10 @@
 \arguments{
 \item{object}{An object of class \code{"adaptive_iptw"}}
 
-\item{est}{A vector indicating for which estimators to return a 
-confidence interval. Possible estimators include the TMLE IPTW 
-(\code{"iptw_tmle"}, recommended), the one-step IPTW 
-(\code{"iptw_os"}, not recommended), the standard IPTW 
+\item{est}{A vector indicating for which estimators to return a
+confidence interval. Possible estimators include the TMLE IPTW
+(\code{"iptw_tmle"}, recommended), the one-step IPTW
+(\code{"iptw_os"}, not recommended), the standard IPTW
 (\code{"iptw"}, recommended only for comparison to the other two estimators).}
 
 \item{level}{The nominal coverage probability of the desired confidence interval (should be
@@ -25,7 +25,7 @@ marginal means are computed. If instead, \code{contrast} is a numeric vector of 
 and zeros to define linear combinations of the various means (e.g., to estimate an average
 treatment effect, see example). Finally, \code{contrast} can be a list with named functions
 \code{f}, \code{f_inv}, \code{h}, and \code{fh_grad}. The first two functions should take
-as input argument \code{eff}. Respectively, these specify which transformation 
+as input argument \code{eff}. Respectively, these specify which transformation
 of the effect measure to compute the confidence interval for and the inverse
 transformation to put the confidence interval back on the original scale. The function \code{h}
 defines the contrast to be estimated and should take as input \code{est}, a vector
@@ -61,7 +61,7 @@ ci_mean <- ci(fit1)
 # get confidence intervals for ATE
 ci_ATE <- ci(fit1, contrast = c(1,-1))
 
-# get confidence intervals for risk ratio 
+# get confidence intervals for risk ratio
 # by inputting own contrast function
 # this computes CI on log scale and back transforms
 myContrast <- list(f = function(eff){ log(eff) },

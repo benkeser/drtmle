@@ -15,38 +15,38 @@ estimateQrn(Y, A, W, DeltaA, DeltaY, Qn, gn, glm_Qr, SL_Qr,
 
 \item{W}{A \code{data.frame} of named covariates}
 
-\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if 
+\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if
 missing 1 if observed)}
 
-\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if 
+\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if
 missing 1 if observed)}
 
-\item{Qn}{A list of outcome regression estimates evaluated on observed data. 
-If NULL then 0 is used for all Qn (as is needed to estimate reduced dimension 
+\item{Qn}{A list of outcome regression estimates evaluated on observed data.
+If NULL then 0 is used for all Qn (as is needed to estimate reduced dimension
 regression for adaptive_iptw)}
 
-\item{gn}{A list of propensity regression estimates evaluated on observed 
+\item{gn}{A list of propensity regression estimates evaluated on observed
 data}
 
-\item{glm_Qr}{A character describing a formula to be used in the call to 
-\code{glm} for the first reduced-dimension regression. Ignored if 
+\item{glm_Qr}{A character describing a formula to be used in the call to
+\code{glm} for the first reduced-dimension regression. Ignored if
 \code{SL_gr!=NULL}.}
 
-\item{SL_Qr}{A vector of characters or a list describing the Super Learner 
+\item{SL_Qr}{A vector of characters or a list describing the Super Learner
 library to be used for the first reduced-dimension regression.}
 
-\item{family}{Should be gaussian() unless called from adaptive_iptw with 
+\item{family}{Should be gaussian() unless called from adaptive_iptw with
 binary \code{Y}.}
 
 \item{a_0}{A list of fixed treatment values.}
 
-\item{returnModels}{A boolean indicating whether to return model fits for the 
+\item{returnModels}{A boolean indicating whether to return model fits for the
 outcome regression, propensity score, and reduced-dimension regressions.}
 
-\item{validRows}{A \code{list} of length \code{cvFolds} containing the row 
+\item{validRows}{A \code{list} of length \code{cvFolds} containing the row
 indexes of observations to include in validation fold.}
 }
 \description{
-Estimates the reduced dimension regressions necessary for the  
+Estimates the reduced dimension regressions necessary for the
 fluctuations of g
 }

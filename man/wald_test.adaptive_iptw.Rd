@@ -10,29 +10,29 @@
 \arguments{
 \item{object}{An object of class \code{"adaptive_iptw"}}
 
-\item{est}{A vector indicating for which estimators to return a 
-confidence interval. Possible estimators include the TMLE IPTW 
-(\code{"iptw_tmle"}, recommended), the one-step IPTW 
-(\code{"iptw_os"}, not recommended), the standard IPTW 
+\item{est}{A vector indicating for which estimators to return a
+confidence interval. Possible estimators include the TMLE IPTW
+(\code{"iptw_tmle"}, recommended), the one-step IPTW
+(\code{"iptw_os"}, not recommended), the standard IPTW
 (\code{"iptw"}, recommended only for comparison to the other two estimators).}
 
 \item{null}{The null hypothesis value(s).}
 
 \item{contrast}{This option specifies what parameter to return confidence intervals for.
 If \code{contrast=NULL}, then test the null hypothesis that the covariate-adjusted
-marginal means equal the value(s) specified in \code{null}. 
+marginal means equal the value(s) specified in \code{null}.
 \code{contrast} can also be a numeric vector of ones, negative ones,
 and zeros to define linear combinations of the various means (e.g., to estimate an average
-treatment effect, see examples). In this case, we test the null hypothesis that the 
-linear combination of means equals the value specified in \code{null}. 
+treatment effect, see examples). In this case, we test the null hypothesis that the
+linear combination of means equals the value specified in \code{null}.
 \code{contrast} can also be a list with named functions
 \code{f}, \code{h}, and \code{fh_grad}. The function \code{f} takes
-as input argument \code{eff} and specifies which transformation 
-of the effect measure to test. The function \code{h} defines the contrast 
+as input argument \code{eff} and specifies which transformation
+of the effect measure to test. The function \code{h} defines the contrast
 to be estimated and should take as input \code{est}, a vector
 of the same length as \code{object$a_0}, and output the desired contrast. The function
 \code{fh_grad} is the gradient of the function \code{h(f())}. The function
-computes a test of the null hypothesis that \code{h(f(object$est)) = null}. 
+computes a test of the null hypothesis that \code{h(f(object$est)) = null}.
 See examples.}
 
 \item{...}{Other options (not currently used).}
@@ -61,7 +61,7 @@ fit1 <- adaptive_iptw(W = W, A = A, Y = Y, a_0 = c(1,0),
 # get test that each mean = 0.5
 test_mean <- wald_test(fit1, null = 0.5)
 
-# get test that the ATE = 0 
+# get test that the ATE = 0
 ci_ATE <- ci(fit1, contrast = c(1,-1), null = 0)
 
 # get test for risk ratio = 1 on log scale

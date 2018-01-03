@@ -2,7 +2,7 @@
 % Please edit documentation in R/method_fixes.R
 \name{method.CC_LS_mod}
 \alias{method.CC_LS_mod}
-\title{Modification of convex combination least squares method 
+\title{Modification of convex combination least squares method
 for \code{SuperLearner} that doesn't fail with duplicated predictors.
 Issue reported to \code{SuperLearner} maintainers. This function will
 be deprecated when a more robust fix in the \code{SuperLearner} package
@@ -11,7 +11,7 @@ is implemented.}
 method.CC_LS_mod()
 }
 \description{
-Modification of convex combination least squares method 
+Modification of convex combination least squares method
 for \code{SuperLearner} that doesn't fail with duplicated predictors.
 Issue reported to \code{SuperLearner} maintainers. This function will
 be deprecated when a more robust fix in the \code{SuperLearner} package

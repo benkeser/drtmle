@@ -15,39 +15,39 @@ estimategrn(Y, A, W, DeltaA, DeltaY, Qn, gn, SL_gr, tolg, glm_gr, a_0,
 
 \item{W}{A \code{data.frame} of named covariates.}
 
-\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if 
+\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if
 missing 1 if observed).}
 
-\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if 
+\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if
 missing 1 if observed).}
 
 \item{Qn}{A list of outcome regression estimates evaluated on observed data.}
 
-\item{gn}{A list of propensity regression estimates evaluated on observed 
+\item{gn}{A list of propensity regression estimates evaluated on observed
 data.}
 
-\item{SL_gr}{A vector of characters or a list describing the Super Learner 
+\item{SL_gr}{A vector of characters or a list describing the Super Learner
 library to be used for the reduced-dimension propensity score.}
 
-\item{tolg}{A numeric indicating the minimum value for estimates of the 
+\item{tolg}{A numeric indicating the minimum value for estimates of the
 propensity score.}
 
-\item{glm_gr}{A character describing a formula to be used in the call to 
-\code{glm} for the second reduced-dimension regression. Ignored if 
+\item{glm_gr}{A character describing a formula to be used in the call to
+\code{glm} for the second reduced-dimension regression. Ignored if
 \code{SL_gr!=NULL}.}
 
 \item{a_0}{A list of fixed treatment values .}
 
-\item{reduction}{A character equal to \code{'univariate'} for a univariate 
+\item{reduction}{A character equal to \code{'univariate'} for a univariate
 misspecification correction or \code{'bivariate'} for the bivariate version.}
 
-\item{returnModels}{A boolean indicating whether to return model fits for the 
+\item{returnModels}{A boolean indicating whether to return model fits for the
 outcome regression, propensity score, and reduced-dimension regressions.}
 
-\item{validRows}{A \code{list} of length \code{cvFolds} containing the row 
+\item{validRows}{A \code{list} of length \code{cvFolds} containing the row
 indexes of observations to include in validation fold.}
 }
 \description{
-Estimates the reduced dimension regressions necessary for the additional 
+Estimates the reduced dimension regressions necessary for the additional
 fluctuations.
 }

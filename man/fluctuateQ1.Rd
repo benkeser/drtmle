@@ -24,6 +24,6 @@ fluctuateQ1(Y, A, W, DeltaA, DeltaY, Qn, gn, a_0)
 \item{a_0}{A list of fixed treatment values}
 }
 \description{
-Function called internally by drtmle to perform the first fluctuation 
+Function called internally by drtmle to perform the first fluctuation
 of the initial estimator of Q (i.e., solves the original EIF estimating eqn)
 }

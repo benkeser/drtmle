@@ -13,37 +13,37 @@ estimateG(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg, stratify = FALSE,
 
 \item{W}{A \code{data.frame} of named covariates}
 
-\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if 
+\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if
 missing 1 if observed)}
 
-\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if 
+\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if
 missing 1 if observed)}
 
-\item{SL_g}{A vector of characters describing the super learner library to be 
-used for each of the regression (\code{DeltaA}, \code{A}, and \code{DeltaY}). 
-To use the same regression for each of the regressions (or if there is no 
+\item{SL_g}{A vector of characters describing the super learner library to be
+used for each of the regression (\code{DeltaA}, \code{A}, and \code{DeltaY}).
+To use the same regression for each of the regressions (or if there is no
 missing data in \code{A} nor \code{Y}), a single library may be input.}
 
-\item{glm_g}{A character describing a formula to be used in the call to 
+\item{glm_g}{A character describing a formula to be used in the call to
 \code{glm} for the propensity score.}
 
-\item{a_0}{A vector of fixed treatment values at which to return marginal 
+\item{a_0}{A vector of fixed treatment values at which to return marginal
 mean estimates.}
 
-\item{tolg}{A numeric indicating the minimum value for estimates of the 
+\item{tolg}{A numeric indicating the minimum value for estimates of the
 propensity score.}
 
-\item{stratify}{A \code{boolean} indicating whether to estimate the missing 
+\item{stratify}{A \code{boolean} indicating whether to estimate the missing
 outcome regression separately
-for observations with \code{A} equal to 0/1 (if \code{TRUE}) or to pool 
+for observations with \code{A} equal to 0/1 (if \code{TRUE}) or to pool
 across \code{A} (if \code{FALSE}).}
 
-\item{validRows}{A \code{list} of length \code{cvFolds} containing the row 
+\item{validRows}{A \code{list} of length \code{cvFolds} containing the row
 indexes of observations to include in validation fold.}
 
 \item{verbose}{A boolean indicating whether to print status updates.}
 
-\item{returnModels}{A boolean indicating whether to return model fits for the 
+\item{returnModels}{A boolean indicating whether to return model fits for the
 outcome regression, propensity score, and reduced-dimension regressions.}
 }
 \description{

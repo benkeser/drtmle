@@ -21,14 +21,14 @@ drtmle(Y, A, W, DeltaA = as.numeric(!is.na(A)),
 
 \item{W}{A \code{data.frame} of named covariates.}
 
-\item{DeltaA}{A \code{numeric} vector of missing treatment indicator (assumed to be equal to
-0 if missing 1 if observed).}
+\item{DeltaA}{A \code{numeric} vector of missing treatment indicator (assumed
+to be equal to 0 if missing 1 if observed).}
 
-\item{DeltaY}{A \code{numeric} vector of missing outcome indicator (assumed to be equal to 0
-if missing 1 if observed).}
+\item{DeltaY}{A \code{numeric} vector of missing outcome indicator (assumed
+to be equal to 0 if missing 1 if observed).}
 
-\item{a_0}{A \code{numeric} vector of fixed treatment values at which to return marginal
-mean estimates.}
+\item{a_0}{A \code{numeric} vector of fixed treatment values at which to
+return marginal mean estimates.}
 
 \item{family}{A \code{family} object equal to either \code{binomial()} or
 \code{gaussian()}, to be passed to the \code{SuperLearner} or \code{glm}
@@ -70,16 +70,16 @@ formula may be input.}
 
 \item{glm_gr}{A character describing a formula to be used in the call to
 \code{glm} for the reduced-dimension propensity score. Ignored if
-\code{SL_gr!=NULL}. The formula should use the variable name \code{'Qn'} and 
+\code{SL_gr!=NULL}. The formula should use the variable name \code{'Qn'} and
 \code{'gn'} if \code{reduction='bivariate'} and \code{'Qn'} otherwise.}
 
-\item{guard}{A character vector indicating what pattern of misspecifications 
+\item{guard}{A character vector indicating what pattern of misspecifications
 to guard against. If \code{guard} contains \code{"Q"}, then the TMLE guards
 against misspecification of the outcome regression by estimating the
 reduced-dimension outcome regression specified by \code{glm_Qr} or
 \code{SL_Qr}. If \code{guard} contains \code{"g"} then the TMLE
 (additionally) guards against misspecification of the propensity score by
-estimating the reduced-dimension propensity score specified by \code{glm_gr} 
+estimating the reduced-dimension propensity score specified by \code{glm_gr}
 or \code{SL_gr}.}
 
 \item{reduction}{A character equal to \code{"univariate"} for a univariate
@@ -95,7 +95,7 @@ cross-validation is used. Alternatively, \code{cvFolds} may be entered as a
 vector of fold assignments for observations, in which case its length should
 be the same length as \code{Y}.}
 
-\item{maxIter}{A numeric that sets the maximum number of iterations the TMLE 
+\item{maxIter}{A numeric that sets the maximum number of iterations the TMLE
 can perform in its fluctuation step.}
 
 \item{tolIC}{A numeric that defines the stopping criteria based on the
@@ -112,11 +112,11 @@ submodel for the outcome regression should be fit using a single minimization
 latter was found to be more stable in simulations and is the default.}
 
 \item{parallel}{A boolean indicating whether to use parallelization based on
-\code{future} when estimating nuisance parameters. 
-Only useful if \code{cvFolds > 1}. By default, a \code{multiprocess} evaluation 
-scheme is invoked, using forked R processes
-(if supported on the OS) and background R sessions otherwise. Users may also
-register their own backends using the \code{future.batchtools} package.}
+\code{future} when estimating nuisance parameters.
+Only useful if \code{cvFolds > 1}. By default, a \code{multiprocess}
+evaluation scheme is invoked, using forked R processes (if supported on the
+OS) and background R sessions otherwise. Users may also register their own
+backends using the \code{future.batchtools} package.}
 
 \item{future_hpc}{A character string identifying a high-performance computing
 backend to be used with parallelization. This should match exactly one of the
@@ -148,17 +148,17 @@ An object of class \code{"drtmle"}.
        a doubly-robust covariance matrix}
  \item{\code{nuisance_drtmle}}{A \code{list} of the final TMLE estimates of
        the outcome regression (\code{$QnStar}), propensity score
-       (\code{$gnStar}), and reduced-dimension regressions (\code{$QrnStar}, 
+       (\code{$gnStar}), and reduced-dimension regressions (\code{$QrnStar},
        \code{$grnStar}) evaluated at the observed data values.}
  \item{\code{ic_drtmle}}{A \code{list} of the empirical mean of the efficient
        influence function (\code{$eif}) and the extra pieces of the influence
        function resulting from misspecification. All should be smaller than
        \code{tolIC} (unless \code{maxIter} was reached first). Also includes
-       a matrix of the influence function at the estimated nuisance parameters
-       evaluated at the observed data.}
+       a matrix of the influence function values at the estimated nuisance
+       parameters evaluated at the observed data.}
  \item{\code{aiptw_c}}{A \code{list} of doubly-robust point estimates and
        a non-doubly-robust covariance matrix. Theory does not guarantee
-       performance of inference for these estimators, but simulation studies 
+       performance of inference for these estimators, but simulation studies
        showed they often perform adequately.}
  \item{\code{nuisance_aiptw}}{A \code{list} of the initial estimates of the
        outcome regression, propensity score, and reduced-dimension
@@ -175,11 +175,11 @@ An object of class \code{"drtmle"}.
        \code{NULL} if \code{returnModels = FALSE}.}
  \item{\code{gnMod}}{The fitted object for the propensity score. Returns
        \code{NULL} if \code{returnModels = FALSE}.}
- \item{\code{QrnMod}}{The fitted object for the reduced-dimension regression 
+ \item{\code{QrnMod}}{The fitted object for the reduced-dimension regression
        that guards against misspecification of the outcome regression.
        Returns \code{NULL} if \code{returnModels = FALSE}.}
- \item{\code{grnMod}}{The fitted object for the reduced-dimension regression 
-       that guards against misspecification of the propensity score. Returns 
+ \item{\code{grnMod}}{The fitted object for the reduced-dimension regression
+       that guards against misspecification of the propensity score. Returns
        \code{NULL} if \code{returnModels = FALSE}.}
  \item{\code{a_0}}{The treatment levels that were requested for computation
        of covariate-adjusted means.}
@@ -200,7 +200,7 @@ Y <- rbinom(n, 1, plogis(W$W1*W$W2*A))
 # A quick example of drtmle:
 # We note that more flexible super learner libraries
 # are available, and that we recommend the user use more flexible
-# libraries for SL_Qr and SL_gr for general use. 
+# libraries for SL_Qr and SL_gr for general use.
 fit1 <- drtmle(W = W, A = A, Y = Y, a_0 = c(1,0),
                family=binomial(),
                stratify=FALSE,

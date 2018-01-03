@@ -10,37 +10,37 @@ estimateQ(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify, family,
 \arguments{
 \item{Y}{A vector of continuous or binary outcomes.}
 
-\item{A}{A vector of binary treatment assignment (assumed to be equal to 0 or 
+\item{A}{A vector of binary treatment assignment (assumed to be equal to 0 or
 1).}
 
 \item{W}{A \code{data.frame} of named covariates.}
 
-\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if 
+\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if
 missing 1 if observed).}
 
-\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if 
+\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if
 missing 1 if observed).}
 
-\item{SL_Q}{A vector of characters or a list describing the Super Learner 
+\item{SL_Q}{A vector of characters or a list describing the Super Learner
 library to be used for the outcome regression.}
 
-\item{glm_Q}{A character describing a formula to be used in the call to 
+\item{glm_Q}{A character describing a formula to be used in the call to
 \code{glm} for the outcome regression.}
 
 \item{a_0}{A list of fixed treatment values}
 
-\item{stratify}{A \code{boolean} indicating whether to estimate the outcome 
-regression separately for observations with \code{A} equal to 0/1 (if 
+\item{stratify}{A \code{boolean} indicating whether to estimate the outcome
+regression separately for observations with \code{A} equal to 0/1 (if
 \code{TRUE}) or to pool across \code{A} (if \code{FALSE}).}
 
 \item{family}{A character passed to \code{SuperLearner}}
 
 \item{verbose}{A boolean indicating whether to print status updates.}
 
-\item{returnModels}{A boolean indicating whether to return model fits for the 
+\item{returnModels}{A boolean indicating whether to return model fits for the
 outcome regression, propensity score, and reduced-dimension regressions.}
 
-\item{validRows}{A \code{list} of length \code{cvFolds} containing the row 
+\item{validRows}{A \code{list} of length \code{cvFolds} containing the row
 indexes of observations to include in validation fold.}
 
 \item{...}{Additional arguments (not currently used)}
