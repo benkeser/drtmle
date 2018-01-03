@@ -34,7 +34,7 @@ fit1 <- drtmle(W = W, A = A, Y = Y, a_0 = c(1,0),
                stratify=FALSE,
                SL_Q=c("SL.glm","SL.mean","SL.glm.interaction"),
                SL_g=c("SL.glm","SL.mean","SL.glm.interaction"),
-               SL_Qr="SL.npreg", SL_gr="SL.npreg", 
+               SL_Qr="SL.npreg", SL_gr="SL.npreg",
                maxIter = 1, returnModels = TRUE)
 # plot the reduced-dimension regression fits (not run)
 \dontrun{plot(fit1)}

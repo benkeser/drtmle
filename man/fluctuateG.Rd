@@ -29,7 +29,7 @@ fluctuateG(Y, A, W, DeltaY, DeltaA, a_0, gn, Qrn, tolg, coefTol = 1e+05)
 result as potentially the result of numeric instability.}
 }
 \description{
-Function called internally by drtmle to perform the fluctuation 
+Function called internally by drtmle to perform the fluctuation
 of the initial estimator of g (i.e., solves the new estimating eqn that results
 from misspecification of Q)
 }

@@ -32,7 +32,7 @@ fluctuateQ2(Y, A, W, DeltaY, DeltaA, Qn, gn, grn, a_0, reduction,
 result as potentially the result of numeric instability.}
 }
 \description{
-Function called internally by drtmle to perform the second fluctuation 
+Function called internally by drtmle to perform the second fluctuation
 of the initial estimator of Q (i.e., solves the new estimating eqn that results
 from misspecification of g)
 }

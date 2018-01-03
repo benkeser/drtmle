@@ -63,7 +63,7 @@ propensity score and reduced-dimension regressions.}
 
 \item{verbose}{A boolean indicating whether to print status updates.}
 
-\item{maxIter}{A numeric that sets the maximum number of iterations the TMLE 
+\item{maxIter}{A numeric that sets the maximum number of iterations the TMLE
 can perform in its fluctuation step.}
 
 \item{tolIC}{A numeric that defines the stopping criteria based on the
@@ -101,11 +101,11 @@ An object of class \code{"adaptive_iptw"}.
        observed data values.}
  \item{\code{iptw}}{A \code{list} of point estimates for the standard IPTW
        estimator. No estimate of the covariance matrix is provided because
-       theory does not support asymptotic Normality of the IPTW estimator if 
+       theory does not support asymptotic Normality of the IPTW estimator if
        super learning is used to estimate the propensity score.}
  \item{\code{gnMod}}{The fitted object for the propensity score. Returns
        \code{NULL} if \code{returnModels = FALSE}.}
- \item{\code{QrnMod}}{The fitted object for the reduced-dimension regression 
+ \item{\code{QrnMod}}{The fitted object for the reduced-dimension regression
        that guards against misspecification of the outcome regression.
        Returns \code{NULL} if \code{returnModels = FALSE}.}
  \item{\code{a_0}}{The treatment levels that were requested for computation

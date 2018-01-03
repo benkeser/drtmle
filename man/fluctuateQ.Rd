@@ -32,7 +32,7 @@ fluctuateQ(Y, A, W, DeltaY, DeltaA, Qn, gn, grn, a_0, reduction,
 result as potentially the result of numeric instability.}
 }
 \description{
-Function called internally by drtmle to perform simultaneous fluctuation 
-of the initial estimator of Q (i.e., solves both EIF estimating eqn and 
+Function called internally by drtmle to perform simultaneous fluctuation
+of the initial estimator of Q (i.e., solves both EIF estimating eqn and
 the new estimating eqn that results from misspecification of g)
 }
