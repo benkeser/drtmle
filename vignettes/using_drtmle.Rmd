@@ -895,7 +895,6 @@ further information.
 ```{r, cache = TRUE, message = FALSE}
 library(future.batchtools)
 library(parallel)
-library(snow) # for SOCK-type clusters
 cl <- makeCluster(2, type = "SOCK")
 plan(cluster, workers = cl)
 clusterEvalQ(cl, library("SuperLearner"))
