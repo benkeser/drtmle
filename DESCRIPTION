@@ -28,7 +28,8 @@ Suggests:
     gam,
     quadprog,
     nloptr,
-    parallel
+    parallel,
+    snow
 License: MIT + file LICENSE
 URL: https://github.com/benkeser/drtmle
 BugReports: https://github.com/benkeser/drtmle/issues
