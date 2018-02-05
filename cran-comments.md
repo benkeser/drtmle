@@ -19,4 +19,6 @@ Seems safe to ignore this note.
 Nothing to report.
 
 ## Additional Notes
-Submission of updated package, version 1.0.2
+Submission of updated package, version 1.0.2. This version also
+corrects the no long double build issue that caused the package
+to be archived. 
