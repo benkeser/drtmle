@@ -82,11 +82,11 @@ library(drtmle)
 library(SuperLearner)
 
 # simulate simple data structure
-set.seed(1234)
+set.seed(12345)
 n <- 200
 W <- data.frame(W1 = runif(n,-2,2), W2 = rbinom(n,1,0.5))
-A <- rbinom(n, 1, plogis(-2 + W$W1 - 2*W$W2))
-Y <- rbinom(n, 1, plogis(-2 + W$W1 - 2*W$W2 + A))
+A <- rbinom(n, 1, plogis(-2 + W$W1 - 2*W$W1*W$W2))
+Y <- rbinom(n, 1, plogis(-2 + W$W1 - 2*W$W1*W$W2 + A))
 
 # estimate the covariate-adjusted marginal mean for A = 1 and A = 0
 # here, we do not properly estimate the propensity score
@@ -103,12 +103,14 @@ fit1 <- drtmle(W = W, A = A, Y = Y, # input data
 fit1
 
 # get confidence intervals for marginal means
+# truth is E[Y(1)] = 0.29, E[Y(0)] = 0.15
 ci_fit1 <- ci(fit1)
 # print the output
 ci_fit1
 
 # get confidence intervals for ate
-ci_ate1 <- ci(fit1,contrast = c(-1, 1))
+# truth is E[Y(1)] - E[Y(0)] = 0.14
+ci_ate1 <- ci(fit1, contrast = c(-1, 1))
 # print the output
 ci_ate1
 ```

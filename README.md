@@ -55,11 +55,11 @@ library(SuperLearner)
 #> Package created on 2017-11-29
 
 # simulate simple data structure
-set.seed(1234)
+set.seed(12345)
 n <- 200
 W <- data.frame(W1 = runif(n,-2,2), W2 = rbinom(n,1,0.5))
-A <- rbinom(n, 1, plogis(-2 + W$W1 - 2*W$W2))
-Y <- rbinom(n, 1, plogis(-2 + W$W1 - 2*W$W2 + A))
+A <- rbinom(n, 1, plogis(-2 + W$W1 - 2*W$W1*W$W2))
+Y <- rbinom(n, 1, plogis(-2 + W$W1 - 2*W$W1*W$W2 + A))
 
 # estimate the covariate-adjusted marginal mean for A = 1 and A = 0
 # here, we do not properly estimate the propensity score
@@ -76,30 +76,32 @@ fit1 <- drtmle(W = W, A = A, Y = Y, # input data
 fit1
 #> $est
 #>            
-#> 0 0.1403428
-#> 1 0.2158854
+#> 0 0.1729750
+#> 1 0.3620682
 #> 
 #> $cov
 #>              0            1
-#> 0 0.0008075554 0.0002582092
-#> 1 0.0002582092 0.0014881480
+#> 0 8.823949e-04 2.366906e-05
+#> 1 2.366906e-05 7.155764e-03
 
 # get confidence intervals for marginal means
+# truth is E[Y(1)] = 0.29, E[Y(0)] = 0.15
 ci_fit1 <- ci(fit1)
 # print the output
 ci_fit1
 #> $drtmle
 #>     est   cil   ciu
-#> 0 0.140 0.085 0.196
-#> 1 0.216 0.140 0.291
+#> 0 0.173 0.115 0.231
+#> 1 0.362 0.196 0.528
 
 # get confidence intervals for ate
-ci_ate1 <- ci(fit1,contrast = c(-1, 1))
+# truth is E[Y(1)] - E[Y(0)] = 0.14
+ci_ate1 <- ci(fit1, contrast = c(-1, 1))
 # print the output
 ci_ate1
 #> $drtmle
-#>                   est    cil   ciu
-#> E[Y(1)]-E[Y(0)] 0.076 -0.007 0.158
+#>                   est   cil   ciu
+#> E[Y(1)]-E[Y(0)] 0.189 0.014 0.364
 ```
 
 ### Inference for super learner-based IPTW
@@ -112,20 +114,17 @@ fit2 <- adaptive_iptw(Y = Y, A = A, W = W, a_0 = c(0, 1),
                       SL_g = c("SL.glm", "SL.mean", "SL.step.interaction"),
                       SL_Qr = "SL.npreg")
 #> Loading required package: nloptr
-#> Warning in method$computeCoef(Z = Z, Y = Y, libraryNames = libraryNames, :
-#> SL.step.interaction_All are duplicates of previous learners. Removing from
-#> super learner.
 # print the output
 fit2
 #> $est
 #>            
-#> 0 0.1377524
-#> 1 0.1943633
+#> 0 0.1741983
+#> 1 0.2420712
 #> 
 #> $cov
 #>              0            1
-#> 0 0.0007623723 0.0002181465
-#> 1 0.0002181465 0.0106635990
+#> 0 8.533203e-04 8.986878e-05
+#> 1 8.986878e-05 2.203778e-02
 
 # compute a confidence interval for margin means
 ci_fit2 <- ci(fit2)
@@ -133,8 +132,8 @@ ci_fit2 <- ci(fit2)
 ci_fit2
 #> $iptw_tmle
 #>     est    cil   ciu
-#> 0 0.138  0.084 0.192
-#> 1 0.194 -0.008 0.397
+#> 0 0.174  0.117 0.231
+#> 1 0.242 -0.049 0.533
 
 # compute a confidence interval for the ate
 ci_ate2 <- ci(fit2, contrast = c(-1, 1))
@@ -142,7 +141,7 @@ ci_ate2 <- ci(fit2, contrast = c(-1, 1))
 ci_ate2
 #> $iptw_tmle
 #>                   est    cil   ciu
-#> E[Y(1)]-E[Y(0)] 0.057 -0.149 0.262
+#> E[Y(1)]-E[Y(0)] 0.068 -0.227 0.363
 ```
 
 ------------------------------------------------------------------------
