@@ -21,6 +21,8 @@ install:
   - Rscript -e "devtools::install_deps(dep = TRUE)"
   - Rscript -e "devtools::install_github('jimhester/covr')"
 
+r_check_args: --as-cran --without-long-double
+
 after_success:
   - Rscript -e 'library(covr); covr::codecov()'
 
