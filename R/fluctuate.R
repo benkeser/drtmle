@@ -60,7 +60,7 @@ fluctuateQ1 <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, a_0) {
 #' @importFrom stats predict glm
 #'
 
-fluctuateG <- function(Y, A, W, DeltaY, DeltaA, a_0, gn, Qrn, tolg, coefTol=1e5) {
+fluctuateG <- function(Y, A, W, DeltaY, DeltaA, a_0, gn, Qrn, tolg, coefTol = 1e5) {
   gnStar <- mapply(a = a_0, g = gn, Qr = Qrn, FUN = function(x, a, g, Qr) {
     H1 <- Qr / g
     off <- SuperLearner::trimLogit(g, tolg)
