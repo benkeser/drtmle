@@ -72,7 +72,10 @@ fluctuateG <- function(Y, A, W, DeltaY, DeltaA, a_0, gn, Qrn, tolg, coefTol = 1e
         family = "binomial"
       )
     )
-    if (!fm$converged | abs(fm$coef) > coefTol) {
+    if(is.na(fm$coefficients)){
+      fm$coefficients <- Inf
+    }
+    if (!fm$converged | abs(fm$coefficients) > coefTol) {
       suppressWarnings(
         fm <- stats::glm(
           thisA ~ -1 + offset(off) + H1,
@@ -80,13 +83,16 @@ fluctuateG <- function(Y, A, W, DeltaY, DeltaA, a_0, gn, Qrn, tolg, coefTol = 1e
           family = "binomial"
         )
       )
-      if (!fm$converged | abs(fm$coef) > coefTol) {
-        # warning("No sane fluctuation found for G this iteration. Check mean of IC.")
+      if(is.na(fm$coefficients)){
+        fm$coefficients <- Inf
+      }
+      if (!fm$converged | abs(fm$coefficients) > coefTol) {
+        fm$coefficients <- 0
       }
     }
     pred <- stats::predict(fm, type = "response")
     pred[pred < tolg] <- tolg
-    list(est = pred, eps = fm$coef)
+    list(est = pred, eps = fm$coefficients)
   }, SIMPLIFY = FALSE)
   gnStar
 }
@@ -135,7 +141,7 @@ fluctuateQ2 <- function(Y, A, W, DeltaY, DeltaA,
         data = data.frame(Y = Y, off = off, H2 = H2), family = "binomial"
       )
     )
-    if (!fm$converged | abs(max(fm$coef)) > coefTol) {
+    if (!fm$converged | abs(max(fm$coefficients)) > coefTol) {
       # if it doesn't converge, try with no starting values
       suppressWarnings(
         fm <- stats::glm(
@@ -144,7 +150,7 @@ fluctuateQ2 <- function(Y, A, W, DeltaY, DeltaA,
           family = "binomial"
         )
       )
-      if (!fm$converged | abs(max(fm$coef)) > coefTol) {
+      if (!fm$converged | abs(max(fm$coefficients)) > coefTol) {
         # warning("No sane fluctuation found. Proceeding using current estimates.")
         if (reduction == "univariate") {
           return(list(est = Q, eps = rep(0, 2)))
@@ -161,7 +167,7 @@ fluctuateQ2 <- function(Y, A, W, DeltaY, DeltaA,
         )
       ) * (u - l) + l
 
-      return(list(est = Qnstar, eps = fm$coef))
+      return(list(est = Qnstar, eps = fm$coefficients))
     } else if (reduction == "bivariate") {
       Qnstar <- stats::predict(
         fm, type = "response", newdata = data.frame(
@@ -169,7 +175,7 @@ fluctuateQ2 <- function(Y, A, W, DeltaY, DeltaA,
           H2 = 1 / gr$grn2 * (gr$grn2 - g) / g
         )
       ) * (u - l) + l
-      return(list(est = Qnstar, eps = fm$coef))
+      return(list(est = Qnstar, eps = fm$coefficients))
     }
   }, SIMPLIFY = FALSE)
   QnStar
@@ -219,7 +225,7 @@ fluctuateQ <- function(Y, A, W, DeltaY, DeltaA,
         family = "binomial"
       )
     )
-    if (!fm$converged | abs(max(fm$coef)) > coefTol) {
+    if (!fm$converged | abs(max(fm$coefficients)) > coefTol) {
       # if it doesn't converge, try with no starting values
       suppressWarnings(
         fm <- stats::glm(
@@ -228,7 +234,7 @@ fluctuateQ <- function(Y, A, W, DeltaY, DeltaA,
           family = "binomial"
         )
       )
-      if (!fm$converged | abs(max(fm$coef)) > coefTol) {
+      if (!fm$converged | abs(max(fm$coefficients)) > coefTol) {
         # warning("No sane fluctuation found. Proceeding using current estimates.")
         if (reduction == "univariate") {
           return(list(est = Q, eps = rep(0, 2)))
@@ -245,7 +251,7 @@ fluctuateQ <- function(Y, A, W, DeltaY, DeltaA,
           H2 = 1 / gr$grn2 * gr$grn1
         )
       ) * (u - l) + l
-      return(list(est = Qnstar, eps = fm$coef))
+      return(list(est = Qnstar, eps = fm$coefficients))
     } else if (reduction == "bivariate") {
       Qnstar <- stats::predict(
         fm, type = "response", newdata = data.frame(
@@ -253,7 +259,7 @@ fluctuateQ <- function(Y, A, W, DeltaY, DeltaA,
           H2 = 1 / gr$grn2 * (gr$grn2 - g) / g
         )
       ) * (u - l) + l
-      return(list(est = Qnstar, eps = fm$coef))
+      return(list(est = Qnstar, eps = fm$coefficients))
     }
   }, SIMPLIFY = FALSE)
   QnStar

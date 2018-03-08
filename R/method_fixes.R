@@ -17,25 +17,36 @@ method.CC_LS_mod <- function() {
       d <- crossprod(wX, wY)
       A <- cbind(rep(1, ncol(wX)), diag(ncol(wX)))
       bvec <- c(1, rep(0, ncol(wX)))
-      fit <- quadprog::solve.QP(
+
+      fit <- tryCatch({quadprog::solve.QP(
         Dmat = D, dvec = d, Amat = A,
         bvec = bvec, meq = 1
-      )
+      )}, error = function(e){
+        "fit error"
+      })
       invisible(fit)
     }
-    colDup <- which(duplicated(round(Z, 8), MARGIN = 2))
+    colDup <- which(duplicated(round(Z, 5), MARGIN = 2))
     modZ <- Z
     if (length(colDup) > 0) {
       warning(paste0("Algorithm ", colDup, " is duplicated. Setting weight to 0."))
       modZ <- modZ[, -colDup]
     }
     fit <- compute(x = modZ, y = Y, wt = obsWeights)
-    coef <- fit$solution
-    if (length(colDup) > 0) {
-      ind <- c(seq_along(coef), colDup - 0.5)
-      coef <- c(coef, rep(0, length(colDup)))
-      coef <- coef[order(ind)]
+    if(class(fit) == "character"){
+      warning(paste0("Error in solve.QP; returning discrete SL weighting instead."))
+      coef <- rep(0, ncol(Z))
+      idx <- which.min(cvRisk)
+      coef[idx[1]] <- 1
+    }else{
+     coef <- fit$solution      
+      if (length(colDup) > 0) {
+        ind <- c(seq_along(coef), colDup - 0.5)
+        coef <- c(coef, rep(0, length(colDup)))
+        coef <- coef[order(ind)]
+      }
     }
+
     if (any(is.na(coef))) {
       warning("Some algorithms have weights of NA, setting to 0.")
       coef[is.na(coef)] <- 0
@@ -75,7 +86,7 @@ method.CC_nloglik_mod <- function() {
   }
   computeCoef <- function(Z, Y, libraryNames, obsWeights, control,
                           verbose, ...) {
-    colDup <- which(duplicated(round(Z, 8), MARGIN = 2))
+    colDup <- which(duplicated(round(Z, 5), MARGIN = 2))
     modZ <- Z
     if (length(colDup) > 0) {
       warning(paste0("Algorithm ", colDup, " is duplicated. Setting weight to 0."))
