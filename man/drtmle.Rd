@@ -136,7 +136,7 @@ function will ignore the nuisance parameter estimation specified by
 \code{SL_g} and \code{glm_g}. The entries in the list should correspond to
 the propensity for the observed values of \code{W}, with order determined by
 the input to \code{a_0} (e.g., if \code{a_0 = c(0,1)} then \code{gn[[1]]}
-should be propensity of \code{A} = 0 and \code{Qn[[2]]} should be propensity
+should be propensity of \code{A} = 0 and \code{gn[[2]]} should be propensity
 of \code{A} = 1).}
 
 \item{...}{Other options (not currently used).}

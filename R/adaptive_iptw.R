@@ -52,6 +52,16 @@
 #' \code{multiprocess} evaluation scheme is invoked, using forked R processes
 #' (if supported on the OS) and background R sessions otherwise. Users may also
 #' register their own backends using the \code{future.batchtools} package.
+#' @param future_hpc A character string identifying a high-performance computing
+#' backend to be used with parallelization. This should match exactly one of the
+#' options available from the \code{future.batchtools} package.
+#' @param gn An optional list of propensity score estimates. If specified, the
+#' function will ignore the nuisance parameter estimation specified by
+#' \code{SL_g} and \code{glm_g}. The entries in the list should correspond to
+#' the propensity for the observed values of \code{W}, with order determined by
+#' the input to \code{a_0} (e.g., if \code{a_0 = c(0,1)} then \code{gn[[1]]}
+#' should be propensity of \code{A} = 0 and \code{gn[[2]]} should be propensity
+#' of \code{A} = 1).
 #' @param ... Other options (not currently used).
 #' @return An object of class \code{"adaptive_iptw"}.
 #' \describe{
@@ -120,6 +130,8 @@ adaptive_iptw <- function(W, A, Y,
                           tolg = 1e-2,
                           cvFolds = 1,
                           parallel = FALSE,
+                          future_hpc = NULL,
+                          gn = NULL,
                           ...) {
   call <- match.call()
   # if cvFolds non-null split data into cvFolds pieces
@@ -131,36 +143,52 @@ adaptive_iptw <- function(W, A, Y,
   }
   # use futures with foreach if parallel mode
   if (!parallel) {
-    future::plan(future::sequential)
+    future::plan(future::transparent)
   } else {
     doFuture::registerDoFuture()
-    if (all(c("sequential", "uniprocess") %in% class(future::plan()))) {
+    if (all(c("sequential", "uniprocess") %in% class(future::plan())) &
+      is.null(future_hpc)) {
       future::plan(future::multiprocess)
+    } else if (!is.null(future_hpc)) {
+      if (future_hpc == "batchtools_torque") {
+        future::plan(future.batchtools::batchtools_torque)
+      } else if (future_hpc == "batchtools_slurm") {
+        future::plan(future.batchtools::batchtools_slurm)
+      } else if (future_hpc == "batchtools_sge") {
+        future::plan(future.batchtools::batchtools_sge)
+      } else if (future_hpc == "batchtools_lsf") {
+        future::plan(future.batchtools::batchtools_lsf)
+      } else if (future_hpc == "batchtools_openlava") {
+        future::plan(future.batchtools::batchtools_openlava)
+      } else {
+        stop("The currently specified HPC backend is not (yet) available.")
+      }
     }
   }
   # -------------------------------
   # estimate propensity score
   # -------------------------------
-  gnOut <- future::future_lapply(
-    x = validRows, FUN = estimateG,
-    A = A, W = W,
-    DeltaA = DeltaA, DeltaY = DeltaY,
-    tolg = tolg, verbose = verbose,
-    returnModels = returnModels,
-    SL_g = SL_g, glm_g = glm_g,
-    a_0 = a_0, stratify = stratify
-  )
-  # re-order predictions
-  gnValid <- unlist(gnOut, recursive = FALSE, use.names = FALSE)
-  gnUnOrd <- do.call(Map, c(c, gnValid[seq(1, length(gnValid), 2)]))
-  gn <- vector(mode = "list", length = length(a_0))
-  for (i in seq_along(a_0)) {
-    gn[[i]] <- rep(NA, n)
-    gn[[i]][unlist(validRows)] <- gnUnOrd[[i]]
+  if (is.null(gn)) {
+    gnOut <- future::future_lapply(
+      x = validRows, FUN = estimateG,
+      A = A, W = W,
+      DeltaA = DeltaA, DeltaY = DeltaY,
+      tolg = tolg, verbose = verbose,
+      returnModels = returnModels,
+      SL_g = SL_g, glm_g = glm_g,
+      a_0 = a_0, stratify = stratify
+    )
+    # re-order predictions
+    gnValid <- unlist(gnOut, recursive = FALSE, use.names = FALSE)
+    gnUnOrd <- do.call(Map, c(c, gnValid[seq(1, length(gnValid), 2)]))
+    gn <- vector(mode = "list", length = length(a_0))
+    for (i in seq_along(a_0)) {
+      gn[[i]] <- rep(NA, n)
+      gn[[i]][unlist(validRows)] <- gnUnOrd[[i]]
+    }
+    # obtain list of propensity score fits
+    gnMod <- gnValid[seq(2, length(gnValid), 2)]
   }
-  # obtain list of propensity score fits
-  gnMod <- gnValid[seq(2, length(gnValid), 2)]
-
   # compute iptw estimator
   psi_n <- mapply(a = split(a_0, seq_along(a_0)), g = gn, function(a, g) {
     modA <- A

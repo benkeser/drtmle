@@ -10,7 +10,8 @@ adaptive_iptw(W, A, Y, DeltaY = as.numeric(!is.na(Y)),
   \%in\% c(0, 1))) {     stats::binomial() } else {     stats::gaussian() },
   a_0 = unique(A[!is.na(A)]), SL_g = NULL, glm_g = NULL, SL_Qr = NULL,
   glm_Qr = NULL, returnModels = TRUE, verbose = FALSE, maxIter = 2,
-  tolIC = 1/length(Y), tolg = 0.01, cvFolds = 1, parallel = FALSE, ...)
+  tolIC = 1/length(Y), tolg = 0.01, cvFolds = 1, parallel = FALSE,
+  future_hpc = NULL, gn = NULL, ...)
 }
 \arguments{
 \item{W}{A \code{data.frame} of named covariates}
@@ -82,6 +83,18 @@ parameters in parallel. Only useful if \code{cvFolds > 1}. By default, a
 \code{multiprocess} evaluation scheme is invoked, using forked R processes
 (if supported on the OS) and background R sessions otherwise. Users may also
 register their own backends using the \code{future.batchtools} package.}
+
+\item{future_hpc}{A character string identifying a high-performance computing
+backend to be used with parallelization. This should match exactly one of the
+options available from the \code{future.batchtools} package.}
+
+\item{gn}{An optional list of propensity score estimates. If specified, the
+function will ignore the nuisance parameter estimation specified by
+\code{SL_g} and \code{glm_g}. The entries in the list should correspond to
+the propensity for the observed values of \code{W}, with order determined by
+the input to \code{a_0} (e.g., if \code{a_0 = c(0,1)} then \code{gn[[1]]}
+should be propensity of \code{A} = 0 and \code{gn[[2]]} should be propensity
+of \code{A} = 1).}
 
 \item{...}{Other options (not currently used).}
 }
