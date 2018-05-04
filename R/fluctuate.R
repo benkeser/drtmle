@@ -6,16 +6,17 @@
 #' @param Y The outcome
 #' @param A The treatment
 #' @param W The covariates
-#' @param DeltaY Indicator of missing outcome (assumed to be equal to 0 if missing 1 if observed)
-#' @param DeltaA Indicator of missing treatment (assumed to be equal to 0 if missing 1 if observed)
+#' @param DeltaY Indicator of missing outcome (assumed to be equal to 0 if
+#'  missing 1 if observed)
+#' @param DeltaA Indicator of missing treatment (assumed to be equal to 0 if
+#'  missing 1 if observed)
 #' @param Qn A list of outcome regression estimates evaluated on observed data
 #' @param gn A list of propensity regression estimates evaluated on observed data
 #' @param a_0 A list of fixed treatment values
 #'
 #' @importFrom SuperLearner trimLogit
 #' @importFrom stats predict glm
-#'
-
+#
 fluctuateQ1 <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, a_0) {
   QnStar <- mapply(a = a_0, Q = Qn, g = gn, FUN = function(x, a, Q, g) {
     l <- min(Y, na.rm = TRUE)
@@ -43,26 +44,30 @@ fluctuateQ1 <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, a_0) {
 #' fluctuateG
 #'
 #' Function called internally by drtmle to perform the fluctuation
-#' of the initial estimator of g (i.e., solves the new estimating eqn that results
-#' from misspecification of Q)
+#' of the initial estimator of g (i.e., solves the new estimating eqn that
+#' results from misspecification of Q)
 #'
 #' @param Y The outcome
 #' @param A The treatment
 #' @param W The covariates
-#' @param DeltaY Indicator of missing outcome (assumed to be equal to 0 if missing 1 if observed)
-#' @param DeltaA Indicator of missing treatment (assumed to be equal to 0 if missing 1 if observed)
-#' @param gn A list of propensity regression estimates evaluated on observed data
-#' @param Qrn A list of reduced-dimension regression estimates evaluated on observed data
-#' @param coefTol A tolerance level on the magnitude of the coefficient that flags the
-#' result as potentially the result of numeric instability.
+#' @param DeltaY Indicator of missing outcome (assumed to be equal to 0 if
+#'  missing 1 if observed)
+#' @param DeltaA Indicator of missing treatment (assumed to be equal to 0 if
+#'  missing 1 if observed)
+#' @param gn A list of propensity regression estimates evaluated on observed
+#'  data
+#' @param Qrn A list of reduced-dimension regression estimates evaluated on
+#'  observed data
+#' @param coefTol A tolerance level on the magnitude of the coefficient that
+#'  flags the result as potentially the result of numeric instability.
 #' @param tolg The lower bound on propensity score estimates
 #' @param a_0 A list of fixed treatment values
 #'
 #' @importFrom SuperLearner trimLogit
 #' @importFrom stats predict glm
-#'
-
-fluctuateG <- function(Y, A, W, DeltaY, DeltaA, a_0, gn, Qrn, tolg, coefTol = 1e5) {
+#
+fluctuateG <- function(Y, A, W, DeltaY, DeltaA, a_0, gn, Qrn, tolg,
+                       coefTol = 1e5) {
   gnStar <- mapply(a = a_0, g = gn, Qr = Qrn, FUN = function(x, a, g, Qr) {
     H1 <- Qr / g
     off <- SuperLearner::trimLogit(g, tolg)
@@ -104,30 +109,34 @@ fluctuateG <- function(Y, A, W, DeltaY, DeltaA, a_0, gn, Qrn, tolg, coefTol = 1e
 #' fluctuateQ2
 #'
 #' Function called internally by drtmle to perform the second fluctuation
-#' of the initial estimator of Q (i.e., solves the new estimating eqn that results
-#' from misspecification of g)
+#' of the initial estimator of Q (i.e., solves the new estimating eqn that
+#' results from misspecification of g)
 #'
 #' @param Y The outcome
 #' @param A The treatment
 #' @param W The covariates
-#' @param DeltaY Indicator of missing outcome (assumed to be equal to 0 if missing 1 if observed)
-#' @param DeltaA Indicator of missing treatment (assumed to be equal to 0 if missing 1 if observed)
+#' @param DeltaY Indicator of missing outcome (assumed to be equal to 0 if
+#'  missing 1 if observed)
+#' @param DeltaA Indicator of missing treatment (assumed to be equal to 0 if
+#'  missing 1 if observed)
 #' @param Qn A list of outcome regression estimates evaluated on observed data
-#' @param gn A list of propensity regression estimates evaluated on observed data
-#' @param grn A list of reduced-dimension regression estimates evaluated on observed data
-#' @param coefTol A tolerance level on the magnitude of the coefficient that flags the
-#' result as potentially the result of numeric instability.
-#' @param reduction A character indicating what reduced dimension regression was used.
+#' @param gn A list of propensity regression estimates evaluated on observed
+#'  data
+#' @param grn A list of reduced-dimension regression estimates evaluated on
+#'  observed data
+#' @param coefTol A tolerance level on the magnitude of the coefficient that
+#'  flags the result as potentially the result of numeric instability.
+#' @param reduction A character indicating what reduced dimension regression was
+#'  used.
 #' @param a_0 A list of fixed treatment values
 #'
 #' @importFrom SuperLearner trimLogit
 #' @importFrom stats predict glm
-#'
-
-
+#
 fluctuateQ2 <- function(Y, A, W, DeltaY, DeltaA,
                         Qn, gn, grn, a_0, reduction, coefTol=1e5) {
-  QnStar <- mapply(a = a_0, Q = Qn, g = gn, gr = grn, FUN = function(a, Q, g, gr) {
+  QnStar <- mapply(a = a_0, Q = Qn, g = gn, gr = grn,
+                   FUN = function(a, Q, g, gr) {
     l <- min(Y, na.rm = TRUE)
     u <- max(Y, na.rm = TRUE)
     Yscale <- (Y - l) / (u - l)
@@ -196,14 +205,19 @@ fluctuateQ2 <- function(Y, A, W, DeltaY, DeltaA,
 #' @param Y The outcome
 #' @param A The treatment
 #' @param W The covariates
-#' @param DeltaY Indicator of missing outcome (assumed to be equal to 0 if missing 1 if observed)
-#' @param DeltaA Indicator of missing treatment (assumed to be equal to 0 if missing 1 if observed)
+#' @param DeltaY Indicator of missing outcome (assumed to be equal to 0 if
+#'  missing 1 if observed)
+#' @param DeltaA Indicator of missing treatment (assumed to be equal to 0 if
+#'  missing 1 if observed)
 #' @param Qn A list of outcome regression estimates evaluated on observed data
-#' @param gn A list of propensity regression estimates evaluated on observed data
-#' @param grn A list of reduced-dimension regression estimates evaluated on observed data
-#' @param coefTol A tolerance level on the magnitude of the coefficient that flags the
-#' result as potentially the result of numeric instability.
-#' @param reduction A character indicating what reduced dimension regression was used.
+#' @param gn A list of propensity regression estimates evaluated on observed
+#'  data
+#' @param grn A list of reduced-dimension regression estimates evaluated on
+#'  observed data
+#' @param coefTol A tolerance level on the magnitude of the coefficient that
+#'  flags the result as potentially the result of numeric instability.
+#' @param reduction A character indicating what reduced dimension regression was
+#'  used.
 #' @param a_0 A list of fixed treatment values
 #'
 #' @importFrom SuperLearner trimLogit
@@ -211,7 +225,8 @@ fluctuateQ2 <- function(Y, A, W, DeltaY, DeltaA,
 #'
 fluctuateQ <- function(Y, A, W, DeltaY, DeltaA,
                        Qn, gn, grn, a_0, reduction, coefTol=1e5) {
-  QnStar <- mapply(a = a_0, Q = Qn, g = gn, gr = grn, FUN = function(a, Q, g, gr) {
+  QnStar <- mapply(a = a_0, Q = Qn, g = gn, gr = grn,
+                   FUN = function(a, Q, g, gr) {
     l <- min(Y, na.rm = TRUE)
     u <- max(Y, na.rm = TRUE)
     Yscale <- (Y - l) / (u - l)
@@ -221,7 +236,8 @@ fluctuateQ <- function(Y, A, W, DeltaY, DeltaA,
     if (reduction == "univariate") {
       H2 <- as.numeric(A == a & DeltaA == 1 & DeltaY == 1) / gr$grn2 * gr$grn1
     } else if (reduction == "bivariate") {
-      H2 <- as.numeric(A == a & DeltaA == 1 & DeltaY == 1) / gr$grn2 * (gr$grn2 - g) / g
+      H2 <- as.numeric(A == a & DeltaA == 1 & DeltaY == 1) /
+        gr$grn2 * (gr$grn2 - g) / g
     }
 
     suppressWarnings(

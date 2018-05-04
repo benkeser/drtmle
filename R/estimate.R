@@ -4,37 +4,38 @@
 #'
 #' @importFrom plyr alply
 #' @param A A vector of binary treatment assignment (assumed to be equal to 0 or
-#' 1)
+#'  1)
 #' @param DeltaY Indicator of missing outcome (assumed to be equal to 0 if
-#' missing 1 if observed)
+#'  missing 1 if observed)
 #' @param DeltaA Indicator of missing treatment (assumed to be equal to 0 if
-#' missing 1 if observed)
+#'  missing 1 if observed)
 #' @param W A \code{data.frame} of named covariates
 #' @param stratify A \code{boolean} indicating whether to estimate the missing
-#' outcome regression separately
-#' for observations with \code{A} equal to 0/1 (if \code{TRUE}) or to pool
-#' across \code{A} (if \code{FALSE}).
+#'  outcome regression separately for observations with \code{A} equal to 0/1
+#'  (if \code{TRUE}) or to pool across \code{A} (if \code{FALSE}).
 #' @param SL_g A vector of characters describing the super learner library to be
-#' used for each of the regression (\code{DeltaA}, \code{A}, and \code{DeltaY}).
-#' To use the same regression for each of the regressions (or if there is no
-#' missing data in \code{A} nor \code{Y}), a single library may be input.
+#'  used for each of the regression (\code{DeltaA}, \code{A}, and
+#'  \code{DeltaY}). To use the same regression for each of the regressions (or
+#'  if there is no missing data in \code{A} nor \code{Y}), a single library may
+#'  be input.
 #' @param tolg A numeric indicating the minimum value for estimates of the
-#' propensity score.
+#'  propensity score.
 #' @param verbose A boolean indicating whether to print status updates.
 #' @param returnModels A boolean indicating whether to return model fits for the
-#' outcome regression, propensity score, and reduced-dimension regressions.
+#'  outcome regression, propensity score, and reduced-dimension regressions.
 #' @param glm_g A character describing a formula to be used in the call to
-#' \code{glm} for the propensity score.
+#'  \code{glm} for the propensity score.
 #' @param a_0 A vector of fixed treatment values at which to return marginal
-#' mean estimates.
+#'  mean estimates.
 #' @param validRows A \code{list} of length \code{cvFolds} containing the row
-#' indexes of observations to include in validation fold.
+#'  indexes of observations to include in validation fold.
 #' @importFrom SuperLearner SuperLearner trimLogit
 #' @importFrom stats predict glm as.formula
 #'
 
 estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
-                      stratify = FALSE, validRows = NULL, verbose = FALSE, returnModels = FALSE) {
+                      stratify = FALSE, validRows = NULL, verbose = FALSE,
+                      returnModels = FALSE) {
   if (is.null(SL_g) & is.null(glm_g)) {
     stop("Specify Super Learner library or GLM formula for g")
   }
@@ -540,34 +541,34 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
 #'
 #' @param Y A vector of continuous or binary outcomes.
 #' @param A A vector of binary treatment assignment (assumed to be equal to 0 or
-#' 1).
+#'  1).
 #' @param W A \code{data.frame} of named covariates.
 #' @param DeltaY Indicator of missing outcome (assumed to be equal to 0 if
-#' missing 1 if observed).
+#'  missing 1 if observed).
 #' @param DeltaA Indicator of missing treatment (assumed to be equal to 0 if
-#' missing 1 if observed).
+#'  missing 1 if observed).
 #' @param SL_Q A vector of characters or a list describing the Super Learner
-#' library to be used for the outcome regression.
+#'  library to be used for the outcome regression.
 #' @param verbose A boolean indicating whether to print status updates.
 #' @param returnModels A boolean indicating whether to return model fits for the
-#' outcome regression, propensity score, and reduced-dimension regressions.
+#'  outcome regression, propensity score, and reduced-dimension regressions.
 #' @param glm_Q A character describing a formula to be used in the call to
-#' \code{glm} for the outcome regression.
+#'  \code{glm} for the outcome regression.
 #' @param a_0 A list of fixed treatment values
 #' @param family A character passed to \code{SuperLearner}
 #' @param stratify A \code{boolean} indicating whether to estimate the outcome
-#' regression separately for observations with \code{A} equal to 0/1 (if
-#' \code{TRUE}) or to pool across \code{A} (if \code{FALSE}).
+#'  regression separately for observations with \code{A} equal to 0/1 (if
+#'  \code{TRUE}) or to pool across \code{A} (if \code{FALSE}).
 #' @param validRows A \code{list} of length \code{cvFolds} containing the row
-#' indexes of observations to include in validation fold.
+#'  indexes of observations to include in validation fold.
 #' @param ... Additional arguments (not currently used)
 #'
 #' @importFrom SuperLearner SuperLearner trimLogit
 #' @importFrom stats predict glm as.formula
 #'
 estimateQ <- function(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify,
-                      family, verbose = FALSE, returnModels = FALSE, validRows = NULL,
-                      ...) {
+                      family, verbose = FALSE, returnModels = FALSE,
+                      validRows = NULL, ...) {
   if (is.null(SL_Q) & is.null(glm_Q)) {
     stop("Specify Super Learner library or GLM formula for Q")
   }
@@ -614,7 +615,7 @@ estimateQ <- function(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify,
           )
         )
 
-        Qn <- alply(a_0, 1, function(x) {
+        Qn <- plyr::alply(a_0, 1, function(x) {
           stats::predict(
             fm,
             newdata = data.frame(A = x, validW),
@@ -629,7 +630,7 @@ estimateQ <- function(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify,
           obsWeights = rep(1, length(trainA[include])),
           family = family
         ))
-        Qn <- alply(a_0, 1, function(x) {
+        Qn <- plyr::alply(a_0, 1, function(x) {
           stats::predict(object = fm$fit, newdata = data.frame(
             A = x,
             validW
@@ -731,38 +732,39 @@ estimateQ <- function(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify,
 #'  1)
 #' @param W A \code{data.frame} of named covariates
 #' @param DeltaY Indicator of missing outcome (assumed to be equal to 0 if
-#' missing 1 if observed)
+#'  missing 1 if observed)
 #' @param DeltaA Indicator of missing treatment (assumed to be equal to 0 if
-#' missing 1 if observed)
+#'  missing 1 if observed)
 #' @param Qn A list of outcome regression estimates evaluated on observed data.
-#' If NULL then 0 is used for all Qn (as is needed to estimate reduced dimension
-#' regression for adaptive_iptw)
+#'  If NULL then 0 is used for all Qn (as is needed to estimate reduced
+#'  dimension regression for adaptive_iptw)
 #' @param gn A list of propensity regression estimates evaluated on observed
-#' data
+#'  data
 #' @param SL_Qr A vector of characters or a list describing the Super Learner
-#' library to be used for the first reduced-dimension regression.
+#'  library to be used for the first reduced-dimension regression.
 #' @param glm_Qr A character describing a formula to be used in the call to
-#' \code{glm} for the first reduced-dimension regression. Ignored if
-#' \code{SL_gr!=NULL}.
+#'  \code{glm} for the first reduced-dimension regression. Ignored if
+#'  \code{SL_gr!=NULL}.
 #' @param a_0 A list of fixed treatment values.
 #' @param returnModels A boolean indicating whether to return model fits for the
-#' outcome regression, propensity score, and reduced-dimension regressions.
+#'  outcome regression, propensity score, and reduced-dimension regressions.
 #' @param family Should be gaussian() unless called from adaptive_iptw with
-#' binary \code{Y}.
+#'  binary \code{Y}.
 #' @param validRows A \code{list} of length \code{cvFolds} containing the row
-#' indexes of observations to include in validation fold.
+#'  indexes of observations to include in validation fold.
 #' @importFrom SuperLearner SuperLearner trimLogit
 #' @importFrom stats predict glm as.formula gaussian binomial
 
 estimateQrn <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, glm_Qr, SL_Qr,
-                        family = stats::gaussian(), a_0, returnModels, validRows = NULL) {
+                        family = stats::gaussian(), a_0, returnModels,
+                        validRows = NULL) {
 
   # if estimateQrn is called in adaptive_iptw, then Qn will enter as NULL.
   # Here we fill its value to 0 so that we estimate the correct nuisance
   # parameter for adaptive_iptw
   if (is.null(Qn)) {
     Qn <- vector(mode = "list", length = length(a_0))
-    for (i in 1:length(a_0)) {
+    for (i in seq_len(a_0)) {
       Qn[[i]] <- rep(0, length(Y))
     }
   }
@@ -914,26 +916,26 @@ estimateQrn <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, glm_Qr, SL_Qr,
 #'  1).
 #' @param W A \code{data.frame} of named covariates.
 #' @param DeltaY Indicator of missing outcome (assumed to be equal to 0 if
-#' missing 1 if observed).
+#'  missing 1 if observed).
 #' @param DeltaA Indicator of missing treatment (assumed to be equal to 0 if
-#' missing 1 if observed).
+#'  missing 1 if observed).
 #' @param Qn A list of outcome regression estimates evaluated on observed data.
 #' @param gn A list of propensity regression estimates evaluated on observed
-#' data.
+#'  data.
 #' @param SL_gr A vector of characters or a list describing the Super Learner
-#' library to be used for the reduced-dimension propensity score.
+#'  library to be used for the reduced-dimension propensity score.
 #' @param glm_gr A character describing a formula to be used in the call to
-#' \code{glm} for the second reduced-dimension regression. Ignored if
-#' \code{SL_gr!=NULL}.
+#'  \code{glm} for the second reduced-dimension regression. Ignored if
+#'  \code{SL_gr!=NULL}.
 #' @param reduction A character equal to \code{'univariate'} for a univariate
-#' misspecification correction or \code{'bivariate'} for the bivariate version.
+#'  misspecification correction or \code{'bivariate'} for the bivariate version.
 #' @param tolg A numeric indicating the minimum value for estimates of the
-#' propensity score.
+#'  propensity score.
 #' @param a_0 A list of fixed treatment values .
 #' @param returnModels A boolean indicating whether to return model fits for the
-#' outcome regression, propensity score, and reduced-dimension regressions.
+#'  outcome regression, propensity score, and reduced-dimension regressions.
 #' @param validRows A \code{list} of length \code{cvFolds} containing the row
-#' indexes of observations to include in validation fold.
+#'  indexes of observations to include in validation fold.
 #'
 #' @importFrom SuperLearner SuperLearner trimLogit
 #' @importFrom stats predict glm as.formula

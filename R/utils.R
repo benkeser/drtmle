@@ -7,7 +7,7 @@
 #' @param ... Other arguments (not used)
 #' @export
 #' @method print drtmle
-
+#
 print.drtmle <- function(x, ...) {
   tmp <- list(
     est = cbind(x$drtmle$est),
@@ -30,7 +30,7 @@ print.drtmle <- function(x, ...) {
 #' @param ... Other arguments (not used)
 #' @export
 #' @method print adaptive_iptw
-
+#
 print.adaptive_iptw <- function(x, ...) {
   tmp <- list(
     est = cbind(x$iptw_tmle$est),
@@ -54,7 +54,7 @@ print.adaptive_iptw <- function(x, ...) {
 #' @param digits Number of digits to round to
 #' @param ... Other options (not currently used)
 #' @method print ci.drtmle
-
+#
 print.ci.drtmle <- function(x, digits = 3, ...) {
   tmp <- lapply(x, round, digits = digits)
   print(tmp)
@@ -67,7 +67,7 @@ print.ci.drtmle <- function(x, digits = 3, ...) {
 #' @param digits Number of digits to round to
 #' @param ... Other options (not currently used)
 #' @method print ci.adaptive_iptw
-
+#
 print.ci.adaptive_iptw <- function(x, digits = 3, ...) {
   tmp <- lapply(x, round, digits = digits)
   print(tmp)
@@ -80,7 +80,7 @@ print.ci.adaptive_iptw <- function(x, digits = 3, ...) {
 #' @param digits Number of digits to round to
 #' @param ... Other options (not currently used)
 #' @method print wald_test.drtmle
-
+#
 print.wald_test.drtmle <- function(x, digits = 3, ...) {
   tmp <- lapply(x, round, digits = digits)
   print(tmp)
@@ -93,7 +93,7 @@ print.wald_test.drtmle <- function(x, digits = 3, ...) {
 #' @param digits Number of digits to round to
 #' @param ... Other options (not currently used)
 #' @method print wald_test.adaptive_iptw
-
+#
 print.wald_test.adaptive_iptw <- function(x, digits = 3, ...) {
   tmp <- lapply(x, round, digits = digits)
   print(tmp)
@@ -108,7 +108,7 @@ print.wald_test.adaptive_iptw <- function(x, digits = 3, ...) {
 #'
 #' @param x An object of class \code{"drtmle"}
 #' @param nPoints Number of points to plot lines (increase for less bumpy plot,
-#' decrease for faster evaluation).
+#'  decrease for faster evaluation).
 #' @param a_0 For what value of a_0 should the plot be made for?
 #' @param ... More arguments (not currently used) TO DO: Pass to plot? to lines?
 #' @export
@@ -133,7 +133,7 @@ print.wald_test.adaptive_iptw <- function(x, digits = 3, ...) {
 #'                maxIter = 1, returnModels = TRUE)
 #' # plot the reduced-dimension regression fits (not run)
 #' \dontrun{plot(fit1)}
-
+#
 plot.drtmle <- function(x, nPoints = 500,
                         a_0 = x$a_0[1], ...) {
   # ask to see next plot
@@ -230,7 +230,8 @@ plot.drtmle <- function(x, nPoints = 500,
       type = "n", xlim = xl, ylim = yl,
       xaxt = "n", yaxt = "n", bty = "n",
       xlab = expression(Q[n](W)),
-      ylab = expression("E[{" * A - g[n](W) * "} / " * g[n](W) * "} | " * Q[n](W) * "]")
+      ylab = expression("E[{" * A - g[n](W) * "} / " * g[n](W) * "} | " *
+                        Q[n](W) * "]")
     )
     # add axes
     axis(side = 1)

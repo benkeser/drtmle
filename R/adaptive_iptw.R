@@ -2,66 +2,65 @@
 #' for the propensity score
 #'
 #' @param W A \code{data.frame} of named covariates
-#' @param A A \code{numeric} vector of binary treatment assignment (assumed to be equal to 0 or
-#'  1)
+#' @param A A \code{numeric} vector of binary treatment assignment (assumed to
+#'  be equal to 0 or 1)
 #' @param Y A \code{numeric} numeric of continuous or binary outcomes.
-#' @param DeltaY A \code{numeric} indicator of missing outcome (assumed to be equal to 0 if
-#' missing 1 if observed)
-#' @param DeltaA A \code{numeric} indicator of missing treatment (assumed to be equal to 0 if
-#' missing 1 if observed)
-#' @param a_0 A vector of \code{numeric} treatment values at which to return marginal
-#' mean estimates.
+#' @param DeltaY A \code{numeric} indicator of missing outcome (assumed to be
+#'  equal to 0 if missing 1 if observed)
+#' @param DeltaA A \code{numeric} indicator of missing treatment (assumed to be
+#'  equal to 0 if missing 1 if observed)
+#' @param a_0 A vector of \code{numeric} treatment values at which to return
+#'  marginal mean estimates.
 #' @param stratify A \code{boolean} indicating whether to estimate the missing
-#' outcome regression separately
-#' for observations with different levels of \code{A} (if \code{TRUE}) or to
-#' pool across \code{A} (if \code{FALSE}).
+#'  outcome regression separately for observations with different levels of
+#'  \code{A} (if \code{TRUE}) or to pool across \code{A} (if \code{FALSE}).
 #' @param family A \code{family} object equal to either \code{binomial()} or
-#' \code{gaussian()}, to be passed to the \code{SuperLearner} or \code{glm}
-#' function.
+#'  \code{gaussian()}, to be passed to the \code{SuperLearner} or \code{glm}
+#'  function.
 #' @param SL_g A vector of characters describing the super learner library to be
-#' used for each of the propensity score regressions (\code{DeltaA}, \code{A},
-#' and \code{DeltaY}). To use the same library for each of the regressions (or
-#' if there is no missing data in \code{A} nor \code{Y}), a single library may
-#' be input. See \code{link{SuperLearner::SuperLearner}} for details on how
-#' super learner libraries can be specified.
+#'  used for each of the propensity score regressions (\code{DeltaA}, \code{A},
+#'  and \code{DeltaY}). To use the same library for each of the regressions (or
+#'  if there is no missing data in \code{A} nor \code{Y}), a single library may
+#'  be input. See \code{link{SuperLearner::SuperLearner}} for details on how
+#'  super learner libraries can be specified.
 #' @param SL_Qr A vector of characters or a list describing the Super Learner
-#' library to be used for the reduced-dimension outcome regression.
+#'  library to be used for the reduced-dimension outcome regression.
 #' @param glm_g A list of characters describing the formulas to be used
-#' for each of the propensity score regressions (\code{DeltaA}, \code{A}, and
-#' \code{DeltaY}). To use the same formula for each of the regressions (or if
-#' there is no missing data in \code{A} nor \code{Y}), a single character
-#' formula may be input.
+#'  for each of the propensity score regressions (\code{DeltaA}, \code{A}, and
+#'  \code{DeltaY}). To use the same formula for each of the regressions (or if
+#'  there is no missing data in \code{A} nor \code{Y}), a single character
+#'  formula may be input.
 #' @param glm_Qr A character describing a formula to be used in the call to
-#' \code{glm} for reduced-dimension outcome regression. Ignored if
-#' \code{SL_Qr!=NULL}. The formula should use the variable name \code{'gn'}.
+#'  \code{glm} for reduced-dimension outcome regression. Ignored if
+#'  \code{SL_Qr!=NULL}. The formula should use the variable name \code{'gn'}.
 #' @param maxIter A numeric that sets the maximum number of iterations the TMLE
-#' can perform in its fluctuation step.
+#'  can perform in its fluctuation step.
 #' @param tolIC A numeric that defines the stopping criteria based on the
-#' empirical mean of the influence function.
+#'  empirical mean of the influence function.
 #' @param tolg A numeric indicating the minimum value for estimates of the
-#' propensity score.
+#'  propensity score.
 #' @param verbose A boolean indicating whether to print status updates.
 #' @param returnModels A boolean indicating whether to return model fits for the
-#' propensity score and reduced-dimension regressions.
+#'  propensity score and reduced-dimension regressions.
 #' @param cvFolds A numeric equal to the number of folds to be used in
-#' cross-validated fitting of nuisance parameters. If \code{cvFolds = 1}, no
-#' cross-validation is used.
+#'  cross-validated fitting of nuisance parameters. If \code{cvFolds = 1}, no
+#'  cross-validation is used.
 #' @param parallel A boolean indicating whether to use parallelization based on
-#' \code{future} to estimate nuisance
-#' parameters in parallel. Only useful if \code{cvFolds > 1}. By default, a
-#' \code{multiprocess} evaluation scheme is invoked, using forked R processes
-#' (if supported on the OS) and background R sessions otherwise. Users may also
-#' register their own backends using the \code{future.batchtools} package.
+#'  \code{future} to estimate nuisance parameters in parallel. Only useful if
+#'  \code{cvFolds > 1}. By default, a \code{multiprocess} evaluation scheme is
+#'  invoked, using forked R processes (if supported on the OS) and background R
+#'  sessions otherwise. Users may also register their own backends using the
+#'  \code{future.batchtools} package.
 #' @param future_hpc A character string identifying a high-performance computing
-#' backend to be used with parallelization. This should match exactly one of the
-#' options available from the \code{future.batchtools} package.
+#'  backend to be used with parallelization. This should match exactly one of
+#'  the options available from the \code{future.batchtools} package.
 #' @param gn An optional list of propensity score estimates. If specified, the
-#' function will ignore the nuisance parameter estimation specified by
-#' \code{SL_g} and \code{glm_g}. The entries in the list should correspond to
-#' the propensity for the observed values of \code{W}, with order determined by
-#' the input to \code{a_0} (e.g., if \code{a_0 = c(0,1)} then \code{gn[[1]]}
-#' should be propensity of \code{A} = 0 and \code{gn[[2]]} should be propensity
-#' of \code{A} = 1).
+#'  function will ignore the nuisance parameter estimation specified by
+#'  \code{SL_g} and \code{glm_g}. The entries in the list should correspond to
+#'  the propensity for the observed values of \code{W}, with order determined by
+#'  the input to \code{a_0} (e.g., if \code{a_0 = c(0,1)} then \code{gn[[1]]}
+#'  should be propensity of \code{A} = 0 and \code{gn[[2]]} should be propensity
+#'  of \code{A} = 1).
 #' @param ... Other options (not currently used).
 #' @return An object of class \code{"adaptive_iptw"}.
 #' \describe{
@@ -138,7 +137,7 @@ adaptive_iptw <- function(W, A, Y,
   # if cvFolds non-null split data into cvFolds pieces
   n <- length(Y)
   if (cvFolds != 1) {
-    validRows <- split(sample(1:n), rep(1:cvFolds, length = n))
+    validRows <- split(sample(seq_len(n)), rep(seq_len(cvFolds), length = n))
   } else {
     validRows <- list(seq_len(n))
   }
@@ -171,7 +170,7 @@ adaptive_iptw <- function(W, A, Y,
   # -------------------------------
   if (is.null(gn)) {
     gnOut <- future.apply::future_lapply(
-      x = validRows, FUN = estimateG,
+      X = validRows, FUN = estimateG,
       A = A, W = W,
       DeltaA = DeltaA, DeltaY = DeltaY,
       tolg = tolg, verbose = verbose,
@@ -215,7 +214,7 @@ adaptive_iptw <- function(W, A, Y,
   # of Y - Qn on gn (which is needed for drtmle), while here we just need
   # the regression of Y on gn.
   QrnOut <- future.apply::future_lapply(
-    x = validRows, FUN = estimateQrn,
+    X = validRows, FUN = estimateQrn,
     Y = Y, A = A, W = W,
     DeltaA = DeltaA, DeltaY = DeltaY,
     Qn = NULL, gn = gn, glm_Qr = glm_Qr,
@@ -272,7 +271,7 @@ adaptive_iptw <- function(W, A, Y,
     })
     # re-estimate reduced dimension regression
     QrnStarOut <- future.apply::future_lapply(
-      x = validRows, FUN = estimateQrn,
+      X = validRows, FUN = estimateQrn,
       Y = Y, A = A, W = W,
       DeltaA = DeltaA, DeltaY = DeltaY,
       Qn = NULL, gn = gnStar,

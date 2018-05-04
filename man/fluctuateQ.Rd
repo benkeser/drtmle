@@ -14,22 +14,27 @@ fluctuateQ(Y, A, W, DeltaY, DeltaA, Qn, gn, grn, a_0, reduction,
 
 \item{W}{The covariates}
 
-\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if missing 1 if observed)}
+\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if
+missing 1 if observed)}
 
-\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if missing 1 if observed)}
+\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if
+missing 1 if observed)}
 
 \item{Qn}{A list of outcome regression estimates evaluated on observed data}
 
-\item{gn}{A list of propensity regression estimates evaluated on observed data}
+\item{gn}{A list of propensity regression estimates evaluated on observed
+data}
 
-\item{grn}{A list of reduced-dimension regression estimates evaluated on observed data}
+\item{grn}{A list of reduced-dimension regression estimates evaluated on
+observed data}
 
 \item{a_0}{A list of fixed treatment values}
 
-\item{reduction}{A character indicating what reduced dimension regression was used.}
+\item{reduction}{A character indicating what reduced dimension regression was
+used.}
 
-\item{coefTol}{A tolerance level on the magnitude of the coefficient that flags the
-result as potentially the result of numeric instability.}
+\item{coefTol}{A tolerance level on the magnitude of the coefficient that
+flags the result as potentially the result of numeric instability.}
 }
 \description{
 Function called internally by drtmle to perform simultaneous fluctuation

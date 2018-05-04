@@ -4,97 +4,98 @@
 #' @param A A \code{numeric} vector of discrete-valued treatment assignment.
 #' @param Y A \code{numeric} continuous or binary outcomes.
 #' @param DeltaY A \code{numeric} vector of missing outcome indicator (assumed
-#' to be equal to 0 if missing 1 if observed).
+#'  to be equal to 0 if missing 1 if observed).
 #' @param DeltaA A \code{numeric} vector of missing treatment indicator (assumed
-#' to be equal to 0 if missing 1 if observed).
+#'  to be equal to 0 if missing 1 if observed).
 #' @param a_0 A \code{numeric} vector of fixed treatment values at which to
-#' return marginal mean estimates.
+#'  return marginal mean estimates.
 #' @param family A \code{family} object equal to either \code{binomial()} or
-#' \code{gaussian()}, to be passed to the \code{SuperLearner} or \code{glm}
-#' function.
+#'  \code{gaussian()}, to be passed to the \code{SuperLearner} or \code{glm}
+#'  function.
 #' @param stratify A \code{boolean} indicating whether to estimate the outcome
-#' regression separately for different values of \code{A} (if \code{TRUE}) or to
-#' pool across \code{A} (if \code{FALSE}).
+#'  regression separately for different values of \code{A} (if \code{TRUE}) or
+#'  to pool across \code{A} (if \code{FALSE}).
 #' @param SL_Q A vector of characters or a list describing the Super Learner
-#' library to be used for the outcome regression. See
-#' \code{link{SuperLearner::SuperLearner}} for details.
+#'  library to be used for the outcome regression. See
+#'  \code{link{SuperLearner::SuperLearner}} for details.
 #' @param SL_g A vector of characters describing the super learner library to be
-#' used for each of the propensity score regressions (\code{DeltaA}, \code{A},
-#' and \code{DeltaY}). To use the same library for each of the regressions (or
-#' if there is no missing data in \code{A} nor \code{Y}), a single library may
-#' be input. See \code{link{SuperLearner::SuperLearner}} for details on how
-#' super learner libraries can be specified.
+#'  used for each of the propensity score regressions (\code{DeltaA}, \code{A},
+#'  and \code{DeltaY}). To use the same library for each of the regressions (or
+#'  if there is no missing data in \code{A} nor \code{Y}), a single library may
+#'  be input. See \code{link{SuperLearner::SuperLearner}} for details on how
+#'  super learner libraries can be specified.
 #' @param SL_Qr A vector of characters or a list describing the Super Learner
-#' library to be used for the reduced-dimension outcome regression.
+#'  library to be used for the reduced-dimension outcome regression.
 #' @param SL_gr A vector of characters or a list describing the Super Learner
-#' library to be used for the second reduced-dimension propensity score.
+#'  library to be used for the second reduced-dimension propensity score.
 #' @param glm_Q A character describing a formula to be used in the call to
-#' \code{glm} for the outcome regression. Ignored if \code{SL_Q!=NULL}.
+#'  \code{glm} for the outcome regression. Ignored if \code{SL_Q!=NULL}.
 #' @param glm_g A list of characters describing the formulas to be used
-#' for each of the propensity score regressions (\code{DeltaA}, \code{A}, and
-#' \code{DeltaY}). To use the same formula for each of the regressions (or if
-#' there is no missing data in \code{A} nor \code{Y}), a single character
-#' formula may be input.
+#'  for each of the propensity score regressions (\code{DeltaA}, \code{A}, and
+#'  \code{DeltaY}). To use the same formula for each of the regressions (or if
+#'  there is no missing data in \code{A} nor \code{Y}), a single character
+#'  formula may be input.
 #' @param glm_Qr A character describing a formula to be used in the call to
-#' \code{glm} for reduced-dimension outcome regression. Ignored if
-#' \code{SL_Qr!=NULL}. The formula should use the variable name \code{'gn'}.
+#'  \code{glm} for reduced-dimension outcome regression. Ignored if
+#'  \code{SL_Qr!=NULL}. The formula should use the variable name \code{'gn'}.
 #' @param glm_gr A character describing a formula to be used in the call to
-#' \code{glm} for the reduced-dimension propensity score. Ignored if
-#' \code{SL_gr!=NULL}. The formula should use the variable name \code{'Qn'} and
-#' \code{'gn'} if \code{reduction='bivariate'} and \code{'Qn'} otherwise.
+#'  \code{glm} for the reduced-dimension propensity score. Ignored if
+#'  \code{SL_gr!=NULL}. The formula should use the variable name \code{'Qn'} and
+#'  \code{'gn'} if \code{reduction='bivariate'} and \code{'Qn'} otherwise.
 #' @param guard A character vector indicating what pattern of misspecifications
-#' to guard against. If \code{guard} contains \code{"Q"}, then the TMLE guards
-#' against misspecification of the outcome regression by estimating the
-#' reduced-dimension outcome regression specified by \code{glm_Qr} or
-#' \code{SL_Qr}. If \code{guard} contains \code{"g"} then the TMLE
-#' (additionally) guards against misspecification of the propensity score by
-#' estimating the reduced-dimension propensity score specified by \code{glm_gr}
-#' or \code{SL_gr}.
+#'  to guard against. If \code{guard} contains \code{"Q"}, then the TMLE guards
+#'  against misspecification of the outcome regression by estimating the
+#'  reduced-dimension outcome regression specified by \code{glm_Qr} or
+#'  \code{SL_Qr}. If \code{guard} contains \code{"g"} then the TMLE
+#'  (additionally) guards against misspecification of the propensity score by
+#'  estimating the reduced-dimension propensity score specified by \code{glm_gr}
+#'  or \code{SL_gr}.
 #' @param reduction A character equal to \code{"univariate"} for a univariate
-#' misspecification correction (default) or \code{"bivariate"}
-#' for the bivariate version.
+#'  misspecification correction (default) or \code{"bivariate"} for the
+#'  bivariate version.
 #' @param returnModels A boolean indicating whether to return model fits for the
-#' outcome regression, propensity score, and reduced-dimension regressions.
+#'  outcome regression, propensity score, and reduced-dimension regressions.
 #' @param maxIter A numeric that sets the maximum number of iterations the TMLE
-#' can perform in its fluctuation step.
+#'  can perform in its fluctuation step.
 #' @param tolIC A numeric that defines the stopping criteria based on the
-#' empirical mean of the influence function.
+#'  empirical mean of the influence function.
 #' @param tolg A numeric indicating the minimum value for estimates of the
-#' propensity score.
+#'  propensity score.
 #' @param verbose A boolean indicating whether to print status updates.
 #' @param Qsteps A numeric equal to 1 or 2 indicating whether the fluctuation
-#' submodel for the outcome regression should be fit using a single minimization
-#' (\code{Qsteps = 1}) or a backfitting-type minimization (\code{Qsteps=2}). The
-#' latter was found to be more stable in simulations and is the default.
+#'  submodel for the outcome regression should be fit using a single
+#'  minimization (\code{Qsteps = 1}) or a backfitting-type minimization
+#'  (\code{Qsteps=2}). The latter was found to be more stable in simulations and
+#'  is the default.
 #' @param cvFolds A numeric equal to the number of folds to be used in
-#' cross-validated fitting of nuisance parameters. If \code{cvFolds = 1}, no
-#' cross-validation is used. Alternatively, \code{cvFolds} may be entered as a
-#' vector of fold assignments for observations, in which case its length should
-#' be the same length as \code{Y}.
+#'  cross-validated fitting of nuisance parameters. If \code{cvFolds = 1}, no
+#'  cross-validation is used. Alternatively, \code{cvFolds} may be entered as a
+#'  vector of fold assignments for observations, in which case its length should
+#'  be the same length as \code{Y}.
 #' @param parallel A boolean indicating whether to use parallelization based on
-#' \code{future} when estimating nuisance parameters.
-#' Only useful if \code{cvFolds > 1}. By default, a \code{multiprocess}
-#' evaluation scheme is invoked, using forked R processes (if supported on the
-#' OS) and background R sessions otherwise. Users may also register their own
-#' backends using the \code{future.batchtools} package.
+#'  \code{future} when estimating nuisance parameters. Only useful if
+#'  \code{cvFolds > 1}. By default, a \code{multiprocess} evaluation scheme is
+#'  invoked, using forked R processes (if supported on the OS) and background R
+#'  sessions otherwise. Users may also register their own backends using the
+#'  \code{future.batchtools} package.
 #' @param future_hpc A character string identifying a high-performance computing
-#' backend to be used with parallelization. This should match exactly one of the
-#' options available from the \code{future.batchtools} package.
+#'  backend to be used with parallelization. This should match exactly one of
+#'  the options available from the \code{future.batchtools} package.
 #' @param Qn An optional list of outcome regression estimates. If specified, the
-#' function will ignore the nuisance parameter estimation specified by
-#' \code{SL_Q} and \code{glm_Q}. The entries in the list should correspond to
-#' the outcome regression evaluated at \code{A} and the observed values of
-#' \code{W}, with order determined by the input to \code{a_0} (e.g., if
-#' \code{a_0 = c(0, 1)} then \code{Qn[[1]]} should be outcome regression at
-#' \code{A} = 0 and \code{Qn[[2]]} should be outcome regression at
-#' \code{A} = 1).
+#'  function will ignore the nuisance parameter estimation specified by
+#'  \code{SL_Q} and \code{glm_Q}. The entries in the list should correspond to
+#'  the outcome regression evaluated at \code{A} and the observed values of
+#'  \code{W}, with order determined by the input to \code{a_0} (e.g., if
+#'  \code{a_0 = c(0, 1)} then \code{Qn[[1]]} should be outcome regression at
+#'  \code{A} = 0 and \code{Qn[[2]]} should be outcome regression at
+#'  \code{A} = 1).
 #' @param gn An optional list of propensity score estimates. If specified, the
-#' function will ignore the nuisance parameter estimation specified by
-#' \code{SL_g} and \code{glm_g}. The entries in the list should correspond to
-#' the propensity for the observed values of \code{W}, with order determined by
-#' the input to \code{a_0} (e.g., if \code{a_0 = c(0,1)} then \code{gn[[1]]}
-#' should be propensity of \code{A} = 0 and \code{gn[[2]]} should be propensity
-#' of \code{A} = 1).
+#'  function will ignore the nuisance parameter estimation specified by
+#'  \code{SL_g} and \code{glm_g}. The entries in the list should correspond to
+#'  the propensity for the observed values of \code{W}, with order determined by
+#'  the input to \code{a_0} (e.g., if \code{a_0 = c(0,1)} then \code{gn[[1]]}
+#'  should be propensity of \code{A} = 0 and \code{gn[[2]]} should be propensity
+#'  of \code{A} = 1).
 #' @param ... Other options (not currently used).
 #'
 #' @return An object of class \code{"drtmle"}.
@@ -145,7 +146,7 @@
 #' @importFrom future.apply future_lapply
 #' @importFrom doFuture registerDoFuture
 #' @importFrom future.batchtools batchtools_slurm batchtools_lsf batchtools_sge
-#' batchtools_torque batchtools_openlava
+#'  batchtools_torque batchtools_openlava
 #' @importFrom stats cov
 #'
 #'
@@ -246,14 +247,14 @@ drtmle <- function(Y, A, W,
   # -------------------------------
   if (is.null(gn)) {
     gnOut <- future.apply::future_lapply(
-      x = validRows, FUN = estimateG, A = A,
+      X = validRows, FUN = estimateG, A = A,
       W = W, DeltaA = DeltaA, DeltaY = DeltaY,
       tolg = tolg, verbose = verbose,
       stratify = stratify,
       returnModels = returnModels, SL_g = SL_g,
       glm_g = glm_g, a_0 = a_0
     )
-    # # re-order predictions
+    # re-order predictions
     gnValid <- unlist(gnOut, recursive = FALSE, use.names = FALSE)
     gnUnOrd <- do.call(Map, c(c, gnValid[seq(1, length(gnValid), 2)]))
     gn <- vector(mode = "list", length = length(a_0))
@@ -269,7 +270,7 @@ drtmle <- function(Y, A, W,
   # -------------------------------
   if (is.null(Qn)) {
     QnOut <- future.apply::future_lapply(
-      x = validRows, FUN = estimateQ,
+      X = validRows, FUN = estimateQ,
       Y = Y, A = A, W = W,
       DeltaA = DeltaA, DeltaY = DeltaY,
       verbose = verbose,
@@ -309,7 +310,7 @@ drtmle <- function(Y, A, W,
 
   if ("Q" %in% guard) {
     QrnOut <- future.apply::future_lapply(
-      x = validRows, FUN = estimateQrn,
+      X = validRows, FUN = estimateQrn,
       Y = Y, A = A, W = W,
       DeltaA = DeltaA, DeltaY = DeltaY,
       Qn = Qn, gn = gn, glm_Qr = glm_Qr,
@@ -335,7 +336,7 @@ drtmle <- function(Y, A, W,
   }
   if ("g" %in% guard) {
     grnOut <- future.apply::future_lapply(
-      x = validRows, FUN = estimategrn,
+      X = validRows, FUN = estimategrn,
       Y = Y, A = A, W = W,
       DeltaA = DeltaA, DeltaY = DeltaY,
       tolg = tolg, Qn = Qn, gn = gn,
@@ -422,7 +423,7 @@ drtmle <- function(Y, A, W,
     # fluctuate QnStar
     if ("g" %in% guard) {
       grnStarOut <- future.apply::future_lapply(
-        x = validRows, FUN = estimategrn,
+        X = validRows, FUN = estimategrn,
         Y = Y, A = A, W = W,
         DeltaA = DeltaA, DeltaY = DeltaY,
         tolg = tolg, Qn = QnStar,
@@ -498,7 +499,7 @@ drtmle <- function(Y, A, W,
 
     if ("Q" %in% guard) {
       QrnStarOut <- future.apply::future_lapply(
-        x = validRows, FUN = estimateQrn,
+        X = validRows, FUN = estimateQrn,
         Y = Y, A = A, W = W,
         DeltaA = DeltaA, DeltaY = DeltaY,
         Qn = QnStar, gn = gnStar,

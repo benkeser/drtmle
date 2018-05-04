@@ -16,28 +16,27 @@ adaptive_iptw(W, A, Y, DeltaY = as.numeric(!is.na(Y)),
 \arguments{
 \item{W}{A \code{data.frame} of named covariates}
 
-\item{A}{A \code{numeric} vector of binary treatment assignment (assumed to be equal to 0 or
-1)}
+\item{A}{A \code{numeric} vector of binary treatment assignment (assumed to
+be equal to 0 or 1)}
 
 \item{Y}{A \code{numeric} numeric of continuous or binary outcomes.}
 
-\item{DeltaY}{A \code{numeric} indicator of missing outcome (assumed to be equal to 0 if
-missing 1 if observed)}
+\item{DeltaY}{A \code{numeric} indicator of missing outcome (assumed to be
+equal to 0 if missing 1 if observed)}
 
-\item{DeltaA}{A \code{numeric} indicator of missing treatment (assumed to be equal to 0 if
-missing 1 if observed)}
+\item{DeltaA}{A \code{numeric} indicator of missing treatment (assumed to be
+equal to 0 if missing 1 if observed)}
 
 \item{stratify}{A \code{boolean} indicating whether to estimate the missing
-outcome regression separately
-for observations with different levels of \code{A} (if \code{TRUE}) or to
-pool across \code{A} (if \code{FALSE}).}
+outcome regression separately for observations with different levels of
+\code{A} (if \code{TRUE}) or to pool across \code{A} (if \code{FALSE}).}
 
 \item{family}{A \code{family} object equal to either \code{binomial()} or
 \code{gaussian()}, to be passed to the \code{SuperLearner} or \code{glm}
 function.}
 
-\item{a_0}{A vector of \code{numeric} treatment values at which to return marginal
-mean estimates.}
+\item{a_0}{A vector of \code{numeric} treatment values at which to return
+marginal mean estimates.}
 
 \item{SL_g}{A vector of characters describing the super learner library to be
 used for each of the propensity score regressions (\code{DeltaA}, \code{A},
@@ -78,15 +77,15 @@ cross-validated fitting of nuisance parameters. If \code{cvFolds = 1}, no
 cross-validation is used.}
 
 \item{parallel}{A boolean indicating whether to use parallelization based on
-\code{future} to estimate nuisance
-parameters in parallel. Only useful if \code{cvFolds > 1}. By default, a
-\code{multiprocess} evaluation scheme is invoked, using forked R processes
-(if supported on the OS) and background R sessions otherwise. Users may also
-register their own backends using the \code{future.batchtools} package.}
+\code{future} to estimate nuisance parameters in parallel. Only useful if
+\code{cvFolds > 1}. By default, a \code{multiprocess} evaluation scheme is
+invoked, using forked R processes (if supported on the OS) and background R
+sessions otherwise. Users may also register their own backends using the
+\code{future.batchtools} package.}
 
 \item{future_hpc}{A character string identifying a high-performance computing
-backend to be used with parallelization. This should match exactly one of the
-options available from the \code{future.batchtools} package.}
+backend to be used with parallelization. This should match exactly one of
+the options available from the \code{future.batchtools} package.}
 
 \item{gn}{An optional list of propensity score estimates. If specified, the
 function will ignore the nuisance parameter estimation specified by
