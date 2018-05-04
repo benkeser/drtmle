@@ -27,7 +27,7 @@ equal to 0 if missing 1 if observed)}
 \item{DeltaA}{A \code{numeric} indicator of missing treatment (assumed to be
 equal to 0 if missing 1 if observed)}
 
-\item{stratify}{A \code{boolean} indicating whether to estimate the missing
+\item{stratify}{A \code{logical} indicating whether to estimate the missing
 outcome regression separately for observations with different levels of
 \code{A} (if \code{TRUE}) or to pool across \code{A} (if \code{FALSE}).}
 
@@ -58,10 +58,10 @@ library to be used for the reduced-dimension outcome regression.}
 \code{glm} for reduced-dimension outcome regression. Ignored if
 \code{SL_Qr!=NULL}. The formula should use the variable name \code{'gn'}.}
 
-\item{returnModels}{A boolean indicating whether to return model fits for the
+\item{returnModels}{A logical indicating whether to return model fits for the
 propensity score and reduced-dimension regressions.}
 
-\item{verbose}{A boolean indicating whether to print status updates.}
+\item{verbose}{A logical indicating whether to print status updates.}
 
 \item{maxIter}{A numeric that sets the maximum number of iterations the TMLE
 can perform in its fluctuation step.}
@@ -76,7 +76,7 @@ propensity score.}
 cross-validated fitting of nuisance parameters. If \code{cvFolds = 1}, no
 cross-validation is used.}
 
-\item{parallel}{A boolean indicating whether to use parallelization based on
+\item{parallel}{A logical indicating whether to use parallelization based on
 \code{future} to estimate nuisance parameters in parallel. Only useful if
 \code{cvFolds > 1}. By default, a \code{multiprocess} evaluation scheme is
 invoked, using forked R processes (if supported on the OS) and background R

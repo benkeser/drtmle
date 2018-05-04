@@ -31,8 +31,7 @@
 #'  indexes of observations to include in validation fold.
 #' @importFrom SuperLearner SuperLearner trimLogit
 #' @importFrom stats predict glm as.formula
-#'
-
+#
 estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
                       stratify = FALSE, validRows = NULL, verbose = FALSE,
                       returnModels = FALSE) {
@@ -565,7 +564,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
 #'
 #' @importFrom SuperLearner SuperLearner trimLogit
 #' @importFrom stats predict glm as.formula
-#'
+#
 estimateQ <- function(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify,
                       family, verbose = FALSE, returnModels = FALSE,
                       validRows = NULL, ...) {
@@ -754,7 +753,7 @@ estimateQ <- function(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify,
 #'  indexes of observations to include in validation fold.
 #' @importFrom SuperLearner SuperLearner trimLogit
 #' @importFrom stats predict glm as.formula gaussian binomial
-
+#
 estimateQrn <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, glm_Qr, SL_Qr,
                         family = stats::gaussian(), a_0, returnModels,
                         validRows = NULL) {
@@ -764,7 +763,7 @@ estimateQrn <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, glm_Qr, SL_Qr,
   # parameter for adaptive_iptw
   if (is.null(Qn)) {
     Qn <- vector(mode = "list", length = length(a_0))
-    for (i in seq_len(a_0)) {
+    for (i in seq_along(a_0)) {
       Qn[[i]] <- rep(0, length(Y))
     }
   }

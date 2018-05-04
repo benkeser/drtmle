@@ -11,7 +11,7 @@
 #'  equal to 0 if missing 1 if observed)
 #' @param a_0 A vector of \code{numeric} treatment values at which to return
 #'  marginal mean estimates.
-#' @param stratify A \code{boolean} indicating whether to estimate the missing
+#' @param stratify A \code{logical} indicating whether to estimate the missing
 #'  outcome regression separately for observations with different levels of
 #'  \code{A} (if \code{TRUE}) or to pool across \code{A} (if \code{FALSE}).
 #' @param family A \code{family} object equal to either \code{binomial()} or
@@ -39,13 +39,13 @@
 #'  empirical mean of the influence function.
 #' @param tolg A numeric indicating the minimum value for estimates of the
 #'  propensity score.
-#' @param verbose A boolean indicating whether to print status updates.
-#' @param returnModels A boolean indicating whether to return model fits for the
+#' @param verbose A logical indicating whether to print status updates.
+#' @param returnModels A logical indicating whether to return model fits for the
 #'  propensity score and reduced-dimension regressions.
 #' @param cvFolds A numeric equal to the number of folds to be used in
 #'  cross-validated fitting of nuisance parameters. If \code{cvFolds = 1}, no
 #'  cross-validation is used.
-#' @param parallel A boolean indicating whether to use parallelization based on
+#' @param parallel A logical indicating whether to use parallelization based on
 #'  \code{future} to estimate nuisance parameters in parallel. Only useful if
 #'  \code{cvFolds > 1}. By default, a \code{multiprocess} evaluation scheme is
 #'  invoked, using forked R processes (if supported on the OS) and background R
@@ -137,7 +137,7 @@ adaptive_iptw <- function(W, A, Y,
   # if cvFolds non-null split data into cvFolds pieces
   n <- length(Y)
   if (cvFolds != 1) {
-    validRows <- split(sample(seq_len(n)), rep(seq_len(cvFolds), length = n))
+    validRows <- split(sample(seq_len(n)), rep(1:cvFolds, length = n))
   } else {
     validRows <- list(seq_len(n))
   }
