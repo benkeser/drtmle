@@ -38,8 +38,8 @@ method.CC_LS_mod <- function() {
       coef <- rep(0, ncol(Z))
       idx <- which.min(cvRisk)
       coef[idx[1]] <- 1
-    }else{
-     coef <- fit$solution      
+    } else {
+     coef <- fit$solution
       if (length(colDup) > 0) {
         ind <- c(seq_along(coef), colDup - 0.5)
         coef <- c(coef, rep(0, length(colDup)))

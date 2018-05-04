@@ -141,7 +141,8 @@
 #' }
 #'
 #' @importFrom plyr llply laply
-#' @importFrom future plan sequential multiprocess future_lapply
+#' @importFrom future plan sequential multiprocess
+#' @importFrom future.apply future_lapply
 #' @importFrom doFuture registerDoFuture
 #' @importFrom future.batchtools batchtools_slurm batchtools_lsf batchtools_sge
 #' batchtools_torque batchtools_openlava
@@ -244,7 +245,7 @@ drtmle <- function(Y, A, W,
   # estimate propensity score
   # -------------------------------
   if (is.null(gn)) {
-    gnOut <- future::future_lapply(
+    gnOut <- future.apply::future_lapply(
       x = validRows, FUN = estimateG, A = A,
       W = W, DeltaA = DeltaA, DeltaY = DeltaY,
       tolg = tolg, verbose = verbose,
@@ -267,7 +268,7 @@ drtmle <- function(Y, A, W,
   # estimate outcome regression
   # -------------------------------
   if (is.null(Qn)) {
-    QnOut <- future::future_lapply(
+    QnOut <- future.apply::future_lapply(
       x = validRows, FUN = estimateQ,
       Y = Y, A = A, W = W,
       DeltaA = DeltaA, DeltaY = DeltaY,
@@ -307,7 +308,7 @@ drtmle <- function(Y, A, W,
   PnDQn <- PnDgn <- 0
 
   if ("Q" %in% guard) {
-    QrnOut <- future::future_lapply(
+    QrnOut <- future.apply::future_lapply(
       x = validRows, FUN = estimateQrn,
       Y = Y, A = A, W = W,
       DeltaA = DeltaA, DeltaY = DeltaY,
@@ -333,7 +334,7 @@ drtmle <- function(Y, A, W,
     PnDgn <- lapply(Dngo, mean)
   }
   if ("g" %in% guard) {
-    grnOut <- future::future_lapply(
+    grnOut <- future.apply::future_lapply(
       x = validRows, FUN = estimategrn,
       Y = Y, A = A, W = W,
       DeltaA = DeltaA, DeltaY = DeltaY,
@@ -420,7 +421,7 @@ drtmle <- function(Y, A, W,
 
     # fluctuate QnStar
     if ("g" %in% guard) {
-      grnStarOut <- future::future_lapply(
+      grnStarOut <- future.apply::future_lapply(
         x = validRows, FUN = estimategrn,
         Y = Y, A = A, W = W,
         DeltaA = DeltaA, DeltaY = DeltaY,
@@ -496,7 +497,7 @@ drtmle <- function(Y, A, W,
     }
 
     if ("Q" %in% guard) {
-      QrnStarOut <- future::future_lapply(
+      QrnStarOut <- future.apply::future_lapply(
         x = validRows, FUN = estimateQrn,
         Y = Y, A = A, W = W,
         DeltaA = DeltaA, DeltaY = DeltaY,

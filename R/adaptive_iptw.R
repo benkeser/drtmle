@@ -91,7 +91,8 @@
 #' }
 #'
 #' @importFrom plyr llply laply
-#' @importFrom future plan future_lapply
+#' @importFrom future plan
+#' @importFrom future.apply future_lapply
 #' @importFrom doFuture registerDoFuture
 #' @importFrom stats cov
 #'
@@ -169,7 +170,7 @@ adaptive_iptw <- function(W, A, Y,
   # estimate propensity score
   # -------------------------------
   if (is.null(gn)) {
-    gnOut <- future::future_lapply(
+    gnOut <- future.apply::future_lapply(
       x = validRows, FUN = estimateG,
       A = A, W = W,
       DeltaA = DeltaA, DeltaY = DeltaY,
@@ -213,7 +214,7 @@ adaptive_iptw <- function(W, A, Y,
   # assign Qn = 0 for all a_0 because estimateQrn estimates the regression
   # of Y - Qn on gn (which is needed for drtmle), while here we just need
   # the regression of Y on gn.
-  QrnOut <- future::future_lapply(
+  QrnOut <- future.apply::future_lapply(
     x = validRows, FUN = estimateQrn,
     Y = Y, A = A, W = W,
     DeltaA = DeltaA, DeltaY = DeltaY,
@@ -270,7 +271,7 @@ adaptive_iptw <- function(W, A, Y,
       x$eps
     })
     # re-estimate reduced dimension regression
-    QrnStarOut <- future::future_lapply(
+    QrnStarOut <- future.apply::future_lapply(
       x = validRows, FUN = estimateQrn,
       Y = Y, A = A, W = W,
       DeltaA = DeltaA, DeltaY = DeltaY,
@@ -295,7 +296,7 @@ adaptive_iptw <- function(W, A, Y,
       A = A, DeltaA = DeltaA, DeltaY = DeltaY,
       Qrn = QrnStar, gn = gnStar, a_0 = a_0
     )
-    PnDgnStar <- future::future_lapply(DngoStar, mean)
+    PnDgnStar <- future.apply::future_lapply(DngoStar, mean)
     if (verbose) {
       cat("TMLE Iteration", ct, "=", round(unlist(eps), 5), "\n")
       cat("Mean of IC       =", round(unlist(PnDgnStar), 10), "\n")
