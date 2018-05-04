@@ -188,6 +188,8 @@ adaptive_iptw <- function(W, A, Y,
     }
     # obtain list of propensity score fits
     gnMod <- gnValid[seq(2, length(gnValid), 2)]
+  }else{
+    gnMod <- NULL
   }
   # compute iptw estimator
   psi_n <- mapply(a = split(a_0, seq_along(a_0)), g = gn, function(a, g) {
