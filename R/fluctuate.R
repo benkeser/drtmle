@@ -237,7 +237,7 @@ fluctuateQ <- function(Y, A, W, DeltaY, DeltaA,
     }else{
       fluc_formula <- "Yscale ~ -1 + offset(off) + H1 + H2"
       start <- c(0,0)
-    }else 
+    }
     suppressWarnings(
       fm <- stats::glm(
         as.formula(fluc_formula), start = start, 
