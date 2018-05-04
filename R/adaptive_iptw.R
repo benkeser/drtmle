@@ -189,7 +189,7 @@ adaptive_iptw <- function(W, A, Y,
     }
     # obtain list of propensity score fits
     gnMod <- gnValid[seq(2, length(gnValid), 2)]
-  }else{
+  } else {
     gnMod <- NULL
   }
   # compute iptw estimator
@@ -326,7 +326,8 @@ adaptive_iptw <- function(W, A, Y,
 
   # covariance for tmle iptw
   DnoStarMat <- matrix(
-    unlist(DnoStar) - unlist(DngoStar), nrow = n,
+    unlist(DnoStar) - unlist(DngoStar),
+    nrow = n,
     ncol = length(a_0)
   )
   cov.t <- stats::cov(DnoStarMat) / n

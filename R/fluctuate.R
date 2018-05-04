@@ -25,12 +25,14 @@ fluctuateQ1 <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, a_0) {
     H1 <- as.numeric(A == a & DeltaA == 1 & DeltaY == 1) / g
     suppressWarnings(
       fm <- stats::glm(
-        Yscale ~ -1 + offset(off) + H1, start = 0,
+        Yscale ~ -1 + offset(off) + H1,
+        start = 0,
         data = data.frame(Y = Y, off = off, H1 = H1), family = "binomial"
       )
     )
     Qnstar <- stats::predict(
-      fm, type = "response",
+      fm,
+      type = "response",
       newdata = data.frame(off = off, H1 = 1 / g)
     ) * (u - l) + l
     list(est = Qnstar, eps = fm$coef)
@@ -67,12 +69,13 @@ fluctuateG <- function(Y, A, W, DeltaY, DeltaA, a_0, gn, Qrn, tolg, coefTol = 1e
     thisA <- as.numeric(A == a & DeltaA == 1 & DeltaY == 1)
     suppressWarnings(
       fm <- stats::glm(
-        thisA ~ -1 + offset(off) + H1, start = 0,
+        thisA ~ -1 + offset(off) + H1,
+        start = 0,
         data = data.frame(thisA = thisA, off = off, H1 = H1),
         family = "binomial"
       )
     )
-    if(is.na(fm$coefficients)){
+    if (is.na(fm$coefficients)) {
       fm$coefficients <- Inf
     }
     if (!fm$converged | abs(fm$coefficients) > coefTol) {
@@ -83,7 +86,7 @@ fluctuateG <- function(Y, A, W, DeltaY, DeltaA, a_0, gn, Qrn, tolg, coefTol = 1e
           family = "binomial"
         )
       )
-      if(is.na(fm$coefficients)){
+      if (is.na(fm$coefficients)) {
         fm$coefficients <- Inf
       }
       if (!fm$converged | abs(fm$coefficients) > coefTol) {
@@ -137,7 +140,8 @@ fluctuateQ2 <- function(Y, A, W, DeltaY, DeltaA,
     }
     suppressWarnings(
       fm <- stats::glm(
-        Yscale ~ -1 + offset(off) + H2, start = 0,
+        Yscale ~ -1 + offset(off) + H2,
+        start = 0,
         data = data.frame(Y = Y, off = off, H2 = H2), family = "binomial"
       )
     )
@@ -162,7 +166,8 @@ fluctuateQ2 <- function(Y, A, W, DeltaY, DeltaA,
 
     if (reduction == "univariate") {
       Qnstar <- stats::predict(
-        fm, type = "response", newdata = data.frame(
+        fm,
+        type = "response", newdata = data.frame(
           off = off, H2 = 1 / gr$grn2 * gr$grn1
         )
       ) * (u - l) + l
@@ -170,7 +175,8 @@ fluctuateQ2 <- function(Y, A, W, DeltaY, DeltaA,
       return(list(est = Qnstar, eps = fm$coefficients))
     } else if (reduction == "bivariate") {
       Qnstar <- stats::predict(
-        fm, type = "response", newdata = data.frame(
+        fm,
+        type = "response", newdata = data.frame(
           off = off,
           H2 = 1 / gr$grn2 * (gr$grn2 - g) / g
         )
@@ -220,7 +226,8 @@ fluctuateQ <- function(Y, A, W, DeltaY, DeltaA,
 
     suppressWarnings(
       fm <- stats::glm(
-        Yscale ~ -1 + offset(off) + H1 + H2, start = c(0, 0),
+        Yscale ~ -1 + offset(off) + H1 + H2,
+        start = c(0, 0),
         data = data.frame(Y = Y, off = off, H1 = H1, H2 = H2),
         family = "binomial"
       )
@@ -246,7 +253,8 @@ fluctuateQ <- function(Y, A, W, DeltaY, DeltaA,
 
     if (reduction == "univariate") {
       Qnstar <- stats::predict(
-        fm, type = "response", newdata = data.frame(
+        fm,
+        type = "response", newdata = data.frame(
           off = off, H1 = 1 / g,
           H2 = 1 / gr$grn2 * gr$grn1
         )
@@ -254,7 +262,8 @@ fluctuateQ <- function(Y, A, W, DeltaY, DeltaA,
       return(list(est = Qnstar, eps = fm$coefficients))
     } else if (reduction == "bivariate") {
       Qnstar <- stats::predict(
-        fm, type = "response", newdata = data.frame(
+        fm,
+        type = "response", newdata = data.frame(
           off = off, H1 = 1 / g,
           H2 = 1 / gr$grn2 * (gr$grn2 - g) / g
         )

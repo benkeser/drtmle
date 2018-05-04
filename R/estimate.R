@@ -114,7 +114,8 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
         glm_g$DeltaA
       )), data = thisDat, family = stats::binomial())
       gn_DeltaA <- stats::predict(
-        fm_DeltaA, type = "response",
+        fm_DeltaA,
+        type = "response",
         newdata = data.frame(DeltaA = validDeltaA, validW)
       )
     }
@@ -476,7 +477,8 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
           )),
           data = data.frame(A = trainA[include], trainW[
             include,
-            , drop = FALSE
+            ,
+            drop = FALSE
           ]), family = stats::binomial()
         )
         name_DeltaY <- paste0("DeltaY ~ W + A | DeltaA == 1")
@@ -506,7 +508,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
   # combine estimates into a single propensity score
   # ------------------------------------------------------
   gn <- mapply(gn_A = gn_A, gn_DeltaY = gn_DeltaY, FUN = function(gn_A,
-                                                                  gn_DeltaY) {
+                                                                    gn_DeltaY) {
     gn_A * gn_DeltaY * gn_DeltaA
   }, SIMPLIFY = FALSE)
 
@@ -614,7 +616,8 @@ estimateQ <- function(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify,
 
         Qn <- alply(a_0, 1, function(x) {
           stats::predict(
-            fm, newdata = data.frame(A = x, validW),
+            fm,
+            newdata = data.frame(A = x, validW),
             onlySL = TRUE
           )[[1]]
         })
@@ -683,7 +686,8 @@ estimateQ <- function(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify,
       )
       Qn <- plyr::alply(matrix(a_0), 1, function(a, fm) {
         stats::predict(
-          fm, newdata = data.frame(A = a, validW),
+          fm,
+          newdata = data.frame(A = a, validW),
           type = "response"
         )
       }, fm = fm)
@@ -700,7 +704,8 @@ estimateQ <- function(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify,
           family = family
         )
         return(list(est = stats::predict(
-          fm, newdata = validW,
+          fm,
+          newdata = validW,
           type = "response"
         ), fm = fm))
       })
@@ -878,7 +883,8 @@ estimateQrn <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, glm_Qr, SL_Qr,
           family = family
         )
         est <- stats::predict(
-          fm, newdata = data.frame(gn = valid_g),
+          fm,
+          newdata = data.frame(gn = valid_g),
           type = "response"
         )
         out <- list(est = est, fm = NULL)
@@ -1132,7 +1138,8 @@ estimategrn <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, SL_gr, tolg, glm_gr,
               trainDeltaY == 1 & trainDeltaA == 1), Qn = train_Q)
           )
           grn2 <- stats::predict(
-            fm2, type = "response", newdata =
+            fm2,
+            type = "response", newdata =
               data.frame(A = rep(0, length(validA)), Qn = valid_Q)
           )
         } else if (reduction == "bivariate") {
@@ -1147,7 +1154,8 @@ estimategrn <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, SL_gr, tolg, glm_gr,
             )
           )
           grn2 <- stats::predict(
-            fm2, type = "response",
+            fm2,
+            type = "response",
             newdata = data.frame(
               A = rep(0, length(validA)),
               Qn = valid_Q, gn = valid_g

@@ -181,7 +181,8 @@ plot.drtmle <- function(x, nPoints = 500,
   yl <- range(unlist(fit_Qrn))
   # set up empty plot
   plot(
-    0, type = "n", xlim = xl, ylim = yl,
+    0,
+    type = "n", xlim = xl, ylim = yl,
     xaxt = "n", yaxt = "n", bty = "n",
     xlab = expression(g[n](W)),
     ylab = expression("E[Y-" * Q[n](W) * " | " * g[n](W) * "]")
@@ -225,7 +226,8 @@ plot.drtmle <- function(x, nPoints = 500,
     yl <- range(unlist(fit_grn1))
     # set up empty plot
     plot(
-      0, type = "n", xlim = xl, ylim = yl,
+      0,
+      type = "n", xlim = xl, ylim = yl,
       xaxt = "n", yaxt = "n", bty = "n",
       xlab = expression(Q[n](W)),
       ylab = expression("E[{" * A - g[n](W) * "} / " * g[n](W) * "} | " * Q[n](W) * "]")
@@ -258,7 +260,8 @@ plot.drtmle <- function(x, nPoints = 500,
     yl <- range(unlist(fit_grn2))
     # set up empty plot
     plot(
-      0, type = "n", xlim = xl, ylim = yl,
+      0,
+      type = "n", xlim = xl, ylim = yl,
       xaxt = "n", yaxt = "n", bty = "n",
       xlab = expression(Q[n](W)),
       ylab = expression("E[A | " * Q[n](W) * "]")

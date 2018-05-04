@@ -40,7 +40,8 @@ SL.npreg <- function(Y, X, newX, family = gaussian(),
     bw <- np::npregbw(
       stats::as.formula(
         paste("Y ~", paste(names(X), collapse = "+"))
-      ), data = X,
+      ),
+      data = X,
       ftol = 0.01, tol = 0.01, remin = FALSE
     )
 

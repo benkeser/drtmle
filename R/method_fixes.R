@@ -6,9 +6,9 @@
 #' @export
 method.CC_LS_mod <- function() {
   computeCoef <- function(Z, Y, libraryNames, verbose, obsWeights,
-                          ...) {
+                            ...) {
     cvRisk <- apply(Z, 2, function(x) mean(obsWeights * (x -
-        Y) ^ 2))
+        Y)^2))
     names(cvRisk) <- libraryNames
     compute <- function(x, y, wt = rep(1, length(y))) {
       wX <- sqrt(wt) * x
@@ -18,10 +18,12 @@ method.CC_LS_mod <- function() {
       A <- cbind(rep(1, ncol(wX)), diag(ncol(wX)))
       bvec <- c(1, rep(0, ncol(wX)))
 
-      fit <- tryCatch({quadprog::solve.QP(
-        Dmat = D, dvec = d, Amat = A,
-        bvec = bvec, meq = 1
-      )}, error = function(e){
+      fit <- tryCatch({
+        quadprog::solve.QP(
+          Dmat = D, dvec = d, Amat = A,
+          bvec = bvec, meq = 1
+        )
+      }, error = function(e) {
         "fit error"
       })
       invisible(fit)
@@ -33,13 +35,13 @@ method.CC_LS_mod <- function() {
       modZ <- modZ[, -colDup]
     }
     fit <- compute(x = modZ, y = Y, wt = obsWeights)
-    if(class(fit) == "character"){
+    if (class(fit) == "character") {
       warning(paste0("Error in solve.QP; returning discrete SL weighting instead."))
       coef <- rep(0, ncol(Z))
       idx <- which.min(cvRisk)
       coef[idx[1]] <- 1
     } else {
-     coef <- fit$solution
+      coef <- fit$solution
       if (length(colDup) > 0) {
         ind <- c(seq_along(coef), colDup - 0.5)
         coef <- c(coef, rep(0, length(colDup)))
@@ -85,7 +87,7 @@ method.CC_nloglik_mod <- function() {
       matrix(coef[coef != 0]))
   }
   computeCoef <- function(Z, Y, libraryNames, obsWeights, control,
-                          verbose, ...) {
+                            verbose, ...) {
     colDup <- which(duplicated(round(Z, 5), MARGIN = 2))
     modZ <- Z
     if (length(colDup) > 0) {
@@ -96,7 +98,8 @@ method.CC_nloglik_mod <- function() {
     logitZ <- SuperLearner::trimLogit(Z, control$trimLogit)
     cvRisk <- apply(logitZ, 2, function(x) -sum(2 * obsWeights *
         ifelse(Y, stats::plogis(x, log.p = TRUE), stats::plogis(
-          x, log.p = TRUE,
+          x,
+          log.p = TRUE,
           lower.tail = FALSE
         ))))
     names(cvRisk) <- libraryNames
