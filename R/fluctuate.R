@@ -24,19 +24,23 @@ fluctuateQ1 <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, a_0) {
     Yscale <- (Y - l) / (u - l)
     off <- SuperLearner::trimLogit((Q - l) / (u - l))
     H1 <- as.numeric(A == a & DeltaA == 1 & DeltaY == 1) / g
-    suppressWarnings(
-      fm <- stats::glm(
-        Yscale ~ -1 + offset(off) + H1,
-        start = 0,
-        data = data.frame(Y = Y, off = off, H1 = H1), family = "binomial"
+    if (!all(H1 < 1e-7)) {
+      suppressWarnings(
+        fm <- stats::glm(
+          Yscale ~ -1 + offset(off) + H1,
+          start = 0,
+          data = data.frame(Y = Y, off = off, H1 = H1), family = "binomial"
+        )
       )
-    )
-    Qnstar <- stats::predict(
-      fm,
-      type = "response",
-      newdata = data.frame(off = off, H1 = 1 / g)
-    ) * (u - l) + l
-    list(est = Qnstar, eps = fm$coef)
+      Qnstar <- stats::predict(
+        fm,
+        type = "response",
+        newdata = data.frame(off = off, H1 = 1 / g)
+      ) * (u - l) + l
+      list(est = Qnstar, eps = fm$coef)
+    } else {
+      list(est = Q, eps = 0)
+    }
   }, SIMPLIFY = FALSE)
   QnStar
 }
@@ -135,64 +139,72 @@ fluctuateG <- function(Y, A, W, DeltaY, DeltaA, a_0, gn, Qrn, tolg,
 #
 fluctuateQ2 <- function(Y, A, W, DeltaY, DeltaA,
                         Qn, gn, grn, a_0, reduction, coefTol=1e5) {
-  QnStar <- mapply(a = a_0, Q = Qn, g = gn, gr = grn,
-                   FUN = function(a, Q, g, gr) {
-    l <- min(Y, na.rm = TRUE)
-    u <- max(Y, na.rm = TRUE)
-    Yscale <- (Y - l) / (u - l)
-    off <- SuperLearner::trimLogit((Q - l) / (u - l))
-    if (reduction == "univariate") {
-      H2 <- as.numeric(A == a & DeltaA == 1 & DeltaY == 1) / gr$grn2 * gr$grn1
-    } else if (reduction == "bivariate") {
-      H2 <- as.numeric(A == a & DeltaA == 1 & DeltaY == 1) / gr$grn2 *
-        (gr$grn2 - g) / g
-    }
-    suppressWarnings(
-      fm <- stats::glm(
-        Yscale ~ -1 + offset(off) + H2,
-        start = 0,
-        data = data.frame(Y = Y, off = off, H2 = H2), family = "binomial"
-      )
-    )
-    if (!fm$converged | abs(max(fm$coefficients)) > coefTol) {
-      # if it doesn't converge, try with no starting values
-      suppressWarnings(
-        fm <- stats::glm(
-          Yscale ~ -1 + offset(off) + H2,
-          data = data.frame(Y = Y, off = off, H2 = H2),
-          family = "binomial"
+  QnStar <- mapply(
+    a = a_0, Q = Qn, g = gn, gr = grn,
+    FUN = function(a, Q, g, gr) {
+      l <- min(Y, na.rm = TRUE)
+      u <- max(Y, na.rm = TRUE)
+      Yscale <- (Y - l) / (u - l)
+      off <- SuperLearner::trimLogit((Q - l) / (u - l))
+      if (reduction == "univariate") {
+        H2 <- as.numeric(A == a & DeltaA == 1 & DeltaY == 1) / gr$grn2 * gr$grn1
+      } else if (reduction == "bivariate") {
+        H2 <- as.numeric(A == a & DeltaA == 1 & DeltaY == 1) / gr$grn2 *
+          (gr$grn2 - g) / g
+      }
+      if (!all(H2 < 1e-7)) {
+        suppressWarnings(
+          fm <- stats::glm(
+            Yscale ~ -1 + offset(off) + H2,
+            start = 0,
+            data = data.frame(Y = Y, off = off, H2 = H2), family = "binomial"
+          )
         )
-      )
+      } else {
+        fm <- list(converged = FALSE, coefficients = Inf)
+      }
       if (!fm$converged | abs(max(fm$coefficients)) > coefTol) {
-        # warning("No sane fluctuation found. Proceeding using current estimates.")
-        if (reduction == "univariate") {
-          return(list(est = Q, eps = rep(0, 2)))
-        } else if (reduction == "bivariate") {
-          return(list(est = Q, eps = rep(0, 2)))
+        # if it doesn't converge, try with no starting values
+        if (!all(H2 < 1e-7)) {
+          suppressWarnings(
+            fm <- stats::glm(
+              Yscale ~ -1 + offset(off) + H2,
+              data = data.frame(Y = Y, off = off, H2 = H2),
+              family = "binomial"
+            )
+          )
+        }
+        if (!fm$converged | abs(max(fm$coefficients)) > coefTol) {
+          # warning("No sane fluctuation found. Proceeding using current estimates.")
+          if (reduction == "univariate") {
+            return(list(est = Q, eps = rep(0, 2)))
+          } else if (reduction == "bivariate") {
+            return(list(est = Q, eps = rep(0, 2)))
+          }
         }
       }
-    }
 
-    if (reduction == "univariate") {
-      Qnstar <- stats::predict(
-        fm,
-        type = "response", newdata = data.frame(
-          off = off, H2 = 1 / gr$grn2 * gr$grn1
-        )
-      ) * (u - l) + l
+      if (reduction == "univariate") {
+        Qnstar <- stats::predict(
+          fm,
+          type = "response", newdata = data.frame(
+            off = off, H2 = 1 / gr$grn2 * gr$grn1
+          )
+        ) * (u - l) + l
 
-      return(list(est = Qnstar, eps = fm$coefficients))
-    } else if (reduction == "bivariate") {
-      Qnstar <- stats::predict(
-        fm,
-        type = "response", newdata = data.frame(
-          off = off,
-          H2 = 1 / gr$grn2 * (gr$grn2 - g) / g
-        )
-      ) * (u - l) + l
-      return(list(est = Qnstar, eps = fm$coefficients))
-    }
-  }, SIMPLIFY = FALSE)
+        return(list(est = Qnstar, eps = fm$coefficients))
+      } else if (reduction == "bivariate") {
+        Qnstar <- stats::predict(
+          fm,
+          type = "response", newdata = data.frame(
+            off = off,
+            H2 = 1 / gr$grn2 * (gr$grn2 - g) / g
+          )
+        ) * (u - l) + l
+        return(list(est = Qnstar, eps = fm$coefficients))
+      }
+    }, SIMPLIFY = FALSE
+  )
   QnStar
 }
 
@@ -225,67 +237,86 @@ fluctuateQ2 <- function(Y, A, W, DeltaY, DeltaA,
 #'
 fluctuateQ <- function(Y, A, W, DeltaY, DeltaA,
                        Qn, gn, grn, a_0, reduction, coefTol=1e5) {
-  QnStar <- mapply(a = a_0, Q = Qn, g = gn, gr = grn,
-                   FUN = function(a, Q, g, gr) {
-    l <- min(Y, na.rm = TRUE)
-    u <- max(Y, na.rm = TRUE)
-    Yscale <- (Y - l) / (u - l)
-    off <- SuperLearner::trimLogit((Q - l) / (u - l))
+  QnStar <- mapply(
+    a = a_0, Q = Qn, g = gn, gr = grn,
+    FUN = function(a, Q, g, gr) {
+      l <- min(Y, na.rm = TRUE)
+      u <- max(Y, na.rm = TRUE)
+      Yscale <- (Y - l) / (u - l)
+      off <- SuperLearner::trimLogit((Q - l) / (u - l))
 
-    H1 <- as.numeric(A == a & DeltaA == 1 & DeltaY == 1) / g
-    if (reduction == "univariate") {
-      H2 <- as.numeric(A == a & DeltaA == 1 & DeltaY == 1) / gr$grn2 * gr$grn1
-    } else if (reduction == "bivariate") {
-      H2 <- as.numeric(A == a & DeltaA == 1 & DeltaY == 1) /
-        gr$grn2 * (gr$grn2 - g) / g
-    }
+      H1 <- as.numeric(A == a & DeltaA == 1 & DeltaY == 1) / g
+      if (reduction == "univariate") {
+        H2 <- as.numeric(A == a & DeltaA == 1 & DeltaY == 1) / gr$grn2 * gr$grn1
+      } else if (reduction == "bivariate") {
+        H2 <- as.numeric(A == a & DeltaA == 1 & DeltaY == 1) /
+          gr$grn2 * (gr$grn2 - g) / g
+      }
 
-    suppressWarnings(
-      fm <- stats::glm(
-        Yscale ~ -1 + offset(off) + H1 + H2,
-        start = c(0, 0),
-        data = data.frame(Y = Y, off = off, H1 = H1, H2 = H2),
-        family = "binomial"
-      )
-    )
-    if (!fm$converged | abs(max(fm$coefficients)) > coefTol) {
-      # if it doesn't converge, try with no starting values
+      if (all(H2 < 1e-7) & !all(H1 < 1e-7)) {
+        fluc_formula <- "Yscale ~ -1 + offset(off) + H1"
+        start <- 0
+      } else if (all(H1 < 1e-7) & !all(H2 < 1e-7)) {
+        fluc_formula <- "Yscale ~ -1 + offset(off) + H2"
+        start <- 0
+      } else {
+        fluc_formula <- "Yscale ~ -1 + offset(off) + H1 + H2"
+        start <- c(0, 0)
+      }
       suppressWarnings(
         fm <- stats::glm(
-          Yscale ~ -1 + offset(off) + H1 + H2,
+          as.formula(fluc_formula),
+          start = start,
           data = data.frame(Y = Y, off = off, H1 = H1, H2 = H2),
           family = "binomial"
         )
       )
+      if (any(is.na(fm$coefficients))) {
+        fm$coefficients[is.na(fm$coefficients)] <- Inf
+      }
       if (!fm$converged | abs(max(fm$coefficients)) > coefTol) {
-        # warning("No sane fluctuation found. Proceeding using current estimates.")
-        if (reduction == "univariate") {
-          return(list(est = Q, eps = rep(0, 2)))
-        } else if (reduction == "bivariate") {
-          return(list(est = Q, eps = rep(0, 2)))
+        # if it doesn't converge, try with no starting values
+        suppressWarnings(
+          fm <- stats::glm(
+            as.formula(fluc_formula),
+            start = NULL,
+            data = data.frame(Y = Y, off = off, H1 = H1, H2 = H2),
+            family = "binomial"
+          )
+        )
+        if (any(is.na(fm$coefficients))) {
+          fm$coefficients[is.na(fm$coefficients)] <- Inf
+        }
+        if (!fm$converged | abs(max(fm$coefficients)) > coefTol) {
+          # warning("No sane fluctuation found. Proceeding using current estimates.")
+          if (reduction == "univariate") {
+            return(list(est = Q, eps = rep(0, 2)))
+          } else if (reduction == "bivariate") {
+            return(list(est = Q, eps = rep(0, 2)))
+          }
         }
       }
-    }
 
-    if (reduction == "univariate") {
-      Qnstar <- stats::predict(
-        fm,
-        type = "response", newdata = data.frame(
-          off = off, H1 = 1 / g,
-          H2 = 1 / gr$grn2 * gr$grn1
-        )
-      ) * (u - l) + l
-      return(list(est = Qnstar, eps = fm$coefficients))
-    } else if (reduction == "bivariate") {
-      Qnstar <- stats::predict(
-        fm,
-        type = "response", newdata = data.frame(
-          off = off, H1 = 1 / g,
-          H2 = 1 / gr$grn2 * (gr$grn2 - g) / g
-        )
-      ) * (u - l) + l
-      return(list(est = Qnstar, eps = fm$coefficients))
-    }
-  }, SIMPLIFY = FALSE)
+      if (reduction == "univariate") {
+        Qnstar <- stats::predict(
+          fm,
+          type = "response", newdata = data.frame(
+            off = off, H1 = 1 / g,
+            H2 = 1 / gr$grn2 * gr$grn1
+          )
+        ) * (u - l) + l
+        return(list(est = Qnstar, eps = fm$coefficients))
+      } else if (reduction == "bivariate") {
+        Qnstar <- stats::predict(
+          fm,
+          type = "response", newdata = data.frame(
+            off = off, H1 = 1 / g,
+            H2 = 1 / gr$grn2 * (gr$grn2 - g) / g
+          )
+        ) * (u - l) + l
+        return(list(est = Qnstar, eps = fm$coefficients))
+      }
+    }, SIMPLIFY = FALSE
+  )
   QnStar
 }

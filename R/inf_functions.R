@@ -13,19 +13,21 @@
 #' @param a_0 Vector of values to return marginal mean
 #
 eval_Dstar <- function(A, Y, DeltaY, DeltaA, Qn, gn, psi_n, a_0) {
-  return(mapply(a = split(a_0, 1:length(a_0)), Q = Qn, g = gn, p = psi_n,
-                FUN = function(a, Q, g, p) {
-    # in order for influence function computations to compute properly
-    # replace missing A and Y by arbitrary numerics.
-    # Note that when these are missing, they are always getting multiplied
-    # by 0, but R return 0*NA = NA for some reason and this is a hacky fix
-    # to get around that.
-    modA <- A
-    modA[is.na(A)] <- -999
-    modY <- Y
-    modY[is.na(Y)] <- -999
-    as.numeric(modA == a & DeltaA == 1 & DeltaY == 1) / g * (modY - Q) + Q - p
-  }, SIMPLIFY = FALSE))
+  return(mapply(
+    a = split(a_0, 1:length(a_0)), Q = Qn, g = gn, p = psi_n,
+    FUN = function(a, Q, g, p) {
+      # in order for influence function computations to compute properly
+      # replace missing A and Y by arbitrary numerics.
+      # Note that when these are missing, they are always getting multiplied
+      # by 0, but R return 0*NA = NA for some reason and this is a hacky fix
+      # to get around that.
+      modA <- A
+      modA[is.na(A)] <- -999
+      modY <- Y
+      modY[is.na(Y)] <- -999
+      as.numeric(modA == a & DeltaA == 1 & DeltaY == 1) / g * (modY - Q) + Q - p
+    }, SIMPLIFY = FALSE
+  ))
 }
 
 #' Evaluate extra piece of efficient influence function resulting from
@@ -43,12 +45,14 @@ eval_Dstar <- function(A, Y, DeltaY, DeltaA, Qn, gn, psi_n, a_0) {
 #' @param a_0 Vector of values to return marginal mean
 #
 eval_Dstar_g <- function(A, DeltaY, DeltaA, Qrn, gn, a_0) {
-  return(mapply(a = split(a_0, 1:length(a_0)), Qr = Qrn, g = gn,
-                FUN = function(a, Qr, g) {
-    modA <- A
-    modA[is.na(A)] <- -999
-    Qr / g * (as.numeric(modA == a & DeltaA == 1 & DeltaY == 1) - g)
-  }, SIMPLIFY = FALSE))
+  return(mapply(
+    a = split(a_0, 1:length(a_0)), Qr = Qrn, g = gn,
+    FUN = function(a, Qr, g) {
+      modA <- A
+      modA[is.na(A)] <- -999
+      Qr / g * (as.numeric(modA == a & DeltaA == 1 & DeltaY == 1) - g)
+    }, SIMPLIFY = FALSE
+  ))
 }
 
 
@@ -72,25 +76,29 @@ eval_Dstar_g <- function(A, DeltaY, DeltaA, Qrn, gn, a_0) {
 #
 eval_Dstar_Q <- function(A, Y, DeltaY, DeltaA, Qn, gn, grn, a_0, reduction) {
   if (reduction == "univariate") {
-    return(mapply(a = split(a_0, 1:length(a_0)), Q = Qn, gr = grn,
-                  FUN = function(a, Q, gr) {
-      modA <- A
-      modA[is.na(A)] <- -999
-      modY <- Y
-      modY[is.na(Y)] <- -999
-      as.numeric(modA == a & DeltaA == 1 & DeltaY == 1) /
-        gr$grn2 * gr$grn1 * (modY - Q)
-    }, SIMPLIFY = FALSE))
+    return(mapply(
+      a = split(a_0, 1:length(a_0)), Q = Qn, gr = grn,
+      FUN = function(a, Q, gr) {
+        modA <- A
+        modA[is.na(A)] <- -999
+        modY <- Y
+        modY[is.na(Y)] <- -999
+        as.numeric(modA == a & DeltaA == 1 & DeltaY == 1) /
+          gr$grn2 * gr$grn1 * (modY - Q)
+      }, SIMPLIFY = FALSE
+    ))
   } else if (reduction == "bivariate") {
-    return(mapply(a = split(a_0, 1:length(a_0)), Q = Qn, g = gn, gr = grn,
-                  FUN = function(a, Q, gr, g) {
-      modA <- A
-      modA[is.na(A)] <- -999
-      modY <- Y
-      modY[is.na(Y)] <- -999
-      as.numeric(modA == a & DeltaA == 1 & DeltaY == 1) /
-        gr$grn2 * (gr$grn2 - g) / g * (modY - Q)
-    }, SIMPLIFY = FALSE))
+    return(mapply(
+      a = split(a_0, 1:length(a_0)), Q = Qn, g = gn, gr = grn,
+      FUN = function(a, Q, gr, g) {
+        modA <- A
+        modA[is.na(A)] <- -999
+        modY <- Y
+        modY[is.na(Y)] <- -999
+        as.numeric(modA == a & DeltaA == 1 & DeltaY == 1) /
+          gr$grn2 * (gr$grn2 - g) / g * (modY - Q)
+      }, SIMPLIFY = FALSE
+    ))
   }
 }
 
@@ -108,14 +116,16 @@ eval_Dstar_Q <- function(A, Y, DeltaY, DeltaA, Qn, gn, grn, a_0, reduction) {
 #' @param psi_n List of estimated ATEs
 #
 eval_Diptw <- function(A, Y, DeltaA, DeltaY, gn, psi_n, a_0) {
-  return(mapply(a = split(a_0, 1:length(a_0)), g = gn, psi = psi_n,
-                FUN = function(a, g, psi) {
-    modA <- A
-    modA[is.na(A)] <- -999
-    modY <- Y
-    modY[is.na(Y)] <- -999
-    as.numeric(modA == a & DeltaA == 1 & DeltaY == 1) / g * modY - psi
-  }, SIMPLIFY = FALSE))
+  return(mapply(
+    a = split(a_0, 1:length(a_0)), g = gn, psi = psi_n,
+    FUN = function(a, g, psi) {
+      modA <- A
+      modA[is.na(A)] <- -999
+      modY <- Y
+      modY[is.na(Y)] <- -999
+      as.numeric(modA == a & DeltaA == 1 & DeltaY == 1) / g * modY - psi
+    }, SIMPLIFY = FALSE
+  ))
 }
 
 
@@ -133,10 +143,12 @@ eval_Diptw <- function(A, Y, DeltaA, DeltaY, gn, psi_n, a_0) {
 #' @param a_0 Vector of values to return marginal mean
 #
 eval_Diptw_g <- function(A, DeltaA, DeltaY, Qrn, gn, a_0) {
-  return(mapply(a = split(a_0, 1:length(a_0)), Qr = Qrn, g = gn,
-                FUN = function(a, Qr, g) {
-    modA <- A
-    modA[is.na(A)] <- -999
-    Qr / g * (as.numeric(modA == a & DeltaA == 1 & DeltaY == 1) - g)
-  }, SIMPLIFY = FALSE))
+  return(mapply(
+    a = split(a_0, 1:length(a_0)), Qr = Qrn, g = gn,
+    FUN = function(a, Qr, g) {
+      modA <- A
+      modA[is.na(A)] <- -999
+      Qr / g * (as.numeric(modA == a & DeltaA == 1 & DeltaY == 1) - g)
+    }, SIMPLIFY = FALSE
+  ))
 }

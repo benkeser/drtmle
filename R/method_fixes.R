@@ -32,8 +32,10 @@ method.CC_LS_mod <- function() {
     colDup <- which(duplicated(round(Z, 5), MARGIN = 2))
     modZ <- Z
     if (length(colDup) > 0) {
-      warning(paste0("Algorithm ", colDup,
-                     " is duplicated. Setting weight to 0."))
+      warning(paste0(
+        "Algorithm ", colDup,
+        " is duplicated. Setting weight to 0."
+      ))
       modZ <- modZ[, -colDup]
     }
     fit <- compute(x = modZ, y = Y, wt = obsWeights)
@@ -87,7 +89,8 @@ method.CC_nloglik_mod <- function() {
       stop("All metalearner coefficients are zero, cannot compute prediction.")
     }
     stats::plogis(SuperLearner::trimLogit(predY[, coef != 0],
-                                          trim = control$trimLogit) %*%
+      trim = control$trimLogit
+    ) %*%
       matrix(coef[coef != 0]))
   }
   computeCoef <- function(Z, Y, libraryNames, obsWeights, control,
@@ -95,8 +98,10 @@ method.CC_nloglik_mod <- function() {
     colDup <- which(duplicated(round(Z, 5), MARGIN = 2))
     modZ <- Z
     if (length(colDup) > 0) {
-      warning(paste0("Algorithm ", colDup,
-                     " is duplicated. Setting weight to 0."))
+      warning(paste0(
+        "Algorithm ", colDup,
+        " is duplicated. Setting weight to 0."
+      ))
       modZ <- modZ[, -colDup]
     }
     modlogitZ <- SuperLearner::trimLogit(modZ, control$trimLogit)
@@ -139,7 +144,7 @@ method.CC_nloglik_mod <- function() {
         Y,
         modlogitZ
       ), lb = lower_bounds, ub = upper_bounds,
-                        eval_g_eq = function(beta) (sum(beta) -
+      eval_g_eq = function(beta) (sum(beta) -
           1), eval_jac_g_eq = function(beta) rep(1, length(beta)),
       opts = list(algorithm = "NLOPT_LD_SLSQP", xtol_abs = 1e-08)
     )

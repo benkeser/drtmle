@@ -111,7 +111,7 @@ ci.drtmle <- function(object, est = c("drtmle"), level = 0.95,
       thisSe <- sqrt(t(g) %*% v %*% g)
       out[[i]][1, ] <- rep(thisC, 3) +
         stats::qnorm(c(0.5, (1 - level) / 2, (1 + level) / 2)) *
-        rep(thisSe, 3)
+          rep(thisSe, 3)
       # E[Y(a_0[1])] - E[Y(a_0[2])]
       indMinus <- which(contrast == -1)
       indPlus <- which(contrast == 1)
@@ -148,7 +148,7 @@ ci.drtmle <- function(object, est = c("drtmle"), level = 0.95,
       thisSe <- sqrt(t(grad) %*% v %*% grad)
       transformCI <- rep(f_thisC, 3) +
         stats::qnorm(c(0.5, (1 - level) / 2, (1 + level) / 2)) *
-        rep(thisSe, 3)
+          rep(thisSe, 3)
       out[[i]][1, ] <- do.call(contrast$f_inv, args = list(eff = transformCI))
       row.names(out[[i]]) <- c("user contrast")
       colnames(out[[i]]) <- c("est", "cil", "ciu")
@@ -298,7 +298,7 @@ ci.adaptive_iptw <- function(object, est = c("iptw_tmle"), level = 0.95,
       thisSe <- sqrt(t(grad) %*% v %*% grad)
       transformCI <- rep(f_thisC, 3) +
         stats::qnorm(c(0.5, (1 - level) / 2, (1 + level) / 2)) *
-        rep(thisSe, 3)
+          rep(thisSe, 3)
       out[[i]][1, ] <- do.call(contrast$f_inv, args = list(eff = transformCI))
       row.names(out[[i]]) <- c("user contrast")
       colnames(out[[i]]) <- c("est", "cil", "ciu")
