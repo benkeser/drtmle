@@ -35,8 +35,8 @@ return marginal mean estimates.}
 function.}
 
 \item{stratify}{A \code{boolean} indicating whether to estimate the outcome
-regression separately for different values of \code{A} (if \code{TRUE}) or to
-pool across \code{A} (if \code{FALSE}).}
+regression separately for different values of \code{A} (if \code{TRUE}) or
+to pool across \code{A} (if \code{FALSE}).}
 
 \item{SL_Q}{A vector of characters or a list describing the Super Learner
 library to be used for the outcome regression. See
@@ -83,8 +83,8 @@ estimating the reduced-dimension propensity score specified by \code{glm_gr}
 or \code{SL_gr}.}
 
 \item{reduction}{A character equal to \code{"univariate"} for a univariate
-misspecification correction (default) or \code{"bivariate"}
-for the bivariate version.}
+misspecification correction (default) or \code{"bivariate"} for the
+bivariate version.}
 
 \item{returnModels}{A boolean indicating whether to return model fits for the
 outcome regression, propensity score, and reduced-dimension regressions.}
@@ -107,20 +107,21 @@ propensity score.}
 \item{verbose}{A boolean indicating whether to print status updates.}
 
 \item{Qsteps}{A numeric equal to 1 or 2 indicating whether the fluctuation
-submodel for the outcome regression should be fit using a single minimization
-(\code{Qsteps = 1}) or a backfitting-type minimization (\code{Qsteps=2}). The
-latter was found to be more stable in simulations and is the default.}
+submodel for the outcome regression should be fit using a single
+minimization (\code{Qsteps = 1}) or a backfitting-type minimization
+(\code{Qsteps=2}). The latter was found to be more stable in simulations and
+is the default.}
 
 \item{parallel}{A boolean indicating whether to use parallelization based on
-\code{future} when estimating nuisance parameters.
-Only useful if \code{cvFolds > 1}. By default, a \code{multiprocess}
-evaluation scheme is invoked, using forked R processes (if supported on the
-OS) and background R sessions otherwise. Users may also register their own
-backends using the \code{future.batchtools} package.}
+\code{future} when estimating nuisance parameters. Only useful if
+\code{cvFolds > 1}. By default, a \code{multiprocess} evaluation scheme is
+invoked, using forked R processes (if supported on the OS) and background R
+sessions otherwise. Users may also register their own backends using the
+\code{future.batchtools} package.}
 
 \item{future_hpc}{A character string identifying a high-performance computing
-backend to be used with parallelization. This should match exactly one of the
-options available from the \code{future.batchtools} package.}
+backend to be used with parallelization. This should match exactly one of
+the options available from the \code{future.batchtools} package.}
 
 \item{Qn}{An optional list of outcome regression estimates. If specified, the
 function will ignore the nuisance parameter estimation specified by

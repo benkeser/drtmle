@@ -12,27 +12,27 @@
 
 \item{est}{A vector indicating for which estimators to return a
 confidence interval. Possible estimators include the TMLE with doubly robust
-inference (\code{"drtmle"}, recommended), the AIPTW with additional correction
-for misspecification (\code{"aiptw_c"}, not recommended), the standard TMLE
-(\code{"tmle"}, recommended only for comparison to "drtmle"), the standard
-AIPTW (\code{"aiptw"}, recommended only for comparison to "drtmle"), and
-G-computation (\code{"gcomp"}, not recommended).}
+inference (\code{"drtmle"}, recommended), the AIPTW with additional
+correction for misspecification (\code{"aiptw_c"}, not recommended), the
+standard TMLE (\code{"tmle"}, recommended only for comparison to "drtmle"),
+the standard AIPTW (\code{"aiptw"}, recommended only for comparison to
+"drtmle"), and G-computation (\code{"gcomp"}, not recommended).}
 
 \item{null}{The null hypothesis value.}
 
-\item{contrast}{This option specifies what parameter to return confidence intervals for.
-If \code{contrast=NULL}, then test the null hypothesis that the covariate-adjusted
-marginal means equal the value(s) specified in \code{null}.
-\code{contrast} can also be a numeric vector of ones, negative ones,
-and zeros to define linear combinations of the various means (e.g., to estimate an average
-treatment effect, see examples). In this case, we test the null hypothesis that the
-linear combination of means equals the value specified in \code{null}.
-\code{contrast} can also be a list with named functions
-\code{f}, \code{h}, and \code{fh_grad}. The function \code{f} takes
-as input argument \code{eff} and specifies which transformation
-of the effect measure to test. The function \code{h} defines the contrast
-to be estimated and should take as input \code{est}, a vector
-of the same length as \code{object$a_0}, and output the desired contrast. The function
+\item{contrast}{This option specifies what parameter to return confidence
+intervals for. If \code{contrast=NULL}, then test the null hypothesis that
+the covariate-adjusted marginal means equal the value(s) specified in
+\code{null}. \code{contrast} can also be a numeric vector of ones, negative
+ones, and zeros to define linear combinations of the various means (e.g., to
+estimate an average treatment effect, see examples). In this case, we test
+the null hypothesis that the linear combination of means equals the value
+specified in \code{null}. \code{contrast} can also be a list with named
+functions \code{f}, \code{h}, and \code{fh_grad}. The function \code{f}
+takes as input argument \code{eff} and specifies which transformation of the
+effect measure to test. The function \code{h} defines the contrast to be
+estimated and should take as input \code{est}, a vector of the same length
+as \code{object$a_0}, and output the desired contrast. The function
 \code{fh_grad} is the gradient of the function \code{h(f())}. The function
 computes a test of the null hypothesis that \code{h(f(object$est)) = null}.
 See examples.}
@@ -41,7 +41,7 @@ See examples.}
 }
 \value{
 An object of class \code{"ci.drtmle"} with point estimates and
-confidence intervals of the specified level.
+ confidence intervals of the specified level.
 }
 \description{
 Wald tests for drtmle objects

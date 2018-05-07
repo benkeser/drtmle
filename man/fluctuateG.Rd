@@ -13,23 +13,27 @@ fluctuateG(Y, A, W, DeltaY, DeltaA, a_0, gn, Qrn, tolg, coefTol = 1e+05)
 
 \item{W}{The covariates}
 
-\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if missing 1 if observed)}
+\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if
+missing 1 if observed)}
 
-\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if missing 1 if observed)}
+\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if
+missing 1 if observed)}
 
 \item{a_0}{A list of fixed treatment values}
 
-\item{gn}{A list of propensity regression estimates evaluated on observed data}
+\item{gn}{A list of propensity regression estimates evaluated on observed
+data}
 
-\item{Qrn}{A list of reduced-dimension regression estimates evaluated on observed data}
+\item{Qrn}{A list of reduced-dimension regression estimates evaluated on
+observed data}
 
 \item{tolg}{The lower bound on propensity score estimates}
 
-\item{coefTol}{A tolerance level on the magnitude of the coefficient that flags the
-result as potentially the result of numeric instability.}
+\item{coefTol}{A tolerance level on the magnitude of the coefficient that
+flags the result as potentially the result of numeric instability.}
 }
 \description{
 Function called internally by drtmle to perform the fluctuation
-of the initial estimator of g (i.e., solves the new estimating eqn that results
-from misspecification of Q)
+of the initial estimator of g (i.e., solves the new estimating eqn that
+results from misspecification of Q)
 }

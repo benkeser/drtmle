@@ -9,36 +9,36 @@ wald_test <- function(...) {
 #'
 #' @param object An object of class \code{"drtmle"}
 #' @param est A vector indicating for which estimators to return a
-#' confidence interval. Possible estimators include the TMLE with doubly robust
-#' inference (\code{"drtmle"}, recommended), the AIPTW with additional correction
-#' for misspecification (\code{"aiptw_c"}, not recommended), the standard TMLE
-#' (\code{"tmle"}, recommended only for comparison to "drtmle"), the standard
-#' AIPTW (\code{"aiptw"}, recommended only for comparison to "drtmle"), and
-#' G-computation (\code{"gcomp"}, not recommended).
+#'  confidence interval. Possible estimators include the TMLE with doubly robust
+#'  inference (\code{"drtmle"}, recommended), the AIPTW with additional
+#'  correction for misspecification (\code{"aiptw_c"}, not recommended), the
+#'  standard TMLE (\code{"tmle"}, recommended only for comparison to "drtmle"),
+#'  the standard AIPTW (\code{"aiptw"}, recommended only for comparison to
+#'  "drtmle"), and G-computation (\code{"gcomp"}, not recommended).
 #' @param null The null hypothesis value.
-#' @param contrast This option specifies what parameter to return confidence intervals for.
-#' If \code{contrast=NULL}, then test the null hypothesis that the covariate-adjusted
-#' marginal means equal the value(s) specified in \code{null}.
-#' \code{contrast} can also be a numeric vector of ones, negative ones,
-#' and zeros to define linear combinations of the various means (e.g., to estimate an average
-#' treatment effect, see examples). In this case, we test the null hypothesis that the
-#' linear combination of means equals the value specified in \code{null}.
-#' \code{contrast} can also be a list with named functions
-#' \code{f}, \code{h}, and \code{fh_grad}. The function \code{f} takes
-#' as input argument \code{eff} and specifies which transformation
-#' of the effect measure to test. The function \code{h} defines the contrast
-#' to be estimated and should take as input \code{est}, a vector
-#' of the same length as \code{object$a_0}, and output the desired contrast. The function
-#' \code{fh_grad} is the gradient of the function \code{h(f())}. The function
-#' computes a test of the null hypothesis that \code{h(f(object$est)) = null}.
-#' See examples.
+#' @param contrast This option specifies what parameter to return confidence
+#'  intervals for. If \code{contrast=NULL}, then test the null hypothesis that
+#'  the covariate-adjusted marginal means equal the value(s) specified in
+#'  \code{null}. \code{contrast} can also be a numeric vector of ones, negative
+#'  ones, and zeros to define linear combinations of the various means (e.g., to
+#'  estimate an average treatment effect, see examples). In this case, we test
+#'  the null hypothesis that the linear combination of means equals the value
+#'  specified in \code{null}. \code{contrast} can also be a list with named
+#'  functions \code{f}, \code{h}, and \code{fh_grad}. The function \code{f}
+#'  takes as input argument \code{eff} and specifies which transformation of the
+#'  effect measure to test. The function \code{h} defines the contrast to be
+#'  estimated and should take as input \code{est}, a vector of the same length
+#'  as \code{object$a_0}, and output the desired contrast. The function
+#'  \code{fh_grad} is the gradient of the function \code{h(f())}. The function
+#'  computes a test of the null hypothesis that \code{h(f(object$est)) = null}.
+#'  See examples.
 #' @param ... Other options (not currently used).
 #'
 #' @importFrom stats pnorm
 #' @export
 #' @method wald_test drtmle
 #' @return An object of class \code{"ci.drtmle"} with point estimates and
-#' confidence intervals of the specified level.
+#'  confidence intervals of the specified level.
 #'
 #' @examples
 #' # load super learner
@@ -69,7 +69,7 @@ wald_test <- function(...) {
 #'                    h = function(est){ est[1]/est[2] },
 #'                    fh_grad =  function(est){ c(1/est[1],-1/est[2]) })
 #' test_RR <- wald_test(fit1, contrast = myContrast, null = 1)
-
+#
 wald_test.drtmle <- function(object, est = c("drtmle"), null = 0,
                              contrast = NULL, ...) {
   if (class(object) != "drtmle") {
@@ -90,7 +90,8 @@ wald_test.drtmle <- function(object, est = c("drtmle"), null = 0,
     for (i in seq_along(est)) {
       out[[i]] <- matrix(NA, nrow = length(object$a_0), ncol = 2)
       for (j in seq_along(object$a_0)) {
-        zstat <- (object[[est[i]]]$est[j] - null[j]) / sqrt(object[[est[i]]]$cov[j, j])
+        zstat <- (object[[est[i]]]$est[j] - null[j]) /
+          sqrt(object[[est[i]]]$cov[j, j])
         pval <- 2 * stats::pnorm(-abs(zstat))
         out[[i]][j, ] <- c(zstat, pval)
       }
@@ -172,35 +173,35 @@ wald_test.drtmle <- function(object, est = c("drtmle"), null = 0,
 #' Wald tests for adaptive_iptw objects
 #'
 #' @param object An object of class \code{"adaptive_iptw"}
-#' @param est A vector indicating for which estimators to return a
-#' confidence interval. Possible estimators include the TMLE IPTW
-#' (\code{"iptw_tmle"}, recommended), the one-step IPTW
-#' (\code{"iptw_os"}, not recommended), the standard IPTW
-#' (\code{"iptw"}, recommended only for comparison to the other two estimators).
+#' @param est A vector indicating for which estimators to return a confidence
+#'  interval. Possible estimators include the TMLE IPTW (\code{"iptw_tmle"},
+#'  recommended), the one-step IPTW (\code{"iptw_os"}, not recommended), the
+#'  standard IPTW (\code{"iptw"}, recommended only for comparison to the other
+#'  two estimators).
 #' @param null The null hypothesis value(s).
-#' @param contrast This option specifies what parameter to return confidence intervals for.
-#' If \code{contrast=NULL}, then test the null hypothesis that the covariate-adjusted
-#' marginal means equal the value(s) specified in \code{null}.
-#' \code{contrast} can also be a numeric vector of ones, negative ones,
-#' and zeros to define linear combinations of the various means (e.g., to estimate an average
-#' treatment effect, see examples). In this case, we test the null hypothesis that the
-#' linear combination of means equals the value specified in \code{null}.
-#' \code{contrast} can also be a list with named functions
-#' \code{f}, \code{h}, and \code{fh_grad}. The function \code{f} takes
-#' as input argument \code{eff} and specifies which transformation
-#' of the effect measure to test. The function \code{h} defines the contrast
-#' to be estimated and should take as input \code{est}, a vector
-#' of the same length as \code{object$a_0}, and output the desired contrast. The function
-#' \code{fh_grad} is the gradient of the function \code{h(f())}. The function
-#' computes a test of the null hypothesis that \code{h(f(object$est)) = null}.
-#' See examples.
+#' @param contrast This option specifies what parameter to return confidence
+#'  intervals for. If \code{contrast=NULL}, then test the null hypothesis that
+#'  the covariate-adjusted marginal means equal the value(s) specified in
+#'  \code{null}. \code{contrast} can also be a numeric vector of ones, negative
+#'  ones, and zeros to define linear combinations of the various means (e.g., to
+#'  estimate an average treatment effect, see examples). In this case, we test
+#'  the null hypothesis that the linear combination of means equals the value
+#'  specified in \code{null}. \code{contrast} can also be a list with named
+#'  functions \code{f}, \code{h}, and \code{fh_grad}. The function \code{f}
+#'  takes as input argument \code{eff} and specifies which transformation of the
+#'  effect measure to test. The function \code{h} defines the contrast to be
+#'  estimated and should take as input \code{est}, a vector of the same length
+#'  as \code{object$a_0}, and output the desired contrast. The function
+#'  \code{fh_grad} is the gradient of the function \code{h(f())}. The function
+#'  computes a test of the null hypothesis that \code{h(f(object$est)) = null}.
+#'  See examples.
 #' @param ... Other options (not currently used).
 #'
 #' @importFrom stats pnorm
 #' @export
 #' @method wald_test adaptive_iptw
 #' @return An object of class \code{"ci.adaptive_iptw"} with point estimates and
-#' confidence intervals of the specified level.
+#'  confidence intervals of the specified level.
 #'
 #' @examples
 #' # load super learner
@@ -228,7 +229,7 @@ wald_test.drtmle <- function(object, est = c("drtmle"), null = 0,
 #'                    h = function(est){ est[1]/est[2] },
 #'                    fh_grad =  function(est){ c(1/est[1],-1/est[2]) })
 #' ci_RR <- ci(fit1, contrast = myContrast, null = 1)
-
+#
 wald_test.adaptive_iptw <- function(object, est = c("iptw_tmle"), null = 0,
                                     contrast = NULL, ...) {
   if (any(est == "iptw")) {
@@ -252,7 +253,8 @@ wald_test.adaptive_iptw <- function(object, est = c("iptw_tmle"), null = 0,
     for (i in seq_along(est)) {
       out[[i]] <- matrix(NA, nrow = length(object$a_0), ncol = 2)
       for (j in seq_along(object$a_0)) {
-        zstat <- (object[[est[i]]]$est[j] - null[j]) / sqrt(object[[est[i]]]$cov[j, j])
+        zstat <- (object[[est[i]]]$est[j] - null[j]) /
+          sqrt(object[[est[i]]]$cov[j, j])
         pval <- 2 * stats::pnorm(-abs(zstat))
         out[[i]][j, ] <- c(zstat, pval)
       }

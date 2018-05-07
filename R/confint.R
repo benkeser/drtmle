@@ -9,32 +9,36 @@ ci <- function(...) {
 #'
 #' @param object An object of class \code{"drtmle"}
 #' @param est A vector indicating for which estimators to return a
-#' confidence interval. Possible estimators include the TMLE with doubly robust
-#' inference (\code{"drtmle"}, recommended), the AIPTW with additional correction
-#' for misspecification (\code{"aiptw_c"}, not recommended), the standard TMLE
-#' (\code{"tmle"}, recommended only for comparison to "drtmle"), the standard
-#' AIPTW (\code{"aiptw"}, recommended only for comparison to "drtmle"), and
-#' G-computation (\code{"gcomp"}, not recommended).
-#' @param level The nominal coverage probability of the desired confidence interval (should be
-#' between 0 and 1). Default computes 95\% confidence intervals.
-#' @param contrast Specifies the parameter for which to return confidence intervals.
-#' If \code{contrast=NULL}, then confidence intervals for the
-#' marginal means are computed. If instead, \code{contrast} is a numeric vector of ones, negative ones,
-#' and zeros to define linear combinations of the various means (e.g., to estimate an average
-#' treatment effect, see example). Finally, \code{contrast} can be a list with named functions
-#' \code{f}, \code{f_inv}, \code{h}, and \code{fh_grad}. The first two functions should take
-#' as input argument \code{eff}. Respectively, these specify which transformation
-#' of the effect measure to compute the confidence interval for and the inverse
-#' transformation to put the confidence interval back on the original scale. The function \code{h}
-#' defines the contrast to be estimated and should take as input \code{est}, a vector
-#' of the same length as \code{object$a_0}, and output the desired contrast. The function
-#' \code{fh_grad} is the gradient of the function \code{h}. See examples and vignette for more information.
+#'  confidence interval. Possible estimators include the TMLE with doubly robust
+#'  inference (\code{"drtmle"}, recommended), the AIPTW with additional
+#'  correction for misspecification (\code{"aiptw_c"}, not recommended), the
+#'  standard TMLE (\code{"tmle"}, recommended only for comparison to "drtmle"),
+#'  the standard AIPTW (\code{"aiptw"}, recommended only for comparison to
+#'  "drtmle"), and G-computation (\code{"gcomp"}, not recommended).
+#' @param level The nominal coverage probability of the desired confidence
+#'  interval (should be between 0 and 1). Default computes 95\% confidence
+#'  intervals.
+#' @param contrast Specifies the parameter for which to return confidence
+#'  intervals. If \code{contrast=NULL}, then confidence intervals for the
+#'  marginal means are computed. If instead, \code{contrast} is a numeric vector
+#'  of ones, negative ones, and zeros to define linear combinations of the
+#'  various means (e.g., to estimate an average treatment effect, see example).
+#'  Finally, \code{contrast} can be a list with named functions \code{f},
+#'  \code{f_inv}, \code{h}, and \code{fh_grad}. The first two functions should
+#'  take as input argument \code{eff}. Respectively, these specify which
+#'  transformation of the effect measure to compute the confidence interval for
+#'  and the inverse transformation to put the confidence interval back on the
+#'  original scale. The function \code{h} defines the contrast to be estimated
+#'  and should take as input \code{est}, a vector of the same length as
+#'  \code{object$a_0}, and output the desired contrast. The function
+#'  \code{fh_grad} is the gradient of the function \code{h}. See examples and
+#'  vignette for more information.
 #' @param ... Other options (not currently used).
 #' @importFrom stats qnorm
 #' @export
 #' @method ci drtmle
 #' @return An object of class \code{"ci.drtmle"} with point estimates and
-#' confidence intervals of the specified level.
+#'  confidence intervals of the specified level.
 #'
 #' @examples
 #' # load super learner
@@ -83,7 +87,8 @@ ci.drtmle <- function(object, est = c("drtmle"), level = 0.95,
       out[[i]] <- matrix(NA, nrow = length(object$a_0), ncol = 3)
       for (j in seq_along(object$a_0)) {
         out[[i]][j, ] <-
-          rep(object[[est[i]]]$est[j], 3) + stats::qnorm(c(0.5, (1 - level) / 2, (1 + level) / 2)) *
+          rep(object[[est[i]]]$est[j], 3) +
+          stats::qnorm(c(0.5, (1 - level) / 2, (1 + level) / 2)) *
             rep(sqrt(object[[est[i]]]$cov[j, j]), 3)
       }
       row.names(out[[i]]) <- object$a_0
@@ -104,8 +109,9 @@ ci.drtmle <- function(object, est = c("drtmle"), level = 0.95,
       v <- object[[est[i]]]$cov
       thisC <- t(g) %*% p
       thisSe <- sqrt(t(g) %*% v %*% g)
-      out[[i]][1, ] <- rep(thisC, 3) + stats::qnorm(c(0.5, (1 - level) / 2, (1 + level) / 2)) *
-        rep(thisSe, 3)
+      out[[i]][1, ] <- rep(thisC, 3) +
+        stats::qnorm(c(0.5, (1 - level) / 2, (1 + level) / 2)) *
+          rep(thisSe, 3)
       # E[Y(a_0[1])] - E[Y(a_0[2])]
       indMinus <- which(contrast == -1)
       indPlus <- which(contrast == 1)
@@ -140,8 +146,9 @@ ci.drtmle <- function(object, est = c("drtmle"), level = 0.95,
       ), nrow = length(object$a_0))
       v <- object[[est[i]]]$cov
       thisSe <- sqrt(t(grad) %*% v %*% grad)
-      transformCI <- rep(f_thisC, 3) + stats::qnorm(c(0.5, (1 - level) / 2, (1 + level) / 2)) *
-        rep(thisSe, 3)
+      transformCI <- rep(f_thisC, 3) +
+        stats::qnorm(c(0.5, (1 - level) / 2, (1 + level) / 2)) *
+          rep(thisSe, 3)
       out[[i]][1, ] <- do.call(contrast$f_inv, args = list(eff = transformCI))
       row.names(out[[i]]) <- c("user contrast")
       colnames(out[[i]]) <- c("est", "cil", "ciu")
@@ -161,25 +168,29 @@ ci.drtmle <- function(object, est = c("drtmle"), level = 0.95,
 #' (\code{"iptw_tmle"}, recommended), the one-step IPTW
 #' (\code{"iptw_os"}, not recommended), the standard IPTW
 #' (\code{"iptw"}, recommended only for comparison to the other two estimators).
-#' @param level The nominal coverage probability of the desired confidence interval (should be
-#' between 0 and 1). Default computes 95\% confidence intervals.
-#' @param contrast Specifies the parameter for which to return confidence intervals.
-#' If \code{contrast=NULL}, then confidence intervals for the
-#' marginal means are computed. If instead, \code{contrast} is a numeric vector of ones, negative ones,
-#' and zeros to define linear combinations of the various means (e.g., to estimate an average
-#' treatment effect, see example). Finally, \code{contrast} can be a list with named functions
-#' \code{f}, \code{f_inv}, \code{h}, and \code{fh_grad}. The first two functions should take
-#' as input argument \code{eff}. Respectively, these specify which transformation
-#' of the effect measure to compute the confidence interval for and the inverse
-#' transformation to put the confidence interval back on the original scale. The function \code{h}
-#' defines the contrast to be estimated and should take as input \code{est}, a vector
-#' of the same length as \code{object$a_0}, and output the desired contrast. The function
-#' \code{fh_grad} is the gradient of the function \code{h}. See examples and vignette for more information.
+#' @param level The nominal coverage probability of the desired confidence
+#'  interval (should be between 0 and 1). Default computes 95\% confidence
+#'  intervals.
+#' @param contrast Specifies the parameter for which to return confidence
+#'  intervals. If \code{contrast=NULL}, then confidence intervals for the
+#'  marginal means are computed. If instead, \code{contrast} is a numeric vector
+#'  of ones, negative ones, and zeros to define linear combinations of the
+#'  various means (e.g., to estimate an average treatment effect, see example).
+#'  Finally, \code{contrast} can be a list with named functions \code{f},
+#'  \code{f_inv}, \code{h}, and \code{fh_grad}. The first two functions should
+#'  take as input argument \code{eff}. Respectively, these specify which
+#'  transformation of the effect measure to compute the confidence interval for
+#'  and the inverse transformation to put the confidence interval back on the
+#'  original scale. The function \code{h} defines the contrast to be estimated
+#'  and should take as input \code{est}, a vector of the same length as
+#'  \code{object$a_0}, and output the desired contrast. The function
+#'  \code{fh_grad} is the gradient of the function \code{h}. See examples and
+#'  vignette for more information.
 #' @param ... Other options (not currently used).
 #' @export
 #' @method ci adaptive_iptw
 #' @return An object of class \code{"ci.adaptive_iptw"} with point estimates and
-#' confidence intervals of the specified level.
+#'  confidence intervals of the specified level.
 #'
 #' @examples
 #' # load super learner
@@ -228,7 +239,8 @@ ci.adaptive_iptw <- function(object, est = c("iptw_tmle"), level = 0.95,
       out[[i]] <- matrix(NA, nrow = length(object$a_0), ncol = 3)
       for (j in seq_along(object$a_0)) {
         out[[i]][j, ] <-
-          rep(object[[est[i]]]$est[j], 3) + stats::qnorm(c(0.5, (1 - level) / 2, (1 + level) / 2)) *
+          rep(object[[est[i]]]$est[j], 3) +
+          stats::qnorm(c(0.5, (1 - level) / 2, (1 + level) / 2)) *
             rep(sqrt(object[[est[i]]]$cov[j, j]), 3)
       }
       row.names(out[[i]]) <- object$a_0
@@ -284,8 +296,9 @@ ci.adaptive_iptw <- function(object, est = c("iptw_tmle"), level = 0.95,
       ), nrow = length(object$a_0))
       v <- object[[est[i]]]$cov
       thisSe <- sqrt(t(grad) %*% v %*% grad)
-      transformCI <- rep(f_thisC, 3) + stats::qnorm(c(0.5, (1 - level) / 2, (1 + level) / 2)) *
-        rep(thisSe, 3)
+      transformCI <- rep(f_thisC, 3) +
+        stats::qnorm(c(0.5, (1 - level) / 2, (1 + level) / 2)) *
+          rep(thisSe, 3)
       out[[i]][1, ] <- do.call(contrast$f_inv, args = list(eff = transformCI))
       row.names(out[[i]]) <- c("user contrast")
       colnames(out[[i]]) <- c("est", "cil", "ciu")
