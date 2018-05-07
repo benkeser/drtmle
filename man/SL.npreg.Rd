@@ -14,12 +14,15 @@ SL.npreg(Y, X, newX, family = gaussian(), obsWeights = rep(1, length(Y)),
 
 \item{newX}{A test set of predictors.}
 
-\item{family}{Not used by the function directly, but ensures compatibility with \code{SuperLearner}.}
+\item{family}{Not used by the function directly, but ensures compatibility
+with \code{SuperLearner}.}
 
-\item{obsWeights}{Not used by the function directly, but ensures compatibility with \code{SuperLearner}.}
+\item{obsWeights}{Not used by the function directly, but ensures
+compatibility with \code{SuperLearner}.}
 
-\item{rangeThresh}{If the the range of the outcomes is smaller than this number, the method
-returns the empirical average of the outcomes. Used for computational expediency and stability.}
+\item{rangeThresh}{If the the range of the outcomes is smaller than this
+number, the method returns the empirical average of the outcomes. Used for
+computational expediency and stability.}
 
 \item{...}{Other arguments (not currently used).}
 }

@@ -7,13 +7,16 @@
 eval_Dstar(A, Y, DeltaY, DeltaA, Qn, gn, psi_n, a_0)
 }
 \arguments{
-\item{A}{A vector of binary treatment assignment (assumed to be equal to 0 or 1)}
+\item{A}{A vector of binary treatment assignment (assumed to be equal to 0 or
+1)}
 
 \item{Y}{A numeric of continuous or binary outcomes.}
 
-\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if missing 1 if observed)}
+\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if
+missing 1 if observed)}
 
-\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if missing 1 if observed)}
+\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if
+missing 1 if observed)}
 
 \item{Qn}{List of estimated outcome regression evaluated at observations}
 

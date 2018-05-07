@@ -13,9 +13,11 @@ fluctuateQ1(Y, A, W, DeltaA, DeltaY, Qn, gn, a_0)
 
 \item{W}{The covariates}
 
-\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if missing 1 if observed)}
+\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if
+missing 1 if observed)}
 
-\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if missing 1 if observed)}
+\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if
+missing 1 if observed)}
 
 \item{Qn}{A list of outcome regression estimates evaluated on observed data}
 

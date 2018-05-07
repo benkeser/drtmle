@@ -8,24 +8,28 @@ misspecification of propensity score}
 eval_Dstar_Q(A, Y, DeltaY, DeltaA, Qn, gn, grn, a_0, reduction)
 }
 \arguments{
-\item{A}{A vector of binary treatment assignment (assumed to be equal to 0 or 1)}
+\item{A}{A vector of binary treatment assignment (assumed to be equal to 0 or
+1)}
 
 \item{Y}{A numeric of continuous or binary outcomes.}
 
-\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if missing 1 if observed)}
+\item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if
+missing 1 if observed)}
 
-\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if missing 1 if observed)}
+\item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if
+missing 1 if observed)}
 
 \item{Qn}{List of estimated outcome regression evaluated at observations}
 
 \item{gn}{List of estimated propensity scores evaluated at observations}
 
-\item{grn}{List of estimated reduced-dimension propensity scores evaluated at observations}
+\item{grn}{List of estimated reduced-dimension propensity scores evaluated at
+observations}
 
 \item{a_0}{Vector of values to return marginal mean}
 
-\item{reduction}{A character equal to \code{"univariate"} for a univariate misspecification correction or \code{"bivariate"}
-for the bivariate version.}
+\item{reduction}{A character equal to \code{"univariate"} for a univariate
+misspecification correction or \code{"bivariate"} for the bivariate version.}
 }
 \description{
 Evaluate extra piece of efficient influence function resulting from

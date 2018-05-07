@@ -22,8 +22,8 @@ missing 1 if observed)}
 missing 1 if observed)}
 
 \item{Qn}{A list of outcome regression estimates evaluated on observed data.
-If NULL then 0 is used for all Qn (as is needed to estimate reduced dimension
-regression for adaptive_iptw)}
+If NULL then 0 is used for all Qn (as is needed to estimate reduced
+dimension regression for adaptive_iptw)}
 
 \item{gn}{A list of propensity regression estimates evaluated on observed
 data}

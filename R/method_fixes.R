@@ -4,11 +4,12 @@
 #' be deprecated when a more robust fix in the \code{SuperLearner} package
 #' is implemented.
 #' @export
+#
 method.CC_LS_mod <- function() {
   computeCoef <- function(Z, Y, libraryNames, verbose, obsWeights,
-                          ...) {
+                            ...) {
     cvRisk <- apply(Z, 2, function(x) mean(obsWeights * (x -
-        Y) ^ 2))
+        Y)^2))
     names(cvRisk) <- libraryNames
     compute <- function(x, y, wt = rep(1, length(y))) {
       wX <- sqrt(wt) * x
@@ -18,10 +19,12 @@ method.CC_LS_mod <- function() {
       A <- cbind(rep(1, ncol(wX)), diag(ncol(wX)))
       bvec <- c(1, rep(0, ncol(wX)))
 
-      fit <- tryCatch({quadprog::solve.QP(
-        Dmat = D, dvec = d, Amat = A,
-        bvec = bvec, meq = 1
-      )}, error = function(e){
+      fit <- tryCatch({
+        quadprog::solve.QP(
+          Dmat = D, dvec = d, Amat = A,
+          bvec = bvec, meq = 1
+        )
+      }, error = function(e) {
         "fit error"
       })
       invisible(fit)
@@ -29,17 +32,20 @@ method.CC_LS_mod <- function() {
     colDup <- which(duplicated(round(Z, 5), MARGIN = 2))
     modZ <- Z
     if (length(colDup) > 0) {
-      warning(paste0("Algorithm ", colDup, " is duplicated. Setting weight to 0."))
+      warning(paste0(
+        "Algorithm ", colDup,
+        " is duplicated. Setting weight to 0."
+      ))
       modZ <- modZ[, -colDup]
     }
     fit <- compute(x = modZ, y = Y, wt = obsWeights)
-    if(class(fit) == "character"){
+    if (class(fit) == "character") {
       warning(paste0("Error in solve.QP; returning discrete SL weighting instead."))
       coef <- rep(0, ncol(Z))
       idx <- which.min(cvRisk)
       coef[idx[1]] <- 1
-    }else{
-     coef <- fit$solution      
+    } else {
+      coef <- fit$solution
       if (length(colDup) > 0) {
         ind <- c(seq_along(coef), colDup - 0.5)
         coef <- c(coef, rep(0, length(colDup)))
@@ -76,27 +82,34 @@ method.CC_LS_mod <- function() {
 #' @importFrom SuperLearner trimLogit
 #' @importFrom stats plogis
 #' @export
+#
 method.CC_nloglik_mod <- function() {
   computePred <- function(predY, coef, control, ...) {
     if (sum(coef != 0) == 0) {
       stop("All metalearner coefficients are zero, cannot compute prediction.")
     }
-    stats::plogis(SuperLearner::trimLogit(predY[, coef != 0], trim = control$trimLogit) %*%
+    stats::plogis(SuperLearner::trimLogit(predY[, coef != 0],
+      trim = control$trimLogit
+    ) %*%
       matrix(coef[coef != 0]))
   }
   computeCoef <- function(Z, Y, libraryNames, obsWeights, control,
-                          verbose, ...) {
+                            verbose, ...) {
     colDup <- which(duplicated(round(Z, 5), MARGIN = 2))
     modZ <- Z
     if (length(colDup) > 0) {
-      warning(paste0("Algorithm ", colDup, " is duplicated. Setting weight to 0."))
+      warning(paste0(
+        "Algorithm ", colDup,
+        " is duplicated. Setting weight to 0."
+      ))
       modZ <- modZ[, -colDup]
     }
     modlogitZ <- SuperLearner::trimLogit(modZ, control$trimLogit)
     logitZ <- SuperLearner::trimLogit(Z, control$trimLogit)
     cvRisk <- apply(logitZ, 2, function(x) -sum(2 * obsWeights *
         ifelse(Y, stats::plogis(x, log.p = TRUE), stats::plogis(
-          x, log.p = TRUE,
+          x,
+          log.p = TRUE,
           lower.tail = FALSE
         ))))
     names(cvRisk) <- libraryNames
@@ -130,7 +143,8 @@ method.CC_nloglik_mod <- function() {
       x0 = rep(1 / ncol(modZ), ncol(modZ)), eval_f = obj_and_grad(
         Y,
         modlogitZ
-      ), lb = lower_bounds, ub = upper_bounds, eval_g_eq = function(beta) (sum(beta) -
+      ), lb = lower_bounds, ub = upper_bounds,
+      eval_g_eq = function(beta) (sum(beta) -
           1), eval_jac_g_eq = function(beta) rep(1, length(beta)),
       opts = list(algorithm = "NLOPT_LD_SLSQP", xtol_abs = 1e-08)
     )

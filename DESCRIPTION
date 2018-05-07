@@ -20,6 +20,7 @@ Imports:
     np,
     future,
     doFuture,
+    future.apply,
     future.batchtools
 Suggests:
     testthat,
@@ -37,4 +38,4 @@ BugReports: https://github.com/benkeser/drtmle/issues
 Encoding: UTF-8
 LazyData: true
 VignetteBuilder: knitr
-RoxygenNote: 6.0.1
+RoxygenNote: 6.0.1.9000
