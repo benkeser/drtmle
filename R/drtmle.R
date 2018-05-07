@@ -392,7 +392,6 @@ drtmle <- function(Y, A, W,
   if ("Q" %in% guard) QrnStar <- Qrn
   gnStar <- gn
   PnDQnStar <- PnDgnStar <- PnDnoStar <- Inf
-  eps <- list(Inf)
   ct <- 0
 
   # fluctuate
@@ -411,12 +410,6 @@ drtmle <- function(Y, A, W,
       gnStar <- plyr::llply(gnStarOut, function(x) {
         unlist(x$est)
       })
-      epsg <- plyr::laply(gnStarOut, function(x) {
-        x$eps
-      })
-    } else {
-      epsg <- NA
-    }
 
     # fluctuate QnStar
     if ("g" %in% guard) {
@@ -451,9 +444,6 @@ drtmle <- function(Y, A, W,
         QnStar <- plyr::llply(QnStarOut, function(x) {
           unlist(x$est)
         })
-        epsQ <- plyr::laply(QnStarOut, function(x) {
-          x$eps
-        })
       } else if (Qsteps == 2) {
         # do the extra targeting
         QnStarOut2 <- fluctuateQ2(
@@ -475,11 +465,6 @@ drtmle <- function(Y, A, W,
         QnStar <- plyr::llply(QnStarOut1, function(x) {
           unlist(x[[1]])
         })
-
-        # for later retrieval of fluct coefficients
-        epsQ <- mapply(q1 = QnStarOut1, q2 = QnStarOut2, function(q1, q2) {
-          c(q1$eps, q2$eps)
-        })
       }
     } else {
       QnStarOut <- fluctuateQ1(
@@ -489,9 +474,6 @@ drtmle <- function(Y, A, W,
       )
       QnStar <- plyr::llply(QnStarOut, function(x) {
         unlist(x[[1]])
-      })
-      epsQ <- plyr::laply(QnStarOut, function(x) {
-        x$eps
       })
     }
 
@@ -517,9 +499,6 @@ drtmle <- function(Y, A, W,
       # obtain list of reduced dimension regression fits
       QrnMod <- QrnValid[seq(2, length(QrnValid), 2)]
     }
-
-    # get fluctuation parameters
-    eps <- c(epsQ, epsg)
 
     # tmle estimates
     psi_t <- lapply(QnStar, mean)
