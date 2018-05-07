@@ -529,7 +529,6 @@ drtmle <- function(Y, A, W,
       PnDgnStar <- lapply(DngoStar, mean)
     }
     if (verbose) {
-      cat("TMLE Iteration", ct, "=", round(unlist(eps), 5), "\n")
       cat("Mean of IC       =", round(c(
         unlist(PnDnoStar),
         unlist(PnDQnStar),

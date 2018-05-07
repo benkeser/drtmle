@@ -251,7 +251,6 @@ adaptive_iptw <- function(W, A, Y,
   gnStar <- gn
   QrnStar <- Qrn
   PnDgnStar <- Inf
-  eps <- list(Inf)
   ct <- 0
   # fluctuate
   while (max(abs(unlist(PnDgnStar))) > tolIC & ct < maxIter) {
@@ -265,9 +264,6 @@ adaptive_iptw <- function(W, A, Y,
     )
     gnStar <- plyr::llply(gnStarOut, function(x) {
       unlist(x$est)
-    })
-    eps <- plyr::laply(gnStarOut, function(x) {
-      x$eps
     })
     # re-estimate reduced dimension regression
     QrnStarOut <- future.apply::future_lapply(
@@ -297,7 +293,6 @@ adaptive_iptw <- function(W, A, Y,
     )
     PnDgnStar <- future.apply::future_lapply(DngoStar, mean)
     if (verbose) {
-      cat("TMLE Iteration", ct, "=", round(unlist(eps), 5), "\n")
       cat("Mean of IC       =", round(unlist(PnDgnStar), 10), "\n")
     }
   }
