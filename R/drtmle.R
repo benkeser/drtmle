@@ -412,6 +412,7 @@ drtmle <- function(Y, A, W,
       gnStar <- plyr::llply(gnStarOut, function(x) {
         unlist(x$est)
       })
+    }
 
     # fluctuate QnStar
     if ("g" %in% guard) {
