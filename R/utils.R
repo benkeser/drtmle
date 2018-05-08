@@ -110,7 +110,8 @@ print.wald_test.adaptive_iptw <- function(x, digits = 3, ...) {
 #' @param nPoints Number of points to plot lines (increase for less bumpy plot,
 #'  decrease for faster evaluation).
 #' @param a_0 For what value of a_0 should the plot be made for?
-#' @param ... More arguments (not currently used) TO DO: Pass to plot? to lines?
+#' @param ask Boolean indicating whether R should ask to show each plot
+#' @param ... More arguments passed to \code{plot}
 #' @export
 #' @method plot drtmle
 #' @importFrom graphics axis lines par plot
@@ -135,9 +136,10 @@ print.wald_test.adaptive_iptw <- function(x, digits = 3, ...) {
 #' \dontrun{plot(fit1)}
 #
 plot.drtmle <- function(x, nPoints = 500,
+                        ask = TRUE,
                         a_0 = x$a_0[1], ...) {
   # ask to see next plot
-  par(ask = TRUE)
+  par(ask = ask)
   # check if returnModels is null
   if (is.null(x$QrnMod) & is.null(x$grnMod)) {
     stop("Plot function only works if returnModels = TRUE.")
@@ -185,7 +187,7 @@ plot.drtmle <- function(x, nPoints = 500,
     type = "n", xlim = xl, ylim = yl,
     xaxt = "n", yaxt = "n", bty = "n",
     xlab = expression(g[n](W)),
-    ylab = expression("E[Y-" * Q[n](W) * " | " * g[n](W) * "]")
+    ylab = expression("E[Y-" * Q[n](W) * " | " * g[n](W) * "]"), ...
   )
   # add axes
   axis(side = 1)
@@ -231,7 +233,7 @@ plot.drtmle <- function(x, nPoints = 500,
       xaxt = "n", yaxt = "n", bty = "n",
       xlab = expression(Q[n](W)),
       ylab = expression("E[{" * A - g[n](W) * "} / " * g[n](W) * "} | " *
-        Q[n](W) * "]")
+        Q[n](W) * "]", ...)
     )
     # add axes
     axis(side = 1)
@@ -265,7 +267,8 @@ plot.drtmle <- function(x, nPoints = 500,
       type = "n", xlim = xl, ylim = yl,
       xaxt = "n", yaxt = "n", bty = "n",
       xlab = expression(Q[n](W)),
-      ylab = expression("E[A | " * Q[n](W) * "]")
+      ylab = expression("E[A | " * Q[n](W) * "]"),
+      ...
     )
     # add axes
     axis(side = 1)

@@ -4,7 +4,7 @@
 \alias{plot.drtmle}
 \title{Plot reduced dimension regression fits}
 \usage{
-\method{plot}{drtmle}(x, nPoints = 500, a_0 = x$a_0[1], ...)
+\method{plot}{drtmle}(x, nPoints = 500, ask = TRUE, a_0 = x$a_0[1], ...)
 }
 \arguments{
 \item{x}{An object of class \code{"drtmle"}}
@@ -12,9 +12,11 @@
 \item{nPoints}{Number of points to plot lines (increase for less bumpy plot,
 decrease for faster evaluation).}
 
+\item{ask}{Boolean indicating whether R should ask to show each plot}
+
 \item{a_0}{For what value of a_0 should the plot be made for?}
 
-\item{...}{More arguments (not currently used) TO DO: Pass to plot? to lines?}
+\item{...}{More arguments passed to \code{plot}}
 }
 \description{
 Plot reduced dimension regression fits
