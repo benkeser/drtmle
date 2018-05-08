@@ -232,7 +232,7 @@ plot.drtmle <- function(x, nPoints = 500,
       type = "n", xlim = xl, ylim = yl,
       xaxt = "n", yaxt = "n", bty = "n",
       xlab = expression(Q[n](W)),
-      ylab = expression("E[{" * A - g[n](W) * "} / " * g[n](W) * "} | " *
+      ylab = expression("E[{" * A - g[n](W) * "} / " * g[n](W) * " | " *
         Q[n](W) * "]", ...)
     )
     # add axes
