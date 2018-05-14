@@ -102,7 +102,7 @@ method.CC_nloglik_mod <- function() {
         "Algorithm ", colDup,
         " is duplicated. Setting weight to 0."
       ))
-      modZ <- modZ[, -colDup]
+      modZ <- modZ[, -colDup, drop = FALSE]
     }
     modlogitZ <- SuperLearner::trimLogit(modZ, control$trimLogit)
     logitZ <- SuperLearner::trimLogit(Z, control$trimLogit)
