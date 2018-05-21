@@ -11,9 +11,6 @@ check:
 checkfast:
 	Rscript -e "devtools::check(build_args = '--no-build-vignettes')"
 
-bioc:
-	Rscript -e "BiocCheck::BiocCheck('.')"
-
 test:
 	Rscript -e "devtools::test()"
 
