@@ -1,3 +1,7 @@
+July 2, 2018
+* Version 1.0.3 released on GitHub and CRAN
+* Fix warnings on CRAN builds
+
 February 5, 2018
 * Version 1.0.2 released on GitHub and CRAN
 * Replace foreach parallelization with future

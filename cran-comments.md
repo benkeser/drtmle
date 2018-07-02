@@ -1,6 +1,6 @@
 ## Test environments
-* local macOS / OS X install, R 3.4.1
-* ubuntu 12.04 (on travis-ci), R 3.4.2
+* local macOS / OS X install, R 3.4.4
+* ubuntu 12.04 (on travis-ci), R 3.5.0
 * win-builder (devel and release)
 
 ## R CMD check results
@@ -8,7 +8,7 @@ There were 0 ERRORs.
 
 There were 0 WARNINGs.
 
-There were 1 NOTEs.
+There were 0 NOTEs.
 
 Note: 
 Maintainer: 'David Benkeser <benkeser@emory.edu>'
@@ -19,6 +19,6 @@ Seems safe to ignore this note.
 Nothing to report.
 
 ## Additional Notes
-Submission of updated package, version 1.0.2. This version also
-corrects the no long double build issue that caused the package
-to be archived. 
+Submission of updated package, version 1.0.3. This version fixes
+the ``no long double'' build issue flagged in checks, as well as 
+the unstated dependencies warning for package foreach.  
