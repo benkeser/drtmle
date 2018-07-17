@@ -38,7 +38,6 @@ method.CC_LS_mod <- function() {
       ))
       modZ <- modZ[, -colDup, drop = FALSE]
     }
-    if()
     fit <- compute(x = modZ, y = Y, wt = obsWeights)
     if (class(fit) == "character") {
       warning(paste0("Error in solve.QP; returning discrete SL weighting instead."))
