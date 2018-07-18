@@ -333,6 +333,8 @@ drtmle <- function(Y, A, W,
       gn = gn, a_0 = a_0
     )
     PnDgn <- lapply(Dngo, mean)
+  }else{
+    Qrn <- NULL
   }
   if ("g" %in% guard) {
     grnOut <- future.apply::future_lapply(
@@ -362,6 +364,8 @@ drtmle <- function(Y, A, W,
       reduction = reduction
     )
     PnDQn <- lapply(DnQo, mean)
+  }else{
+    grn <- NULL
   }
 
   # one step estimates
@@ -390,8 +394,16 @@ drtmle <- function(Y, A, W,
 
   # initialize fluctuations
   QnStar <- Qn
-  if ("g" %in% guard) grnStar <- grn
-  if ("Q" %in% guard) QrnStar <- Qrn
+  if ("g" %in% guard){ 
+    grnStar <- grn
+  }else{
+    grnStar <- NULL
+  }
+  if ("Q" %in% guard){
+    QrnStar <- Qrn
+  }else{
+    QrnStar <- NULL
+  }
   gnStar <- gn
   PnDQnStar <- PnDgnStar <- PnDnoStar <- Inf
   ct <- 0
