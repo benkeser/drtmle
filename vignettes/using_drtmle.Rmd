@@ -206,6 +206,7 @@ estimators. One example is the augmented IPTW (AIPTW) estimator
 \psi_{n,AIPTW}(a) = \psi_{n,IPTW}(a) + \frac{1}{n} \sum\limits_{i=1}^n \biggl\{
 1 - \frac{I(A_i = a)}{g_n(a \mid W_i)} \biggr\} \  \bar{Q}_n(a, W_i) \ ,
 \end{equation*}
+
 which adds an augmentation term to the IPTW estimator. Equivalently, the
 estimator can be viewed as adding an augmentation to the GCOMP estimator
 \begin{equation} \label{oneStepEst}
@@ -263,7 +264,7 @@ equations. These equations involve additional regression parameters that we
 refer to as the reduced outcome regression (R-OR) and the reduced propensity
 score (R-PS), defined respectively as \begin{align*}
   \bar{Q}_{r,0n}(a,w) &:= E_{0}\bigl\{Y - \bar{Q}_n(W) \mid A = a,
-  g_n(W)=g_n(w)\bigr\} \\
+  g_n(W)=g_n(w)\bigr\} \ , \ \mbox{and} \\
   g_{r,0n}(a \mid w) &:= Pr_0\left\{A = a \mid \bar{Q}_n(W)=\bar{Q}_n(w),
   g_n(W)=g_n(w)\right\} \ .
 \end{align*}
@@ -299,11 +300,13 @@ to achieve this form of double-robustness. In particular, they formulated an
 alternative version of the R-PS, \begin{align*}
 g_{r,0,1}(a \mid w) := Pr_0\{A = a \mid \bar{Q}_n(W) = \bar{Q}_n(w) \} \ ,
 \end{align*}
+
 which we refer to as R-PS1. They also introduced an additional regression of a
 weighted residual from the PS on the OR, \begin{align*}
 g_{r,0,2}(a \mid w) := E_0\biggl\{\frac{I(A = a) - g_n(a \mid W)}{g_n(a \mid
 W)} \ \bigg\vert \ \bar{Q}_n(W) = \bar{Q}_n(w) \biggr\} \ ,
 \end{align*}
+
 which we refer to as R-PS2. The key feature of R-PS1 and R-PS2 is that they are
 both univariate regressions, while R-PS is a bivariate regression. Benkeser and
 colleagues suggested that this may make R-PS1 and R-PS2 easier to estimate
@@ -400,7 +403,7 @@ In fact, there are three ways to estimate each of the regression parameters:
 generalized linear models, super learning, and a user-specified estimation
 technique. We demonstrate each of these approaches in turn on a simple
 simulated data set. The true parameter values of interest are $\psi_0(0)=$ `r
-round(EY0,2)` and $\psi_0(1)=$ `r round(EY1, 2)`.
+round(EY0, 2)` and $\psi_0(1)=$ `r round(EY1, 2)`.
 ```{r}
 set.seed(1234)
 n <- 200

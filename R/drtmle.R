@@ -207,6 +207,11 @@ drtmle <- function(Y, A, W,
   call <- match.call()
   # if cvFolds non-null split data into cvFolds pieces
   n <- length(Y)
+  # save user input Qn and gn, because these values
+  # get overwritten later.
+  Qn_user <- Qn
+  gn_user <- gn
+
   if (length(cvFolds) > 1) {
     stopifnot(length(cvFolds) == length(Y))
     # comes in as vector of fold assignments
@@ -705,10 +710,10 @@ drtmle <- function(Y, A, W,
 
   # tack on models if requested
   if (returnModels) {
-    if(is.null(Qn)){
+    if(is.null(Qn_user)){
       out$QnMod <- QnMod
     }
-    if(is.null(gn)){
+    if(is.null(gn_user)){
       out$gnMod <- gnMod
     }
     if('Q' %in% guard){
