@@ -163,7 +163,7 @@ After using the `drtmle` R package, please cite the following:
       title = {drtmle: Doubly-Robust Nonparametric Estimation and Inference},
       author = {David Benkeser},
       note = {R package version 1.0.0},
-      doi = {10.5281/zenodo.844836},
+      doi = {10.5281/zenodo.844836}
     }
 
     @article{benkeser2017improved,
