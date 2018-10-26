@@ -96,6 +96,8 @@
 #'  the input to \code{a_0} (e.g., if \code{a_0 = c(0,1)} then \code{gn[[1]]}
 #'  should be propensity of \code{A} = 0 and \code{gn[[2]]} should be propensity
 #'  of \code{A} = 1).
+#' @param use_future Boolean indicating whether to use \code{future_lapply} or
+#' instead to just use lapply. The latter can be easier to run down errors. 
 #' @param ... Other options (not currently used).
 #'
 #' @return An object of class \code{"drtmle"}.
@@ -200,6 +202,7 @@ drtmle <- function(Y, A, W,
                    future_hpc = NULL,
                    Qn = NULL,
                    gn = NULL,
+                   use_future = FALSE,
                    ...) {
   call <- match.call()
   # if cvFolds non-null split data into cvFolds pieces
@@ -246,14 +249,25 @@ drtmle <- function(Y, A, W,
   # estimate propensity score
   # -------------------------------
   if (is.null(gn)) {
-    gnOut <- future.apply::future_lapply(
-      X = validRows, FUN = estimateG, A = A,
-      W = W, DeltaA = DeltaA, DeltaY = DeltaY,
-      tolg = tolg, verbose = verbose,
-      stratify = stratify,
-      returnModels = returnModels, SL_g = SL_g,
-      glm_g = glm_g, a_0 = a_0
-    )
+    if(use_future){
+      gnOut <- future.apply::future_lapply(
+        X = validRows, FUN = estimateG, A = A,
+        W = W, DeltaA = DeltaA, DeltaY = DeltaY,
+        tolg = tolg, verbose = verbose,
+        stratify = stratify,
+        returnModels = returnModels, SL_g = SL_g,
+        glm_g = glm_g, a_0 = a_0
+      )
+    }else{
+      gnOut <- lapply(
+        X = validRows, FUN = estimateG, A = A,
+        W = W, DeltaA = DeltaA, DeltaY = DeltaY,
+        tolg = tolg, verbose = verbose,
+        stratify = stratify,
+        returnModels = returnModels, SL_g = SL_g,
+        glm_g = glm_g, a_0 = a_0
+      )
+    }
     # re-order predictions
     gnValid <- unlist(gnOut, recursive = FALSE, use.names = FALSE)
     gnUnOrd <- do.call(Map, c(c, gnValid[seq(1, length(gnValid), 2)]))
@@ -269,17 +283,31 @@ drtmle <- function(Y, A, W,
   # estimate outcome regression
   # -------------------------------
   if (is.null(Qn)) {
-    QnOut <- future.apply::future_lapply(
-      X = validRows, FUN = estimateQ,
-      Y = Y, A = A, W = W,
-      DeltaA = DeltaA, DeltaY = DeltaY,
-      verbose = verbose,
-      returnModels = returnModels,
-      SL_Q = SL_Q, a_0 = a_0,
-      stratify = stratify,
-      glm_Q = glm_Q,
-      family = family
-    )
+    if(use_future){
+      QnOut <- future.apply::future_lapply(
+        X = validRows, FUN = estimateQ,
+        Y = Y, A = A, W = W,
+        DeltaA = DeltaA, DeltaY = DeltaY,
+        verbose = verbose,
+        returnModels = returnModels,
+        SL_Q = SL_Q, a_0 = a_0,
+        stratify = stratify,
+        glm_Q = glm_Q,
+        family = family
+      )
+    }else{
+      QnOut <- lapply(
+        X = validRows, FUN = estimateQ,
+        Y = Y, A = A, W = W,
+        DeltaA = DeltaA, DeltaY = DeltaY,
+        verbose = verbose,
+        returnModels = returnModels,
+        SL_Q = SL_Q, a_0 = a_0,
+        stratify = stratify,
+        glm_Q = glm_Q,
+        family = family
+      )
+    }
     # re-order predictions
     QnValid <- unlist(QnOut, recursive = FALSE, use.names = FALSE)
     QnUnOrd <- do.call(Map, c(c, QnValid[seq(1, length(QnValid), 2)]))
@@ -309,14 +337,25 @@ drtmle <- function(Y, A, W,
   PnDQn <- PnDgn <- 0
 
   if ("Q" %in% guard) {
-    QrnOut <- future.apply::future_lapply(
-      X = validRows, FUN = estimateQrn,
-      Y = Y, A = A, W = W,
-      DeltaA = DeltaA, DeltaY = DeltaY,
-      Qn = Qn, gn = gn, glm_Qr = glm_Qr,
-      family = stats::gaussian(), SL_Qr = SL_Qr,
-      a_0 = a_0, returnModels = returnModels
-    )
+    if(use_future){
+      QrnOut <- future.apply::future_lapply(
+        X = validRows, FUN = estimateQrn,
+        Y = Y, A = A, W = W,
+        DeltaA = DeltaA, DeltaY = DeltaY,
+        Qn = Qn, gn = gn, glm_Qr = glm_Qr,
+        family = stats::gaussian(), SL_Qr = SL_Qr,
+        a_0 = a_0, returnModels = returnModels
+      )
+    }else{
+      QrnOut <- lapply(
+        X = validRows, FUN = estimateQrn,
+        Y = Y, A = A, W = W,
+        DeltaA = DeltaA, DeltaY = DeltaY,
+        Qn = Qn, gn = gn, glm_Qr = glm_Qr,
+        family = stats::gaussian(), SL_Qr = SL_Qr,
+        a_0 = a_0, returnModels = returnModels
+      )
+    }
     # re-order predictions
     QrnValid <- unlist(QrnOut, recursive = FALSE, use.names = FALSE)
     QrnUnOrd <- do.call(Map, c(c, QrnValid[seq(1, length(QrnValid), 2)]))
@@ -337,15 +376,27 @@ drtmle <- function(Y, A, W,
     Qrn <- NULL
   }
   if ("g" %in% guard) {
-    grnOut <- future.apply::future_lapply(
-      X = validRows, FUN = estimategrn,
-      Y = Y, A = A, W = W,
-      DeltaA = DeltaA, DeltaY = DeltaY,
-      tolg = tolg, Qn = Qn, gn = gn,
-      glm_gr = glm_gr, SL_gr = SL_gr, a_0 = a_0,
-      reduction = reduction,
-      returnModels = returnModels
-    )
+    if(use_future){
+      grnOut <- future.apply::future_lapply(
+        X = validRows, FUN = estimategrn,
+        Y = Y, A = A, W = W,
+        DeltaA = DeltaA, DeltaY = DeltaY,
+        tolg = tolg, Qn = Qn, gn = gn,
+        glm_gr = glm_gr, SL_gr = SL_gr, a_0 = a_0,
+        reduction = reduction,
+        returnModels = returnModels
+      )
+    }else{
+      grnOut <- lapply(
+        X = validRows, FUN = estimategrn,
+        Y = Y, A = A, W = W,
+        DeltaA = DeltaA, DeltaY = DeltaY,
+        tolg = tolg, Qn = Qn, gn = gn,
+        glm_gr = glm_gr, SL_gr = SL_gr, a_0 = a_0,
+        reduction = reduction,
+        returnModels = returnModels
+      )
+    }
     # re-order predictions
     grnValid <- unlist(grnOut, recursive = FALSE, use.names = FALSE)
     grnUnOrd <- do.call(Map, c(rbind, grnValid[seq(1, length(grnValid), 2)]))
@@ -428,16 +479,29 @@ drtmle <- function(Y, A, W,
 
     # fluctuate QnStar
     if ("g" %in% guard) {
-      grnStarOut <- future.apply::future_lapply(
-        X = validRows, FUN = estimategrn,
-        Y = Y, A = A, W = W,
-        DeltaA = DeltaA, DeltaY = DeltaY,
-        tolg = tolg, Qn = QnStar,
-        gn = gnStar, glm_gr = glm_gr,
-        SL_gr = SL_gr, a_0 = a_0,
-        reduction = reduction,
-        returnModels = returnModels
-      )
+      if(use_future){
+        grnStarOut <- future.apply::future_lapply(
+          X = validRows, FUN = estimategrn,
+          Y = Y, A = A, W = W,
+          DeltaA = DeltaA, DeltaY = DeltaY,
+          tolg = tolg, Qn = QnStar,
+          gn = gnStar, glm_gr = glm_gr,
+          SL_gr = SL_gr, a_0 = a_0,
+          reduction = reduction,
+          returnModels = returnModels
+        )
+      }else{
+        grnStarOut <- lapply(
+          X = validRows, FUN = estimategrn,
+          Y = Y, A = A, W = W,
+          DeltaA = DeltaA, DeltaY = DeltaY,
+          tolg = tolg, Qn = QnStar,
+          gn = gnStar, glm_gr = glm_gr,
+          SL_gr = SL_gr, a_0 = a_0,
+          reduction = reduction,
+          returnModels = returnModels
+        )
+      }
       # re-order predictions
       grnValid <- unlist(grnStarOut, recursive = FALSE, use.names = FALSE)
       grnUnOrd <- do.call(Map, c(rbind, grnValid[seq(1, length(grnValid), 2)]))
@@ -493,16 +557,29 @@ drtmle <- function(Y, A, W,
     }
 
     if ("Q" %in% guard) {
-      QrnStarOut <- future.apply::future_lapply(
-        X = validRows, FUN = estimateQrn,
-        Y = Y, A = A, W = W,
-        DeltaA = DeltaA, DeltaY = DeltaY,
-        Qn = QnStar, gn = gnStar,
-        glm_Qr = glm_Qr,
-        family = stats::gaussian(),
-        SL_Qr = SL_Qr, a_0 = a_0,
-        returnModels = returnModels
-      )
+      if(use_future){
+        QrnStarOut <- future.apply::future_lapply(
+          X = validRows, FUN = estimateQrn,
+          Y = Y, A = A, W = W,
+          DeltaA = DeltaA, DeltaY = DeltaY,
+          Qn = QnStar, gn = gnStar,
+          glm_Qr = glm_Qr,
+          family = stats::gaussian(),
+          SL_Qr = SL_Qr, a_0 = a_0,
+          returnModels = returnModels
+        )
+      }else{
+        QrnStarOut <- lapply(
+          X = validRows, FUN = estimateQrn,
+          Y = Y, A = A, W = W,
+          DeltaA = DeltaA, DeltaY = DeltaY,
+          Qn = QnStar, gn = gnStar,
+          glm_Qr = glm_Qr,
+          family = stats::gaussian(),
+          SL_Qr = SL_Qr, a_0 = a_0,
+          returnModels = returnModels
+        )
+      }
       # re-order predictions
       QrnValid <- unlist(QrnStarOut, recursive = FALSE, use.names = FALSE)
       QrnUnOrd <- do.call(Map, c(c, QrnValid[seq(1, length(QrnValid), 2)]))
@@ -628,10 +705,18 @@ drtmle <- function(Y, A, W,
 
   # tack on models if requested
   if (returnModels) {
-    out$QnMod <- QnMod
-    out$gnMod <- gnMod
-    out$QrnMod <- QrnMod
-    out$grnMod <- grnMod
+    if(is.null(Qn)){
+      out$QnMod <- QnMod
+    }
+    if(is.null(gn)){
+      out$gnMod <- gnMod
+    }
+    if('Q' %in% guard){
+      out$QrnMod <- QrnMod
+    }
+    if('g' %in% guard){
+      out$grnMod <- grnMod
+    }
   }
   class(out) <- "drtmle"
   return(out)

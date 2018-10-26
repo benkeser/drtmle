@@ -4,7 +4,8 @@
 \alias{plot.drtmle}
 \title{Plot reduced dimension regression fits}
 \usage{
-\method{plot}{drtmle}(x, nPoints = 500, ask = TRUE, a_0 = x$a_0[1], ...)
+\method{plot}{drtmle}(x, nPoints = 500, ask = TRUE, a_0 = x$a_0[1],
+  ...)
 }
 \arguments{
 \item{x}{An object of class \code{"drtmle"}}

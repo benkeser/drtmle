@@ -4,8 +4,8 @@
 \alias{wald_test.adaptive_iptw}
 \title{Wald tests for adaptive_iptw objects}
 \usage{
-\method{wald_test}{adaptive_iptw}(object, est = c("iptw_tmle"), null = 0,
-  contrast = NULL, ...)
+\method{wald_test}{adaptive_iptw}(object, est = c("iptw_tmle"),
+  null = 0, contrast = NULL, ...)
 }
 \arguments{
 \item{object}{An object of class \code{"adaptive_iptw"}}

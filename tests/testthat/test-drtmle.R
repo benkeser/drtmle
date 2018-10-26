@@ -424,3 +424,86 @@ test_that("drtmle executes as expected with stratify = FALSE", {
   expect_true(is.numeric(fit9$aiptw_c$est))
   expect_true(is.numeric(fit9$aiptw_c$cov))
 })
+
+
+# --------------------------------------------------------------------
+
+test_that("drtmle executes when user inputs Qn and gn and returnModels = TRUE", {
+  set.seed(123456)
+  n <- 100
+  W <- data.frame(W1 = runif(n), W2 = rnorm(n))
+  A <- rbinom(n, 1, plogis(W$W1 - W$W2))
+  Y <- rnorm(n, W$W1 * W$W2 * A, 2)
+  Qn <- list(rnorm(n), rnorm(n))
+  tmp <- runif(n)
+  gn <- list(tmp, 1 - tmp)
+
+    fit9 <- drtmle(
+    W = W, A = A, Y = Y,
+    family = gaussian(),
+    stratify = FALSE,
+    Qn = Qn, gn = gn,
+    SL_Qr = "SL.glm",
+    SL_gr = "SL.glm",
+    returnModels = TRUE,
+    guard = c("Q", "g"),
+    reduction = "univariate",
+    Qsteps = 2
+  )
+  expect_true(is.numeric(fit9$gcomp$est))
+  expect_true(is.numeric(fit9$tmle$est))
+  expect_true(is.numeric(fit9$tmle$est))
+  expect_true(is.numeric(fit9$tmle$cov))
+  expect_true(is.numeric(fit9$drtmle$est))
+  expect_true(is.numeric(fit9$drtmle$cov))
+  expect_true(is.numeric(fit9$aiptw$est))
+  expect_true(is.numeric(fit9$aiptw$cov))
+  expect_true(is.numeric(fit9$aiptw_c$est))
+  expect_true(is.numeric(fit9$aiptw_c$cov))
+}
+
+# --------------------------------------------------------------------
+
+test_that("GitHub error #16 resolves", {
+  set.seed(123456)
+  X <- runif(100, 0, 1)
+
+Q <- X
+
+g <- exp(X) / (1 + exp(X))
+
+A <- rbinom(100, 1, g)
+
+Y <- runif(Q, -0.1, 0.1)
+
+X <- as.data.frame(X)
+
+a <- drtmle(W = X, A = A, Y = Y, a_0 = 1, glm_Q = 'X', 
+            glm_g = 'X', SL_Qr = 'SL.npreg', 
+            guard = 'Q', returnModel = TRUE)
+  expect_true(is.numeric(a$gcomp$est))
+  expect_true(is.numeric(a$tmle$est))
+  expect_true(is.numeric(a$tmle$est))
+  expect_true(is.numeric(a$tmle$cov))
+  expect_true(is.numeric(a$drtmle$est))
+  expect_true(is.numeric(a$drtmle$cov))
+  expect_true(is.numeric(a$aiptw$est))
+  expect_true(is.numeric(a$aiptw$cov))
+  expect_true(is.numeric(a$aiptw_c$est))
+  expect_true(is.numeric(a$aiptw_c$cov))
+# and the converse 
+b <- drtmle(W = X, A = A, Y = Y, a_0 = 1, glm_Q = 'X', 
+            glm_g = 'X', SL_gr = 'SL.npreg', 
+            guard = 'g', returnModel = TRUE)
+  expect_true(is.numeric(b$gcomp$est))
+  expect_true(is.numeric(b$tmle$est))
+  expect_true(is.numeric(b$tmle$est))
+  expect_true(is.numeric(b$tmle$cov))
+  expect_true(is.numeric(b$drtmle$est))
+  expect_true(is.numeric(b$drtmle$cov))
+  expect_true(is.numeric(b$aiptw$est))
+  expect_true(is.numeric(b$aiptw$cov))
+  expect_true(is.numeric(b$aiptw_c$est))
+  expect_true(is.numeric(b$aiptw_c$cov))
+
+}

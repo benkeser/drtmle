@@ -5,14 +5,15 @@
 \title{TMLE estimate of the average treatment effect with doubly-robust inference}
 \usage{
 drtmle(Y, A, W, DeltaA = as.numeric(!is.na(A)),
-  DeltaY = as.numeric(!is.na(Y)), a_0 = unique(A[!is.na(A)]), family = if
-  (all(Y \%in\% c(0, 1))) {     stats::binomial() } else {     stats::gaussian()
-  }, stratify = TRUE, SL_Q = NULL, SL_g = NULL, SL_Qr = NULL,
-  SL_gr = NULL, glm_Q = NULL, glm_g = NULL, glm_Qr = NULL,
-  glm_gr = NULL, guard = c("Q", "g"), reduction = "univariate",
-  returnModels = FALSE, cvFolds = 1, maxIter = 3, tolIC = 1/length(Y),
-  tolg = 0.01, verbose = FALSE, Qsteps = 2, parallel = FALSE,
-  future_hpc = NULL, Qn = NULL, gn = NULL, ...)
+  DeltaY = as.numeric(!is.na(Y)), a_0 = unique(A[!is.na(A)]),
+  family = if (all(Y \%in\% c(0, 1))) {     stats::binomial() } else {   
+   stats::gaussian() }, stratify = TRUE, SL_Q = NULL, SL_g = NULL,
+  SL_Qr = NULL, SL_gr = NULL, glm_Q = NULL, glm_g = NULL,
+  glm_Qr = NULL, glm_gr = NULL, guard = c("Q", "g"),
+  reduction = "univariate", returnModels = FALSE, cvFolds = 1,
+  maxIter = 3, tolIC = 1/length(Y), tolg = 0.01, verbose = FALSE,
+  Qsteps = 2, parallel = FALSE, future_hpc = NULL, Qn = NULL,
+  gn = NULL, use_future = FALSE, ...)
 }
 \arguments{
 \item{Y}{A \code{numeric} continuous or binary outcomes.}
@@ -139,6 +140,9 @@ the propensity for the observed values of \code{W}, with order determined by
 the input to \code{a_0} (e.g., if \code{a_0 = c(0,1)} then \code{gn[[1]]}
 should be propensity of \code{A} = 0 and \code{gn[[2]]} should be propensity
 of \code{A} = 1).}
+
+\item{use_future}{Boolean indicating whether to use \code{future_lapply} or
+instead to just use lapply. The latter can be easier to run down errors.}
 
 \item{...}{Other options (not currently used).}
 }

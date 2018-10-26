@@ -1,6 +1,6 @@
 Package: drtmle
 Title: Doubly-Robust Nonparametric Estimation and Inference
-Version: 1.0.3.9000
+Version: 1.0.3.9001
 Authors@R: c(
     person("David", "Benkeser", email = "benkeser@emory.edu",
            role = c("aut", "cre","cph"),
@@ -39,4 +39,4 @@ BugReports: https://github.com/benkeser/drtmle/issues
 Encoding: UTF-8
 LazyData: true
 VignetteBuilder: knitr
-RoxygenNote: 6.0.1.9000
+RoxygenNote: 6.1.0

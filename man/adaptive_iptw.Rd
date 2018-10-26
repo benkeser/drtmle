@@ -6,12 +6,12 @@
 for the propensity score}
 \usage{
 adaptive_iptw(W, A, Y, DeltaY = as.numeric(!is.na(Y)),
-  DeltaA = as.numeric(!is.na(A)), stratify = FALSE, family = if (all(Y
-  \%in\% c(0, 1))) {     stats::binomial() } else {     stats::gaussian() },
-  a_0 = unique(A[!is.na(A)]), SL_g = NULL, glm_g = NULL, SL_Qr = NULL,
-  glm_Qr = NULL, returnModels = TRUE, verbose = FALSE, maxIter = 2,
-  tolIC = 1/length(Y), tolg = 0.01, cvFolds = 1, parallel = FALSE,
-  future_hpc = NULL, gn = NULL, ...)
+  DeltaA = as.numeric(!is.na(A)), stratify = FALSE, family = if
+  (all(Y \%in\% c(0, 1))) {     stats::binomial() } else {    
+  stats::gaussian() }, a_0 = unique(A[!is.na(A)]), SL_g = NULL,
+  glm_g = NULL, SL_Qr = NULL, glm_Qr = NULL, returnModels = TRUE,
+  verbose = FALSE, maxIter = 2, tolIC = 1/length(Y), tolg = 0.01,
+  cvFolds = 1, parallel = FALSE, future_hpc = NULL, gn = NULL, ...)
 }
 \arguments{
 \item{W}{A \code{data.frame} of named covariates}

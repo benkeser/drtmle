@@ -151,9 +151,6 @@ layout(t(1:3))
 plot(fit1, ask = FALSE)
 ```
 
-<img src="README-example-1.png" style="display: block; margin: auto;" />
-
-
 ### Inference for super learner-based IPTW
 
 The package additionally includes a function for computing valid
