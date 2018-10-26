@@ -173,7 +173,7 @@ test_that("drtmle executes as expected with stratify = TRUE", {
     SL_gr = "SL.glm",
     guard = c("Q", "g"),
     reduction = "bivariate",
-    use_future = FALSE,
+    use_future = FALSE
   )
   expect_true(is.numeric(fit5$gcomp$est))
   expect_true(is.numeric(fit5$tmle$est))
