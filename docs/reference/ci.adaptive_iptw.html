@@ -18,13 +18,25 @@
 <!-- Font Awesome icons -->
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 
+<!-- clipboard.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
+
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
+
+
+
+<meta property="og:title" content="Confidence intervals for adaptive_iptw objects — ci.adaptive_iptw" />
+
+<meta property="og:description" content="Estimate confidence intervals for objects of class &quot;adaptive_iptw&quot;" />
+<meta name="twitter:card" content="summary" />
+
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -47,8 +59,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">drtmle</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">drtmle</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">1.0.3.9001</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
@@ -73,7 +89,7 @@
   </ul>
 </li>
 <li>
-  <a href="../news/index.html">News</a>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
       
@@ -85,6 +101,7 @@
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -92,21 +109,25 @@
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Confidence intervals for adaptive_iptw objects</h1>
+    <small class="dont-index">Source: <a href='https://github.com/benkeser/drtmle/blob/master/R/confint.R'><code>R/confint.R</code></a></small>
+    <div class="hidden name"><code>ci.adaptive_iptw.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
     <p>Estimate confidence intervals for objects of class <code>"adaptive_iptw"</code></p>
     
+    </div>
 
     <pre class="usage"><span class='co'># S3 method for adaptive_iptw</span>
 <span class='fu'><a href='ci.html'>ci</a></span>(<span class='no'>object</span>, <span class='kw'>est</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"iptw_tmle"</span>), <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0.95</span>,
   <span class='kw'>contrast</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
@@ -115,31 +136,35 @@
     </tr>
     <tr>
       <th>est</th>
-      <td><p>A vector indicating for which estimators to return a 
-confidence interval. Possible estimators include the TMLE IPTW 
-(<code>"iptw_tmle"</code>, recommended), the one-step IPTW 
-(<code>"iptw_os"</code>, not recommended), the standard IPTW 
+      <td><p>A vector indicating for which estimators to return a
+confidence interval. Possible estimators include the TMLE IPTW
+(<code>"iptw_tmle"</code>, recommended), the one-step IPTW
+(<code>"iptw_os"</code>, not recommended), the standard IPTW
 (<code>"iptw"</code>, recommended only for comparison to the other two estimators).</p></td>
     </tr>
     <tr>
       <th>level</th>
-      <td><p>The nominal coverage probability of the desired confidence interval (should be
-between 0 and 1). Default computes 95% confidence intervals.</p></td>
+      <td><p>The nominal coverage probability of the desired confidence
+interval (should be between 0 and 1). Default computes 95% confidence
+intervals.</p></td>
     </tr>
     <tr>
       <th>contrast</th>
-      <td><p>Specifies the parameter for which to return confidence intervals.
-If <code>contrast=NULL</code>, then confidence intervals for the
-marginal means are computed. If instead, <code>contrast</code> is a numeric vector of ones, negative ones,
-and zeros to define linear combinations of the various means (e.g., to estimate an average
-treatment effect, see example). Finally, <code>contrast</code> can be a list with named functions
-<code>f</code>, <code>f_inv</code>, <code>h</code>, and <code>fh_grad</code>. The first two functions should take
-as input argument <code>eff</code>. Respectively, these specify which transformation 
-of the effect measure to compute the confidence interval for and the inverse
-transformation to put the confidence interval back on the original scale. The function <code>h</code>
-defines the contrast to be estimated and should take as input <code>est</code>, a vector
-of the same length as <code>object$a_0</code>, and output the desired contrast. The function
-<code>fh_grad</code> is the gradient of the function <code>h</code>. See examples and vignette for more information.</p></td>
+      <td><p>Specifies the parameter for which to return confidence
+intervals. If <code>contrast=NULL</code>, then confidence intervals for the
+marginal means are computed. If instead, <code>contrast</code> is a numeric vector
+of ones, negative ones, and zeros to define linear combinations of the
+various means (e.g., to estimate an average treatment effect, see example).
+Finally, <code>contrast</code> can be a list with named functions <code>f</code>,
+<code>f_inv</code>, <code>h</code>, and <code>fh_grad</code>. The first two functions should
+take as input argument <code>eff</code>. Respectively, these specify which
+transformation of the effect measure to compute the confidence interval for
+and the inverse transformation to put the confidence interval back on the
+original scale. The function <code>h</code> defines the contrast to be estimated
+and should take as input <code>est</code>, a vector of the same length as
+<code>object$a_0</code>, and output the desired contrast. The function
+<code>fh_grad</code> is the gradient of the function <code>h</code>. See examples and
+vignette for more information.</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -150,7 +175,7 @@ of the same length as <code>object$a_0</code>, and output the desired contrast. 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>An object of class <code>"ci.adaptive_iptw"</code> with point estimates and
-confidence intervals of the specified level.</p>
+ confidence intervals of the specified level.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
@@ -173,7 +198,7 @@ confidence intervals of the specified level.</p>
 <span class='co'># get confidence intervals for ATE</span>
 <span class='no'>ci_ATE</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ci.html'>ci</a></span>(<span class='no'>fit1</span>, <span class='kw'>contrast</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>1</span>,-<span class='fl'>1</span>))
 
-<span class='co'># get confidence intervals for risk ratio </span>
+<span class='co'># get confidence intervals for risk ratio</span>
 <span class='co'># by inputting own contrast function</span>
 <span class='co'># this computes CI on log scale and back transforms</span>
 <span class='no'>myContrast</span> <span class='kw'>&lt;-</span> <span class='fu'>list</span>(<span class='kw'>f</span> <span class='kw'>=</span> <span class='kw'>function</span>(<span class='no'>eff</span>){ <span class='fu'>log</span>(<span class='no'>eff</span>) },
@@ -201,11 +226,14 @@ confidence intervals of the specified level.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Site built with <a href="http://pkgdown.r-lib.org/">pkgdown</a>.</p>
 </div>
 
       </footer>
    </div>
 
+  
+
   </body>
 </html>
+

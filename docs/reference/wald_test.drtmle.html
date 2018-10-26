@@ -18,13 +18,25 @@
 <!-- Font Awesome icons -->
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 
+<!-- clipboard.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
+
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
+
+
+
+<meta property="og:title" content="Wald tests for drtmle objects — wald_test.drtmle" />
+
+<meta property="og:description" content="Wald tests for drtmle objects" />
+<meta name="twitter:card" content="summary" />
+
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -47,8 +59,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">drtmle</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">drtmle</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">1.0.3.9001</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
@@ -73,7 +89,7 @@
   </ul>
 </li>
 <li>
-  <a href="../news/index.html">News</a>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
       
@@ -85,6 +101,7 @@
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -92,21 +109,25 @@
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Wald tests for drtmle objects</h1>
+    <small class="dont-index">Source: <a href='https://github.com/benkeser/drtmle/blob/master/R/test.R'><code>R/test.R</code></a></small>
+    <div class="hidden name"><code>wald_test.drtmle.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
     <p>Wald tests for drtmle objects</p>
     
+    </div>
 
     <pre class="usage"><span class='co'># S3 method for drtmle</span>
 <span class='fu'><a href='wald_test.html'>wald_test</a></span>(<span class='no'>object</span>, <span class='kw'>est</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"drtmle"</span>), <span class='kw'>null</span> <span class='kw'>=</span> <span class='fl'>0</span>,
   <span class='kw'>contrast</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
@@ -115,13 +136,13 @@
     </tr>
     <tr>
       <th>est</th>
-      <td><p>A vector indicating for which estimators to return a 
+      <td><p>A vector indicating for which estimators to return a
 confidence interval. Possible estimators include the TMLE with doubly robust
-inference (<code>"drtmle"</code>, recommended), the AIPTW with additional correction 
-for misspecification (<code>"aiptw_c"</code>, not recommended), the standard TMLE 
-(<code>"tmle"</code>, recommended only for comparison to "drtmle"), the standard 
-AIPTW (<code>"aiptw"</code>, recommended only for comparison to "drtmle"), and 
-G-computation (<code>"gcomp"</code>, not recommended).</p></td>
+inference (<code>"drtmle"</code>, recommended), the AIPTW with additional
+correction for misspecification (<code>"aiptw_c"</code>, not recommended), the
+standard TMLE (<code>"tmle"</code>, recommended only for comparison to "drtmle"),
+the standard AIPTW (<code>"aiptw"</code>, recommended only for comparison to
+"drtmle"), and G-computation (<code>"gcomp"</code>, not recommended).</p></td>
     </tr>
     <tr>
       <th>null</th>
@@ -129,21 +150,21 @@ G-computation (<code>"gcomp"</code>, not recommended).</p></td>
     </tr>
     <tr>
       <th>contrast</th>
-      <td><p>This option specifies what parameter to return confidence intervals for.
-If <code>contrast=NULL</code>, then test the null hypothesis that the covariate-adjusted
-marginal means equal the value(s) specified in <code>null</code>. 
-<code>contrast</code> can also be a numeric vector of ones, negative ones,
-and zeros to define linear combinations of the various means (e.g., to estimate an average
-treatment effect, see examples). In this case, we test the null hypothesis that the 
-linear combination of means equals the value specified in <code>null</code>. 
-<code>contrast</code> can also be a list with named functions
-<code>f</code>, <code>h</code>, and <code>fh_grad</code>. The function <code>f</code> takes
-as input argument <code>eff</code> and specifies which transformation 
-of the effect measure to test. The function <code>h</code> defines the contrast 
-to be estimated and should take as input <code>est</code>, a vector
-of the same length as <code>object$a_0</code>, and output the desired contrast. The function
+      <td><p>This option specifies what parameter to return confidence
+intervals for. If <code>contrast=NULL</code>, then test the null hypothesis that
+the covariate-adjusted marginal means equal the value(s) specified in
+<code>null</code>. <code>contrast</code> can also be a numeric vector of ones, negative
+ones, and zeros to define linear combinations of the various means (e.g., to
+estimate an average treatment effect, see examples). In this case, we test
+the null hypothesis that the linear combination of means equals the value
+specified in <code>null</code>. <code>contrast</code> can also be a list with named
+functions <code>f</code>, <code>h</code>, and <code>fh_grad</code>. The function <code>f</code>
+takes as input argument <code>eff</code> and specifies which transformation of the
+effect measure to test. The function <code>h</code> defines the contrast to be
+estimated and should take as input <code>est</code>, a vector of the same length
+as <code>object$a_0</code>, and output the desired contrast. The function
 <code>fh_grad</code> is the gradient of the function <code>h(f())</code>. The function
-computes a test of the null hypothesis that <code>h(f(object$est)) = null</code>. 
+computes a test of the null hypothesis that <code>h(f(object$est)) = null</code>.
 See examples.</p></td>
     </tr>
     <tr>
@@ -155,7 +176,7 @@ See examples.</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>An object of class <code>"ci.drtmle"</code> with point estimates and
-confidence intervals of the specified level.</p>
+ confidence intervals of the specified level.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
@@ -207,11 +228,14 @@ confidence intervals of the specified level.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Site built with <a href="http://pkgdown.r-lib.org/">pkgdown</a>.</p>
 </div>
 
       </footer>
    </div>
 
+  
+
   </body>
 </html>
+

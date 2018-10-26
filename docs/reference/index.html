@@ -18,13 +18,22 @@
 <!-- Font Awesome icons -->
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 
+<!-- clipboard.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
+
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
+
+
+
+<meta property="og:title" content="Function reference" />
+
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -47,8 +56,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">drtmle</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">drtmle</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">1.0.3.9001</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
@@ -73,7 +86,7 @@
   </ul>
 </li>
 <li>
-  <a href="../news/index.html">News</a>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
       
@@ -85,6 +98,7 @@
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -92,237 +106,213 @@
       
       </header>
 
-      <div class="row">
-  <div class="col-md-9">
+<div class="row">
+  <div class="contents col-md-9">
     <div class="page-header">
-      <h1>
-        Reference
-        <small>version&nbsp;1.0.2</small>
-      </h1>
+      <h1>Reference</h1>
     </div>
 
-    <div class="contents">
-      <table class="ref-index">
+    <table class="ref-index">
 
-      <colgroup>
-        <col class="alias" />
-        <col class="title" />
-      </colgroup>
+    <colgroup>
+      
+      <col class="alias" />
+      <col class="title" />
+    </colgroup>
 
-      <tbody>
-        <tr>
-          <th colspan="2">
-            <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-            <p class="section-desc"></p>
-          </th>
-        </tr>
-        <tr>
-          <!--  -->
-          <td>
-            <p><code><a href="adaptive_iptw.html">adaptive_iptw</a></code> </p>
-          </td>
-          <td><p>Compute asymptotically linear IPTW estimators with super learning
+    <tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr>
+      <tr>
+        
+        <td>
+          <p><code><a href="SL.npreg.html">SL.npreg()</a></code> </p>
+        </td>
+        <td><p>Super learner wrapper for kernel regression</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="adaptive_iptw.html">adaptive_iptw()</a></code> </p>
+        </td>
+        <td><p>Compute asymptotically linear IPTW estimators with super learning
 for the propensity score</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="ci.adaptive_iptw.html">ci</a></code> </p>
-          </td>
-          <td><p>Confidence intervals for adaptive_iptw objects</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="ci.drtmle.html">ci</a></code> </p>
-          </td>
-          <td><p>Confidence intervals for drtmle objects</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="ci.html">ci</a></code> </p>
-          </td>
-          <td><p>Compute confidence intervals for drtmle and adaptive_iptw@</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="drtmle.html">drtmle</a></code> </p>
-          </td>
-          <td><p>TMLE estimate of the average treatment effect with doubly-robust inference</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="estimateG.html">estimateG</a></code> </p>
-          </td>
-          <td><p>estimateG</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="estimategrn.html">estimategrn</a></code> </p>
-          </td>
-          <td><p>estimategrn</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="estimateQ.html">estimateQ</a></code> </p>
-          </td>
-          <td><p>estimateQ</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="estimateQrn.html">estimateQrn</a></code> </p>
-          </td>
-          <td><p>estimateQrn</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="eval_Diptw_g.html">eval_Diptw_g</a></code> </p>
-          </td>
-          <td><p>Evaluate extra piece of the influence function for the IPTW</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="eval_Diptw.html">eval_Diptw</a></code> </p>
-          </td>
-          <td><p>Evaluate usual influence function of IPTW</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="eval_Dstar_g.html">eval_Dstar_g</a></code> </p>
-          </td>
-          <td><p>Evaluate extra piece of efficient influence function resulting from
-misspecification of outcome regression</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="eval_Dstar_Q.html">eval_Dstar_Q</a></code> </p>
-          </td>
-          <td><p>Evaluate extra piece of efficient influence function resulting from
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="ci.html">ci()</a></code> </p>
+        </td>
+        <td><p>Compute confidence intervals for drtmle and adaptive_iptw@</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="ci.adaptive_iptw.html">ci(<i>&lt;adaptive_iptw&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Confidence intervals for adaptive_iptw objects</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="ci.drtmle.html">ci(<i>&lt;drtmle&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Confidence intervals for drtmle objects</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="drtmle.html">drtmle()</a></code> </p>
+        </td>
+        <td><p>TMLE estimate of the average treatment effect with doubly-robust inference</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="estimateG.html">estimateG()</a></code> </p>
+        </td>
+        <td><p>estimateG</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="estimateQ.html">estimateQ()</a></code> </p>
+        </td>
+        <td><p>estimateQ</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="estimateQrn.html">estimateQrn()</a></code> </p>
+        </td>
+        <td><p>estimateQrn</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="estimategrn.html">estimategrn()</a></code> </p>
+        </td>
+        <td><p>estimategrn</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="eval_Diptw.html">eval_Diptw()</a></code> </p>
+        </td>
+        <td><p>Evaluate usual influence function of IPTW</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="eval_Diptw_g.html">eval_Diptw_g()</a></code> </p>
+        </td>
+        <td><p>Evaluate extra piece of the influence function for the IPTW</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="eval_Dstar.html">eval_Dstar()</a></code> </p>
+        </td>
+        <td><p>Evaluate usual efficient influence function</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="eval_Dstar_Q.html">eval_Dstar_Q()</a></code> </p>
+        </td>
+        <td><p>Evaluate extra piece of efficient influence function resulting from
 misspecification of propensity score</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="eval_Dstar.html">eval_Dstar</a></code> </p>
-          </td>
-          <td><p>Evaluate usual efficient influence function</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="fluctuateG.html">fluctuateG</a></code> </p>
-          </td>
-          <td><p>fluctuateG</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="fluctuateQ.html">fluctuateQ</a></code> </p>
-          </td>
-          <td><p>fluctuateQ</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="fluctuateQ1.html">fluctuateQ1</a></code> </p>
-          </td>
-          <td><p>fluctuateQ1</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="fluctuateQ2.html">fluctuateQ2</a></code> </p>
-          </td>
-          <td><p>fluctuateQ2</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="method.CC_LS_mod.html">method.CC_LS_mod</a></code> </p>
-          </td>
-          <td><p>Modification of convex combination least squares method 
-for <code>SuperLearner</code> that doesn't fail with duplicated predictors.
-Issue reported to <code>SuperLearner</code> maintainers. This function will
-be deprecated when a more robust fix in the <code>SuperLearner</code> package
-is implemented.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="method.CC_nloglik_mod.html">method.CC_nloglik_mod</a></code> </p>
-          </td>
-          <td><p>Modification of convex combination negative log likelihood method
-for <code>SuperLearner</code> that doesn't fail with duplicated predictors.
-Issue reported to <code>SuperLearner</code> maintainers. This function will
-be deprecated when a more robust fix in the <code>SuperLearner</code> package
-is implemented.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="plot.drtmle.html">plot</a></code> </p>
-          </td>
-          <td><p>Plot reduced dimension regression fits</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="predict.SL.npreg.html">predict</a></code> </p>
-          </td>
-          <td><p>Predict method for SL.npreg</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="print.adaptive_iptw.html">print</a></code> </p>
-          </td>
-          <td><p>Print the output of a <code>"adaptive_iptw"</code> object.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="print.ci.adaptive_iptw.html">print</a></code> </p>
-          </td>
-          <td><p>Print the output of ci.adaptive_iptw</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="print.ci.drtmle.html">print</a></code> </p>
-          </td>
-          <td><p>Print the output of ci.drtmle</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="print.drtmle.html">print</a></code> </p>
-          </td>
-          <td><p>Print the output of a <code>"drtmle"</code> object.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="print.wald_test.adaptive_iptw.html">print</a></code> </p>
-          </td>
-          <td><p>Print the output of wald_test.adaptive_iptw</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="print.wald_test.drtmle.html">print</a></code> </p>
-          </td>
-          <td><p>Print the output of wald_test.drtmle</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="SL.npreg.html">SL.npreg</a></code> </p>
-          </td>
-          <td><p>Super learner wrapper for kernel regression</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="wald_test.adaptive_iptw.html">wald_test</a></code> </p>
-          </td>
-          <td><p>Wald tests for adaptive_iptw objects</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="wald_test.drtmle.html">wald_test</a></code> </p>
-          </td>
-          <td><p>Wald tests for drtmle objects</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="wald_test.html">wald_test</a></code> </p>
-          </td>
-          <td><p>Wald tests for drtmle and adaptive_iptw objects</p></td>
-        </tr>
-      </tbody>
-      </table>
-    </div>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="eval_Dstar_g.html">eval_Dstar_g()</a></code> </p>
+        </td>
+        <td><p>Evaluate extra piece of efficient influence function resulting from
+misspecification of outcome regression</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="fluctuateG.html">fluctuateG()</a></code> </p>
+        </td>
+        <td><p>fluctuateG</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="fluctuateQ.html">fluctuateQ()</a></code> </p>
+        </td>
+        <td><p>fluctuateQ</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="fluctuateQ1.html">fluctuateQ1()</a></code> </p>
+        </td>
+        <td><p>fluctuateQ1</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="fluctuateQ2.html">fluctuateQ2()</a></code> </p>
+        </td>
+        <td><p>fluctuateQ2</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="plot.drtmle.html">plot(<i>&lt;drtmle&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Plot reduced dimension regression fits</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="predict.SL.npreg.html">predict(<i>&lt;SL.npreg&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Predict method for SL.npreg</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="print.adaptive_iptw.html">print(<i>&lt;adaptive_iptw&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Print the output of a <code>"adaptive_iptw"</code> object.</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="print.ci.adaptive_iptw.html">print(<i>&lt;ci.adaptive_iptw&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Print the output of ci.adaptive_iptw</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="print.ci.drtmle.html">print(<i>&lt;ci.drtmle&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Print the output of ci.drtmle</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="print.drtmle.html">print(<i>&lt;drtmle&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Print the output of a <code>"drtmle"</code> object.</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="print.wald_test.adaptive_iptw.html">print(<i>&lt;wald_test.adaptive_iptw&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Print the output of wald_test.adaptive_iptw</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="print.wald_test.drtmle.html">print(<i>&lt;wald_test.drtmle&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Print the output of wald_test.drtmle</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="wald_test.html">wald_test()</a></code> </p>
+        </td>
+        <td><p>Wald tests for drtmle and adaptive_iptw objects</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="wald_test.adaptive_iptw.html">wald_test(<i>&lt;adaptive_iptw&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Wald tests for adaptive_iptw objects</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="wald_test.drtmle.html">wald_test(<i>&lt;drtmle&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Wald tests for drtmle objects</p></td>
+      </tr>
+    </tbody>
+    </table>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -339,11 +329,14 @@ is implemented.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Site built with <a href="http://pkgdown.r-lib.org/">pkgdown</a>.</p>
 </div>
 
       </footer>
    </div>
 
+  
+
   </body>
 </html>
+

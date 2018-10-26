@@ -18,13 +18,26 @@
 <!-- Font Awesome icons -->
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 
+<!-- clipboard.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
+
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
+
+
+
+<meta property="og:title" content="estimateQrn — estimateQrn" />
+
+<meta property="og:description" content="Estimates the reduced dimension regressions necessary for the
+fluctuations of g" />
+<meta name="twitter:card" content="summary" />
+
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -47,8 +60,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">drtmle</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">drtmle</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">1.0.3.9001</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
@@ -73,7 +90,7 @@
   </ul>
 </li>
 <li>
-  <a href="../news/index.html">News</a>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
       
@@ -85,6 +102,7 @@
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -92,21 +110,25 @@
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>estimateQrn</h1>
+    <small class="dont-index">Source: <a href='https://github.com/benkeser/drtmle/blob/master/R/estimate.R'><code>R/estimate.R</code></a></small>
+    <div class="hidden name"><code>estimateQrn.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
-    <p>Estimates the reduced dimension regressions necessary for the  
+    <p>Estimates the reduced dimension regressions necessary for the
 fluctuations of g</p>
     
+    </div>
 
     <pre class="usage"><span class='fu'>estimateQrn</span>(<span class='no'>Y</span>, <span class='no'>A</span>, <span class='no'>W</span>, <span class='no'>DeltaA</span>, <span class='no'>DeltaY</span>, <span class='no'>Qn</span>, <span class='no'>gn</span>, <span class='no'>glm_Qr</span>, <span class='no'>SL_Qr</span>,
   <span class='kw'>family</span> <span class='kw'>=</span> <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/stats/topics/family'>gaussian</a></span>(), <span class='no'>a_0</span>, <span class='no'>returnModels</span>, <span class='kw'>validRows</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
@@ -124,39 +146,39 @@ fluctuations of g</p>
     </tr>
     <tr>
       <th>DeltaA</th>
-      <td><p>Indicator of missing treatment (assumed to be equal to 0 if 
+      <td><p>Indicator of missing treatment (assumed to be equal to 0 if
 missing 1 if observed)</p></td>
     </tr>
     <tr>
       <th>DeltaY</th>
-      <td><p>Indicator of missing outcome (assumed to be equal to 0 if 
+      <td><p>Indicator of missing outcome (assumed to be equal to 0 if
 missing 1 if observed)</p></td>
     </tr>
     <tr>
       <th>Qn</th>
-      <td><p>A list of outcome regression estimates evaluated on observed data. 
-If NULL then 0 is used for all Qn (as is needed to estimate reduced dimension 
-regression for adaptive_iptw)</p></td>
+      <td><p>A list of outcome regression estimates evaluated on observed data.
+If NULL then 0 is used for all Qn (as is needed to estimate reduced
+dimension regression for adaptive_iptw)</p></td>
     </tr>
     <tr>
       <th>gn</th>
-      <td><p>A list of propensity regression estimates evaluated on observed 
+      <td><p>A list of propensity regression estimates evaluated on observed
 data</p></td>
     </tr>
     <tr>
       <th>glm_Qr</th>
-      <td><p>A character describing a formula to be used in the call to 
-<code>glm</code> for the first reduced-dimension regression. Ignored if 
+      <td><p>A character describing a formula to be used in the call to
+<code>glm</code> for the first reduced-dimension regression. Ignored if
 <code>SL_gr!=NULL</code>.</p></td>
     </tr>
     <tr>
       <th>SL_Qr</th>
-      <td><p>A vector of characters or a list describing the Super Learner 
+      <td><p>A vector of characters or a list describing the Super Learner
 library to be used for the first reduced-dimension regression.</p></td>
     </tr>
     <tr>
       <th>family</th>
-      <td><p>Should be gaussian() unless called from adaptive_iptw with 
+      <td><p>Should be gaussian() unless called from adaptive_iptw with
 binary <code>Y</code>.</p></td>
     </tr>
     <tr>
@@ -165,12 +187,12 @@ binary <code>Y</code>.</p></td>
     </tr>
     <tr>
       <th>returnModels</th>
-      <td><p>A boolean indicating whether to return model fits for the 
+      <td><p>A boolean indicating whether to return model fits for the
 outcome regression, propensity score, and reduced-dimension regressions.</p></td>
     </tr>
     <tr>
       <th>validRows</th>
-      <td><p>A <code>list</code> of length <code>cvFolds</code> containing the row 
+      <td><p>A <code>list</code> of length <code>cvFolds</code> containing the row
 indexes of observations to include in validation fold.</p></td>
     </tr>
     </table>
@@ -192,11 +214,14 @@ indexes of observations to include in validation fold.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Site built with <a href="http://pkgdown.r-lib.org/">pkgdown</a>.</p>
 </div>
 
       </footer>
    </div>
 
+  
+
   </body>
 </html>
+
