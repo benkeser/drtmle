@@ -163,6 +163,28 @@ test_that("drtmle executes as expected with stratify = TRUE", {
   expect_true(is.numeric(fit5$aiptw$cov))
   expect_true(is.numeric(fit5$aiptw_c$est))
   expect_true(is.numeric(fit5$aiptw_c$cov))
+    fit5 <- drtmle(
+    W = W, A = A, Y = Y,
+    family = gaussian(),
+    stratify = TRUE,
+    SL_Q = "SL.glm",
+    SL_g = "SL.glm",
+    SL_Qr = "SL.glm",
+    SL_gr = "SL.glm",
+    guard = c("Q", "g"),
+    reduction = "bivariate",
+    use_future = FALSE,
+  )
+  expect_true(is.numeric(fit5$gcomp$est))
+  expect_true(is.numeric(fit5$tmle$est))
+  expect_true(is.numeric(fit5$tmle$est))
+  expect_true(is.numeric(fit5$tmle$cov))
+  expect_true(is.numeric(fit5$drtmle$est))
+  expect_true(is.numeric(fit5$drtmle$cov))
+  expect_true(is.numeric(fit5$aiptw$est))
+  expect_true(is.numeric(fit5$aiptw$cov))
+  expect_true(is.numeric(fit5$aiptw_c$est))
+  expect_true(is.numeric(fit5$aiptw_c$cov))
   # univariate reduction with
   # single SL + stratify
   fit6 <- drtmle(
