@@ -202,7 +202,7 @@ drtmle <- function(Y, A, W,
                    future_hpc = NULL,
                    Qn = NULL,
                    gn = NULL,
-                   use_future = FALSE,
+                   use_future = TRUE,
                    ...) {
   call <- match.call()
   # if cvFolds non-null split data into cvFolds pieces
