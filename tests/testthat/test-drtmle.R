@@ -460,7 +460,7 @@ test_that("drtmle executes when user inputs Qn and gn and returnModels = TRUE", 
   expect_true(is.numeric(fit9$aiptw$cov))
   expect_true(is.numeric(fit9$aiptw_c$est))
   expect_true(is.numeric(fit9$aiptw_c$cov))
-}
+})
 
 # --------------------------------------------------------------------
 
@@ -506,4 +506,4 @@ b <- drtmle(W = X, A = A, Y = Y, a_0 = 1, glm_Q = 'X',
   expect_true(is.numeric(b$aiptw_c$est))
   expect_true(is.numeric(b$aiptw_c$cov))
 
-}
+})
