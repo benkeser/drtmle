@@ -13,7 +13,7 @@ drtmle(Y, A, W, DeltaA = as.numeric(!is.na(A)),
   reduction = "univariate", returnModels = FALSE, cvFolds = 1,
   maxIter = 3, tolIC = 1/length(Y), tolg = 0.01, verbose = FALSE,
   Qsteps = 2, parallel = FALSE, future_hpc = NULL, Qn = NULL,
-  gn = NULL, use_future = FALSE, ...)
+  gn = NULL, use_future = TRUE, ...)
 }
 \arguments{
 \item{Y}{A \code{numeric} continuous or binary outcomes.}
