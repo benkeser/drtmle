@@ -404,6 +404,7 @@ generalized linear models, super learning, and a user-specified estimation
 technique. We demonstrate each of these approaches in turn on a simple
 simulated data set. The true parameter values of interest are $\psi_0(0)=$ `r
 round(EY0, 2)` and $\psi_0(1)=$ `r round(EY1, 2)`.
+
 ```{r}
 set.seed(1234)
 n <- 200
@@ -548,6 +549,98 @@ npreg_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
                     stratify = TRUE)
 npreg_fit
 ```
+
+The `drtmle` package also allows users to pass in their own estimated outcome
+regression and propensity score via the `Qn` and `gn` options, respectively. 
+If `Qn` is specified by the user, `drtmle` will ignore the nuisance parameter 
+estimation routines specified by `SL_Q` and `glm_Q` -- similarly for `gn` and
+`SL_g`, `glm_g`. As noted in the package documentation, there is a specific format 
+necessary for inputting `Qn` and `gn`. For `Qn`, the entries in the list should 
+correspond to the outcome regression evaluated at A and the observed values of `W`, 
+with order determined by the input to `a_0`. For example, if `a_0 = c(0, 1)` then 
+`Qn[[1]]` should be outcome regression at $A = 0$ and `Qn[[2]]` should be outcome 
+regression at $A = 1$. The example below illustrates this concept.
+
+```{r, cache = TRUE, message = FALSE}
+# fit a GLM for outcome regression outside of drtmle
+out_glm_fit <- glm(Y ~ . , data = data.frame(A = A, W), family = binomial())
+
+# generate Qn list
+Qn10 <- list(
+  # first entry is predicted values setting A = 1
+  predict(out_glm_fit, newdata = data.frame(A = 1, W), type = "response"),
+  # second entry is predicted values setting A = 0
+  predict(out_glm_fit, newdata = data.frame(A = 0, W), type = "response")
+)
+
+# pass this list to drtmle to avoid internal estimation of 
+# outcome regression (note propensity score and reduced-dimension
+# regressions are still estimated internally)
+out_fit1 <- drtmle(W = W, A = A, Y = Y, family = binomial(),
+                  glm_g = ".", glm_Qr = "gn", glm_gr = "Qn", Qn = Qn10,
+                  # crucial to set a_0 to match Qn's construction!
+                  a_0 = c(1,0))
+out_fit1
+
+# to be completely thorough let's re-order Qn10 and re-run
+Qn01 <- list(Qn10[[2]], Qn10[[1]])
+
+out_fit2 <- drtmle(W = W, A = A, Y = Y, family = binomial(),
+                  glm_g = ".", glm_Qr = "gn", glm_gr = "Qn", 
+                  # use re-ordered Qn list
+                  Qn = Qn01,
+                  # a_0 has to be reordered to match Qn01!
+                  a_0 = c(0,1))
+# should be the same as out_fit1, but re-ordered
+out_fit2
+```
+
+Similarly, for `gn` we need to pass in properly ordered lists. For example, 
+if `a_0 = c(0, 1)` then `gn[[1]]` should be propensity for receiving $A = 0$ 
+and `gn[[2]]` should be the propensity for receiving $A = 1$. The example below 
+illustrates this concept.
+
+```{r, cache = TRUE, message = FALSE}
+# fit a GLM for propensity score outside of drtmle
+out_glm_fit <- glm(A ~ . , data = data.frame(W), family = binomial())
+
+# get P(A = 1 | W) by calling predict
+gn1W <- predict(out_glm_fit, newdata = data.frame(W), type = "response")
+
+# generate gn list
+gn10 <- list(
+  # first entry is P(A = 1 | W)
+  gn1W,
+  # second entry is P(A = 0 | W) = 1 - P(A = 1 | W)
+  1 - gn1W
+)
+
+# pass this list to drtmle to avoid internal estimation of 
+# propensity score (note reduced-dimension regressions are 
+# still estimated internally)
+out_fit3 <- drtmle(W = W, A = A, Y = Y, family = binomial(),
+                   glm_Qr = "gn", glm_gr = "Qn", 
+                   Qn = Qn10, gn = gn10, 
+                   # crucial to set a_0 to match Qn and gn's construction!
+                   a_0 = c(1,0))
+out_fit3
+
+# to be completely thorough let's re-order gn10 and re-run
+gn01 <- list(gn10[[2]], gn10[[1]])
+
+out_fit4 <- drtmle(W = W, A = A, Y = Y, family = binomial(),
+                   glm_Qr = "gn", glm_gr = "Qn", 
+                   # use re-ordered Qn/gn list
+                   Qn = Qn01, gn = gn01, 
+                   # a_0 has to be reordered to match Qn01!
+                   a_0 = c(0,1))
+# should be the same as out_fit3, but re-ordered
+out_fit4
+```
+
+This flexibility allows users to use any regression technique to externally
+obtain initial estimates of nuisance parameters. The key step is making sure
+that the ordering of `Qn` and `gn` is consistent with `a_0`. 
 
 ## Confidence intervals \label{confidence_intervals}
 

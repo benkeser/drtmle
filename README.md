@@ -86,8 +86,8 @@ library(drtmle)
 library(SuperLearner)
 #> Loading required package: nnls
 #> Super Learner
-#> Version: 2.0-23
-#> Package created on 2018-03-09
+#> Version: 2.0-24
+#> Package created on 2018-08-10
 
 # simulate simple data structure
 set.seed(12345)
