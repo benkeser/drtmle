@@ -87,7 +87,7 @@ Emory University<br>
 Department of Biostatistics and Bioinformatics<br>
 1518 Clifton Road, NE<br>
 Mailstop: 002-3AA<br>
-Atlanta, Georgia, 30322, U.S.A.<br><a href="mailto:benkeser@emory.edu">benkeser@emory.edu</a>
+Atlanta, Georgia, 30322, U.S.A.<br><a href="mailto:benkeser@emory.edu" class="email">benkeser@emory.edu</a>
 </div></h4>
             
       
@@ -289,7 +289,6 @@ g_{r,n,2}^*(a \mid W_i) \ \{Y_i - \bar{Q}_n^*(a,W_i)\} = 0 \ ,
 ##     out &lt;- list(pred = pred, fit = fit)
 ##     return(out)
 ## }
-## &lt;bytecode: 0x7fa2782f4270&gt;
 ## &lt;environment: namespace:drtmle&gt;</code></pre>
 <p>In the above code, we see that a user-specified function should have options <code>Y, X, newX, family, obsWeights, ...</code>, along with other options specific to the function. The option <code>Y</code> corresponds to the outcome of the regression and <code>X</code> to the variables onto which the outcome is regressed. The option <code>newX</code> should be of the same class and dimension as <code>X</code> and is meant to contain new values of variables at which to evaluate the regression fit. The <code>family</code> and <code>obsWeights</code> options are not strictly necessary (indeed, they are not used by <code>SL.npreg</code>), they are useful to include if one wishes to utilize the function as part of a super learner library. The <code>SL.npreg</code> function proceeds by checking whether there is sufficient variation in <code>Y</code> to even both fitting the kernel regression (as specified by option <code>rangeThresh</code>), and if so, fits a kernel regression with cross-validated bandwidth selection via the <code>npregbw</code> function. The output is then formatted in a specific way so that <code>drtmle</code> is able to retrieve the appropriate objects from the fitted regression. In particular the output should be a list with named objects <code>pred</code> and <code>fit</code>; the former including predictions made from the fitted regression on <code>newX</code>, the latter including any information that may be needed to predict new values based on the fitted object. A class is assigned to the <code>fit</code> object, so that an S3 <code>predict</code> method may later be used to predict new values based on the fitted regression object. The user must also specify this <code>predict</code> method. Use <code>drtmle:::predict.SL.npreg</code> to view the simple <code>predict</code> method for <code>SL.npreg</code>.</p>
 <p>In the code below, we demonstrate a call to <code>drtmle</code> with <code>SL.npreg</code> used to estimate each nuisance parameter. Here, we also illustrate the use of <code>stratify = TRUE</code>, which fits a separate kernel regression of <span class="math inline">\(Y\)</span> onto <span class="math inline">\(W\)</span> in observations with <span class="math inline">\(A = 1\)</span> and <span class="math inline">\(A = 0\)</span>.</p>
@@ -307,7 +306,7 @@ g_{r,n,2}^*(a \mid W_i) \ \{Y_i - \bar{Q}_n^*(a,W_i)\} = 0 \ ,
 ##               1             0
 ## 1  1.676054e-03 -1.026998e-05
 ## 0 -1.026998e-05  3.927620e-03</code></pre>
-<p>The <code>drtmle</code> package also allows users to pass in their own estimated outcome regression and propensity score via the <code>Qn</code> and <code>gn</code> options, respectively. If <code>Qn</code> is specified by the user, <code>drtmle</code> will ignore the nuisance parameter estimation routines specified by <code>SL_Q</code> and <code>glm_Q</code> – similarly for <code>gn</code> and <code>SL_g</code>, <code>glm_g</code>. As noted in the package documentation, there is a specific format necessary for inputting <code>Qn</code> and <code>gn</code>. For <code>Qn</code>, the entries in the list should correspond to the outcome regression evaluated at A and the observed values of <code>W</code>, with order determined by the input to <code>a_0</code>. For example, if <code>a_0 = c(0, 1)</code> then <code>Qn[[1]]</code> should be outcome regression at <span class="math inline">\(A = 0\)</span> and <code>Qn[[2]]</code> should be outcome regression at <span class="math inline">\(A = 1\)</span>. The example below illustrates this concept.</p>
+<p>The <code>drtmle</code> package also allows users to pass in their own estimated OR and PS via the <code>Qn</code> and <code>gn</code> options, respectively. If <code>Qn</code> is specified by the user, <code>drtmle</code> will ignore the nuisance parameter estimation routines specified by <code>SL_Q</code> and <code>glm_Q</code> – similarly for <code>gn</code> and <code>SL_g</code>, <code>glm_g</code>. As noted in the package documentation, there is a specific format necessary for inputting <code>Qn</code> and <code>gn</code>. For <code>Qn</code>, the entries in the list should correspond to the OR evaluated at A and the observed values of <code>W</code>, with order determined by the input to <code>a_0</code>. For example, if <code>a_0 = c(0, 1)</code> then <code>Qn[[1]]</code> should be OR at <span class="math inline">\(A = 0\)</span> and <code>Qn[[2]]</code> should be outcome regression at <span class="math inline">\(A = 1\)</span>. The example below illustrates this concept.</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1"><span class="co"># fit a GLM for outcome regression outside of drtmle</span></a>
 <a class="sourceLine" id="cb15-2" data-line-number="2">out_glm_fit &lt;-<span class="st"> </span><span class="kw">glm</span>(Y <span class="op">~</span><span class="st"> </span>. , <span class="dt">data =</span> <span class="kw">data.frame</span>(<span class="dt">A =</span> A, W), <span class="dt">family =</span> <span class="kw">binomial</span>())</a>
 <a class="sourceLine" id="cb15-3" data-line-number="3"></a>
@@ -519,13 +518,70 @@ f(h(\psi_n))} \ .
 <div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" data-line-number="1">mixed_fit_wNAs</a></code></pre></div>
 <pre><code>## $est
 ##            
-## 1 0.7015634
-## 0 0.5277863
+## 1 0.7015883
+## 0 0.5279045
 ## 
 ## $cov
 ##               1             0
-## 1  1.915210e-03 -3.348101e-05
-## 0 -3.348101e-05  4.832453e-03</code></pre>
+## 1  1.915531e-03 -3.342393e-05
+## 0 -3.342393e-05  4.837798e-03</code></pre>
+<p>We can also fit the PS regressions externally and pass in via <code>gn</code>, though this process is slightly more complicated than when no missing data are present. The basic idea is to fit one regression for (i) the indicator of missing <span class="math inline">\(A\)</span>, (ii) <span class="math inline">\(A\)</span> itself, and (iii) the indicator of missing the outcome. The three PS’s are then multiplied together and an appropriately ordered list is constructed as before. We illustrate with the following simple example.</p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" data-line-number="1"><span class="co"># first regress indicator of missing A on W</span></a>
+<a class="sourceLine" id="cb46-2" data-line-number="2">fit_DeltaA &lt;-<span class="st"> </span><span class="kw">glm</span>(DeltaA <span class="op">~</span><span class="st"> </span>. , <span class="dt">data =</span> W, <span class="dt">family =</span> <span class="kw">binomial</span>())</a>
+<a class="sourceLine" id="cb46-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb46-4" data-line-number="4"><span class="co"># get estimated propensity for observing A</span></a>
+<a class="sourceLine" id="cb46-5" data-line-number="5">ps_DeltaA &lt;-<span class="st"> </span><span class="kw">predict</span>(fit_DeltaA, <span class="dt">type =</span> <span class="st">"response"</span>)</a>
+<a class="sourceLine" id="cb46-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb46-7" data-line-number="7"><span class="co"># now regress A on W | DeltaA = 1</span></a>
+<a class="sourceLine" id="cb46-8" data-line-number="8">fit_A &lt;-<span class="st"> </span><span class="kw">glm</span>(A[DeltaA <span class="op">==</span><span class="st"> </span><span class="dv">1</span>] <span class="op">~</span><span class="st"> </span>. , <span class="dt">data =</span> W[DeltaA <span class="op">==</span><span class="st"> </span><span class="dv">1</span>, , <span class="dt">drop =</span> <span class="ot">FALSE</span>], </a>
+<a class="sourceLine" id="cb46-9" data-line-number="9">             <span class="dt">family =</span> <span class="kw">binomial</span>())</a>
+<a class="sourceLine" id="cb46-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb46-11" data-line-number="11"><span class="co"># get estimated propensity for receiving A = 1</span></a>
+<a class="sourceLine" id="cb46-12" data-line-number="12">ps_A1 &lt;-<span class="st"> </span><span class="kw">predict</span>(fit_A, <span class="dt">newdata =</span> W, <span class="dt">type =</span> <span class="st">"response"</span>)</a>
+<a class="sourceLine" id="cb46-13" data-line-number="13"><span class="co"># propensity for receiving A = 0</span></a>
+<a class="sourceLine" id="cb46-14" data-line-number="14">ps_A0 &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span>ps_A1</a>
+<a class="sourceLine" id="cb46-15" data-line-number="15"></a>
+<a class="sourceLine" id="cb46-16" data-line-number="16"><span class="co"># now regress DeltaY on A + W | DeltaA = 1. Here we are pooling over </span></a>
+<a class="sourceLine" id="cb46-17" data-line-number="17"><span class="co"># values of A (i.e., this is what drtmle does if stratify = FALSE). </span></a>
+<a class="sourceLine" id="cb46-18" data-line-number="18"><span class="co"># We could also fit two regressions, one of DeltaY ~ W | DeltaA = 1, A = 1</span></a>
+<a class="sourceLine" id="cb46-19" data-line-number="19"><span class="co"># and one of DeltaY ~ W | DeltaA = 1, A = 0 (this is what drtmle does if</span></a>
+<a class="sourceLine" id="cb46-20" data-line-number="20"><span class="co"># stratify = TRUE). </span></a>
+<a class="sourceLine" id="cb46-21" data-line-number="21">fit_DeltaY &lt;-<span class="st"> </span><span class="kw">glm</span>(DeltaY[DeltaA <span class="op">==</span><span class="st"> </span><span class="dv">1</span>] <span class="op">~</span><span class="st"> </span>. , </a>
+<a class="sourceLine" id="cb46-22" data-line-number="22">                  <span class="dt">data =</span> <span class="kw">data.frame</span>(<span class="dt">A =</span> A, W)[DeltaA <span class="op">==</span><span class="st"> </span><span class="dv">1</span>, ], </a>
+<a class="sourceLine" id="cb46-23" data-line-number="23">                  <span class="dt">family =</span> <span class="kw">binomial</span>())</a>
+<a class="sourceLine" id="cb46-24" data-line-number="24"></a>
+<a class="sourceLine" id="cb46-25" data-line-number="25"><span class="co"># get estimated propensity for observing outcome if A = 1</span></a>
+<a class="sourceLine" id="cb46-26" data-line-number="26">ps_DeltaY_A1 &lt;-<span class="st"> </span><span class="kw">predict</span>(fit_DeltaY, <span class="dt">newdata =</span> <span class="kw">data.frame</span>(<span class="dt">A =</span> <span class="dv">1</span>, W), </a>
+<a class="sourceLine" id="cb46-27" data-line-number="27">                        <span class="dt">type =</span> <span class="st">"response"</span>)</a>
+<a class="sourceLine" id="cb46-28" data-line-number="28"></a>
+<a class="sourceLine" id="cb46-29" data-line-number="29"><span class="co"># get estimated propensity for observing outcome if A = 0</span></a>
+<a class="sourceLine" id="cb46-30" data-line-number="30">ps_DeltaY_A0 &lt;-<span class="st"> </span><span class="kw">predict</span>(fit_DeltaY, <span class="dt">newdata =</span> <span class="kw">data.frame</span>(<span class="dt">A =</span> <span class="dv">0</span>, W), </a>
+<a class="sourceLine" id="cb46-31" data-line-number="31">                        <span class="dt">type =</span> <span class="st">"response"</span>)</a>
+<a class="sourceLine" id="cb46-32" data-line-number="32"></a>
+<a class="sourceLine" id="cb46-33" data-line-number="33"><span class="co"># now combine all results into a single propensity score </span></a>
+<a class="sourceLine" id="cb46-34" data-line-number="34">gn &lt;-<span class="st"> </span><span class="kw">list</span>(</a>
+<a class="sourceLine" id="cb46-35" data-line-number="35">  <span class="co"># propensity for DeltaA = 1, A = 1, DeltaY = 1</span></a>
+<a class="sourceLine" id="cb46-36" data-line-number="36">  ps_DeltaA <span class="op">*</span><span class="st"> </span>ps_A1 <span class="op">*</span><span class="st"> </span>ps_DeltaY_A1,</a>
+<a class="sourceLine" id="cb46-37" data-line-number="37">  <span class="co"># propensity for DeltaA = 1, A = 0, DeltaY = 1</span></a>
+<a class="sourceLine" id="cb46-38" data-line-number="38">  ps_DeltaA <span class="op">*</span><span class="st"> </span>ps_A0 <span class="op">*</span><span class="st"> </span>ps_DeltaY_A0</a>
+<a class="sourceLine" id="cb46-39" data-line-number="39">)</a>
+<a class="sourceLine" id="cb46-40" data-line-number="40"></a>
+<a class="sourceLine" id="cb46-41" data-line-number="41"><span class="co"># pass in this gn to drtmle</span></a>
+<a class="sourceLine" id="cb46-42" data-line-number="42">out_fit_ps &lt;-<span class="st">  </span><span class="kw"><a href="../reference/drtmle.html">drtmle</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">stratify =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb46-43" data-line-number="43">                      <span class="co"># make sure a_0/gn are ordered properly!</span></a>
+<a class="sourceLine" id="cb46-44" data-line-number="44">                      <span class="dt">gn =</span> gn, <span class="dt">a_0 =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">0</span>),</a>
+<a class="sourceLine" id="cb46-45" data-line-number="45">                      <span class="dt">glm_Q =</span> <span class="st">"W1 + W2*A"</span>, <span class="dt">glm_Qr =</span> <span class="st">"gn"</span>,</a>
+<a class="sourceLine" id="cb46-46" data-line-number="46">                      <span class="dt">glm_gr =</span> <span class="st">"Qn"</span>, <span class="dt">family =</span> <span class="kw">binomial</span>())</a>
+<a class="sourceLine" id="cb46-47" data-line-number="47">out_fit_ps</a></code></pre></div>
+<pre><code>## $est
+##            
+## 1 0.6981474
+## 0 0.5297087
+## 
+## $cov
+##               1             0
+## 1  1.946403e-03 -3.229221e-05
+## 0 -3.229221e-05  5.040662e-03</code></pre>
 </div>
 <div id="multi-level-treatments" class="section level2">
 <h2 class="hasAnchor">
@@ -533,17 +589,17 @@ f(h(\psi_n))} \ .
 <p>So far in our examples, we have only considered binary treatments. However, <code>drtmle</code> is equipped to handle treatments with an arbitrary number of discrete values. Suppose that <span class="math inline">\(A\)</span> assumes values in a set <span class="math inline">\(\mathcal{A}\)</span>, the PS regression estimation is modified to ensure that <span class="math display">\[
   \sum\limits_{a \in \mathcal{A}} g_n(a \mid w) = 1 \ \mbox{for all $w$} \ .
 \]</span> If this condition is true, we say that the estimates of the PS are compatible. Many regression methodologies that have been developed work well with binary outcomes, but have not been extended to multi-level outcomes. To ensure that users of <code>drtmle</code> have access to the large number of binary regression techniques when estimating the PS, we have taken an alternative approach to estimation of the propensity for each level of the treatment. Specifically, rather than fitting a single multinomial-type regression, we fit a series of binomial regressions. As a concrete example, consider the case of no missing data and where <span class="math inline">\(\mathcal{A} = \{0,1,2\}\)</span>. We can ensure compatible estimates of the PS by generating an estimate <span class="math inline">\(g_n(0 \mid w)\)</span> of <span class="math inline">\(Pr_0(A = 0 \mid W = w)\)</span> and <span class="math inline">\(\tilde{g}_n(1 \mid w)\)</span> of <span class="math inline">\(Pr_0(A = 1 \mid A &gt; 0, W = w)\)</span>. The latter estimate may be generated by regression <span class="math inline">\(I(A = 1)\)</span> on <span class="math inline">\(W\)</span> in observations with <span class="math inline">\(A &gt; 0\)</span>. Because the outcome is binary, this regression may be estimated using any technique suitable for binary outcomes. By simple rules of conditional probability, we know that <span class="math inline">\(g_0(1 \mid w) = Pr_0(A = 1 \mid A &gt; 0, W = w)\{1 - Pr_0(A = 0 \mid W)\}\)</span> and thus an estimate of <span class="math inline">\(g_0(1 \mid w)\)</span> can be computed as <span class="math inline">\(g_n(1 \mid w) = \tilde{g}_n(1 \mid w) \{1 - g_n(0 \mid w)\}\)</span>. Finally, we let <span class="math inline">\(g_n(2 \mid w) = 1 - g_n(0 \mid w) - g_n(1 \mid w)\)</span>, which ensures compatibility of the estimates for each level of covariates. This approach generalizes to an arbitrary number of treatment levels. Below, we provide an illustration using simulated data with a treatment that has three levels. The true parameter values in this simulation are <span class="math inline">\(\psi_0(0)=\)</span> 0.62, <span class="math inline">\(\psi_0(1)=\)</span> 0.72, and <span class="math inline">\(\psi_0(2)=\)</span> 0.77.</p>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">1234</span>)</a>
-<a class="sourceLine" id="cb46-2" data-line-number="2">n &lt;-<span class="st"> </span><span class="dv">200</span></a>
-<a class="sourceLine" id="cb46-3" data-line-number="3">W &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">W1 =</span> <span class="kw">runif</span>(n), <span class="dt">W2 =</span> <span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.5</span>))</a>
-<a class="sourceLine" id="cb46-4" data-line-number="4">A &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">2</span>, <span class="kw">plogis</span>(W<span class="op">$</span>W1 <span class="op">+</span><span class="st"> </span>W<span class="op">$</span>W2))</a>
-<a class="sourceLine" id="cb46-5" data-line-number="5">Y &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="kw">plogis</span>(W<span class="op">$</span>W1 <span class="op">+</span><span class="st"> </span>W<span class="op">$</span>W2<span class="op">*</span>A))</a></code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">1234</span>)</a>
+<a class="sourceLine" id="cb48-2" data-line-number="2">n &lt;-<span class="st"> </span><span class="dv">200</span></a>
+<a class="sourceLine" id="cb48-3" data-line-number="3">W &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">W1 =</span> <span class="kw">runif</span>(n), <span class="dt">W2 =</span> <span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.5</span>))</a>
+<a class="sourceLine" id="cb48-4" data-line-number="4">A &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">2</span>, <span class="kw">plogis</span>(W<span class="op">$</span>W1 <span class="op">+</span><span class="st"> </span>W<span class="op">$</span>W2))</a>
+<a class="sourceLine" id="cb48-5" data-line-number="5">Y &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="kw">plogis</span>(W<span class="op">$</span>W1 <span class="op">+</span><span class="st"> </span>W<span class="op">$</span>W2<span class="op">*</span>A))</a></code></pre></div>
 <p>The multi-level PS can still be estimated using any of the three techniques discussed previously. Here, we illustrate with simple generalized linear models.</p>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb47-1" data-line-number="1">glm_fit_multiA &lt;-<span class="st"> </span><span class="kw"><a href="../reference/drtmle.html">drtmle</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">stratify =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb47-2" data-line-number="2">                         <span class="dt">glm_g =</span> <span class="st">"W1 + W2"</span>, <span class="dt">glm_Q =</span> <span class="st">"W1 + W2*A"</span>,</a>
-<a class="sourceLine" id="cb47-3" data-line-number="3">                         <span class="dt">glm_gr =</span> <span class="st">"Qn"</span>, <span class="dt">glm_Qr =</span> <span class="st">"gn"</span>,</a>
-<a class="sourceLine" id="cb47-4" data-line-number="4">                         <span class="dt">family =</span> <span class="kw">binomial</span>(), <span class="dt">a_0 =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>))</a>
-<a class="sourceLine" id="cb47-5" data-line-number="5">glm_fit_multiA</a></code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" data-line-number="1">glm_fit_multiA &lt;-<span class="st"> </span><span class="kw"><a href="../reference/drtmle.html">drtmle</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">stratify =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb49-2" data-line-number="2">                         <span class="dt">glm_g =</span> <span class="st">"W1 + W2"</span>, <span class="dt">glm_Q =</span> <span class="st">"W1 + W2*A"</span>,</a>
+<a class="sourceLine" id="cb49-3" data-line-number="3">                         <span class="dt">glm_gr =</span> <span class="st">"Qn"</span>, <span class="dt">glm_Qr =</span> <span class="st">"gn"</span>,</a>
+<a class="sourceLine" id="cb49-4" data-line-number="4">                         <span class="dt">family =</span> <span class="kw">binomial</span>(), <span class="dt">a_0 =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb49-5" data-line-number="5">glm_fit_multiA</a></code></pre></div>
 <pre><code>## $est
 ##            
 ## 0 0.4563335
@@ -557,43 +613,43 @@ f(h(\psi_n))} \ .
 ## 2 -6.660173e-05  6.376441e-05  2.531909e-03</code></pre>
 <p>Above, we used the option <code>a_0</code> to specify the levels of the treatment at which we were interested in estimating marginal means. There is no need for <code>a_0</code> to contain all unique values of <code>A</code>. For example, certain levels of the treatment may not be of scientific interest, but nevertheless we would like to use these data to help estimate the OR and PS (by setting <code>stratify = FALSE</code>).</p>
 <p>The confidence interval and testing procedures extend to multi-level treatments with minor modifications. We can still obtain a confidence interval and hypothesis test for each of the marginal means by not specifying a <code>contrast</code>.</p>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" data-line-number="1"><span class="kw"><a href="../reference/ci.html">ci</a></span>(glm_fit_multiA)</a></code></pre></div>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" data-line-number="1"><span class="kw"><a href="../reference/ci.html">ci</a></span>(glm_fit_multiA)</a></code></pre></div>
 <pre><code>## $drtmle
 ##     est   cil   ciu
 ## 0 0.456 0.218 0.695
 ## 1 0.736 0.644 0.827
 ## 2 0.796 0.697 0.895</code></pre>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" data-line-number="1"><span class="kw"><a href="../reference/wald_test.html">wald_test</a></span>(glm_fit_multiA, <span class="dt">null =</span> <span class="kw">c</span>(<span class="fl">0.4</span>, <span class="fl">0.5</span>, <span class="fl">0.6</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb53-1" data-line-number="1"><span class="kw"><a href="../reference/wald_test.html">wald_test</a></span>(glm_fit_multiA, <span class="dt">null =</span> <span class="kw">c</span>(<span class="fl">0.4</span>, <span class="fl">0.5</span>, <span class="fl">0.6</span>))</a></code></pre></div>
 <pre><code>## $drtmle
 ##                 zstat  pval
 ## H0: E[Y(0)]=0.4 0.462 0.644
 ## H0: E[Y(1)]=0.5 5.051 0.000
 ## H0: E[Y(2)]=0.6 3.896 0.000</code></pre>
 <p>Alternatively, we can specify a <code>contrast</code> to estimate confidence intervals about the average treatment effect of <span class="math inline">\(A=1\)</span> vs. <span class="math inline">\(A=0\)</span>. Calls to <code>wald_test</code> can also be made.</p>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb53-1" data-line-number="1"><span class="kw"><a href="../reference/ci.html">ci</a></span>(glm_fit_multiA, <span class="dt">contrast =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb55-1" data-line-number="1"><span class="kw"><a href="../reference/ci.html">ci</a></span>(glm_fit_multiA, <span class="dt">contrast =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>))</a></code></pre></div>
 <pre><code>## $drtmle
 ##                   est   cil   ciu
 ## E[Y(1)]-E[Y(0)] 0.279 0.023 0.536</code></pre>
 <p>Similarly, we can compute confidence intervals comparing the average treatment effect of <span class="math inline">\(A = 2\)</span> vs. <span class="math inline">\(A = 0\)</span>.</p>
-<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb55-1" data-line-number="1"><span class="kw"><a href="../reference/ci.html">ci</a></span>(glm_fit_multiA, <span class="dt">contrast =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb57-1" data-line-number="1"><span class="kw"><a href="../reference/ci.html">ci</a></span>(glm_fit_multiA, <span class="dt">contrast =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>))</a></code></pre></div>
 <pre><code>## $drtmle
 ##                  est  cil   ciu
 ## E[Y(2)]-E[Y(0)] 0.34 0.08 0.599</code></pre>
 <p>The user-specified contrasts are also available. For example, we can modify the <code>riskRatio</code> object we used previously for a two-level treatment to compute the risk ratio comparing <span class="math inline">\(A=1\)</span> to <span class="math inline">\(A=0\)</span> and comparing <span class="math inline">\(A = 2\)</span> to <span class="math inline">\(A = 0\)</span>.</p>
-<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb57-1" data-line-number="1">riskRatio_1v0 &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">f =</span> <span class="cf">function</span>(eff){ <span class="kw">log</span>(eff) },</a>
-<a class="sourceLine" id="cb57-2" data-line-number="2">                      <span class="dt">f_inv =</span> <span class="cf">function</span>(eff){ <span class="kw">exp</span>(eff) },</a>
-<a class="sourceLine" id="cb57-3" data-line-number="3">                      <span class="dt">h =</span> <span class="cf">function</span>(est){ est[<span class="dv">2</span>]<span class="op">/</span>est[<span class="dv">1</span>] },</a>
-<a class="sourceLine" id="cb57-4" data-line-number="4">                      <span class="dt">fh_grad =</span>  <span class="cf">function</span>(est){ <span class="kw">c</span>(<span class="dv">1</span><span class="op">/</span>est[<span class="dv">2</span>], <span class="dv">-1</span><span class="op">/</span>est[<span class="dv">1</span>], <span class="dv">0</span>) })</a>
-<a class="sourceLine" id="cb57-5" data-line-number="5"><span class="kw"><a href="../reference/ci.html">ci</a></span>(glm_fit_multiA, <span class="dt">contrast =</span> riskRatio_1v0)</a></code></pre></div>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb59-1" data-line-number="1">riskRatio_1v0 &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">f =</span> <span class="cf">function</span>(eff){ <span class="kw">log</span>(eff) },</a>
+<a class="sourceLine" id="cb59-2" data-line-number="2">                      <span class="dt">f_inv =</span> <span class="cf">function</span>(eff){ <span class="kw">exp</span>(eff) },</a>
+<a class="sourceLine" id="cb59-3" data-line-number="3">                      <span class="dt">h =</span> <span class="cf">function</span>(est){ est[<span class="dv">2</span>]<span class="op">/</span>est[<span class="dv">1</span>] },</a>
+<a class="sourceLine" id="cb59-4" data-line-number="4">                      <span class="dt">fh_grad =</span>  <span class="cf">function</span>(est){ <span class="kw">c</span>(<span class="dv">1</span><span class="op">/</span>est[<span class="dv">2</span>], <span class="dv">-1</span><span class="op">/</span>est[<span class="dv">1</span>], <span class="dv">0</span>) })</a>
+<a class="sourceLine" id="cb59-5" data-line-number="5"><span class="kw"><a href="../reference/ci.html">ci</a></span>(glm_fit_multiA, <span class="dt">contrast =</span> riskRatio_1v0)</a></code></pre></div>
 <pre><code>## $drtmle
 ##                 est cil   ciu
 ## user contrast 1.612 1.1 2.363</code></pre>
 <p>Similarly, we can compute confidence intervals for the risk ratio comparing the marginal mean for <span class="math inline">\(A=2\)</span> to <span class="math inline">\(A=1\)</span>.</p>
-<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb59-1" data-line-number="1">riskRatio_2v0 &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">f =</span> <span class="cf">function</span>(eff){ <span class="kw">log</span>(eff) },</a>
-<a class="sourceLine" id="cb59-2" data-line-number="2">                      <span class="dt">f_inv =</span> <span class="cf">function</span>(eff){ <span class="kw">exp</span>(eff) },</a>
-<a class="sourceLine" id="cb59-3" data-line-number="3">                      <span class="dt">h =</span> <span class="cf">function</span>(est){ est[<span class="dv">3</span>]<span class="op">/</span>est[<span class="dv">1</span>] },</a>
-<a class="sourceLine" id="cb59-4" data-line-number="4">                      <span class="dt">fh_grad =</span>  <span class="cf">function</span>(est){ <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">-1</span><span class="op">/</span>est[<span class="dv">1</span>], <span class="dv">1</span><span class="op">/</span>est[<span class="dv">3</span>]) })</a>
-<a class="sourceLine" id="cb59-5" data-line-number="5"><span class="kw"><a href="../reference/ci.html">ci</a></span>(glm_fit_multiA, <span class="dt">contrast =</span> riskRatio_2v0)</a></code></pre></div>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb61-1" data-line-number="1">riskRatio_2v0 &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">f =</span> <span class="cf">function</span>(eff){ <span class="kw">log</span>(eff) },</a>
+<a class="sourceLine" id="cb61-2" data-line-number="2">                      <span class="dt">f_inv =</span> <span class="cf">function</span>(eff){ <span class="kw">exp</span>(eff) },</a>
+<a class="sourceLine" id="cb61-3" data-line-number="3">                      <span class="dt">h =</span> <span class="cf">function</span>(est){ est[<span class="dv">3</span>]<span class="op">/</span>est[<span class="dv">1</span>] },</a>
+<a class="sourceLine" id="cb61-4" data-line-number="4">                      <span class="dt">fh_grad =</span>  <span class="cf">function</span>(est){ <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">-1</span><span class="op">/</span>est[<span class="dv">1</span>], <span class="dv">1</span><span class="op">/</span>est[<span class="dv">3</span>]) })</a>
+<a class="sourceLine" id="cb61-5" data-line-number="5"><span class="kw"><a href="../reference/ci.html">ci</a></span>(glm_fit_multiA, <span class="dt">contrast =</span> riskRatio_2v0)</a></code></pre></div>
 <pre><code>## $drtmle
 ##                 est   cil   ciu
 ## user contrast 1.744 1.382 2.202</code></pre>
@@ -602,12 +658,12 @@ f(h(\psi_n))} \ .
 <h2 class="hasAnchor">
 <a href="#cross-validated-regression-estimates" class="anchor"></a>Cross-validated regression estimates</h2>
 <p>When considering adaptive estimation techniques, one runs the risk of overfitting the initial regressions. While the cross validation used by super learning attempts to guard against overfitting, there are no guarantees in finite-samples. To definitively avoid such overfitting, one can use cross-validated estimates of the regression parameters. Theoretically, the use of cross-validated regression weakens the assumptions necessary to achieve asymptotic normality <span class="citation">(Zheng and van der Laan 2010)</span>. This is true of the regular TMLE and AIPTW, as well as of the TMLE estimator with doubly-robust inference. The <code>drtmle</code> function implements cross-validated estimation of the regression parameters through the <code>cvFolds</code> option, as shown in the code below, where we continue with the multi-level treatment example.</p>
-<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb61-1" data-line-number="1">cv_sl_fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/drtmle.html">drtmle</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">family =</span> <span class="kw">binomial</span>(),</a>
-<a class="sourceLine" id="cb61-2" data-line-number="2">                    <span class="dt">SL_g =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.glm.interaction"</span>, <span class="st">"SL.earth"</span>),</a>
-<a class="sourceLine" id="cb61-3" data-line-number="3">                    <span class="dt">SL_Q =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.glm.interaction"</span>, <span class="st">"SL.earth"</span>),</a>
-<a class="sourceLine" id="cb61-4" data-line-number="4">                    <span class="dt">SL_gr =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.earth"</span>, <span class="st">"SL.mean"</span>),</a>
-<a class="sourceLine" id="cb61-5" data-line-number="5">                    <span class="dt">SL_Qr =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.earth"</span>, <span class="st">"SL.mean"</span>),</a>
-<a class="sourceLine" id="cb61-6" data-line-number="6">                    <span class="dt">stratify =</span> <span class="ot">FALSE</span>, <span class="dt">cvFolds =</span> <span class="dv">2</span>, <span class="dt">a_0 =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb63-1" data-line-number="1">cv_sl_fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/drtmle.html">drtmle</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">family =</span> <span class="kw">binomial</span>(),</a>
+<a class="sourceLine" id="cb63-2" data-line-number="2">                    <span class="dt">SL_g =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.glm.interaction"</span>, <span class="st">"SL.earth"</span>),</a>
+<a class="sourceLine" id="cb63-3" data-line-number="3">                    <span class="dt">SL_Q =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.glm.interaction"</span>, <span class="st">"SL.earth"</span>),</a>
+<a class="sourceLine" id="cb63-4" data-line-number="4">                    <span class="dt">SL_gr =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.earth"</span>, <span class="st">"SL.mean"</span>),</a>
+<a class="sourceLine" id="cb63-5" data-line-number="5">                    <span class="dt">SL_Qr =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.earth"</span>, <span class="st">"SL.mean"</span>),</a>
+<a class="sourceLine" id="cb63-6" data-line-number="6">                    <span class="dt">stratify =</span> <span class="ot">FALSE</span>, <span class="dt">cvFolds =</span> <span class="dv">2</span>, <span class="dt">a_0 =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>))</a></code></pre></div>
 <pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
 
 ## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
@@ -666,7 +722,7 @@ f(h(\psi_n))} \ .
 ## Algorithm 3 is duplicated. Setting weight to 0.</code></pre>
 <pre><code>## Warning in (function (a, train_g, train_Q, valid_g, valid_Q) : Only one
 ## unique value of gn0. Using empirical average as Qr estimate.</code></pre>
-<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb70-1" data-line-number="1">cv_sl_fit</a></code></pre></div>
+<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb72-1" data-line-number="1">cv_sl_fit</a></code></pre></div>
 <pre><code>## $est
 ##            
 ## 0 0.4685540
@@ -680,39 +736,40 @@ f(h(\psi_n))} \ .
 ## 2 -5.029384e-05  1.269615e-05  2.376152e-03</code></pre>
 <p>Cross-validation may significantly increase the computation time necessary for running <code>drtmle</code>. Parallelized regression fitting is available by setting the option <code>parallel = TRUE</code>. Since, internally, all computations are carried out using futures (with the API provided by the “future” R package), setting this option amounts only to parallelizing with futures <span class="citation">(Bengtsson 2017a)</span> via <code>future::lapply</code>. Selecting this option results in parallelization of the estimation of the OR, PS, and reduced-dimension regressions.</p>
 <p>If no adjustments are made prior to invoking the <code>drtmle</code> function, futures are computed using the <code>multiprocess</code> option, which performs computations in forked R processes (non-Windows systems) or spawns and uses background R sessions on the current machine. The setup also allows users to specify appropriate system-specific back-ends that may better suit their problem using the <code>future.batchtools</code> package <span class="citation">(Bengtsson 2017b)</span>. Below we demonstrate registration using an ad-hoc cluster on the local system. The choice of back-end is flexible, and submission of the job to a wide variety of schedulers (e.g., SLURM, TORQUE, etc.) is also permitted. Interested readers are invited to consult the documentation of the <code>future.batchtools</code> package for further information.</p>
-<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb72-1" data-line-number="1"><span class="kw">library</span>(future.batchtools)</a>
-<a class="sourceLine" id="cb72-2" data-line-number="2"><span class="kw">library</span>(parallel)</a>
-<a class="sourceLine" id="cb72-3" data-line-number="3">cl &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/parallel/topics/makeCluster">makeCluster</a></span>(<span class="dv">2</span>, <span class="dt">type =</span> <span class="st">"SOCK"</span>)</a>
-<a class="sourceLine" id="cb72-4" data-line-number="4"><span class="kw">plan</span>(cluster, <span class="dt">workers =</span> cl)</a>
-<a class="sourceLine" id="cb72-5" data-line-number="5"><span class="kw"><a href="http://www.rdocumentation.org/packages/parallel/topics/clusterApply">clusterEvalQ</a></span>(cl, <span class="kw">library</span>(<span class="st">"SuperLearner"</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb74-1" data-line-number="1"><span class="kw">library</span>(future.batchtools)</a>
+<a class="sourceLine" id="cb74-2" data-line-number="2"><span class="kw">library</span>(parallel)</a>
+<a class="sourceLine" id="cb74-3" data-line-number="3">cl &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/parallel/topics/makeCluster">makeCluster</a></span>(<span class="dv">2</span>, <span class="dt">type =</span> <span class="st">"SOCK"</span>)</a>
+<a class="sourceLine" id="cb74-4" data-line-number="4"><span class="kw">plan</span>(cluster, <span class="dt">workers =</span> cl)</a>
+<a class="sourceLine" id="cb74-5" data-line-number="5"><span class="kw"><a href="http://www.rdocumentation.org/packages/parallel/topics/clusterApply">clusterEvalQ</a></span>(cl, <span class="kw">library</span>(<span class="st">"SuperLearner"</span>))</a></code></pre></div>
 <pre><code>## [[1]]
-##  [1] "SuperLearner" "nnls"         "snow"         "stats"       
-##  [5] "graphics"     "grDevices"    "utils"        "datasets"    
-##  [9] "methods"      "base"        
+##  [1] "SuperLearner" "nnls"         "snow"         "methods"     
+##  [5] "stats"        "graphics"     "grDevices"    "utils"       
+##  [9] "datasets"     "base"        
 ## 
 ## [[2]]
-##  [1] "SuperLearner" "nnls"         "snow"         "stats"       
-##  [5] "graphics"     "grDevices"    "utils"        "datasets"    
-##  [9] "methods"      "base"</code></pre>
-<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb74-1" data-line-number="1">pcv_sl_fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/drtmle.html">drtmle</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">family =</span> <span class="kw">binomial</span>(),</a>
-<a class="sourceLine" id="cb74-2" data-line-number="2">                     <span class="dt">SL_g =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.glm.interaction"</span>,<span class="st">"SL.earth"</span>),</a>
-<a class="sourceLine" id="cb74-3" data-line-number="3">                     <span class="dt">SL_Q =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.glm.interaction"</span>,<span class="st">"SL.earth"</span>),</a>
-<a class="sourceLine" id="cb74-4" data-line-number="4">                     <span class="dt">SL_gr =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.earth"</span>, <span class="st">"SL.mean"</span>),</a>
-<a class="sourceLine" id="cb74-5" data-line-number="5">                     <span class="dt">SL_Qr =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.earth"</span>, <span class="st">"SL.mean"</span>),</a>
-<a class="sourceLine" id="cb74-6" data-line-number="6">                     <span class="dt">stratify =</span> <span class="ot">FALSE</span>, <span class="dt">a_0 =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>),</a>
-<a class="sourceLine" id="cb74-7" data-line-number="7">                     <span class="dt">cvFolds =</span> <span class="dv">2</span>, <span class="dt">parallel =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb74-8" data-line-number="8">pcv_sl_fit</a></code></pre></div>
+##  [1] "SuperLearner" "nnls"         "snow"         "methods"     
+##  [5] "stats"        "graphics"     "grDevices"    "utils"       
+##  [9] "datasets"     "base"</code></pre>
+<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb76-1" data-line-number="1">pcv_sl_fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/drtmle.html">drtmle</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">family =</span> <span class="kw">binomial</span>(),</a>
+<a class="sourceLine" id="cb76-2" data-line-number="2">                     <span class="dt">SL_g =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.glm.interaction"</span>,<span class="st">"SL.earth"</span>),</a>
+<a class="sourceLine" id="cb76-3" data-line-number="3">                     <span class="dt">SL_Q =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.glm.interaction"</span>,<span class="st">"SL.earth"</span>),</a>
+<a class="sourceLine" id="cb76-4" data-line-number="4">                     <span class="dt">SL_gr =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.earth"</span>, <span class="st">"SL.mean"</span>),</a>
+<a class="sourceLine" id="cb76-5" data-line-number="5">                     <span class="dt">SL_Qr =</span> <span class="kw">c</span>(<span class="st">"SL.glm"</span>, <span class="st">"SL.earth"</span>, <span class="st">"SL.mean"</span>),</a>
+<a class="sourceLine" id="cb76-6" data-line-number="6">                     <span class="dt">stratify =</span> <span class="ot">FALSE</span>, <span class="dt">a_0 =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>),</a>
+<a class="sourceLine" id="cb76-7" data-line-number="7">                     <span class="dt">cvFolds =</span> <span class="dv">2</span>, <span class="dt">parallel =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<pre><code>## earth glm Y: did not converge after 25 iterations</code></pre>
+<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb78-1" data-line-number="1">pcv_sl_fit</a></code></pre></div>
 <pre><code>## $est
 ##            
-## 0 0.5762917
-## 1 0.7285247
-## 2 0.8289446
+## 0 0.5548011
+## 1 0.7194747
+## 2 0.8060602
 ## 
 ## $cov
 ##               0             1             2
-## 0  0.0378971971 -1.877472e-04 -1.486993e-04
-## 1 -0.0001877472  2.318812e-03  1.098734e-05
-## 2 -0.0001486993  1.098734e-05  1.290025e-02</code></pre>
+## 0  0.0132724892 -8.819620e-05 -1.435394e-04
+## 1 -0.0000881962  2.421951e-03  4.037294e-05
+## 2 -0.0001435394  4.037294e-05  4.654205e-03</code></pre>
 </div>
 </div>
 <div id="inference-for-iptw-using-adaptive-ps-estimators" class="section level1">
@@ -729,10 +786,10 @@ W_i)} \ \{ I(A_i = a) - g_n(a \mid W = W_i)\} = 0 \ ,\]</span> then the IPTW est
 <h2 class="hasAnchor">
 <a href="#implementation-of-inference-for-adaptive-iptw" class="anchor"></a>Implementation of inference for adaptive IPTW</h2>
 <p>The IPTW estimators based on adaptive estimation of the PS are implemented in the <code>adaptive_iptw</code> function. The <code>adaptive_iptw</code> function shares many options with <code>drtmle</code>. However, as the IPTW estimator does not rely on an estimate of the OR, these options are omitted. We continue with the multilevel treatment example.</p>
-<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb76-1" data-line-number="1">npreg_iptw_multiA &lt;-<span class="st"> </span><span class="kw"><a href="../reference/adaptive_iptw.html">adaptive_iptw</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">stratify =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb76-2" data-line-number="2">                                   <span class="dt">SL_g =</span> <span class="st">"SL.npreg"</span>, <span class="dt">SL_Qr =</span> <span class="st">"SL.npreg"</span>,</a>
-<a class="sourceLine" id="cb76-3" data-line-number="3">                                   <span class="dt">family =</span> <span class="kw">binomial</span>(), <span class="dt">a_0 =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>))</a>
-<a class="sourceLine" id="cb76-4" data-line-number="4">npreg_iptw_multiA</a></code></pre></div>
+<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb80-1" data-line-number="1">npreg_iptw_multiA &lt;-<span class="st"> </span><span class="kw"><a href="../reference/adaptive_iptw.html">adaptive_iptw</a></span>(<span class="dt">W =</span> W, <span class="dt">A =</span> A, <span class="dt">Y =</span> Y, <span class="dt">stratify =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb80-2" data-line-number="2">                                   <span class="dt">SL_g =</span> <span class="st">"SL.npreg"</span>, <span class="dt">SL_Qr =</span> <span class="st">"SL.npreg"</span>,</a>
+<a class="sourceLine" id="cb80-3" data-line-number="3">                                   <span class="dt">family =</span> <span class="kw">binomial</span>(), <span class="dt">a_0 =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb80-4" data-line-number="4">npreg_iptw_multiA</a></code></pre></div>
 <pre><code>## $est
 ##            
 ## 0 0.4646874
@@ -741,9 +798,9 @@ W_i)} \ \{ I(A_i = a) - g_n(a \mid W = W_i)\} = 0 \ ,\]</span> then the IPTW est
 ## 
 ## $cov
 ##               0             1             2
-## 0  1.414746e-02 -3.045276e-05 -4.361112e-05
-## 1 -3.045276e-05  1.852370e-03  2.263181e-05
-## 2 -4.361112e-05  2.263181e-05  2.371208e-03</code></pre>
+## 0  1.414749e-02 -3.045271e-05 -4.361109e-05
+## 1 -3.045271e-05  1.852370e-03  2.263183e-05
+## 2 -4.361109e-05  2.263183e-05  2.371209e-03</code></pre>
 <p>The <code>"adaptive_iptw"</code> class contains identical methods for computing confidence intervals and Wald tests as the <code>"drtmle"</code> class and we refer readers back to confidence intervals and hypothesis tests section for reminders on the various options for these tests. By default, these methods are implemented for the <code>iptw_tmle</code> estimator of van der Laan (2014). We expect that this estimator will have improved finite-sample behavior relative to <code>iptw_os</code> (the alternative estimator described in the previous subsection), though further study is needed.</p>
 <p>As with <code>drtmle</code>, the <code>adaptive_iptw</code> function allows missing data in <code>A</code> and <code>Y</code>. Similarly, <code>adaptive_iptw</code> also allows for parallelized, cross-validated estimation of the regression parameters via <code>cvFolds</code> and <code>parallel</code> options. As with the estimators implemented in <code>drtmle</code>, cross-validation allows for valid inference under weaker assumptions.</p>
 </div>
@@ -757,104 +814,102 @@ W_i)} \ \{ I(A_i = a) - g_n(a \mid W = W_i)\} = 0 \ ,\]</span> then the IPTW est
 <div id="session-info" class="section level1">
 <h1 class="hasAnchor">
 <a href="#session-info" class="anchor"></a>Session Info</h1>
-<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb78-1" data-line-number="1"><span class="kw">sessionInfo</span>()</a></code></pre></div>
-<pre><code>## R version 3.5.1 (2018-07-02)
+<div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb82-1" data-line-number="1"><span class="kw">sessionInfo</span>()</a></code></pre></div>
+<pre><code>## R version 3.4.4 (2018-03-15)
 ## Platform: x86_64-apple-darwin15.6.0 (64-bit)
-## Running under: macOS High Sierra 10.13.4
+## Running under: macOS High Sierra 10.13.6
 ## 
 ## Matrix products: default
-## BLAS: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRblas.0.dylib
-## LAPACK: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRlapack.dylib
+## BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
+## LAPACK: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRlapack.dylib
 ## 
 ## locale:
 ## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
 ## 
 ## attached base packages:
-## [1] parallel  stats     graphics  grDevices utils     datasets  methods  
-## [8] base     
+## [1] parallel  stats     graphics  grDevices utils     datasets  base     
 ## 
 ## other attached packages:
-##  [1] future.batchtools_0.7.1 future_1.9.0           
-##  [3] earth_4.6.3             plotmo_3.4.2           
+##  [1] future.batchtools_0.6.0 future_1.9.0           
+##  [3] earth_4.6.3             plotmo_3.4.1           
 ##  [5] TeachingDemos_2.10      plotrix_3.7-2          
 ##  [7] quadprog_1.5-5          nloptr_1.0.4           
-##  [9] SuperLearner_2.0-24     nnls_1.4               
+##  [9] SuperLearner_2.0-23     nnls_1.4               
 ## [11] drtmle_1.0.3           
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] progress_1.2.0     listenv_0.7.0      lattice_0.20-35   
-##  [4] snow_0.4-2         htmltools_0.3.6    yaml_2.2.0        
-##  [7] rlang_0.2.1        pkgdown_1.1.0      withr_2.1.2       
-## [10] rappdirs_0.3.1     plyr_1.8.4         foreach_1.4.4     
+##  [1] progress_1.1.2     listenv_0.7.0      lattice_0.20-35   
+##  [4] snow_0.4-3         htmltools_0.3.6    yaml_2.1.19       
+##  [7] rlang_0.2.2        pkgdown_1.1.0      withr_2.1.2       
+## [10] rappdirs_0.3.1     foreach_1.4.4      plyr_1.8.4        
 ## [13] stringr_1.3.1      MatrixModels_0.4-1 commonmark_1.5    
-## [16] codetools_0.2-15   memoise_1.1.0      evaluate_0.11     
-## [19] knitr_1.20         SparseM_1.77       batchtools_0.9.11 
-## [22] quantreg_5.36      Rcpp_0.12.18       backports_1.1.2   
-## [25] checkmate_1.8.5    desc_1.2.0         doFuture_0.6.0    
-## [28] fs_1.2.5           brew_1.0-6         hms_0.4.2         
-## [31] digest_0.6.15      stringi_1.2.4      rprojroot_1.3-2   
-## [34] grid_3.5.1         tools_3.5.1        magrittr_1.5      
-## [37] base64url_1.4      np_0.60-8          crayon_1.3.4      
-## [40] future.apply_1.0.1 pkgconfig_2.0.2    MASS_7.3-50       
-## [43] Matrix_1.2-14      data.table_1.11.8  xml2_1.2.0        
-## [46] prettyunits_1.0.2  assertthat_0.2.0   rmarkdown_1.10    
-## [49] roxygen2_6.1.0     iterators_1.0.10   cubature_1.4      
-## [52] R6_2.2.2           globals_0.12.3     boot_1.3-20       
-## [55] compiler_3.5.1</code></pre>
+## [16] codetools_0.2-15   memoise_1.1.0      evaluate_0.10.1   
+## [19] knitr_1.20         SparseM_1.77       batchtools_0.9.8  
+## [22] quantreg_5.35      methods_3.4.4      Rcpp_0.12.18      
+## [25] backports_1.1.2    checkmate_1.8.5    desc_1.2.0        
+## [28] doFuture_0.6.0     fs_1.2.6           brew_1.0-6        
+## [31] digest_0.6.16      stringi_1.2.4      rprojroot_1.3-2   
+## [34] grid_3.4.4         tools_3.4.4        magrittr_1.5      
+## [37] base64url_1.3      np_0.60-8          crayon_1.3.4      
+## [40] future.apply_1.0.1 MASS_7.3-49        Matrix_1.2-12     
+## [43] data.table_1.11.4  xml2_1.2.0         prettyunits_1.0.2 
+## [46] assertthat_0.2.0   rmarkdown_1.10     roxygen2_6.1.0    
+## [49] iterators_1.0.10   cubature_1.3-11    R6_2.2.2          
+## [52] globals_0.12.2     boot_1.3-20        compiler_3.4.4</code></pre>
 <div id="refs" class="references">
 <div id="ref-futurePackage">
-<p>Bengtsson, Henrik. 2017a. <em>future: A Future API for R</em>. https://cran.r-project.org/web/packages/future. <a href="https://github.com/HenrikBengtsson/future" class="uri">https://github.com/HenrikBengtsson/future</a>.</p>
+<p>Bengtsson, Henrik. 2017a. <em>future: A Future API for R</em>. https://cran.r-project.org/web/packages/future. <a href="https://github.com/HenrikBengtsson/future">https://github.com/HenrikBengtsson/future</a>.</p>
 </div>
 <div id="ref-futurebatchtoolsPackage">
-<p>———. 2017b. <em>future.batchtools: A Future API for Parallel and Distributed Processing Using “Batchtools”</em>. https://cran.r-project.org/web/packages/future.batchtools. <a href="https://github.com/HenrikBengtsson/future.batchtools" class="uri">https://github.com/HenrikBengtsson/future.batchtools</a>.</p>
+<p>———. 2017b. <em>future.batchtools: A Future API for Parallel and Distributed Processing Using “Batchtools”</em>. https://cran.r-project.org/web/packages/future.batchtools. <a href="https://github.com/HenrikBengtsson/future.batchtools">https://github.com/HenrikBengtsson/future.batchtools</a>.</p>
 </div>
 <div id="ref-benkeser:2017:biometrika">
-<p>Benkeser, D, M Carone, M van der Laan, and P Gilbert. 2017. “Doubly-Robust Nonparametric Inference on the Average Treatment Effect.” <em>Biometrika</em>.</p>
+<p>Benkeser, D, M Carone, van der LaanM, and P Gilbert. 2017. “Doubly-Robust Nonparametric Inference on the Average Treatment Effect.” <em>Biometrika</em>.</p>
 </div>
 <div id="ref-npPackage">
-<p>Hayfield, Tristen, and Jeffrey Racine. 2008. “Nonparametric Econometrics: The Np Package.” <em>Journal of Statistical Software</em> 27 (5). <a href="http://www.jstatsoft.org/v27/i05/" class="uri">http://www.jstatsoft.org/v27/i05/</a>.</p>
+<p>Hayfield, Tristen, and Jeffrey Racine. 2008. “Nonparametric Econometrics: The Np Package.” <em>Journal of Statistical Software</em> 27 (5). <a href="http://www.jstatsoft.org/v27/i05/">http://www.jstatsoft.org/v27/i05/</a>.</p>
 </div>
 <div id="ref-horvitzthompson:1952:jasa">
-<p>Horvitz, D, and D Thompson. 1952. “A Generalization of Sampling Without Replacement from a Finite Universe.” <em>Journal of the American Statistical Association</em> 47 (260): 663–85. <a href="https://doi.org/10.1080/01621459.1952.10483446" class="uri">https://doi.org/10.1080/01621459.1952.10483446</a>.</p>
+<p>Horvitz, D, and D Thompson. 1952. “A Generalization of Sampling Without Replacement from a Finite Universe.” <em>Journal of the American Statistical Association</em> 47 (260): 663–85. <a href="https://doi.org/10.1080/01621459.1952.10483446">https://doi.org/10.1080/01621459.1952.10483446</a>.</p>
 </div>
 <div id="ref-SuperLearnerPackage">
-<p>Polley, E, E LeDell, C Kennedy, S Lendle, and M van der Laan. 2017. <em>SuperLearner: Super Learner Prediction</em>. <a href="https://CRAN.R-project.org/package=SuperLearner" class="uri">https://CRAN.R-project.org/package=SuperLearner</a>.</p>
+<p>Polley, E, E LeDell, C Kennedy, S Lendle, and van der LaanM. 2017. <em>SuperLearner: Super Learner Prediction</em>. <a href="https://CRAN.R-project.org/package=SuperLearner">https://CRAN.R-project.org/package=SuperLearner</a>.</p>
 </div>
 <div id="ref-porter:2011:ijb">
-<p>Porter, K, S Gruber, van der Laan M, and J Sekhon. 2011. “The Relative Performance of Targeted Maximum Likelihood Estimators.” <em>International Journal of Biostatistics</em> 7 (1). <a href="https://doi.org/10.2202/1557-4679.1308" class="uri">https://doi.org/10.2202/1557-4679.1308</a>.</p>
+<p>Porter, K, S Gruber, van der Laan M, and J Sekhon. 2011. “The Relative Performance of Targeted Maximum Likelihood Estimators.” <em>International Journal of Biostatistics</em> 7 (1). <a href="https://doi.org/10.2202/1557-4679.1308">https://doi.org/10.2202/1557-4679.1308</a>.</p>
 </div>
 <div id="ref-robins:1986:mathmod">
-<p>Robins, J. 1986. “A New Approach to Causal Inference in Mortality Studies with a Sustained Exposure Period –- Application to Control of the Healthy Worker Survivor Effect.” <em>Mathematical Modelling</em> 7 (9–12): 1393–1512. <a href="https://doi.org/10.1016/0270-0255(86)90088-6" class="uri">https://doi.org/10.1016/0270-0255(86)90088-6</a>.</p>
+<p>Robins, J. 1986. “A New Approach to Causal Inference in Mortality Studies with a Sustained Exposure Period –- Application to Control of the Healthy Worker Survivor Effect.” <em>Mathematical Modelling</em> 7 (9–12): 1393–1512. <a href="https://doi.org/10.1016/0270-0255(86)90088-6">https://doi.org/10.1016/0270-0255(86)90088-6</a>.</p>
 </div>
 <div id="ref-robins:2000:epi">
-<p>Robins, J, M Hernan, and B Brumback. 2000. “Marginal Structural Models and Causal Inference in Epidemiology.” <em>Epidemiology</em> 11 (5): 550–60. <a href="https://doi.org/10.1097/00001648-200009000-00011" class="uri">https://doi.org/10.1097/00001648-200009000-00011</a>.</p>
+<p>Robins, J, M Hernan, and B Brumback. 2000. “Marginal Structural Models and Causal Inference in Epidemiology.” <em>Epidemiology</em> 11 (5): 550–60. <a href="https://doi.org/10.1097/00001648-200009000-00011">https://doi.org/10.1097/00001648-200009000-00011</a>.</p>
 </div>
 <div id="ref-robins:1994:jasa">
-<p>Robins, J, A Rotnitzky, and L Zhao. 1994. “Estimation of Regression Coefficients When Some Regressors Are Not Always Observed.” <em>Journal of the American Statistical Association</em> 89 (427): 846–66. <a href="https://doi.org/10.1080/01621459.1994.10476818" class="uri">https://doi.org/10.1080/01621459.1994.10476818</a>.</p>
+<p>Robins, J, A Rotnitzky, and L Zhao. 1994. “Estimation of Regression Coefficients When Some Regressors Are Not Always Observed.” <em>Journal of the American Statistical Association</em> 89 (427): 846–66. <a href="https://doi.org/10.1080/01621459.1994.10476818">https://doi.org/10.1080/01621459.1994.10476818</a>.</p>
 </div>
 <div id="ref-earthPackage">
-<p>Trevor Hastie, Stephen Milborrow. Derived from mda:mars by, and Rob Tibshirani. Uses Alan Miller’s Fortran utilities with Thomas Lumley’s leaps wrapper. 2018. <em>earth: Multivariate Adaptive Regression Splines</em>. <a href="https://CRAN.R-project.org/package=earth" class="uri">https://CRAN.R-project.org/package=earth</a>.</p>
+<p>Trevor Hastie, Stephen Milborrow. Derived from mda:mars by, and utilities with Thomas Lumley’s leaps wrapper.Rob Tibshirani. Uses Alan Miller’s Fortran. 2018. <em>earth: Multivariate Adaptive Regression Splines</em>. <a href="https://CRAN.R-project.org/package=earth">https://CRAN.R-project.org/package=earth</a>.</p>
 </div>
 <div id="ref-vdvaart:2006:statdec">
-<p>Vaart, A van der, S Dudoit, and M van der Laan. 2006. “Oracle Inequalities for Multi-Fold Cross-Validation.” <em>Statistics and Decisions</em> 24 (3): 351–71. <a href="https://doi.org/10.1524/stnd.2006.24.3.351" class="uri">https://doi.org/10.1524/stnd.2006.24.3.351</a>.</p>
+<p>Vaart, A van der, S Dudoit, and van der LaanM. 2006. “Oracle Inequalities for Multi-Fold Cross-Validation.” <em>Statistics and Decisions</em> 24 (3): 351–71. <a href="https://doi.org/10.1524/stnd.2006.24.3.351">https://doi.org/10.1524/stnd.2006.24.3.351</a>.</p>
 </div>
 <div id="ref-vdl:2014:ijb">
-<p>van der Laan, M. 2014. “Targeted Estimation of Nuisance Parameters to Obtain Valid Statistical Inference.” <em>International Journal of Biostatistics</em> 10 (1): 29–57. <a href="https://doi.org/10.1515/ijb-2012-0038" class="uri">https://doi.org/10.1515/ijb-2012-0038</a>.</p>
+<p>van der Laan, M. 2014. “Targeted Estimation of Nuisance Parameters to Obtain Valid Statistical Inference.” <em>International Journal of Biostatistics</em> 10 (1): 29–57. <a href="https://doi.org/10.1515/ijb-2012-0038">https://doi.org/10.1515/ijb-2012-0038</a>.</p>
 </div>
 <div id="ref-vdl:2007:statapp">
-<p>van der Laan, M, E Polley, and A Hubbard. 2007. “Super Learner.” <em>Statistical Applications in Genetics and Molecular Biology</em> 6 (1). <a href="https://doi.org/10.2202/1544-6115.1309" class="uri">https://doi.org/10.2202/1544-6115.1309</a>.</p>
+<p>van der Laan, M, E Polley, and A Hubbard. 2007. “Super Learner.” <em>Statistical Applications in Genetics and Molecular Biology</em> 6 (1). <a href="https://doi.org/10.2202/1544-6115.1309">https://doi.org/10.2202/1544-6115.1309</a>.</p>
 </div>
 <div id="ref-tlbook:2011">
-<p>van der Laan, M, and S Rose. 2011. <em>Targeted Learning: Causal Inference for Observational and Experimental Data</em>. Springer New York. <a href="https://doi.org/10.1007/978-1-4419-9782-1" class="uri">https://doi.org/10.1007/978-1-4419-9782-1</a>.</p>
+<p>van der Laan, M, and S Rose. 2011. <em>Targeted Learning: Causal Inference for Observational and Experimental Data</em>. Springer New York. <a href="https://doi.org/10.1007/978-1-4419-9782-1">https://doi.org/10.1007/978-1-4419-9782-1</a>.</p>
 </div>
 <div id="ref-vdlrubin:2006:ijb">
-<p>van der Laan, M, and D Rubin. 2006. “Targeted Maximum Likelihood Learning.” <em>International Journal of Biostatistics</em> 2 (1). <a href="https://doi.org/10.2202/1557-4679.1043" class="uri">https://doi.org/10.2202/1557-4679.1043</a>.</p>
+<p>van der Laan, M, and D Rubin. 2006. “Targeted Maximum Likelihood Learning.” <em>International Journal of Biostatistics</em> 2 (1). <a href="https://doi.org/10.2202/1557-4679.1043">https://doi.org/10.2202/1557-4679.1043</a>.</p>
 </div>
 <div id="ref-wolpert:1992:nnet">
-<p>Wolpert, D. 1992. “Stacked Generalization.” <em>Neural Networks</em> 5 (2): 241–59. <a href="https://doi.org/10.1016/S0893-6080(05)80023-1" class="uri">https://doi.org/10.1016/S0893-6080(05)80023-1</a>.</p>
+<p>Wolpert, D. 1992. “Stacked Generalization.” <em>Neural Networks</em> 5 (2): 241–59. <a href="https://doi.org/10.1016/S0893-6080(05)80023-1">https://doi.org/10.1016/S0893-6080(05)80023-1</a>.</p>
 </div>
 <div id="ref-zheng:2010:working">
-<p>Zheng, W, and M van der Laan. 2010. “Asymptotic Theory for Cross-Validated Targeted Maximum Likelihood Estimation.” <em>U.C. Berkeley Division of Biostatistics Working Paper Series</em>. <a href="http://biostats.bepress.com/ucbbiostat/paper273" class="uri">http://biostats.bepress.com/ucbbiostat/paper273</a>.</p>
+<p>Zheng, W, and van der LaanM. 2010. “Asymptotic Theory for Cross-Validated Targeted Maximum Likelihood Estimation.” <em>U.C. Berkeley Division of Biostatistics Working Paper Series</em>. <a href="http://biostats.bepress.com/ucbbiostat/paper273">http://biostats.bepress.com/ucbbiostat/paper273</a>.</p>
 </div>
 </div>
 </div>
