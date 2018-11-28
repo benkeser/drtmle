@@ -651,7 +651,7 @@ drtmle <- function(Y, A, W,
     Qn = QnStar1, gn = gn, psi_n = psi_t1, a_0 = a_0
   )
   Dno1StarMat <- matrix(unlist(Dno1Star), nrow = n, ncol = length(a_0))
-  cov_t1 <- stats::cov(Dno1StarMat)
+  cov_t1 <- stats::cov(Dno1StarMat)/n
 
   # covariance for drtmle
   DnoStar <- eval_Dstar(
