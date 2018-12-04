@@ -209,8 +209,8 @@ drtmle <- function(Y, A, W,
   n <- length(Y)
   # save user input Qn and gn, because these values
   # get overwritten later.
-  Qn_user <- Qn
-  gn_user <- gn
+  Qn_user <- !is.null(Qn)
+  gn_user <- !is.null(gn)
 
   if (length(cvFolds) > 1) {
     stopifnot(length(cvFolds) == length(Y))
@@ -716,10 +716,10 @@ drtmle <- function(Y, A, W,
 
   # tack on models if requested
   if (returnModels) {
-    if(is.null(Qn_user)){
+    if(!Qn_user){
       out$QnMod <- QnMod
     }
-    if(is.null(gn_user)){
+    if(!gn_user){
       out$gnMod <- gnMod
     }
     if('Q' %in% guard){
