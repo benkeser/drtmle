@@ -283,6 +283,12 @@ drtmle <- function(Y, A, W,
     }
     # obtain list of propensity score fits
     gnMod <- gnValid[seq(2, length(gnValid), 2)]
+  }else{
+    # truncate too-small predictions
+    gn <- lapply(gn, function(g) {
+      g[g < tolg] <- tolg
+      g
+    })
   }
   # -------------------------------
   # estimate outcome regression
