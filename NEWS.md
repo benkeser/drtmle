@@ -1,3 +1,9 @@
+December 18, 2018
+* Version 1.0.4 released on GitHub and CRAN
+* Resolves issues arising from returnModels option when users input nuisance parameters
+* Add option to bypass future calls for easier debugging
+* Fixes to bugs in standard TMLE implementation -- namely, more robust fluctuations and corrected variance estimators
+
 July 2, 2018
 * Version 1.0.3 released on GitHub and CRAN
 * Fix warnings on CRAN builds

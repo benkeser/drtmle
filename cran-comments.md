@@ -1,6 +1,7 @@
 ## Test environments
-* local macOS / OS X install, R 3.4.4
-* ubuntu 12.04 (on travis-ci), R 3.5.0
+* local macOS High Sierra install, R 3.5.1
+* ubuntu 14.04.5 (on travis-ci): release (3.5.1), oldrel (3.4.4), and devel
+* Windows Server 2012 R2 x64 (build 9600) (on appveyor): release (3.5.1)
 * win-builder (devel and release)
 
 ## R CMD check results
@@ -10,15 +11,8 @@ There were 0 WARNINGs.
 
 There were 0 NOTEs.
 
-Note: 
-Maintainer: 'David Benkeser <benkeser@emory.edu>'
-
-Seems safe to ignore this note. 
-
 ## Downstream dependencies
 Nothing to report.
 
 ## Additional Notes
-Submission of updated package, version 1.0.3. This version fixes
-the ``no long double'' build issue flagged in checks, as well as 
-the unstated dependencies warning for package foreach.  
+Submission of updated package, version 1.0.4. 
