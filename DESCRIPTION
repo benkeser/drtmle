@@ -31,7 +31,6 @@ Suggests:
     quadprog,
     nloptr,
     parallel,
-    snow,
     foreach
 License: MIT + file LICENSE
 URL: https://github.com/benkeser/drtmle
