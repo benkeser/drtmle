@@ -13,18 +13,21 @@
 #' @param Qn A list of outcome regression estimates evaluated on observed data
 #' @param gn A list of propensity regression estimates evaluated on observed data
 #' @param a_0 A list of fixed treatment values
+#' @param coefTol A tolerance level on the magnitude of the coefficient that
+#'  flags the result as potentially the result of numeric instability.
 #'
 #' @importFrom SuperLearner trimLogit
 #' @importFrom stats predict glm
 #
-fluctuateQ1 <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, a_0) {
-  QnStar <- mapply(a = a_0, Q = Qn, g = gn, FUN = function(x, a, Q, g) {
+fluctuateQ1 <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, a_0, coefTol = 1e3) {
+  fluctuateQ1_apply <- function(x, a, Q, g) {
     l <- min(Y, na.rm = TRUE)
     u <- max(Y, na.rm = TRUE)
     Yscale <- (Y - l) / (u - l)
     off <- SuperLearner::trimLogit((Q - l) / (u - l))
     H1 <- as.numeric(A == a & DeltaA == 1 & DeltaY == 1) / g
     if (!all(H1 < 1e-7)) {
+    # first try to fluctuate using glm
       suppressWarnings(
         fm <- stats::glm(
           Yscale ~ -1 + offset(off) + H1,
@@ -32,6 +35,22 @@ fluctuateQ1 <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, a_0) {
           data = data.frame(Y = Y, off = off, H1 = H1), family = "binomial"
         )
       )
+      if (!fm$converged | abs(max(fm$coefficients)) > coefTol) {
+        # if it doesn't converge, try with no starting values
+        if (!all(H1 < 1e-7)) {
+          suppressWarnings(
+            fm <- stats::glm(
+              Yscale ~ -1 + offset(off) + H1,
+              data = data.frame(Y = Y, off = off, H2 = H1),
+              family = "binomial"
+            )
+          )
+        }
+        if (!fm$converged | abs(max(fm$coefficients)) > coefTol) {
+          # warning("No sane fluctuation found. Proceeding using current estimates.")
+          return(list(est = Q, eps = 0))
+        }
+      }
       Qnstar <- stats::predict(
         fm,
         type = "response",
@@ -41,7 +60,8 @@ fluctuateQ1 <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, a_0) {
     } else {
       list(est = Q, eps = 0)
     }
-  }, SIMPLIFY = FALSE)
+  }
+  QnStar <- mapply(a = a_0, Q = Qn, g = gn, FUN = fluctuateQ1_apply, SIMPLIFY = FALSE)
   QnStar
 }
 
@@ -71,8 +91,8 @@ fluctuateQ1 <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, a_0) {
 #' @importFrom stats predict glm
 #
 fluctuateG <- function(Y, A, W, DeltaY, DeltaA, a_0, gn, Qrn, tolg,
-                       coefTol = 1e5) {
-  gnStar <- mapply(a = a_0, g = gn, Qr = Qrn, FUN = function(x, a, g, Qr) {
+                       coefTol = 1e3) {
+  fluctuateG_apply <- function(x, a, g, Qr) {
     H1 <- Qr / g
     off <- SuperLearner::trimLogit(g, tolg)
     thisA <- as.numeric(A == a & DeltaA == 1 & DeltaY == 1)
@@ -105,7 +125,8 @@ fluctuateG <- function(Y, A, W, DeltaY, DeltaA, a_0, gn, Qrn, tolg,
     pred <- stats::predict(fm, type = "response")
     pred[pred < tolg] <- tolg
     list(est = pred, eps = fm$coefficients)
-  }, SIMPLIFY = FALSE)
+  }
+  gnStar <- mapply(a = a_0, g = gn, Qr = Qrn, FUN = fluctuateG_apply, SIMPLIFY = FALSE)
   gnStar
 }
 
@@ -138,10 +159,8 @@ fluctuateG <- function(Y, A, W, DeltaY, DeltaA, a_0, gn, Qrn, tolg,
 #' @importFrom stats predict glm
 #
 fluctuateQ2 <- function(Y, A, W, DeltaY, DeltaA,
-                        Qn, gn, grn, a_0, reduction, coefTol=1e5) {
-  QnStar <- mapply(
-    a = a_0, Q = Qn, g = gn, gr = grn,
-    FUN = function(a, Q, g, gr) {
+                        Qn, gn, grn, a_0, reduction, coefTol=1e3) {
+  fluctuateQ2_apply <- function(a, Q, g, gr) {
       l <- min(Y, na.rm = TRUE)
       u <- max(Y, na.rm = TRUE)
       Yscale <- (Y - l) / (u - l)
@@ -203,7 +222,10 @@ fluctuateQ2 <- function(Y, A, W, DeltaY, DeltaA,
         ) * (u - l) + l
         return(list(est = Qnstar, eps = fm$coefficients))
       }
-    }, SIMPLIFY = FALSE
+    }
+  QnStar <- mapply(
+    a = a_0, Q = Qn, g = gn, gr = grn,
+    FUN = fluctuateQ2_apply, SIMPLIFY = FALSE
   )
   QnStar
 }
@@ -236,10 +258,8 @@ fluctuateQ2 <- function(Y, A, W, DeltaY, DeltaA,
 #' @importFrom stats predict glm
 #'
 fluctuateQ <- function(Y, A, W, DeltaY, DeltaA,
-                       Qn, gn, grn, a_0, reduction, coefTol=1e5) {
-  QnStar <- mapply(
-    a = a_0, Q = Qn, g = gn, gr = grn,
-    FUN = function(a, Q, g, gr) {
+                       Qn, gn, grn, a_0, reduction, coefTol=1e3) {
+  fluctuateQ_apply <- function(a, Q, g, gr) {
       l <- min(Y, na.rm = TRUE)
       u <- max(Y, na.rm = TRUE)
       Yscale <- (Y - l) / (u - l)
@@ -316,7 +336,10 @@ fluctuateQ <- function(Y, A, W, DeltaY, DeltaA,
         ) * (u - l) + l
         return(list(est = Qnstar, eps = fm$coefficients))
       }
-    }, SIMPLIFY = FALSE
+    }
+  QnStar <- mapply(
+    a = a_0, Q = Qn, g = gn, gr = grn,
+    FUN = fluctuateQ_apply, SIMPLIFY = FALSE
   )
   QnStar
 }
