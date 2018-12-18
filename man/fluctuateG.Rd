@@ -4,7 +4,7 @@
 \alias{fluctuateG}
 \title{fluctuateG}
 \usage{
-fluctuateG(Y, A, W, DeltaY, DeltaA, a_0, gn, Qrn, tolg, coefTol = 1e+05)
+fluctuateG(Y, A, W, DeltaY, DeltaA, a_0, gn, Qrn, tolg, coefTol = 1000)
 }
 \arguments{
 \item{Y}{The outcome}

@@ -5,7 +5,7 @@
 \title{fluctuateQ}
 \usage{
 fluctuateQ(Y, A, W, DeltaY, DeltaA, Qn, gn, grn, a_0, reduction,
-  coefTol = 1e+05)
+  coefTol = 1000)
 }
 \arguments{
 \item{Y}{The outcome}

@@ -4,7 +4,7 @@
 \alias{fluctuateQ1}
 \title{fluctuateQ1}
 \usage{
-fluctuateQ1(Y, A, W, DeltaA, DeltaY, Qn, gn, a_0)
+fluctuateQ1(Y, A, W, DeltaA, DeltaY, Qn, gn, a_0, coefTol = 1000)
 }
 \arguments{
 \item{Y}{The outcome}
@@ -24,6 +24,9 @@ missing 1 if observed)}
 \item{gn}{A list of propensity regression estimates evaluated on observed data}
 
 \item{a_0}{A list of fixed treatment values}
+
+\item{coefTol}{A tolerance level on the magnitude of the coefficient that
+flags the result as potentially the result of numeric instability.}
 }
 \description{
 Function called internally by drtmle to perform the first fluctuation
