@@ -218,7 +218,7 @@ drtmle <- function(Y, A, W,
     # split up into a list of id's
     validRows <- sapply(sort(unique(cvFolds)), function(f) {
       which(cvFolds == f)
-    })
+    }, simplify = FALSE)
   } else if (cvFolds != 1) {
     # split data up
     validRows <- split(sample(seq_len(n)), rep(seq_len(cvFolds), length = n))
