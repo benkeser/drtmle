@@ -1043,22 +1043,24 @@ demonstrate registration using an ad-hoc cluster on the local system. The choice
 of back-end is flexible, and submission of the job to a wide variety
 of schedulers (e.g., SLURM, TORQUE, etc.) is also permitted. Interested readers
 are invited to consult the documentation of the `future.batchtools` package for
-further information.
+further information. 
 
 ```{r, cache = TRUE, message = FALSE}
-library(future.batchtools)
-library(parallel)
-cl <- makeCluster(2, type = "SOCK")
-plan(cluster, workers = cl)
-clusterEvalQ(cl, library("SuperLearner"))
-pcv_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
-                     SL_g = c("SL.glm", "SL.glm.interaction","SL.earth"),
-                     SL_Q = c("SL.glm", "SL.glm.interaction","SL.earth"),
-                     SL_gr = c("SL.glm", "SL.earth", "SL.mean"),
-                     SL_Qr = c("SL.glm", "SL.earth", "SL.mean"),
-                     stratify = FALSE, a_0 = c(0,1,2),
-                     cvFolds = 2, parallel = TRUE)
-pcv_sl_fit
+## Commented out to avoid build errors
+## This code should execute on a system with the snow 
+## package available
+# library(future.batchtools)
+# library(parallel)
+# cl <- makeCluster(2, type = "SOCK")
+# plan(cluster, workers = cl)
+# clusterEvalQ(cl, library("SuperLearner"))
+# pcv_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
+#                      SL_g = c("SL.glm", "SL.glm.interaction","SL.earth"),
+#                      SL_Q = c("SL.glm", "SL.glm.interaction","SL.earth"),
+#                      SL_gr = c("SL.glm", "SL.earth", "SL.mean"),
+#                      SL_Qr = c("SL.glm", "SL.earth", "SL.mean"),
+#                      stratify = FALSE, a_0 = c(0,1,2),
+#                      cvFolds = 2, parallel = TRUE)
 ```
 
 # Inference for IPTW using adaptive PS estimators \label{inference_iptw}
