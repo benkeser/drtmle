@@ -458,16 +458,20 @@ drtmle <- function(Y, A, W,
   QnStar <- Qn
   if ("g" %in% guard){ 
     grnStar <- grn
+    PnDQnStar <- Inf 
   }else{
     grnStar <- NULL
+    PnDQnStar <- 0
   }
   if ("Q" %in% guard){
     QrnStar <- Qrn
+    PnDgnStar <- Inf
   }else{
     QrnStar <- NULL
+    PnDgnStar <- 0
   }
-  gnStar <- gn
-  PnDQnStar <- PnDgnStar <- PnDnoStar <- Inf
+  gnStar <- gn  
+  PnDnoStar <- Inf
   ct <- 0
 
   # fluctuate
