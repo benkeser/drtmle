@@ -20,6 +20,7 @@ print.drtmle <- function(x, ...) {
     print(tmp)
   } else {
     tmp$cov <- diag(tmp$cov)
+    print(tmp)
   }
   invisible(tmp)
 }
