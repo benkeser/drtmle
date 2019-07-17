@@ -82,12 +82,12 @@ for more information and further examples.
 # load packages
 library(drtmle)
 #> drtmle: TMLE with doubly robust inference
-#> Version: 1.0.3
+#> Version: 1.0.4.9001
 library(SuperLearner)
 #> Loading required package: nnls
 #> Super Learner
-#> Version: 2.0-23
-#> Package created on 2018-03-09
+#> Version: 2.0-24
+#> Package created on 2018-08-10
 
 # simulate simple data structure
 set.seed(12345)
@@ -163,6 +163,9 @@ score.
 fit2 <- adaptive_iptw(Y = Y, A = A, W = W, a_0 = c(0, 1),
                       SL_g = c("SL.glm", "SL.mean", "SL.step.interaction"),
                       SL_Qr = "SL.npreg")
+#> Loading required package: nloptr
+#> Loading required package: nloptr
+#> Loading required package: nloptr
 #> Loading required package: nloptr
 # print the output
 fit2

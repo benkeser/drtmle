@@ -550,6 +550,18 @@ npreg_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
 npreg_fit
 ```
 
+Some users may find it unsettling that when applying the super learner in real data analysis is that the results are dependent on the random seed that is set. To remove this dependence, one can instead average over repeated super learner runs; more repeats will lead to less dependence on the random seed. This feature is implemented via the `n_SL` option. The package is currently parallelized at the level of individual calls to `SuperLearner`. With parallelization over enough cores, repeated super learning should not add too much to the computational burden relative to a single call to `SuperLearner`.
+
+```{r, message = FALSE, cache = TRUE}
+repeated_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
+                 SL_g = c("SL.glm", "SL.step.interaction","SL.mean"),
+                 SL_Q = c("SL.glm", "SL.step.interaction","SL.mean"),
+                 SL_gr = c("SL.glm", "SL.earth", "SL.mean"),
+                 SL_Qr = c("SL.glm", "SL.earth", "SL.mean"),
+                 stratify = FALSE, n_SL = 5)
+repeated_sl_fit
+```
+
 The `drtmle` package also allows users to pass in their own estimated OR and PS
 via the `Qn` and `gn` options, respectively. 
 If `Qn` is specified by the user, `drtmle` will ignore the nuisance parameter 

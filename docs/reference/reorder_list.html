@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Predict method for SL.npreg — predict.SL.npreg • drtmle</title>
+<title>Helper function to reorder lists according to cvFolds — reorder_list • drtmle</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,9 +30,9 @@
 
 
 
-<meta property="og:title" content="Predict method for SL.npreg — predict.SL.npreg" />
+<meta property="og:title" content="Helper function to reorder lists according to cvFolds — reorder_list" />
 
-<meta property="og:description" content="Method for predicting SL.npreg objects." />
+<meta property="og:description" content="Helper function to reorder lists according to cvFolds" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -114,57 +114,57 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Predict method for SL.npreg</h1>
-    <small class="dont-index">Source: <a href='https://github.com/benkeser/drtmle/blob/master/R/sl_npreg.R'><code>R/sl_npreg.R</code></a></small>
-    <div class="hidden name"><code>predict.SL.npreg.Rd</code></div>
+    <h1>Helper function to reorder lists according to cvFolds</h1>
+    <small class="dont-index">Source: <a href='https://github.com/benkeser/drtmle/blob/master/R/utils.R'><code>R/utils.R</code></a></small>
+    <div class="hidden name"><code>reorder_list.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Method for predicting SL.npreg objects.</p>
+    <p>Helper function to reorder lists according to cvFolds</p>
     
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for SL.npreg</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/predict'>predict</a></span>(<span class='no'>object</span>, <span class='no'>newdata</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>reorder_list</span>(<span class='no'>a_list</span>, <span class='no'>a_0</span>, <span class='no'>validRows</span>, <span class='kw'>n_SL</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>grn_ind</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>n</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>object</th>
-      <td><p>An object of class <code>"SL.npreg"</code>.</p></td>
+      <th>a_list</th>
+      <td><p>Structured list of nuisance parameters</p></td>
     </tr>
     <tr>
-      <th>newdata</th>
-      <td><p>The new data used to obtain predictions.</p></td>
+      <th>a_0</th>
+      <td><p>Treatment levels</p></td>
     </tr>
     <tr>
-      <th>...</th>
-      <td><p>Other arguments passed to predict.</p></td>
+      <th>validRows</th>
+      <td><p>List of rows of data in validation data for
+each split.</p></td>
+    </tr>
+    <tr>
+      <th>n_SL</th>
+      <td><p>Number of super learners. If &gt;1, then predictions
+are averaged</p></td>
+    </tr>
+    <tr>
+      <th>grn_ind</th>
+      <td><p>Structure of grn call is slightly different</p></td>
+    </tr>
+    <tr>
+      <th>n</th>
+      <td><p>Sample size</p></td>
     </tr>
     </table>
     
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># simulate data</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Random'>set.seed</a></span>(<span class='fl'>1234</span>)
-<span class='no'>n</span> <span class='kw'>&lt;-</span> <span class='fl'>100</span>
-<span class='no'>X</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/data.frame'>data.frame</a></span>(<span class='kw'>X1</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Normal'>rnorm</a></span>(<span class='no'>n</span>))
-<span class='no'>Y</span> <span class='kw'>&lt;-</span> <span class='no'>X</span>$<span class='no'>X1</span> + <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Normal'>rnorm</a></span>(<span class='no'>n</span>)
-<span class='co'># fit npreg</span>
-<span class='no'>fit</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='SL.npreg.html'>SL.npreg</a></span>(<span class='kw'>Y</span> <span class='kw'>=</span> <span class='no'>Y</span>, <span class='kw'>X</span> <span class='kw'>=</span> <span class='no'>X</span>, <span class='kw'>newX</span> <span class='kw'>=</span> <span class='no'>X</span>)
-<span class='co'># predict on fit</span>
-<span class='no'>newX</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/data.frame'>data.frame</a></span>(<span class='kw'>X1</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(-<span class='fl'>1</span>,<span class='fl'>0</span>,<span class='fl'>1</span>))
-<span class='no'>pred</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/predict'>predict</a></span>(<span class='no'>fit</span>$<span class='no'>fit</span>, <span class='kw'>newdata</span> <span class='kw'>=</span> <span class='no'>newX</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-            
-      <li><a href="#examples">Examples</a></li>
-    </ul>
+                </ul>
 
   </div>
 </div>
