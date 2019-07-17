@@ -1,3 +1,8 @@
+July 2019
+* Version 1.0.5
+* Remove dependency on plyr
+* Add option to average over repeated SuperLearner fits
+
 December 18, 2018
 * Version 1.0.4 released on GitHub and CRAN
 * Resolves issues arising from returnModels option when users input nuisance parameters

@@ -281,3 +281,81 @@ plot.drtmle <- function(x, nPoints = 500,
     }
   }
 }
+
+# SHOULD MAKE THIS FUNCTION TAKE AS INPUT THE NUMBER OF SUPER LEARNERS AND 
+# RETURN AS OUTPUT SOMETHING REORDERED/AVERAGED AS NECESSARY
+
+#' Helper function to reorder lists according to cvFolds
+#' 
+#' @param a_list Structured list of nuisance parameters
+#' @param a_0 Treatment levels
+#' @param validRows List of rows of data in validation data for
+#' each split.
+#' @param grn_ind Structure of grn call is slightly different
+#' @param n_SL Number of super learners. If >1, then predictions
+#' are averaged
+#' @param n Sample size
+reorder_list <- function(a_list, 
+                         a_0, 
+                         validRows,
+                         n_SL = 1, 
+                         grn_ind = FALSE,
+                         n){
+  n_cvFolds <- length(validRows) / n_SL
+
+  reduced_outList <- vector(mode = "list", length = length(a_0))
+  for(i in seq_along(reduced_outList)) reduced_outList[[i]] <- rep(0, n)
+  # re-order predictions
+  for(v in seq_len(n_SL)){
+    outListValid <- unlist(a_list[(n_cvFolds * (v-1) + 1):(v*n_cvFolds)], 
+                           recursive = FALSE, use.names = FALSE)
+    outListUnOrd <- do.call(Map, c(c, outListValid[seq(1, length(outListValid), 2)]))
+    outList <- vector(mode = "list", length = length(a_0))
+    if(!grn_ind){
+      for (i in seq_along(a_0)) {
+        outList[[i]] <- rep(NA, n)
+        # works because validRows are the same across repeated SLs
+        outList[[i]][unlist(validRows)[1:n]] <- outListUnOrd[[i]]
+      }
+    }else{
+      for (i in seq_along(a_0)) {
+        outList[[i]] <- data.frame(grn1 = rep(NA, n), grn2 = rep(NA, n))
+        outList[[i]][unlist(validRows), ] <- cbind(outListUnOrd[[i]])
+      }
+    }
+    reduced_outList <- mapply(x = reduced_outList, y = outList, function(x,y){
+      x + y
+    }, SIMPLIFY = FALSE)
+  }
+  out <- lapply(reduced_outList, function(x){ x / n_SL })
+  return(out)
+}
+
+#' Help function to extract models from fitted object
+#' @param a_list Structured list of nuisance parameters
+extract_models <- function(a_list){
+  outListValid <- unlist(a_list, recursive = FALSE, use.names = FALSE)
+  outListValid[seq(2, length(outListValid), 2)]
+}
+
+#' Make list of rows in each validation fold. 
+#' @param cvFolds Numeric number of cv folds
+#' @param n Number of observations
+#' @param ... Other arguments
+make_validRows <- function(cvFolds, n, ...){
+  if (length(cvFolds) > 1) {
+    stopifnot(length(cvFolds) == n)
+    # comes in as vector of fold assignments
+    # split up into a list of id's
+    validRows <- sapply(sort(unique(cvFolds)), function(f) {
+      which(cvFolds == f)
+    }, simplify = FALSE)
+  } else if (cvFolds != 1) {
+    # split data up
+    validRows <- split(sample(seq_len(n)), rep(seq_len(cvFolds), length = n))
+  } else {
+    # no cross-validation
+    validRows <- list(seq_len(n))
+  }
+  return(validRows)
+}

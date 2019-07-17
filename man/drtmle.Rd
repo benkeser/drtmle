@@ -8,8 +8,8 @@ drtmle(Y, A, W, DeltaA = as.numeric(!is.na(A)),
   DeltaY = as.numeric(!is.na(Y)), a_0 = unique(A[!is.na(A)]),
   family = if (all(Y \%in\% c(0, 1))) {     stats::binomial() } else {   
    stats::gaussian() }, stratify = TRUE, SL_Q = NULL, SL_g = NULL,
-  SL_Qr = NULL, SL_gr = NULL, glm_Q = NULL, glm_g = NULL,
-  glm_Qr = NULL, glm_gr = NULL, guard = c("Q", "g"),
+  SL_Qr = NULL, SL_gr = NULL, n_SL = 1, glm_Q = NULL,
+  glm_g = NULL, glm_Qr = NULL, glm_gr = NULL, guard = c("Q", "g"),
   reduction = "univariate", returnModels = FALSE, cvFolds = 1,
   maxIter = 3, tolIC = 1/length(Y), tolg = 0.01, verbose = FALSE,
   Qsteps = 2, parallel = FALSE, future_hpc = NULL, Qn = NULL,
@@ -54,7 +54,11 @@ super learner libraries can be specified.}
 library to be used for the reduced-dimension outcome regression.}
 
 \item{SL_gr}{A vector of characters or a list describing the Super Learner
-library to be used for the second reduced-dimension propensity score.}
+library to be used for the reduced-dimension propensity score.}
+
+\item{n_SL}{Number of repeated Super Learners to run (default 1) for the 
+each nuisance parameter. Repeat Super Learners more times to obtain more stable 
+inference.}
 
 \item{glm_Q}{A character describing a formula to be used in the call to
 \code{glm} for the outcome regression. Ignored if \code{SL_Q!=NULL}.}

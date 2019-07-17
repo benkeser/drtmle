@@ -2,7 +2,6 @@
 #'
 #' Function to estimate propensity score
 #'
-#' @importFrom plyr alply
 #' @param A A vector of binary treatment assignment (assumed to be equal to 0 or
 #'  1)
 #' @param DeltaY Indicator of missing outcome (assumed to be equal to 0 if
@@ -614,13 +613,13 @@ estimateQ <- function(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify,
           )
         )
 
-        Qn <- plyr::alply(a_0, 1, function(x) {
+        Qn <- sapply(a_0, function(x) {
           stats::predict(
             fm,
             newdata = data.frame(A = x, validW),
             onlySL = TRUE
           )[[1]]
-        })
+        }, simplify = FALSE)
       } else if (length(SL_Q) == 1) {
         fm <- do.call(SL_Q, args = list(
           Y = trainY[include],
@@ -629,16 +628,16 @@ estimateQ <- function(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify,
           obsWeights = rep(1, length(trainA[include])),
           family = family
         ))
-        Qn <- plyr::alply(a_0, 1, function(x) {
+        Qn <- sapply(a_0, function(x) {
           stats::predict(object = fm$fit, newdata = data.frame(
             A = x,
             validW
           ))
-        })
+        }, simplify = FALSE)
       }
     } else {
       if (length(SL_Q) > 1 | is.list(SL_Q)) {
-        tmp <- plyr::alply(a_0, 1, function(x) {
+        tmp <- sapply(a_0, function(x) {
           include2 <- trainA == x
           # handle NAs properly
           include2[is.na(include2)] <- FALSE
@@ -650,11 +649,11 @@ estimateQ <- function(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify,
               "binomial", "method.CC_nloglik", "method.CC_LS")
           )
           list(est = fm$SL.predict, fm = fm)
-        })
+        }, simplify = FALSE)
         Qn <- lapply(tmp, "[[", 1)
         fm <- lapply(tmp, "[[", 2)
       } else if (length(SL_Q) == 1) {
-        tmp <- plyr::alply(a_0, 1, function(x) {
+        tmp <- sapply(a_0, function(x) {
           include2 <- trainA == x
           # handle NAs properly
           include2[is.na(include2)] <- FALSE
@@ -667,7 +666,7 @@ estimateQ <- function(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify,
             family = family
           ))
           list(est = fm$pred, fm = fm)
-        })
+        }, simplify = FALSE)
         Qn <- lapply(tmp, "[[", 1)
         fm <- lapply(tmp, "[[", 2)
       }
@@ -684,15 +683,15 @@ estimateQ <- function(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify,
           drop = FALSE
         ], family = family
       )
-      Qn <- plyr::alply(matrix(a_0), 1, function(a, fm) {
+      Qn <- sapply(a_0, function(a, fm) {
         stats::predict(
           fm,
           newdata = data.frame(A = a, validW),
           type = "response"
         )
-      }, fm = fm)
+      }, fm = fm, simplify = FALSE)
     } else {
-      tmp <- plyr::alply(matrix(a_0), 1, function(a) {
+      tmp <- sapply(a_0, function(a) {
         include2 <- trainA == a
         # handle NAs properly
         include2[is.na(include2)] <- FALSE
@@ -708,7 +707,7 @@ estimateQ <- function(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify,
           newdata = validW,
           type = "response"
         ), fm = fm))
-      })
+      }, simplify = FALSE)
       Qn <- lapply(tmp, "[[", 1)
       fm <- lapply(tmp, "[[", 2)
     }

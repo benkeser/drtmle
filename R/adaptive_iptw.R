@@ -89,7 +89,6 @@
 #'  \item{\code{call}}{The call to \code{adaptive_iptw}.}
 #' }
 #'
-#' @importFrom plyr llply laply
 #' @importFrom future plan
 #' @importFrom future.apply future_lapply
 #' @importFrom doFuture registerDoFuture
@@ -262,7 +261,7 @@ adaptive_iptw <- function(W, A, Y,
       DeltaY = DeltaY, a_0 = a_0, tolg = tolg,
       gn = gnStar, Qrn = QrnStar
     )
-    gnStar <- plyr::llply(gnStarOut, function(x) {
+    gnStar <- lapply(gnStarOut, function(x) {
       unlist(x$est)
     })
     # re-estimate reduced dimension regression
