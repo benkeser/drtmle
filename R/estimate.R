@@ -1128,10 +1128,9 @@ estimategrn <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, SL_gr, tolg, glm_gr,
             ) - train_g) /
               train_g, Qn = train_Q)
           )
-          grn1 <- stats::predict(fm1, newdata = data.frame(grn1 = rep(
-            0,
-            length(validA)
-          ), Qn = valid_Q), type = "response")
+          grn1 <- stats::predict(fm1, newdata = data.frame(
+            grn1 = rep(0, length(validA)), Qn = valid_Q
+          ), type = "response")
           fm2 <- stats::glm(
             stats::as.formula(paste0("A~", glm_gr)),
             family = "binomial", data = data.frame(A = as.numeric(Aeqa &

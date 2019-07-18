@@ -85,7 +85,8 @@ reduced-dimension outcome regression specified by \code{glm_Qr} or
 \code{SL_Qr}. If \code{guard} contains \code{"g"} then the TMLE
 (additionally) guards against misspecification of the propensity score by
 estimating the reduced-dimension propensity score specified by \code{glm_gr}
-or \code{SL_gr}.}
+or \code{SL_gr}. If \code{guard} is set to \code{NULL}, then only standard TMLE
+and one-step estimators are computed.}
 
 \item{reduction}{A character equal to \code{"univariate"} for a univariate
 misspecification correction (default) or \code{"bivariate"} for the

@@ -303,12 +303,22 @@ reorder_list <- function(a_list,
                          n){
   n_cvFolds <- length(validRows) / n_SL
 
+
   reduced_outList <- vector(mode = "list", length = length(a_0))
-  for(i in seq_along(reduced_outList)) reduced_outList[[i]] <- rep(0, n)
+
+  for(i in seq_along(reduced_outList)){
+    if(!grn_ind){ 
+      reduced_outList[[i]] <- rep(0, n)
+    }else{
+      reduced_outList[[i]] <- data.frame(grn1 = rep(0, n), grn2 = rep(0, n))
+    }
+  }
+
   # re-order predictions
   for(v in seq_len(n_SL)){
     outListValid <- unlist(a_list[(n_cvFolds * (v-1) + 1):(v*n_cvFolds)], 
                            recursive = FALSE, use.names = FALSE)
+    # this is in 0/1 format 
     outListUnOrd <- do.call(Map, c(c, outListValid[seq(1, length(outListValid), 2)]))
     outList <- vector(mode = "list", length = length(a_0))
     if(!grn_ind){
@@ -320,7 +330,10 @@ reorder_list <- function(a_list,
     }else{
       for (i in seq_along(a_0)) {
         outList[[i]] <- data.frame(grn1 = rep(NA, n), grn2 = rep(NA, n))
-        outList[[i]][unlist(validRows), ] <- cbind(outListUnOrd[[i]])
+        outList[[i]][unlist(validRows), "grn1"] <- unlist(outListUnOrd[[i]][seq(1, 2*n_cvFolds, by = 2)], 
+                                                          use.names = FALSE)
+        outList[[i]][unlist(validRows), "grn2"] <- unlist(outListUnOrd[[i]][seq(2, 2*n_cvFolds, by = 2)],
+                                                          use.names = FALSE)
       }
     }
     reduced_outList <- mapply(x = reduced_outList, y = outList, function(x,y){

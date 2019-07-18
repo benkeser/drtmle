@@ -52,7 +52,8 @@
 #'  \code{SL_Qr}. If \code{guard} contains \code{"g"} then the TMLE
 #'  (additionally) guards against misspecification of the propensity score by
 #'  estimating the reduced-dimension propensity score specified by \code{glm_gr}
-#'  or \code{SL_gr}.
+#'  or \code{SL_gr}. If \code{guard} is set to \code{NULL}, then only standard TMLE
+#'  and one-step estimators are computed.
 #' @param reduction A character equal to \code{"univariate"} for a univariate
 #'  misspecification correction (default) or \code{"bivariate"} for the
 #'  bivariate version.
@@ -216,6 +217,9 @@ drtmle <- function(Y, A, W,
   Qn_user <- !is.null(Qn)
   gn_user <- !is.null(gn)
 
+  # check if any additional targeting is performed
+  extra_targeting <- !is.null(guard)
+
   # if cvFolds non-null split data into cvFolds pieces
   validRows <- make_validRows(cvFolds, n = length(Y), n_SL = n_SL)
   if(n_SL > 1){
@@ -249,6 +253,19 @@ drtmle <- function(Y, A, W,
   # -------------------------------
   # estimate propensity score
   # -------------------------------
+  # general strategy for implementation partially cross-validated standard 
+  # error estimates:
+  # - enforce that returnModels must equal true
+  # - add a function get_partial_cv_results
+  #    - takes as input the fitted super learners
+  #    - outputs similarly formatted nuisance lists
+  #    - skeleton of function likely similar to reorder_list
+  # include additionally? or in lieu of usual?
+  # if former, then would need to update methods to have an se option
+  # as well
+  # need to stop if cvFolds is specified in addition to cvSE? No, because
+  # cvSE would be the default? But need to handle when cvFolds > 1 and cvSE = TRUE
+  # as special case. 
   if (is.null(gn)) {
     if(use_future){
       gnOut <- future.apply::future_lapply(
@@ -453,161 +470,163 @@ drtmle <- function(Y, A, W,
   PnDnoStar <- Inf
   ct <- 0
 
-  # fluctuate
-  while (max(abs(c(unlist(PnDQnStar), unlist(PnDgnStar), unlist(PnDnoStar)))) >
-    tolIC & ct < maxIter) {
-    ct <- ct + 1
+  if(extra_targeting){
+    # fluctuate
+    while (max(abs(c(unlist(PnDQnStar), unlist(PnDgnStar), unlist(PnDnoStar)))) >
+      tolIC & ct < maxIter) {
+      ct <- ct + 1
 
-    # re-estimate Qrn
-    if ("Q" %in% guard) {
-      # fluctuate gnStar
-      gnStarOut <- fluctuateG(
-        Y = Y, A = A, W = W, DeltaA = DeltaA,
-        DeltaY = DeltaY, a_0 = a_0, tolg = tolg,
-        gn = gnStar, Qrn = QrnStar
-      )
-      gnStar <- lapply(gnStarOut, function(x) {
-        unlist(x$est)
-      })
-    }
-
-    # fluctuate QnStar
-    if ("g" %in% guard) {
-      if(use_future){
-        grnStarOut <- future.apply::future_lapply(
-          X = validRows, FUN = estimategrn,
-          Y = Y, A = A, W = W,
-          DeltaA = DeltaA, DeltaY = DeltaY,
-          tolg = tolg, Qn = QnStar,
-          gn = gnStar, glm_gr = glm_gr,
-          SL_gr = SL_gr, a_0 = a_0,
-          reduction = reduction,
-          returnModels = returnModels
-        )
-      }else{
-        grnStarOut <- lapply(
-          X = validRows, FUN = estimategrn,
-          Y = Y, A = A, W = W,
-          DeltaA = DeltaA, DeltaY = DeltaY,
-          tolg = tolg, Qn = QnStar,
-          gn = gnStar, glm_gr = glm_gr,
-          SL_gr = SL_gr, a_0 = a_0,
-          reduction = reduction,
-          returnModels = returnModels
-        )
-      }
-      # re-order predictions    
-      grnStar <- reorder_list(grnStarOut, a_0 = a_0, validRows = validRows, 
-                                 grn_ind = TRUE, n_SL = n_SL, n = n)
-
-      # obtain list of outcome regression fits
-      grnMod <- extract_models(grnStarOut)
-
-      if (Qsteps == 1) {
-        QnStarOut <- fluctuateQ(
+      # re-estimate Qrn
+      if ("Q" %in% guard) {
+        # fluctuate gnStar
+        gnStarOut <- fluctuateG(
           Y = Y, A = A, W = W, DeltaA = DeltaA,
-          DeltaY = DeltaY, a_0 = a_0, Qn = QnStar,
-          gn = gnStar, grn = grnStar,
-          reduction = reduction
+          DeltaY = DeltaY, a_0 = a_0, tolg = tolg,
+          gn = gnStar, Qrn = QrnStar
         )
-        QnStar <- lapply(QnStarOut, function(x) {
+        gnStar <- lapply(gnStarOut, function(x) {
           unlist(x$est)
         })
-      } else if (Qsteps == 2) {
-        # do the extra targeting
-        QnStarOut2 <- fluctuateQ2(
-          Y = Y, A = A, W = W, DeltaA = DeltaA,
-          DeltaY = DeltaY, a_0 = a_0, Qn = QnStar,
-          gn = gnStar, grn = grnStar,
-          reduction = reduction
-        )
-        QnStar <- lapply(QnStarOut2, function(x) {
-          unlist(x[[1]])
-        })
+      }
 
-        # do the usual targeting
-        QnStarOut1 <- fluctuateQ1(
+      # fluctuate QnStar
+      if ("g" %in% guard) {
+        if(use_future){
+          grnStarOut <- future.apply::future_lapply(
+            X = validRows, FUN = estimategrn,
+            Y = Y, A = A, W = W,
+            DeltaA = DeltaA, DeltaY = DeltaY,
+            tolg = tolg, Qn = QnStar,
+            gn = gnStar, glm_gr = glm_gr,
+            SL_gr = SL_gr, a_0 = a_0,
+            reduction = reduction,
+            returnModels = returnModels
+          )
+        }else{
+          grnStarOut <- lapply(
+            X = validRows, FUN = estimategrn,
+            Y = Y, A = A, W = W,
+            DeltaA = DeltaA, DeltaY = DeltaY,
+            tolg = tolg, Qn = QnStar,
+            gn = gnStar, glm_gr = glm_gr,
+            SL_gr = SL_gr, a_0 = a_0,
+            reduction = reduction,
+            returnModels = returnModels
+          )
+        }
+        # re-order predictions    
+        grnStar <- reorder_list(grnStarOut, a_0 = a_0, validRows = validRows, 
+                                   grn_ind = TRUE, n_SL = n_SL, n = n)
+
+        # obtain list of outcome regression fits
+        grnMod <- extract_models(grnStarOut)
+
+        if (Qsteps == 1) {
+          QnStarOut <- fluctuateQ(
+            Y = Y, A = A, W = W, DeltaA = DeltaA,
+            DeltaY = DeltaY, a_0 = a_0, Qn = QnStar,
+            gn = gnStar, grn = grnStar,
+            reduction = reduction
+          )
+          QnStar <- lapply(QnStarOut, function(x) {
+            unlist(x$est)
+          })
+        } else if (Qsteps == 2) {
+          # do the extra targeting
+          QnStarOut2 <- fluctuateQ2(
+            Y = Y, A = A, W = W, DeltaA = DeltaA,
+            DeltaY = DeltaY, a_0 = a_0, Qn = QnStar,
+            gn = gnStar, grn = grnStar,
+            reduction = reduction
+          )
+          QnStar <- lapply(QnStarOut2, function(x) {
+            unlist(x[[1]])
+          })
+
+          # do the usual targeting
+          QnStarOut1 <- fluctuateQ1(
+            Y = Y, A = A, W = W, DeltaA = DeltaA,
+            DeltaY = DeltaY, a_0 = a_0, Qn = QnStar,
+            gn = gnStar
+          )
+          QnStar <- lapply(QnStarOut1, function(x) {
+            unlist(x[[1]])
+          })
+        }
+      } else {
+        QnStarOut <- fluctuateQ1(
           Y = Y, A = A, W = W, DeltaA = DeltaA,
           DeltaY = DeltaY, a_0 = a_0, Qn = QnStar,
           gn = gnStar
         )
-        QnStar <- lapply(QnStarOut1, function(x) {
+        QnStar <- lapply(QnStarOut, function(x) {
           unlist(x[[1]])
         })
       }
-    } else {
-      QnStarOut <- fluctuateQ1(
-        Y = Y, A = A, W = W, DeltaA = DeltaA,
-        DeltaY = DeltaY, a_0 = a_0, Qn = QnStar,
-        gn = gnStar
-      )
-      QnStar <- lapply(QnStarOut, function(x) {
-        unlist(x[[1]])
-      })
-    }
 
-    if ("Q" %in% guard) {
-      if(use_future){
-        QrnStarOut <- future.apply::future_lapply(
-          X = validRows, FUN = estimateQrn,
-          Y = Y, A = A, W = W,
-          DeltaA = DeltaA, DeltaY = DeltaY,
-          Qn = QnStar, gn = gnStar,
-          glm_Qr = glm_Qr,
-          family = stats::gaussian(),
-          SL_Qr = SL_Qr, a_0 = a_0,
-          returnModels = returnModels
-        )
-      }else{
-        QrnStarOut <- lapply(
-          X = validRows, FUN = estimateQrn,
-          Y = Y, A = A, W = W,
-          DeltaA = DeltaA, DeltaY = DeltaY,
-          Qn = QnStar, gn = gnStar,
-          glm_Qr = glm_Qr,
-          family = stats::gaussian(),
-          SL_Qr = SL_Qr, a_0 = a_0,
-          returnModels = returnModels
-        )
+      if ("Q" %in% guard) {
+        if(use_future){
+          QrnStarOut <- future.apply::future_lapply(
+            X = validRows, FUN = estimateQrn,
+            Y = Y, A = A, W = W,
+            DeltaA = DeltaA, DeltaY = DeltaY,
+            Qn = QnStar, gn = gnStar,
+            glm_Qr = glm_Qr,
+            family = stats::gaussian(),
+            SL_Qr = SL_Qr, a_0 = a_0,
+            returnModels = returnModels
+          )
+        }else{
+          QrnStarOut <- lapply(
+            X = validRows, FUN = estimateQrn,
+            Y = Y, A = A, W = W,
+            DeltaA = DeltaA, DeltaY = DeltaY,
+            Qn = QnStar, gn = gnStar,
+            glm_Qr = glm_Qr,
+            family = stats::gaussian(),
+            SL_Qr = SL_Qr, a_0 = a_0,
+            returnModels = returnModels
+          )
+        }
+        # re-order predictions
+        QrnStar <- reorder_list(QrnStarOut, a_0 = a_0, validRows = validRows,
+                                n_SL = n_SL, n = n)
+        # obtain list of reduced dimension regression fits
+        QrnMod <- extract_models(QrnStarOut)
       }
-      # re-order predictions
-      QrnStar <- reorder_list(QrnStarOut, a_0 = a_0, validRows = validRows,
-                              n_SL = n_SL, n = n)
-      # obtain list of reduced dimension regression fits
-      QrnMod <- extract_models(QrnStarOut)
-    }
 
-    # tmle estimates
-    psi_t <- lapply(QnStar, mean)
+      # tmle estimates
+      psi_t <- lapply(QnStar, mean)
 
-    # calculate influence functions
-    DnoStar <- eval_Dstar(
-      A = A, Y = Y, DeltaY = DeltaY, DeltaA = DeltaA,
-      Qn = QnStar, gn = gnStar, psi_n = psi_t, a_0 = a_0
-    )
-    PnDnoStar <- lapply(DnoStar, mean)
-
-    if ("g" %in% guard) {
-      DnQoStar <- eval_Dstar_Q(
-        A = A, Y = Y, DeltaY = DeltaY,
-        DeltaA = DeltaA, Qn = QnStar, grn = grnStar, gn = gn,
-        a_0 = a_0, reduction = reduction
+      # calculate influence functions
+      DnoStar <- eval_Dstar(
+        A = A, Y = Y, DeltaY = DeltaY, DeltaA = DeltaA,
+        Qn = QnStar, gn = gnStar, psi_n = psi_t, a_0 = a_0
       )
-      PnDQnStar <- lapply(DnQoStar, mean)
-    }
-    if ("Q" %in% guard) {
-      DngoStar <- eval_Dstar_g(
-        A = A, DeltaY = DeltaY, DeltaA = DeltaA,
-        Qrn = QrnStar, gn = gnStar, a_0 = a_0
-      )
-      PnDgnStar <- lapply(DngoStar, mean)
-    }
-    if (verbose) {
-      cat("Mean of IC       =", round(c(
-        unlist(PnDnoStar),
-        unlist(PnDQnStar),
-        unlist(PnDgnStar)
-      ), 10), "\n")
+      PnDnoStar <- lapply(DnoStar, mean)
+
+      if ("g" %in% guard) {
+        DnQoStar <- eval_Dstar_Q(
+          A = A, Y = Y, DeltaY = DeltaY,
+          DeltaA = DeltaA, Qn = QnStar, grn = grnStar, gn = gn,
+          a_0 = a_0, reduction = reduction
+        )
+        PnDQnStar <- lapply(DnQoStar, mean)
+      }
+      if ("Q" %in% guard) {
+        DngoStar <- eval_Dstar_g(
+          A = A, DeltaY = DeltaY, DeltaA = DeltaA,
+          Qrn = QrnStar, gn = gnStar, a_0 = a_0
+        )
+        PnDgnStar <- lapply(DngoStar, mean)
+      }
+      if (verbose) {
+        cat("Mean of IC       =", round(c(
+          unlist(PnDnoStar),
+          unlist(PnDQnStar),
+          unlist(PnDgnStar)
+        ), 10), "\n")
+      }
     }
   }
 
@@ -621,8 +640,13 @@ drtmle <- function(Y, A, W,
   })
 
   # tmle estimates
-  psi_t <- lapply(QnStar, mean)
   psi_t1 <- lapply(QnStar1, mean)
+  if(extra_targeting){
+    psi_t <- lapply(QnStar, mean)
+  }else{
+    psi_t <- psi_t1
+  }
+
 
   # covariance for tmle
   Dno1Star <- eval_Dstar(
@@ -630,7 +654,7 @@ drtmle <- function(Y, A, W,
     Qn = QnStar1, gn = gn, psi_n = psi_t1, a_0 = a_0
   )
   Dno1StarMat <- matrix(unlist(Dno1Star), nrow = n, ncol = length(a_0))
-  cov_t1 <- stats::cov(Dno1StarMat)/n
+  cov_t1 <- stats::cov(Dno1StarMat) / n
 
   # covariance for drtmle
   DnoStar <- eval_Dstar(
