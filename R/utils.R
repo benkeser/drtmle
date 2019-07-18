@@ -373,6 +373,86 @@ make_validRows <- function(cvFolds, n, ...){
   return(validRows)
 }
 
+#' Temporary fix for convex combination method mean squared error
+#' Relative to existing implementation, we reduce the tolerance at which 
+#' we declare predictions from a given algorithm the same as another
+#' 
+tmp_method.CC_LS <- function () 
+{
+    computeCoef = function(Z, Y, libraryNames, verbose, obsWeights, 
+        errorsInLibrary = NULL, ...) {
+        cvRisk <- apply(Z, 2, function(x) mean(obsWeights * (x - 
+            Y)^2))
+        names(cvRisk) <- libraryNames
+        compute <- function(x, y, wt = rep(1, length(y))) {
+            wX <- sqrt(wt) * x
+            wY <- sqrt(wt) * y
+            D <- crossprod(wX)
+            d <- crossprod(wX, wY)
+            A <- cbind(rep(1, ncol(wX)), diag(ncol(wX)))
+            bvec <- c(1, rep(0, ncol(wX)))
+            fit <- tryCatch({quadprog::solve.QP(Dmat = D, dvec = d, Amat = A, 
+                bvec = bvec, meq = 1)
+          }, error = function(e){
+            out <- list()
+            class(out) <- "error"
+            out
+          })
+            invisible(fit)
+        }
+        modZ <- Z
+        naCols <- which(apply(Z, 2, function(z) {
+            all(z == 0)
+        }))
+        anyNACols <- length(naCols) > 0
+        if (anyNACols) {
+            warning(paste0(paste0(libraryNames[naCols], collapse = ", "), 
+                " have NAs.", "Removing from super learner."))
+        }
+        tol <- 4
+        dupCols <- which(duplicated(round(Z, tol), MARGIN = 2))
+        anyDupCols <- length(dupCols) > 0
+        if (anyDupCols) {
+            warning(paste0(paste0(libraryNames[dupCols], collapse = ", "), 
+                " are duplicates of previous learners.", " Removing from super learner."))
+        }
+        if (anyDupCols | anyNACols) {
+            rmCols <- unique(c(naCols, dupCols))
+            modZ <- Z[, -rmCols]
+        }
+        fit <- compute(x = modZ, y = Y, wt = obsWeights)
+        if(class(fit) != "error"){
+          coef <- fit$solution
+        }else{
+          coef <- rep(0, ncol(Z))
+          coef[which.min(cvRisk)] <- 1
+        }
+        if (anyNA(coef)) {
+            warning("Some algorithms have weights of NA, setting to 0.")
+            coef[is.na(coef)] = 0
+        }
+        if(class(fit) != "error"){
+          if (anyDupCols | anyNACols) {
+              ind <- c(seq_along(coef), rmCols - 0.5)
+              coef <- c(coef, rep(0, length(rmCols)))
+              coef <- coef[order(ind)]
+          }
+          coef[coef < 1e-04] <- 0
+          coef <- coef/sum(coef)
+        }
+        if (!sum(coef) > 0) 
+            warning("All algorithms have zero weight", call. = FALSE)
+        list(cvRisk = cvRisk, coef = coef, optimizer = fit)
+    }
+    computePred = function(predY, coef, ...) {
+        predY %*% matrix(coef)
+    }
+    out <- list(require = "quadprog", computeCoef = computeCoef, 
+        computePred = computePred)
+    invisible(out)
+}
+
+
 #' Temporary fix for convex combination method negative log-likelihood loss
 #' Relative to existing implementation, we reduce the tolerance at which 
 #' we declare predictions from a given algorithm the same as another
@@ -434,7 +514,7 @@ tmp_method.CC_nloglik <- function ()
           out <- list()
           class(out) <- "error"
           out
-        }
+        })
         if (r$status < 1 || r$status > 4) {
             warning(r$message)
         }

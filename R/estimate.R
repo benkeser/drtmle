@@ -609,7 +609,7 @@ estimateQ <- function(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify,
           X = data.frame(A = trainA, trainW)[include, , drop = FALSE],
           verbose = verbose, family = family, SL.library = SL_Q,
           method = ifelse(family$family == "binomial",
-            "tmp_method.CC_nloglik", "method.CC_LS"
+            "tmp_method.CC_nloglik", "tmp_method.CC_LS"
           )
         )
 
@@ -646,7 +646,7 @@ estimateQ <- function(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify,
             X = trainW[include2 & include, , drop = FALSE],
             newX = validW, verbose = verbose, family = family,
             SL.library = SL_Q, method = ifelse(family$family ==
-              "binomial", "tmp_method.CC_nloglik", "method.CC_LS")
+              "binomial", "tmp_method.CC_nloglik", "tmp_method.CC_LS")
           )
           list(est = fm$SL.predict, fm = fm)
         }, simplify = FALSE)
@@ -829,7 +829,7 @@ estimateQrn <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, glm_Qr, SL_Qr,
                 trainDeltaA == 1 & trainDeltaY == 1]), newX = data.frame(
                 gn = valid_g
               ), family = family, SL.library = SL_Qr,
-              method = "method.CC_LS"
+              method = "tmp_method.CC_LS"
             ))
             # if all weights = 0, use discrete SL
             if (!all(fm$coef == 0)) {
@@ -1019,7 +1019,7 @@ estimategrn <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, SL_gr, tolg, glm_gr,
                 X = data.frame(Qn = train_Q),
                 newX = data.frame(Qn = valid_Q),
                 family = stats::gaussian(), SL.library = SL_gr,
-                method = "method.CC_LS"
+                method = "tmp_method.CC_LS"
               )
               fm2 <- SuperLearner::SuperLearner(
                 Y = as.numeric(Aeqa &
