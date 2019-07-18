@@ -116,6 +116,7 @@ print.wald_test.adaptive_iptw <- function(x, digits = 3, ...) {
 #' @export
 #' @method plot drtmle
 #' @importFrom graphics axis lines par plot
+#' @importFrom stats plogis
 #' @examples
 #' # load super learner
 #' library(SuperLearner)
@@ -376,7 +377,6 @@ make_validRows <- function(cvFolds, n, ...){
 #' Temporary fix for convex combination method mean squared error
 #' Relative to existing implementation, we reduce the tolerance at which 
 #' we declare predictions from a given algorithm the same as another
-#' 
 tmp_method.CC_LS <- function () 
 {
     computeCoef = function(Z, Y, libraryNames, verbose, obsWeights, 
@@ -455,15 +455,16 @@ tmp_method.CC_LS <- function ()
 
 #' Temporary fix for convex combination method negative log-likelihood loss
 #' Relative to existing implementation, we reduce the tolerance at which 
-#' we declare predictions from a given algorithm the same as another
-#' 
+#' we declare predictions from a given algorithm the same as another.
+#' Note that because of the way \code{SuperLearner} is structure, one needs to 
+#' install the optimization software separately.
 tmp_method.CC_nloglik <- function () 
 {
     computePred = function(predY, coef, control, ...) {
         if (sum(coef != 0) == 0) {
             stop("All metalearner coefficients are zero, cannot compute prediction.")
         }
-        plogis(trimLogit(predY[, coef != 0], trim = control$trimLogit) %*% 
+        stats::plogis(trimLogit(predY[, coef != 0], trim = control$trimLogit) %*% 
             matrix(coef[coef != 0]))
     }
     computeCoef = function(Z, Y, libraryNames, obsWeights, control, 
@@ -480,7 +481,7 @@ tmp_method.CC_nloglik <- function ()
         modlogitZ <- trimLogit(modZ, control$trimLogit)
         logitZ <- trimLogit(Z, control$trimLogit)
         cvRisk <- apply(logitZ, 2, function(x) -sum(2 * obsWeights * 
-            ifelse(Y, plogis(x, log.p = TRUE), plogis(x, log.p = TRUE, 
+            ifelse(Y, stats::plogis(x, log.p = TRUE), stats::plogis(x, log.p = TRUE, 
                 lower.tail = FALSE))))
         names(cvRisk) <- libraryNames
         obj_and_grad <- function(y, x, w = NULL) {
@@ -488,12 +489,12 @@ tmp_method.CC_nloglik <- function ()
             x <- x
             function(beta) {
                 xB <- x %*% cbind(beta)
-                loglik <- y * plogis(xB, log.p = TRUE) + (1 - 
-                  y) * plogis(xB, log.p = TRUE, lower.tail = FALSE)
+                loglik <- y * stats::plogis(xB, log.p = TRUE) + (1 - 
+                  y) * stats::plogis(xB, log.p = TRUE, lower.tail = FALSE)
                 if (!is.null(w)) 
                   loglik <- loglik * w
                 obj <- -2 * sum(loglik)
-                p <- plogis(xB)
+                p <- stats::plogis(xB)
                 grad <- if (is.null(w)) 
                   2 * crossprod(x, cbind(p - y))
                 else 2 * crossprod(x, w * cbind(p - y))

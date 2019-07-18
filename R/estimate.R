@@ -92,7 +92,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
           Y = trainDeltaA,
           X = trainW, newX = validW, family = stats::binomial(),
           SL.library = SL_g$DeltaA, verbose = verbose,
-          method = "tmp_method.CC_nloglik"
+          method = tmp_method.CC_nloglik()
         )
         # get predicted probability of missing treatment
         gn_DeltaA <- fm_DeltaA$SL.predict
@@ -141,7 +141,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
           Y = as.numeric(trainA[trainDeltaA == 1] == a_0[1]),
           X = trainW[trainDeltaA == 1, , drop = FALSE], newX = validW,
           family = stats::binomial(), SL.library = SL_g$A,
-          verbose = verbose, method = "tmp_method.CC_nloglik"
+          verbose = verbose, method = tmp_method.CC_nloglik()
         )
         gn_A <- vector(mode = "list", length = 2)
         gn_A[[1]] <- fm_A$SL.predict
@@ -345,7 +345,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
               X = trainW[include & include2, , drop = FALSE],
               newX = validW, family = stats::binomial(),
               SL.library = SL_g$DeltaY, verbose = verbose,
-              method = "tmp_method.CC_nloglik"
+              method = tmp_method.CC_nloglik()
             )
             # name the fit
             name_DeltaY[a_ct] <- paste0(
@@ -364,7 +364,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
               A = trainA[include], trainW[include, , drop = FALSE]
             ),
             family = stats::binomial(), SL.library = SL_g$DeltaY,
-            verbose = verbose, method = "tmp_method.CC_nloglik"
+            verbose = verbose, method = tmp_method.CC_nloglik()
           )
 
           # get predictions back setting A = a for every a in a_0
@@ -608,10 +608,12 @@ estimateQ <- function(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify,
           Y = trainY[include],
           X = data.frame(A = trainA, trainW)[include, , drop = FALSE],
           verbose = verbose, family = family, SL.library = SL_Q,
-          method = ifelse(family$family == "binomial",
-            "tmp_method.CC_nloglik", "tmp_method.CC_LS"
+          method = if(family$family == "binomial"){
+            tmp_method.CC_nloglik()
+          }else{
+              tmp_method.CC_LS()
+          }
           )
-        )
 
         Qn <- sapply(a_0, function(x) {
           stats::predict(
@@ -645,9 +647,12 @@ estimateQ <- function(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify,
             Y = trainY[include2 & include],
             X = trainW[include2 & include, , drop = FALSE],
             newX = validW, verbose = verbose, family = family,
-            SL.library = SL_Q, method = ifelse(family$family ==
-              "binomial", "tmp_method.CC_nloglik", "tmp_method.CC_LS")
-          )
+            SL.library = SL_Q, method = if(family$family ==
+              "binomial"){
+              tmp_method.CC_nloglik()
+              }else{
+                tmp_method.CC_LS()
+              })
           list(est = fm$SL.predict, fm = fm)
         }, simplify = FALSE)
         Qn <- lapply(tmp, "[[", 1)
@@ -829,7 +834,7 @@ estimateQrn <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, glm_Qr, SL_Qr,
                 trainDeltaA == 1 & trainDeltaY == 1]), newX = data.frame(
                 gn = valid_g
               ), family = family, SL.library = SL_Qr,
-              method = "tmp_method.CC_LS"
+              method = tmp_method.CC_LS()
             ))
             # if all weights = 0, use discrete SL
             if (!all(fm$coef == 0)) {
@@ -1019,7 +1024,7 @@ estimategrn <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, SL_gr, tolg, glm_gr,
                 X = data.frame(Qn = train_Q),
                 newX = data.frame(Qn = valid_Q),
                 family = stats::gaussian(), SL.library = SL_gr,
-                method = "tmp_method.CC_LS"
+                method = tmp_method.CC_LS()
               )
               fm2 <- SuperLearner::SuperLearner(
                 Y = as.numeric(Aeqa &
@@ -1027,7 +1032,7 @@ estimategrn <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, SL_gr, tolg, glm_gr,
                 X = data.frame(Qn = train_Q),
                 newX = data.frame(Qn = valid_Q),
                 family = stats::binomial(), SL.library = SL_gr,
-                method = "tmp_method.CC_nloglik"
+                method = tmp_method.CC_nloglik()
               )
               if (!all(fm1$coef == 0)) {
                 grn1 <- fm1$SL.predict
@@ -1048,7 +1053,7 @@ estimategrn <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, SL_gr, tolg, glm_gr,
                 X = data.frame(Qn = train_Q, gn = train_g),
                 newX = data.frame(Qn = valid_Q, gn = valid_g),
                 family = stats::binomial(),
-                SL.library = SL_gr, method = "tmp_method.CC_nloglik"
+                SL.library = SL_gr, method = tmp_method.CC_nloglik()
               )
               if (!all(fm2$coef == 0)) {
                 grn2 <- fm2$SL.predict
