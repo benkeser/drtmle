@@ -418,7 +418,7 @@ tmp_method.CC_LS <- function ()
         }
         if (anyDupCols | anyNACols) {
             rmCols <- unique(c(naCols, dupCols))
-            modZ <- Z[, -rmCols]
+            modZ <- Z[, -rmCols, drop = FALSE]
         }
         fit <- compute(x = modZ, y = Y, wt = obsWeights)
         if(class(fit) != "error"){
@@ -476,7 +476,7 @@ tmp_method.CC_nloglik <- function ()
         if (anyDupCols) {
             warning(paste0(paste0(libraryNames[dupCols], collapse = ", "), 
                 " are duplicates of previous learners.", " Removing from super learner."))
-            modZ <- modZ[, -dupCols]
+            modZ <- modZ[, -dupCols, drop = FALSE]
         }
         modlogitZ <- trimLogit(modZ, control$trimLogit)
         logitZ <- trimLogit(Z, control$trimLogit)

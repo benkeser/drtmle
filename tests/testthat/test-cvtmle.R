@@ -47,7 +47,7 @@ test_that("drtmle executes as expected with cvtmle and stratify = TRUE", {
     glm_Q = "W1 + W2",
     glm_g = "W1 + W2",
     glm_Qr = "gn",
-    glm_gr = "Qn",
+    glm_gr = "Qn + gn",
     guard = c("Q", "g"),
     reduction = "bivariate"
   )

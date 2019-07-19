@@ -409,7 +409,8 @@ drtmle <- function(Y, A, W,
       )
     }
     # re-order predictions
-    grn <- reorder_list(grnOut, a_0 = a_0, validRows = validRows, grn_ind = TRUE,
+    grn <- reorder_list(grnOut, a_0 = a_0, validRows = validRows, 
+                        grn_ind = TRUE,
                         n_SL = n_SL, n = n)
 
     # obtain list of outcome regression fits
