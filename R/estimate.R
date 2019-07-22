@@ -169,7 +169,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
             Y = as.numeric(trainA[include] == a),
             X = trainW[include, , drop = FALSE], newX = validW,
             family = stats::binomial(), SL.library = SL_g$A,
-            verbose = verbose
+            verbose = verbose, method = tmp_method.CC_nloglik()
           )
           # get predictions
           tmp_pred <- tmp_fm$SL.pred

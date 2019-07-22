@@ -290,7 +290,7 @@ g_{r,n,2}^*(a \mid W_i) \ \{Y_i - \bar{Q}_n^*(a,W_i)\} = 0 \ ,
 ##     out &lt;- list(pred = pred, fit = fit)
 ##     return(out)
 ## }
-## &lt;bytecode: 0x7fef0cd8d830&gt;
+## &lt;bytecode: 0x7fe1f81b71c0&gt;
 ## &lt;environment: namespace:drtmle&gt;</code></pre>
 <p>In the above code, we see that a user-specified function should have options <code>Y, X, newX, family, obsWeights, ...</code>, along with other options specific to the function. The option <code>Y</code> corresponds to the outcome of the regression and <code>X</code> to the variables onto which the outcome is regressed. The option <code>newX</code> should be of the same class and dimension as <code>X</code> and is meant to contain new values of variables at which to evaluate the regression fit. The <code>family</code> and <code>obsWeights</code> options are not strictly necessary (indeed, they are not used by <code>SL.npreg</code>), they are useful to include if one wishes to utilize the function as part of a super learner library. The <code>SL.npreg</code> function proceeds by checking whether there is sufficient variation in <code>Y</code> to even both fitting the kernel regression (as specified by option <code>rangeThresh</code>), and if so, fits a kernel regression with cross-validated bandwidth selection via the <code>npregbw</code> function. The output is then formatted in a specific way so that <code>drtmle</code> is able to retrieve the appropriate objects from the fitted regression. In particular the output should be a list with named objects <code>pred</code> and <code>fit</code>; the former including predictions made from the fitted regression on <code>newX</code>, the latter including any information that may be needed to predict new values based on the fitted object. A class is assigned to the <code>fit</code> object, so that an S3 <code>predict</code> method may later be used to predict new values based on the fitted regression object. The user must also specify this <code>predict</code> method. Use <code>drtmle:::predict.SL.npreg</code> to view the simple <code>predict</code> method for <code>SL.npreg</code>.</p>
 <p>In the code below, we demonstrate a call to <code>drtmle</code> with <code>SL.npreg</code> used to estimate each nuisance parameter. Here, we also illustrate the use of <code>stratify = TRUE</code>, which fits a separate kernel regression of <span class="math inline">\(Y\)</span> onto <span class="math inline">\(W\)</span> in observations with <span class="math inline">\(A = 1\)</span> and <span class="math inline">\(A = 0\)</span>.</p>
@@ -1038,33 +1038,39 @@ W_i)} \ \{ I(A_i = a) - g_n(a \mid W = W_i)\} = 0 \ ,\]</span> then the IPTW est
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] future.batchtools_0.7.2 future_1.12.0          
-##  [3] earth_5.1.1             plotmo_3.5.4           
-##  [5] Formula_1.2-3           TeachingDemos_2.10     
-##  [7] plotrix_3.7-5           quadprog_1.5-5         
-##  [9] nloptr_1.2.1            SuperLearner_2.0-24    
-## [11] nnls_1.4                drtmle_1.0.4.9001      
+## [1] SuperLearner_2.0-24 nnls_1.4            drtmle_1.0.4.9001  
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] progress_1.2.0     xfun_0.6           listenv_0.7.0     
-##  [4] lattice_0.20-38    htmltools_0.3.6    yaml_2.2.0        
-##  [7] rlang_0.3.3        pkgdown_1.3.0      withr_2.1.2       
-## [10] rappdirs_0.3.1     plyr_1.8.4         foreach_1.4.4     
-## [13] stringr_1.4.0      MatrixModels_0.4-1 commonmark_1.7    
-## [16] codetools_0.2-16   memoise_1.1.0      evaluate_0.13     
-## [19] knitr_1.22         SparseM_1.77       batchtools_0.9.11 
-## [22] quantreg_5.38      parallel_3.5.3     Rcpp_1.0.1        
-## [25] backports_1.1.3    checkmate_1.9.1    desc_1.2.0        
-## [28] doFuture_0.8.0     fs_1.2.7           brew_1.0-6        
-## [31] hms_0.4.2          digest_0.6.18      stringi_1.4.3     
-## [34] rprojroot_1.3-2    grid_3.5.3         tools_3.5.3       
-## [37] magrittr_1.5       base64url_1.4      np_0.60-9         
-## [40] crayon_1.3.4       future.apply_1.2.0 pkgconfig_2.0.2   
-## [43] MASS_7.3-51.4      Matrix_1.2-17      data.table_1.12.0 
-## [46] xml2_1.2.0         prettyunits_1.0.2  assertthat_0.2.1  
-## [49] rmarkdown_1.12     roxygen2_6.1.1     iterators_1.0.10  
-## [52] cubature_2.0.3     R6_2.4.0           globals_0.12.4    
-## [55] boot_1.3-20        compiler_3.5.3</code></pre>
+##  [1] progress_1.2.0          xfun_0.6               
+##  [3] listenv_0.7.0           lattice_0.20-38        
+##  [5] htmltools_0.3.6         yaml_2.2.0             
+##  [7] rlang_0.3.3             pkgdown_1.3.0          
+##  [9] withr_2.1.2             rappdirs_0.3.1         
+## [11] plyr_1.8.4              foreach_1.4.4          
+## [13] stringr_1.4.0           MatrixModels_0.4-1     
+## [15] commonmark_1.7          future_1.12.0          
+## [17] codetools_0.2-16        memoise_1.1.0          
+## [19] evaluate_0.13           knitr_1.22             
+## [21] SparseM_1.77            batchtools_0.9.11      
+## [23] quantreg_5.38           parallel_3.5.3         
+## [25] Rcpp_1.0.1              backports_1.1.3        
+## [27] checkmate_1.9.1         desc_1.2.0             
+## [29] doFuture_0.8.0          fs_1.2.7               
+## [31] future.batchtools_0.7.2 brew_1.0-6             
+## [33] hms_0.4.2               digest_0.6.18          
+## [35] stringi_1.4.3           rprojroot_1.3-2        
+## [37] grid_3.5.3              quadprog_1.5-5         
+## [39] tools_3.5.3             magrittr_1.5           
+## [41] base64url_1.4           np_0.60-9              
+## [43] crayon_1.3.4            future.apply_1.2.0     
+## [45] pkgconfig_2.0.2         MASS_7.3-51.4          
+## [47] Matrix_1.2-17           data.table_1.12.0      
+## [49] xml2_1.2.0              prettyunits_1.0.2      
+## [51] assertthat_0.2.1        rmarkdown_1.12         
+## [53] roxygen2_6.1.1          iterators_1.0.10       
+## [55] cubature_2.0.3          R6_2.4.0               
+## [57] globals_0.12.4          boot_1.3-20            
+## [59] compiler_3.5.3</code></pre>
 <div id="refs" class="references">
 <div id="ref-futurePackage">
 <p>Bengtsson, Henrik. 2017a. <em>future: A Future API for R</em>. https://cran.r-project.org/web/packages/future. <a href="https://github.com/HenrikBengtsson/future">https://github.com/HenrikBengtsson/future</a>.</p>

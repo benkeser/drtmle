@@ -244,7 +244,8 @@ reduced-dimension outcome regression specified by <code>glm_Qr</code> or
 <code>SL_Qr</code>. If <code>guard</code> contains <code>"g"</code> then the TMLE
 (additionally) guards against misspecification of the propensity score by
 estimating the reduced-dimension propensity score specified by <code>glm_gr</code>
-or <code>SL_gr</code>.</p></td>
+or <code>SL_gr</code>. If <code>guard</code> is set to <code>NULL</code>, then only standard TMLE
+and one-step estimators are computed.</p></td>
     </tr>
     <tr>
       <th>reduction</th>
