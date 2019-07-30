@@ -28,7 +28,7 @@
 #'  mean estimates.
 #' @param validRows A \code{list} of length \code{cvFolds} containing the row
 #'  indexes of observations to include in validation fold.
-#' @importFrom SuperLearner SuperLearner trimLogit
+#' @importFrom SuperLearner SuperLearner trimLogit All
 #' @importFrom stats predict glm as.formula
 #
 estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
