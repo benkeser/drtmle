@@ -41,13 +41,13 @@ to pool across \code{A} (if \code{FALSE}).}
 
 \item{SL_Q}{A vector of characters or a list describing the Super Learner
 library to be used for the outcome regression. See
-\code{link{SuperLearner::SuperLearner}} for details.}
+\code{\link[SuperLearner]{SuperLearner}} for details.}
 
 \item{SL_g}{A vector of characters describing the super learner library to be
 used for each of the propensity score regressions (\code{DeltaA}, \code{A},
 and \code{DeltaY}). To use the same library for each of the regressions (or
 if there is no missing data in \code{A} nor \code{Y}), a single library may
-be input. See \code{\link{SuperLearner::SuperLearner}} for details on how
+be input. See \code{\link[SuperLearner]{SuperLearner}} for details on how
 super learner libraries can be specified.}
 
 \item{SL_Qr}{A vector of characters or a list describing the Super Learner
