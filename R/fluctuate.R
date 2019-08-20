@@ -32,7 +32,7 @@ fluctuateQ1 <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, a_0, coefTol = 1e3) {
         fm <- stats::glm(
           Yscale ~ -1 + offset(off) + H1,
           start = 0,
-          data = data.frame(Y = Y, off = off, H1 = H1), family = "binomial"
+          data = data.frame(Yscale = Yscale, off = off, H1 = H1), family = "binomial"
         )
       )
       if (!fm$converged | abs(max(fm$coefficients)) > coefTol) {
@@ -41,7 +41,7 @@ fluctuateQ1 <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, a_0, coefTol = 1e3) {
           suppressWarnings(
             fm <- stats::glm(
               Yscale ~ -1 + offset(off) + H1,
-              data = data.frame(Y = Y, off = off, H2 = H1),
+              data = data.frame(Yscale = Yscale, off = off, H2 = H1),
               family = "binomial"
             )
           )
@@ -176,7 +176,7 @@ fluctuateQ2 <- function(Y, A, W, DeltaY, DeltaA,
           fm <- stats::glm(
             Yscale ~ -1 + offset(off) + H2,
             start = 0,
-            data = data.frame(Y = Y, off = off, H2 = H2), family = "binomial"
+            data = data.frame(Yscale = Yscale, off = off, H2 = H2), family = "binomial"
           )
         )
       } else {
@@ -188,7 +188,7 @@ fluctuateQ2 <- function(Y, A, W, DeltaY, DeltaA,
           suppressWarnings(
             fm <- stats::glm(
               Yscale ~ -1 + offset(off) + H2,
-              data = data.frame(Y = Y, off = off, H2 = H2),
+              data = data.frame(Yscale = Yscale, off = off, H2 = H2),
               family = "binomial"
             )
           )
@@ -287,7 +287,7 @@ fluctuateQ <- function(Y, A, W, DeltaY, DeltaA,
         fm <- stats::glm(
           as.formula(fluc_formula),
           start = start,
-          data = data.frame(Y = Y, off = off, H1 = H1, H2 = H2),
+          data = data.frame(Yscale = Yscale, off = off, H1 = H1, H2 = H2),
           family = "binomial"
         )
       )
@@ -300,7 +300,7 @@ fluctuateQ <- function(Y, A, W, DeltaY, DeltaA,
           fm <- stats::glm(
             as.formula(fluc_formula),
             start = NULL,
-            data = data.frame(Y = Y, off = off, H1 = H1, H2 = H2),
+            data = data.frame(Yscale = Yscale, off = off, H1 = H1, H2 = H2),
             family = "binomial"
           )
         )
