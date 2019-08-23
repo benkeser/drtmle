@@ -137,14 +137,14 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
       # if there are only two unique values of A, then only need one fit
       if (length(a_0) == length(unique(A)) &
         length(unique(A[!is.na(A)])) == 2) {
-        fm_A <- SuperLearner::SuperLearner(
+        fm_A <- list(SuperLearner::SuperLearner(
           Y = as.numeric(trainA[trainDeltaA == 1] == a_0[1]),
           X = trainW[trainDeltaA == 1, , drop = FALSE], newX = validW,
           family = stats::binomial(), SL.library = SL_g$A,
           verbose = verbose, method = tmp_method.CC_nloglik()
-        )
+        ))
         gn_A <- vector(mode = "list", length = 2)
-        gn_A[[1]] <- fm_A$SL.predict
+        gn_A[[1]] <- fm_A[[1]]$SL.predict
         gn_A[[2]] <- 1 - gn_A[[1]]
         # name for this model
         name_A <- paste0("I(A = ", a_0[1], ") ~ W | DeltaA == 1")
@@ -194,16 +194,16 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
       if (length(a_0) == length(unique(A[!is.na(A)])) &
         length(unique(A[!is.na(A)])) == 2) {
         gn_A <- vector(mode = "list", length = 2)
-        fm_A <- do.call(SL_g$A, args = list(
+        fm_A <- list(do.call(SL_g$A, args = list(
           Y = as.numeric(
             trainA[trainDeltaA == 1] == a_0[1]
           ),
           X = trainW[trainDeltaA == 1, , drop = FALSE], newX = validW,
           obsWeights = rep(1, length(trainA[trainDeltaA == 1])),
           family = stats::binomial()
-        ))
-        gn_A[[1]] <- fm_A$pred
-        gn_A[[2]] <- 1 - fm_A$pred
+        )))
+        gn_A[[1]] <- fm_A[[1]]$pred
+        gn_A[[2]] <- 1 - fm_A[[1]]$pred
         name_A <- paste0("I(A = ", a_0[1], ") ~ W | DeltaA == 1")
       } else {
         a_ct <- 0
@@ -256,13 +256,13 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
       length(unique(A[!is.na(A)])) == 2) {
       thisDat <- data.frame(A = as.numeric(trainA[trainDeltaA == 1] ==
         a_0[1]), trainW[trainDeltaA == 1, , drop = FALSE])
-      fm_A <- stats::glm(
+      fm_A <- list(stats::glm(
         stats::as.formula(paste0("A~", glm_g$A)),
         data = thisDat, family = stats::binomial()
-      )
+      ))
       gn_A <- vector(mode = "list", length = 2)
       name_A <- paste0("I(A = ", a_0[1], ") ~ W | DeltaA == 1")
-      gn_A[[1]] <- stats::predict(fm_A, newdata = data.frame(
+      gn_A[[1]] <- stats::predict(fm_A[[1]], newdata = data.frame(
         A = validA, validW
       ), type = "response")
       gn_A[[2]] <- 1 - gn_A[[1]]
@@ -359,13 +359,13 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
           # levels of A
         } else {
           # fit super learner
-          fm_DeltaY <- SuperLearner::SuperLearner(
+          fm_DeltaY <- list(SuperLearner::SuperLearner(
             Y = trainDeltaY[include], X = data.frame(
               A = trainA[include], trainW[include, , drop = FALSE]
             ),
             family = stats::binomial(), SL.library = SL_g$DeltaY,
             verbose = verbose, method = tmp_method.CC_nloglik()
-          )
+          ))
 
           # get predictions back setting A = a for every a in a_0
           gn_DeltaY <- vector(mode = "list", length = length(a_0))
@@ -374,7 +374,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
           for (a in a_0) {
             a_ct <- a_ct + 1
             gn_DeltaY[[a_ct]] <- stats::predict(
-              fm_DeltaY,
+              fm_DeltaY[[1]],
               onlySL = TRUE, newdata = data.frame(A = a, validW)
             )$pred
           }
@@ -413,7 +413,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
           } # end loop over a_0
         } else {
           # end if stratify call algorithm to fit pooled estimate
-          fm_DeltaY <- do.call(SL_g$DeltaY, args = list(
+          fm_DeltaY <- list(do.call(SL_g$DeltaY, args = list(
             Y = trainDeltaY[include],
             X = data.frame(
               A = trainA[include],
@@ -424,7 +424,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
               1,
               length(trainA[include])
             ), family = stats::binomial()
-          ))
+          )))
           name_DeltaY <- paste0("DeltaY ~ W + A | DeltaA == 1")
           # loop to get predictions setting A = a
           gn_DeltaY <- vector(mode = "list", length = length(a_0))
@@ -432,7 +432,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
           for (a in a_0) {
             a_ct <- a_ct + 1
             gn_DeltaY[[a_ct]] <- stats::predict(
-              fm_DeltaY$fit,
+              fm_DeltaY[[1]]$fit,
               newdata = data.frame(A = a, validW)
             )
           }
@@ -470,7 +470,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
         } # end loop over treatments
       } else {
         # end stratified glm fit glm in everyone with DeltaA == 1
-        fm_DeltaY <- stats::glm(
+        fm_DeltaY <- list(stats::glm(
           stats::as.formula(paste0(
             "trainDeltaY[include]~", glm_g$DeltaY
           )),
@@ -479,7 +479,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
             ,
             drop = FALSE
           ]), family = stats::binomial()
-        )
+        ))
         name_DeltaY <- paste0("DeltaY ~ W + A | DeltaA == 1")
         # get predictions back setting A = a
         gn_DeltaY <- vector(mode = "list", length = length(a_0))
@@ -487,7 +487,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
         for (a in a_0) {
           a_ct <- a_ct + 1
           gn_DeltaY[[a_ct]] <- stats::predict(
-            fm_DeltaY,
+            fm_DeltaY[[1]],
             newdata = data.frame(A = a, validW), type = "response"
           )
         } # end loop over treatments
