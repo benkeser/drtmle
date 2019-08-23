@@ -74,7 +74,7 @@ test_that("drtmle executes when glm and SL are specified", {
   expect_true(is.numeric(fit1$aiptw_c$est))
   expect_true(is.numeric(fit1$aiptw_c$cov))
   expect_true(class(fit1$QnMod[[1]]) == "SuperLearner")
-  expect_true(class(fit1$gnMod[[1]]$A) == "SuperLearner")
+  expect_true(class(fit1$gnMod[[1]]$A[[1]]) == "SuperLearner")
   expect_true(class(fit1$QrnMod[[1]][[1]]) == "SuperLearner")
   expect_true(class(fit1$grnMod[[1]][[1]]$fm1) == "SuperLearner")
   expect_true(class(fit1$grnMod[[1]][[1]]$fm2) == "SuperLearner")
