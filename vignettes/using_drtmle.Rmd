@@ -278,8 +278,7 @@ reasonably fast rates irrespective of the dimension of $W$ and irrespective of
 whether the OR or PS are consistently estimated. Based on these
 reduced-dimension regressions, van der Laan (2014) showed that if estimates of
 the OR $\bar{Q}_n^*$, PS $g_n^*$, R-OR $\bar{Q}_{r,n}^*$, and R-PS $g_{r,n}^*$
-satisfied $$
-\begin{align}
+satisfied \begin{align}
 & \frac{1}{n} \sum\limits_{i=1}^n  \frac{I(A_i = a)}{g_n^*(a \mid W_i)} \{Y_i -
 \bar{Q}_n^*(a,W_i)\} = 0 \ , \label{tmleEIFSolve} \\
 &\frac{1}{n} \sum\limits_{i=1}^n \frac{\bar{Q}_{r,n}(a, W_i)}{g_n(a \mid W_i)}
@@ -288,7 +287,6 @@ satisfied $$
 \biggl\{\frac{g_{r,n}^*(a \mid W_i) - g_n^*(a \mid W_i)}{g_n^*(a \mid W_i)}
 \biggr\} \{Y_i - \bar{Q}_n^*(a, W_i) \} = 0 \ , \label{tmleQsolve}
 \end{align}
-$$
 then the GCOMP estimator based on $\bar{Q}_n^*$ would be doubly-robust not only
 with respect to consistency, but also with respect to its limiting
 distribution. The author additionally proposed a TMLE algorithm to map initial
@@ -780,13 +778,13 @@ means of interest. The estimators previously discussed can be modified to allow
 this missingness to depend on covariates. Let $\Delta_A$ and $\Delta_Y$ be
 indicators that $A$ and $Y$ are observed, respectively. We can redefine the OR
 to be $\bar{Q}_n(a,w) := E(\Delta_Y Y \mid \Delta_A A = a, \Delta_A = 1,
-\Delta_Y = 1, W = w)$ and similarly redefine the PS to be \begin{aligned}
+\Delta_Y = 1, W = w)$ and similarly redefine the PS to be \begin{align}
 g_0(a \mid w) &= Pr_0(\Delta_A = 1, \Delta_A A = a, \Delta_Y = 1 \mid W = w)
 \notag \\
 &= Pr_0(\Delta_A = 1 \mid W) Pr_0(\Delta_A A = a \mid \Delta_A = 1, W = w)
 \label{modPS} \\
-&\hspace{1.5in} Pr_0(\Delta_Y = 1 \mid \Delta_A = 1, \Delta_A A = a, W = w) \ .
-\end{aligned}
+&\hspace{1.5in} Pr_0(\Delta_Y = 1 \mid \Delta_A = 1, \Delta_A A = a, W = w) \ \notag.
+\end{align}
 We introduce missing values to `A` and `Y` in our running example.
 
 ```{r}

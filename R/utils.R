@@ -355,8 +355,9 @@ extract_models <- function(a_list){
 #' Make list of rows in each validation fold. 
 #' @param cvFolds Numeric number of cv folds
 #' @param n Number of observations
+#' @param n_SL Number of super learners to fit
 #' @param ... Other arguments
-make_validRows <- function(cvFolds, n, ...){
+make_validRows <- function(cvFolds, n, n_SL, ...){
   if (length(cvFolds) > 1) {
     stopifnot(length(cvFolds) == n)
     # comes in as vector of fold assignments
@@ -371,7 +372,7 @@ make_validRows <- function(cvFolds, n, ...){
     # no cross-validation
     validRows <- list(seq_len(n))
   }
-  return(validRows)
+  return(rep(validRows, n_SL))
 }
 
 #' Temporary fix for convex combination method mean squared error
