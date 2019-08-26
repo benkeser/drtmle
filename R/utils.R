@@ -372,7 +372,7 @@ make_validRows <- function(cvFolds, n, n_SL, ...){
     # no cross-validation
     validRows <- list(seq_len(n))
   }
-  return(rep(validRows, n_SL))
+  return(validRows)
 }
 
 #' Temporary fix for convex combination method mean squared error
