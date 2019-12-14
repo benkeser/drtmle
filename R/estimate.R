@@ -475,8 +475,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
             "trainDeltaY[include]~", glm_g$DeltaY
           )),
           data = data.frame(A = trainA[include], trainW[
-            include,
-            ,
+            include, ,
             drop = FALSE
           ]), family = stats::binomial()
         ))
@@ -507,7 +506,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
   # combine estimates into a single propensity score
   # ------------------------------------------------------
   gn <- mapply(gn_A = gn_A, gn_DeltaY = gn_DeltaY, FUN = function(gn_A,
-                                                                    gn_DeltaY) {
+                                                                  gn_DeltaY) {
     gn_A * gn_DeltaY * gn_DeltaA
   }, SIMPLIFY = FALSE)
 
@@ -608,12 +607,12 @@ estimateQ <- function(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify,
           Y = trainY[include],
           X = data.frame(A = trainA, trainW)[include, , drop = FALSE],
           verbose = verbose, family = family, SL.library = SL_Q,
-          method = if(family$family == "binomial"){
+          method = if (family$family == "binomial") {
             tmp_method.CC_nloglik()
-          }else{
-              tmp_method.CC_LS()
+          } else {
+            tmp_method.CC_LS()
           }
-          )
+        )
 
         Qn <- sapply(a_0, function(x) {
           stats::predict(
@@ -647,12 +646,13 @@ estimateQ <- function(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify,
             Y = trainY[include2 & include],
             X = trainW[include2 & include, , drop = FALSE],
             newX = validW, verbose = verbose, family = family,
-            SL.library = SL_Q, method = if(family$family ==
-              "binomial"){
+            SL.library = SL_Q, method = if (family$family ==
+              "binomial") {
               tmp_method.CC_nloglik()
-              }else{
-                tmp_method.CC_LS()
-              })
+            } else {
+              tmp_method.CC_LS()
+            }
+          )
           list(est = fm$SL.predict, fm = fm)
         }, simplify = FALSE)
         Qn <- lapply(tmp, "[[", 1)

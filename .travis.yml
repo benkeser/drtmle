@@ -27,7 +27,7 @@ addons:
 before_install:
   - Rscript -e 'update.packages(ask = FALSE)'
 
-r_github_packages:
+r_packages:
   - devtools
   - covr
   - sessioninfo

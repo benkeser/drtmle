@@ -29,7 +29,7 @@
 #' Y <- X$X1 + rnorm(n)
 #' # fit npreg
 #' fit <- SL.npreg(Y = Y, X = X, newX = X)
-#
+#' #
 SL.npreg <- function(Y, X, newX, family = gaussian(),
                      obsWeights = rep(1, length(Y)),
                      rangeThresh = 1e-7, ...) {
@@ -79,9 +79,9 @@ SL.npreg <- function(Y, X, newX, family = gaussian(),
 #' # fit npreg
 #' fit <- SL.npreg(Y = Y, X = X, newX = X)
 #' # predict on fit
-#' newX <- data.frame(X1 = c(-1,0,1))
+#' newX <- data.frame(X1 = c(-1, 0, 1))
 #' pred <- predict(fit$fit, newdata = newX)
-#
+#' #
 predict.SL.npreg <- function(object, newdata, ...) {
   pred <- stats::predict(object = object$object, newdata = newdata)
   pred
