@@ -4,8 +4,7 @@
 \alias{ci.drtmle}
 \title{Confidence intervals for drtmle objects}
 \usage{
-\method{ci}{drtmle}(object, est = c("drtmle"), level = 0.95,
-  contrast = NULL, ...)
+\method{ci}{drtmle}(object, est = c("drtmle"), level = 0.95, contrast = NULL, ...)
 }
 \arguments{
 \item{object}{An object of class \code{"drtmle"}}

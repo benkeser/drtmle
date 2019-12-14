@@ -4,8 +4,7 @@
 \alias{ci.adaptive_iptw}
 \title{Confidence intervals for adaptive_iptw objects}
 \usage{
-\method{ci}{adaptive_iptw}(object, est = c("iptw_tmle"), level = 0.95,
-  contrast = NULL, ...)
+\method{ci}{adaptive_iptw}(object, est = c("iptw_tmle"), level = 0.95, contrast = NULL, ...)
 }
 \arguments{
 \item{object}{An object of class \code{"adaptive_iptw"}}

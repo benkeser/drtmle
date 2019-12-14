@@ -4,16 +4,41 @@
 \alias{drtmle}
 \title{TMLE estimate of the average treatment effect with doubly-robust inference}
 \usage{
-drtmle(Y, A, W, DeltaA = as.numeric(!is.na(A)),
-  DeltaY = as.numeric(!is.na(Y)), a_0 = unique(A[!is.na(A)]),
-  family = if (all(Y \%in\% c(0, 1))) {     stats::binomial() } else {   
-   stats::gaussian() }, stratify = TRUE, SL_Q = NULL, SL_g = NULL,
-  SL_Qr = NULL, SL_gr = NULL, n_SL = 1, glm_Q = NULL,
-  glm_g = NULL, glm_Qr = NULL, glm_gr = NULL, guard = c("Q", "g"),
-  reduction = "univariate", returnModels = FALSE, cvFolds = 1,
-  maxIter = 3, tolIC = 1/length(Y), tolg = 0.01, verbose = FALSE,
-  Qsteps = 2, parallel = FALSE, future_hpc = NULL, Qn = NULL,
-  gn = NULL, use_future = TRUE, ...)
+drtmle(
+  Y,
+  A,
+  W,
+  DeltaA = as.numeric(!is.na(A)),
+  DeltaY = as.numeric(!is.na(Y)),
+  a_0 = unique(A[!is.na(A)]),
+  family = if (all(Y \%in\% c(0, 1))) {     stats::binomial() } else {    
+    stats::gaussian() },
+  stratify = TRUE,
+  SL_Q = NULL,
+  SL_g = NULL,
+  SL_Qr = NULL,
+  SL_gr = NULL,
+  n_SL = 1,
+  glm_Q = NULL,
+  glm_g = NULL,
+  glm_Qr = NULL,
+  glm_gr = NULL,
+  guard = c("Q", "g"),
+  reduction = "univariate",
+  returnModels = FALSE,
+  cvFolds = 1,
+  maxIter = 3,
+  tolIC = 1/length(Y),
+  tolg = 0.01,
+  verbose = FALSE,
+  Qsteps = 2,
+  parallel = FALSE,
+  future_hpc = NULL,
+  Qn = NULL,
+  gn = NULL,
+  use_future = TRUE,
+  ...
+)
 }
 \arguments{
 \item{Y}{A \code{numeric} continuous or binary outcomes.}

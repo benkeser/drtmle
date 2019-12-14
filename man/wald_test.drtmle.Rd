@@ -4,8 +4,7 @@
 \alias{wald_test.drtmle}
 \title{Wald tests for drtmle objects}
 \usage{
-\method{wald_test}{drtmle}(object, est = c("drtmle"), null = 0,
-  contrast = NULL, ...)
+\method{wald_test}{drtmle}(object, est = c("drtmle"), null = 0, contrast = NULL, ...)
 }
 \arguments{
 \item{object}{An object of class \code{"drtmle"}}

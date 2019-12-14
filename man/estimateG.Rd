@@ -4,8 +4,20 @@
 \alias{estimateG}
 \title{estimateG}
 \usage{
-estimateG(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg, stratify = FALSE,
-  validRows = NULL, verbose = FALSE, returnModels = FALSE)
+estimateG(
+  A,
+  W,
+  DeltaY,
+  DeltaA,
+  SL_g,
+  glm_g,
+  a_0,
+  tolg,
+  stratify = FALSE,
+  validRows = NULL,
+  verbose = FALSE,
+  returnModels = FALSE
+)
 }
 \arguments{
 \item{A}{A vector of binary treatment assignment (assumed to be equal to 0 or

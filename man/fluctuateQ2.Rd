@@ -4,8 +4,19 @@
 \alias{fluctuateQ2}
 \title{fluctuateQ2}
 \usage{
-fluctuateQ2(Y, A, W, DeltaY, DeltaA, Qn, gn, grn, a_0, reduction,
-  coefTol = 1000)
+fluctuateQ2(
+  Y,
+  A,
+  W,
+  DeltaY,
+  DeltaA,
+  Qn,
+  gn,
+  grn,
+  a_0,
+  reduction,
+  coefTol = 1000
+)
 }
 \arguments{
 \item{Y}{The outcome}

@@ -4,8 +4,22 @@
 \alias{estimateQ}
 \title{estimateQ}
 \usage{
-estimateQ(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify, family,
-  verbose = FALSE, returnModels = FALSE, validRows = NULL, ...)
+estimateQ(
+  Y,
+  A,
+  W,
+  DeltaA,
+  DeltaY,
+  SL_Q,
+  glm_Q,
+  a_0,
+  stratify,
+  family,
+  verbose = FALSE,
+  returnModels = FALSE,
+  validRows = NULL,
+  ...
+)
 }
 \arguments{
 \item{Y}{A vector of continuous or binary outcomes.}
