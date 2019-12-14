@@ -30,7 +30,8 @@ Suggests:
     quadprog,
     nloptr,
     parallel,
-    foreach
+    foreach,
+    snow
 License: MIT + file LICENSE
 URL: https://github.com/benkeser/drtmle
 BugReports: https://github.com/benkeser/drtmle/issues
