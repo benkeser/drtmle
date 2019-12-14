@@ -25,7 +25,6 @@ Suggests:
     testthat,
     knitr,
     rmarkdown,
-    data.table,
     gam,
     earth,
     quadprog,
