@@ -20,7 +20,8 @@ license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://openso
 > Nonparametric estimators of the average treatment effect with
 > doubly-robust confidence intervals and hypothesis tests
 
-**Author:** [David Benkeser](https://www.benkeserstatistics.com/)
+**Author:** [David
+Benkeser](https://www.sph.emory.edu/faculty/profile/#!dbenkes)
 
 -----
 
@@ -30,7 +31,7 @@ license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://openso
 under fixed levels of a treatment. The package computes targeted minimum
 loss-based (TMLE) estimators that are doubly robust, not only with
 respect to consistency, but also with respect to asymptotic normality,
-as discussed in [Benkeser, et al
+as discussed in [Benkeser, et al.
 (2017)](https://academic.oup.com/biomet/article-abstract/104/4/863/4554445).
 This property facilitates construction of doubly-robust confidence
 intervals and hypothesis tests.
@@ -82,12 +83,12 @@ for more information and further examples.
 # load packages
 library(drtmle)
 #> drtmle: TMLE with doubly robust inference
-#> Version: 1.0.4.9001
+#> Version: 1.0.5
 library(SuperLearner)
 #> Loading required package: nnls
 #> Super Learner
-#> Version: 2.0-24
-#> Package created on 2018-08-10
+#> Version: 2.0-26
+#> Package created on 2019-10-27
 
 # simulate simple data structure
 set.seed(12345)
@@ -112,13 +113,13 @@ fit1 <- drtmle(W = W, A = A, Y = Y, # input data
 fit1
 #> $est
 #>            
-#> 0 0.1729750
-#> 1 0.3620682
+#> 0 0.1730676
+#> 1 0.6061452
 #> 
 #> $cov
-#>              0            1
-#> 0 8.823949e-04 2.366906e-05
-#> 1 2.366906e-05 7.155764e-03
+#>               0             1
+#> 0  0.0008738787 -0.0001554739
+#> 1 -0.0001554739  0.0030956722
 
 # get confidence intervals for marginal means
 # truth is E[Y(1)] = 0.29, E[Y(0)] = 0.15
@@ -128,7 +129,7 @@ ci_fit1
 #> $drtmle
 #>     est   cil   ciu
 #> 0 0.173 0.115 0.231
-#> 1 0.362 0.196 0.528
+#> 1 0.606 0.497 0.715
 
 # get confidence intervals for ate
 # truth is E[Y(1)] - E[Y(0)] = 0.14
@@ -137,7 +138,7 @@ ci_ate1 <- ci(fit1, contrast = c(-1, 1))
 ci_ate1
 #> $drtmle
 #>                   est   cil   ciu
-#> E[Y(1)]-E[Y(0)] 0.189 0.014 0.364
+#> E[Y(1)]-E[Y(0)] 0.433 0.305 0.561
 ```
 
 This method requires estimation of additional univariate regressions to
@@ -165,19 +166,17 @@ fit2 <- adaptive_iptw(Y = Y, A = A, W = W, a_0 = c(0, 1),
                       SL_Qr = "SL.npreg")
 #> Loading required package: nloptr
 #> Loading required package: nloptr
-#> Loading required package: nloptr
-#> Loading required package: nloptr
 # print the output
 fit2
 #> $est
 #>            
-#> 0 0.1741983
-#> 1 0.2420712
+#> 0 0.1732599
+#> 1 0.2436814
 #> 
 #> $cov
 #>              0            1
-#> 0 8.533203e-04 8.986878e-05
-#> 1 8.986878e-05 2.203778e-02
+#> 0 8.633041e-04 8.978028e-05
+#> 1 8.978028e-05 2.309069e-02
 
 # compute a confidence interval for margin means
 ci_fit2 <- ci(fit2)
@@ -185,16 +184,16 @@ ci_fit2 <- ci(fit2)
 ci_fit2
 #> $iptw_tmle
 #>     est    cil   ciu
-#> 0 0.174  0.117 0.231
-#> 1 0.242 -0.049 0.533
+#> 0 0.173  0.116 0.231
+#> 1 0.244 -0.054 0.542
 
 # compute a confidence interval for the ate
 ci_ate2 <- ci(fit2, contrast = c(-1, 1))
 # print the output
 ci_ate2
 #> $iptw_tmle
-#>                   est    cil   ciu
-#> E[Y(1)]-E[Y(0)] 0.068 -0.227 0.363
+#>                  est    cil   ciu
+#> E[Y(1)]-E[Y(0)] 0.07 -0.232 0.373
 ```
 
 -----
@@ -233,7 +232,8 @@ After using the `drtmle` R package, please cite the following:
 
 ## License
 
-© 2016-2017 [David C. Benkeser](http://www.benkeserstatistics.com)
+© 2016-2019 [David C.
+Benkeser](https://www.sph.emory.edu/faculty/profile/#!dbenkes)
 
 The contents of this repository are distributed under the MIT license.
 See below for details:

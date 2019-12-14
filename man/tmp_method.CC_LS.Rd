@@ -3,13 +3,13 @@
 \name{tmp_method.CC_LS}
 \alias{tmp_method.CC_LS}
 \title{Temporary fix for convex combination method mean squared error
-Relative to existing implementation, we reduce the tolerance at which 
+Relative to existing implementation, we reduce the tolerance at which
 we declare predictions from a given algorithm the same as another}
 \usage{
 tmp_method.CC_LS()
 }
 \description{
 Temporary fix for convex combination method mean squared error
-Relative to existing implementation, we reduce the tolerance at which 
+Relative to existing implementation, we reduce the tolerance at which
 we declare predictions from a given algorithm the same as another
 }

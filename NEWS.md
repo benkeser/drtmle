@@ -2,7 +2,8 @@
 
 As of December 2019:
 * Version 1.0.5 released on GitHub and CRAN.
-* ...
+* Addition of `snow` and `data.table` packages to suggests to quell re-occurring
+   warnings and errors on CRAN builds.
 
 # drtmle 1.0.4
 

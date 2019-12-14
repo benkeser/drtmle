@@ -81,8 +81,8 @@ library to be used for the reduced-dimension outcome regression.}
 \item{SL_gr}{A vector of characters or a list describing the Super Learner
 library to be used for the reduced-dimension propensity score.}
 
-\item{n_SL}{Number of repeated Super Learners to run (default 1) for the 
-each nuisance parameter. Repeat Super Learners more times to obtain more stable 
+\item{n_SL}{Number of repeated Super Learners to run (default 1) for the
+each nuisance parameter. Repeat Super Learners more times to obtain more stable
 inference.}
 
 \item{glm_Q}{A character describing a formula to be used in the call to
@@ -230,17 +230,19 @@ library(SuperLearner)
 set.seed(123456)
 n <- 100
 W <- data.frame(W1 = runif(n), W2 = rnorm(n))
-A <- rbinom(n,1,plogis(W$W1 - W$W2))
-Y <- rbinom(n, 1, plogis(W$W1*W$W2*A))
+A <- rbinom(n, 1, plogis(W$W1 - W$W2))
+Y <- rbinom(n, 1, plogis(W$W1 * W$W2 * A))
 # A quick example of drtmle:
 # We note that more flexible super learner libraries
 # are available, and that we recommend the user use more flexible
 # libraries for SL_Qr and SL_gr for general use.
-fit1 <- drtmle(W = W, A = A, Y = Y, a_0 = c(1,0),
-               family=binomial(),
-               stratify=FALSE,
-               SL_Q = c("SL.glm", "SL.mean", "SL.glm.interaction"),
-               SL_g = c("SL.glm", "SL.mean", "SL.glm.interaction"),
-               SL_Qr = "SL.glm",
-               SL_gr = "SL.glm", maxIter = 1)
+fit1 <- drtmle(
+  W = W, A = A, Y = Y, a_0 = c(1, 0),
+  family = binomial(),
+  stratify = FALSE,
+  SL_Q = c("SL.glm", "SL.mean", "SL.glm.interaction"),
+  SL_g = c("SL.glm", "SL.mean", "SL.glm.interaction"),
+  SL_Qr = "SL.glm",
+  SL_gr = "SL.glm", maxIter = 1
+)
 }

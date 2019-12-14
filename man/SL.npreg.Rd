@@ -46,4 +46,5 @@ X <- data.frame(X1 = rnorm(n))
 Y <- X$X1 + rnorm(n)
 # fit npreg
 fit <- SL.npreg(Y = Y, X = X, newX = X)
+#
 }
