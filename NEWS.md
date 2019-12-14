@@ -1,36 +1,60 @@
-July 2019
-* Version 1.0.5
-* Remove dependency on plyr
-* Add option to average over repeated SuperLearner fits
+# drtmle 1.0.5
 
-December 18, 2018
-* Version 1.0.4 released on GitHub and CRAN
-* Resolves issues arising from returnModels option when users input nuisance parameters
-* Add option to bypass future calls for easier debugging
-* Fixes to bugs in standard TMLE implementation -- namely, more robust fluctuations and corrected variance estimators
+As of December 2019:
+* Version 1.0.5 released on GitHub and CRAN.
+* ...
 
-July 2, 2018
-* Version 1.0.3 released on GitHub and CRAN
-* Fix warnings on CRAN builds
+# drtmle 1.0.4
 
-February 5, 2018
-* Version 1.0.2 released on GitHub and CRAN
-* Replace foreach parallelization with future
-* More robust super learner methods included 
-* Fix test to pass build with long doubles removed
-* Return estimated influence functions with drtmle fit for power users
-* Minor documentation corrections and updates
+As of August 2019:
+* Added minor touch-ups and link fixes to documentation and vignettes.
+* Improved how slots are ordered upon being included in the return object.
 
-December 11, 2017
-* Version 1.0.2.9000 released on GitHub
+As of July 2019:
+* Version 1.0.4.9001 released on GitHub.
+* Removed dependency on `plyr` package.
+* Added option to average over repeated Super Learner fits.
+
+As of December 18, 2018:
+* Version 1.0.4 released on GitHub and CRAN.
+* Resolved issues arising from `returnModels` option when users input nuisance
+   parameters.
+* Added option to bypass `future` parallelization calls for easier debugging.
+* Fixed bugs in standard TMLE implementation -- namely, more robust fluctuations
+   and corrected variance estimators.
+
+# drtmle 1.0.3
+
+As of July 2, 2018:
+* Version 1.0.3 released on GitHub and CRAN.
+* Fixed warnings on CRAN builds.
+
+# drtmle 1.0.2
+
+As of February 5, 2018:
+* Version 1.0.2 released on GitHub and CRAN.
+* Replaced `foreach` parallelization with `future`.
+* Included more robust Super Learner methods.
+* Fixed test to pass build with long doubles removed.
+* Accommodated returning estimated influence functions with `drtmle()` fit for
+   power users.
+* Incorporated minor documentation corrections and updates.
+
+As of December 11, 2017:
+* Version 1.0.2.9000 released on GitHub.
 * More robust convex combination SuperLearner implemented.
 
-August 17, 2017
+# drtmle 1.0.0
+
+As of August 17, 2017:
 * Version 1.0.0 released on CRAN.
 * Version 1.0.0.9000 released on GitHub.
 
-August 15, 2017:
-* Version 1.0.0 ready for CRAN release. 
+As of August 15, 2017:
+* Version 1.0.0 ready for CRAN release.
 
-April 05, 2017:
-* The first public release of this package (v. 0.0.1) is made available on GitHub.
+# drtmle 0.0.1
+
+As of April 05, 2017:
+* The first public release of this package (v. 0.0.1) is made available on
+   GitHub.
