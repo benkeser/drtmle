@@ -13,7 +13,7 @@ Description: Targeted minimum loss-based estimators of counterfactual means and
     asymptotic normality (Benkeser et al (2017), <doi:10.1093/biomet/asx053>; MJ
     van der Laan (2014), <doi:10.1515/ijb-2012-0038>).
 Depends:
-    R (>= 3.2.0)
+    R (>= 3.5.0)
 Imports:
     SuperLearner,
     np,
