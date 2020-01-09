@@ -532,3 +532,32 @@ test_that("GitHub error #16 resolves", {
   expect_true(is.numeric(b$aiptw_c$est))
   expect_true(is.numeric(b$aiptw_c$cov))
 })
+
+test_that("drtmle executes with adapt_g", {
+  set.seed(123456)
+  n <- 100
+  W <- data.frame(W1 = runif(n), W2 = rnorm(n))
+  A <- rbinom(n, 1, plogis(W$W1 - W$W2))
+  Y <- rnorm(n, W$W1 * W$W2 * A, 2)
+  
+  fit10 <- drtmle(
+    W = W, A = A, Y = Y,
+    family = gaussian(),
+    stratify = FALSE,
+    adapt_g = TRUE, 
+    glm_Q = ".^2", glm_g = ".",
+    a_0 = c(0,1),
+    returnModels = TRUE,
+    guard = c("Q", "g"),
+    reduction = "univariate"
+  )
+
+  # fit externally as well
+  Qmod <- glm(Y ~ .^2 , data = data.frame(A = A, W))
+  Qnframe <- data.frame(Q0W = predict(Qmod, newdata = data.frame(A = 0, W)),
+                        Q1W = predict(Qmod, newdata = data.frame(A = 1, W)))
+  gmod <- glm(A ~ . , data = Qnframe, family = binomial())
+  gn <- list(1 - gmod$fitted.values,  gmod$fitted.values)
+  expect_true(all(fit10$nuisance_drtmle$gn[[1]] - gn[[1]] < 1e-4))
+  expect_true(all(fit10$nuisance_drtmle$gn[[2]] - gn[[2]] < 1e-4))
+})

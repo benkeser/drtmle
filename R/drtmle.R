@@ -36,8 +36,10 @@
 #' @param glm_g A list of characters describing the formulas to be used
 #'  for each of the propensity score regressions (\code{DeltaA}, \code{A}, and
 #'  \code{DeltaY}). To use the same formula for each of the regressions (or if
-#'  there is no missing data in \code{A} nor \code{Y}), a single character
-#'  formula may be input.
+#'  there are no missing data in \code{A} nor \code{Y}), a single character
+#'  formula may be input. In general the formulas can reference any variable in 
+#'  \code{colnames(W)}, unless \code{adapt_g = TRUE} in which case the formulas
+#'  should reference variables \code{QaW} where \code{a} takes values in \code{a_0}.
 #' @param glm_Qr A character describing a formula to be used in the call to
 #'  \code{glm} for reduced-dimension outcome regression. Ignored if
 #'  \code{SL_Qr!=NULL}. The formula should use the variable name \code{'gn'}.
@@ -45,6 +47,10 @@
 #'  \code{glm} for the reduced-dimension propensity score. Ignored if
 #'  \code{SL_gr!=NULL}. The formula should use the variable name \code{'Qn'} and
 #'  \code{'gn'} if \code{reduction='bivariate'} and \code{'Qn'} otherwise.
+#' @param adapt_g A boolean indicating whether the propensity score should be 
+#'  outcome adaptive. If \code{TRUE} then the propensity score is estimated as the
+#'  regression of \code{A} onto covariates \code{QaW} for \code{a} in each value
+#'  contained in \code{a_0}. See vignette for more details. 
 #' @param guard A character vector indicating what pattern of misspecifications
 #'  to guard against. If \code{guard} contains \code{"Q"}, then the TMLE guards
 #'  against misspecification of the outcome regression by estimating the
@@ -196,6 +202,7 @@ drtmle <- function(Y, A, W,
                    n_SL = 1,
                    glm_Q = NULL, glm_g = NULL,
                    glm_Qr = NULL, glm_gr = NULL,
+                   adapt_g = FALSE, 
                    guard = c("Q", "g"),
                    reduction = "univariate",
                    returnModels = FALSE,
@@ -220,7 +227,11 @@ drtmle <- function(Y, A, W,
 
   # check if any additional targeting is performed
   extra_targeting <- !is.null(guard)
-
+  # if using adaptive propensity, extra targeting not needed
+  if(adapt_g){
+    extra_targeting <- FALSE
+    guard <- NULL
+  }
   # if cvFolds non-null split data into cvFolds pieces
   validRows <- make_validRows(cvFolds, n = length(Y), n_SL = n_SL)
   if (n_SL > 1) {
@@ -251,56 +262,7 @@ drtmle <- function(Y, A, W,
       }
     }
   }
-  # -------------------------------
-  # estimate propensity score
-  # -------------------------------
-  # general strategy for implementation partially cross-validated standard
-  # error estimates:
-  # - enforce that returnModels must equal true
-  # - add a function get_partial_cv_results
-  #    - takes as input the fitted super learners
-  #    - outputs similarly formatted nuisance lists
-  #    - skeleton of function likely similar to reorder_list
-  # include additionally? or in lieu of usual?
-  # if former, then would need to update methods to have an se option
-  # as well
-  # need to stop if cvFolds is specified in addition to cvSE? No, because
-  # cvSE would be the default? But need to handle when cvFolds > 1 and cvSE = TRUE
-  # as special case.
-  if (is.null(gn)) {
-    if (use_future) {
-      gnOut <- future.apply::future_lapply(
-        X = validRows, FUN = estimateG, A = A,
-        W = W, DeltaA = DeltaA, DeltaY = DeltaY,
-        tolg = tolg, verbose = verbose,
-        stratify = stratify,
-        returnModels = returnModels, SL_g = SL_g,
-        glm_g = glm_g, a_0 = a_0
-      )
-    } else {
-      gnOut <- lapply(
-        X = validRows, FUN = estimateG, A = A,
-        W = W, DeltaA = DeltaA, DeltaY = DeltaY,
-        tolg = tolg, verbose = verbose,
-        stratify = stratify,
-        returnModels = returnModels, SL_g = SL_g,
-        glm_g = glm_g, a_0 = a_0
-      )
-    }
-    # re-order predictions
-    gn <- reorder_list(gnOut,
-      a_0 = a_0, validRows = validRows,
-      n_SL = n_SL, n = n
-    )
-    # obtain list of propensity score fits
-    gnMod <- extract_models(gnOut)
-  } else {
-    # truncate too-small predictions
-    gn <- lapply(gn, function(g) {
-      g[g < tolg] <- tolg
-      g
-    })
-  }
+
   # -------------------------------
   # estimate outcome regression
   # -------------------------------
@@ -338,6 +300,46 @@ drtmle <- function(Y, A, W,
 
     # obtain list of outcome regression fits
     QnMod <- extract_models(QnOut)
+  }
+
+  # -------------------------------
+  # estimate propensity score
+  # -------------------------------
+  if (is.null(gn)) {
+    if (use_future) {
+      gnOut <- future.apply::future_lapply(
+        X = validRows, FUN = estimateG, A = A,
+        W = W, DeltaA = DeltaA, DeltaY = DeltaY,
+        tolg = tolg, verbose = verbose,
+        stratify = stratify,
+        returnModels = returnModels, SL_g = SL_g,
+        glm_g = glm_g, a_0 = a_0, 
+        Qn = Qn, adapt_g = adapt_g
+      )
+    } else {
+      gnOut <- lapply(
+        X = validRows, FUN = estimateG, A = A,
+        W = W, DeltaA = DeltaA, DeltaY = DeltaY,
+        tolg = tolg, verbose = verbose,
+        stratify = stratify,
+        returnModels = returnModels, SL_g = SL_g,
+        glm_g = glm_g, a_0 = a_0,
+        Qn = Qn, adapt_g = adapt_g
+      )
+    }
+    # re-order predictions
+    gn <- reorder_list(gnOut,
+      a_0 = a_0, validRows = validRows,
+      n_SL = n_SL, n = n
+    )
+    # obtain list of propensity score fits
+    gnMod <- extract_models(gnOut)
+  } else {
+    # truncate too-small predictions
+    gn <- lapply(gn, function(g) {
+      g[g < tolg] <- tolg
+      g
+    })
   }
   # naive g-computation estimate
   psi_n <- lapply(Qn, mean)

@@ -1,9 +1,12 @@
 # drtmle 1.0.5
 
-As of December 2019:
+As of January 2019:
 * Version 1.0.5 released on GitHub and CRAN.
 * Addition of `snow` and `data.table` packages to suggests to quell re-occurring
    warnings and errors on CRAN builds.
+* Added `nSL` option for fitting and averaging multiple super learners as part
+   of the estimation procedure. 
+* Added `adapt_g` option for outcome-adaptive propensity score fitting. 
 
 # drtmle 1.0.4
 

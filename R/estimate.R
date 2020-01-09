@@ -28,12 +28,16 @@
 #'  mean estimates.
 #' @param validRows A \code{list} of length \code{cvFolds} containing the row
 #'  indexes of observations to include in validation fold.
+#' @param Qn A \code{list} of estimates of the outcome regression for each value
+#'  in \code{a_0}. Only needed if \code{adapt_g = TRUE}. 
+#' @param adapt_g A boolean indicating whether propensity score is adaptive
+#'  to outcome regression. 
 #' @importFrom SuperLearner SuperLearner trimLogit All
 #' @importFrom stats predict glm as.formula
 #
 estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
                       stratify = FALSE, validRows = NULL, verbose = FALSE,
-                      returnModels = FALSE) {
+                      returnModels = FALSE, Qn = NULL, adapt_g = FALSE) {
   if (is.null(SL_g) & is.null(glm_g)) {
     stop("Specify Super Learner library or GLM formula for g")
   }
@@ -50,14 +54,28 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
     trainDeltaA <- DeltaA[-validRows]
     trainDeltaY <- DeltaY[-validRows]
     trainA <- A[-validRows]
-    trainW <- W[-validRows, , drop = FALSE]
-    validW <- W[validRows, , drop = FALSE]
+    if(!adapt_g){
+      trainW <- W[-validRows, , drop = FALSE]
+      validW <- W[validRows, , drop = FALSE]
+    }else{
+      allW <- data.frame(Reduce(cbind, Qn))
+      trainW <- allW[-validRows, , drop = FALSE]
+      validW <- allW[validRows, , drop = FALSE]
+      colnames(trainW) <- paste0("Q", a_0, "W")
+      colnames(validW) <- paste0("Q", a_0, "W")
+    }
     validA <- A[validRows]
     validDeltaA <- DeltaA[validRows]
     validDeltaY <- DeltaY[validRows]
   } else {
     trainA <- validA <- A
-    trainW <- validW <- W
+    if(!adapt_g){
+      trainW <- validW <- W
+    }else{
+      trainW <- validW <- data.frame(Reduce(cbind, Qn))
+      colnames(trainW) <- paste0("Q", a_0, "W")
+      colnames(validW) <- paste0("Q", a_0, "W")
+    }
     trainDeltaA <- validDeltaA <- DeltaA
     trainDeltaY <- validDeltaY <- DeltaY
   }

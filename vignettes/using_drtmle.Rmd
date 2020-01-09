@@ -47,6 +47,9 @@ bibliography: refs.bib
   MathJax.Hub.Config({ TeX: { equationNumbers: {autoNumber: "AMS"} } });
 </script>
 
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(warning=FALSE, message=FALSE)
+```
 # Introduction \label{intro}
 
 In many fields researchers are interested in assessing the population-level
@@ -240,7 +243,7 @@ provides a means of mapping an initial estimator of the OR into an estimator
 that satisfies (4). In addition to possessing the desirable asymptotic
 properties, TMLE estimators have been shown to outperform AIPTW estimators in
 finite samples [@porter:2011:ijb]. We refer readers to van der Laan and Rose
-(2011) for more about TMLE [@tlbook:2011}]
+(2011) for more about TMLE [@tlbook:2011]
 
 # Doubly-robust inference \label{theory_drinf}
 
@@ -340,6 +343,29 @@ that, surprisingly, this AIPTW-style estimator does not achieve the same
 doubly-robust properties as the TMLE estimator. Thus, while AIPTW and TMLE are
 generally competitors for producing estimators doubly-robust with respect to
 consistency, for doubly-robust inference, TMLE is preferred.
+
+# Outcome-adaptive propensity score estimation \label{theory_drinf}
+
+In [recent work](https://arxiv.org/abs/1901.05056), we have proposed 
+estimators of the average treatment effect to be used in settings where this 
+effect is weakly identifiable, as evidenced by small estimated propensity scores. 
+In these settings doubly robust estimators may exhibit non-robust behavior
+in small samples. The proposed solution was to target an alternative quantity 
+in the propensity estimation step. If we are interested in estimating $\psi_0(a)$
+for $a = 0, 1$, we can estimate $Pr_0(A = a \mid \bar{Q}_0(1, W), \bar{Q}_0(0, W))$,
+which describes the conditional probability of receiving treatment $A = a$ given
+the value of the two outcome regressions. For this reason, we call this quantity
+an *outcome-adaptive propensity score*. We have shown that all of the usual 
+asymptotics for TMLE carry through when an estimator of this quantity is 
+substituted for the true propensity score. The resultant TMLE is *super-efficient*
+meaning that it will generally have greater asymptotic efficiency than a standard
+TMLE. Simulations indicate that this approach also delivers more stable behavior
+in settings where estimated propensities become very small. However, the estimator 
+is not doubly robust -- the asymptotics rely on the outcome regression being
+consistently estimated at $n^{-1/4}$ rate. In this sense, this estimator trades off
+robustness in the name of achieving greater stability and efficiency. See our
+paper for further discussion.
+
 
 # Implementation of doubly-robust inference \label{implement_drinf}
 
@@ -483,19 +509,18 @@ are passed to the `SL.library` argument of the `SuperLearner` function of the
 information on how to properly specify a super learner library. In the code
 below, we illustrate a call to `drtmle` with a relatively simple library. For
 the OR and PS, the library includes a main-terms generalized linear model (via
-the function `SL.glm` from `SuperLearner`), a stepwise generalized linear model
-with two-way interaction terms (`SL.step.interaction`), and an unadjusted
+the function `SL.glm` from `SuperLearner`) and an unadjusted
 generalized linear model (`SL.mean`). For the reduced dimension regressions we
 use a super learner library with a main terms generalized linear model
-(`SL.glm`), adaptive regression splines (`SL.earth`, which utilizes the `earth`
-package [@earthPackage]) and an unadjusted generalized linear model (`SL.mean`).
+(`SL.glm`) and adaptive regression splines (`SL.earth`, which utilizes the `earth`
+package [@earthPackage]).
 
-```{r, message = FALSE, cache = TRUE}
+```{r, warning = FALSE, message = FALSE, cache = TRUE}
 sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
-                 SL_g = c("SL.glm", "SL.step.interaction","SL.mean"),
-                 SL_Q = c("SL.glm", "SL.step.interaction","SL.mean"),
-                 SL_gr = c("SL.glm", "SL.earth", "SL.mean"),
-                 SL_Qr = c("SL.glm", "SL.earth", "SL.mean"),
+                 SL_g = c("SL.glm","SL.mean"),
+                 SL_Q = c("SL.glm","SL.mean"),
+                 SL_gr = c("SL.glm", "SL.earth"),
+                 SL_Qr = c("SL.glm", "SL.earth"),
                  stratify = FALSE)
 sl_fit
 ```
@@ -548,17 +573,47 @@ npreg_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
 npreg_fit
 ```
 
-Some users may find it unsettling that when applying the super learner in real data analysis is that the results are dependent on the random seed that is set. To remove this dependence, one can instead average over repeated super learner runs; more repeats will lead to less dependence on the random seed. This feature is implemented via the `n_SL` option. The package is currently parallelized at the level of individual calls to `SuperLearner`. With parallelization over enough cores, repeated super learning should not add too much to the computational burden relative to a single call to `SuperLearner`.
+Some users may find it unsettling that when applying the super learner in real data 
+analysis is that the results are dependent on the random seed that is set. To remove 
+this dependence, one can instead average over repeated super learner runs; more 
+repeats will lead to less dependence on the random seed. This feature is implemented 
+via the `n_SL` option. The package is currently parallelized at the level of individual 
+calls to `SuperLearner`. With parallelization over enough cores, repeated super 
+learning should not add too much to the computational burden relative to a single 
+call to `SuperLearner`.
 
 ```{r, message = FALSE, cache = TRUE}
 repeated_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
-                 SL_g = c("SL.glm", "SL.step.interaction","SL.mean"),
-                 SL_Q = c("SL.glm", "SL.step.interaction","SL.mean"),
-                 SL_gr = c("SL.glm", "SL.earth", "SL.mean"),
-                 SL_Qr = c("SL.glm", "SL.earth", "SL.mean"),
+                 SL_g = c("SL.glm", "SL.step.interaction", "SL.mean"),
+                 SL_Q = c("SL.glm", "SL.step.interaction", "SL.mean"),
+                 SL_gr = c("SL.glm", "SL.earth"),
+                 SL_Qr = c("SL.glm", "SL.earth"),
                  stratify = FALSE, n_SL = 5)
 repeated_sl_fit
 ```
+
+If the outcome-adaptive propensity score is desired, the user may specify this via 
+the `adapt_g` option. In this case, the additional targeting steps needed for doubly
+robust inference are "turned off" (i.e., `guard = NULL`), since, as discussed above,
+this estimator is *not* doubly robust. Note that when the `adapt-g = TRUE` the data
+used for the propensity score estimation will be a `data.frame` with column names
+`QaW` where `a` takes all the values specified in `a_0`. For example if `a_0 = c(0,1)`,
+then the propensity score estimation data frame will have two columns called `Q0W`
+and `Q1W`. This may be relevant for users writing their own `SuperLearner` wrappers
+or those who make use of the `glm_g` setting, as illustrated below. 
+
+```{r, message = FALSE}
+# outcome adaptive propensity score fit using glms
+adaptg_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
+                     glm_Q = ".^2", glm_g = "Q1W + Q0W",
+                     adapt_g = TRUE)
+
+# outcome adaptive propensity score fit using super learner
+adaptg_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
+                     SL_Q = c("SL.glm", "SL.mean"), 
+                     SL_g = c("SL.glm", "SL.mean"),
+                     adapt_g = TRUE)
+``` 
 
 The `drtmle` package also allows users to pass in their own estimated OR and PS
 via the `Qn` and `gn` options, respectively. 
@@ -1029,8 +1084,8 @@ continue with the multi-level treatment example.
 cv_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
                     SL_g = c("SL.glm", "SL.glm.interaction", "SL.earth"),
                     SL_Q = c("SL.glm", "SL.glm.interaction", "SL.earth"),
-                    SL_gr = c("SL.glm", "SL.earth", "SL.mean"),
-                    SL_Qr = c("SL.glm", "SL.earth", "SL.mean"),
+                    SL_gr = c("SL.glm", "SL.mean"),
+                    SL_Qr = c("SL.glm", "SL.mean"),
                     stratify = FALSE, cvFolds = 2, a_0 = c(0, 1, 2))
 cv_sl_fit
 ```
@@ -1055,10 +1110,8 @@ of schedulers (e.g., SLURM, TORQUE, etc.) is also permitted. Interested readers
 are invited to consult the documentation of the `future.batchtools` package for
 further information. 
 
-```{r, cache = TRUE, message = FALSE}
+```{r, cache = TRUE, message = FALSE, eval = FALSE}
 ## Commented out to avoid build errors
-## This code should execute on a system with the snow 
-## package available
 # library(future.batchtools)
 # library(parallel)
 # cl <- makeCluster(2, type = "SOCK")

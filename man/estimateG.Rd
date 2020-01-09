@@ -16,7 +16,9 @@ estimateG(
   stratify = FALSE,
   validRows = NULL,
   verbose = FALSE,
-  returnModels = FALSE
+  returnModels = FALSE,
+  Qn = NULL,
+  adapt_g = FALSE
 )
 }
 \arguments{
@@ -57,6 +59,12 @@ indexes of observations to include in validation fold.}
 
 \item{returnModels}{A boolean indicating whether to return model fits for the
 outcome regression, propensity score, and reduced-dimension regressions.}
+
+\item{Qn}{A \code{list} of estimates of the outcome regression for each value
+in \code{a_0}. Only needed if \code{adapt_g = TRUE}.}
+
+\item{adapt_g}{A boolean indicating whether propensity score is adaptive
+to outcome regression.}
 }
 \description{
 Function to estimate propensity score

@@ -23,6 +23,7 @@ drtmle(
   glm_g = NULL,
   glm_Qr = NULL,
   glm_gr = NULL,
+  adapt_g = FALSE,
   guard = c("Q", "g"),
   reduction = "univariate",
   returnModels = FALSE,
@@ -91,8 +92,10 @@ inference.}
 \item{glm_g}{A list of characters describing the formulas to be used
 for each of the propensity score regressions (\code{DeltaA}, \code{A}, and
 \code{DeltaY}). To use the same formula for each of the regressions (or if
-there is no missing data in \code{A} nor \code{Y}), a single character
-formula may be input.}
+there are no missing data in \code{A} nor \code{Y}), a single character
+formula may be input. In general the formulas can reference any variable in 
+\code{colnames(W)}, unless \code{adapt_g = TRUE} in which case the formulas
+should reference variables \code{QaW} where \code{a} takes values in \code{a_0}.}
 
 \item{glm_Qr}{A character describing a formula to be used in the call to
 \code{glm} for reduced-dimension outcome regression. Ignored if
@@ -102,6 +105,11 @@ formula may be input.}
 \code{glm} for the reduced-dimension propensity score. Ignored if
 \code{SL_gr!=NULL}. The formula should use the variable name \code{'Qn'} and
 \code{'gn'} if \code{reduction='bivariate'} and \code{'Qn'} otherwise.}
+
+\item{adapt_g}{A boolean indicating whether the propensity score should be 
+outcome adaptive. If \code{TRUE} then the propensity score is estimated as the
+regression of \code{A} onto covariates \code{QaW} for \code{a} in each value
+contained in \code{a_0}. See vignette for more details.}
 
 \item{guard}{A character vector indicating what pattern of misspecifications
 to guard against. If \code{guard} contains \code{"Q"}, then the TMLE guards
