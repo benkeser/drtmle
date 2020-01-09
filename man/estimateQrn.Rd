@@ -4,8 +4,21 @@
 \alias{estimateQrn}
 \title{estimateQrn}
 \usage{
-estimateQrn(Y, A, W, DeltaA, DeltaY, Qn, gn, glm_Qr, SL_Qr,
-  family = stats::gaussian(), a_0, returnModels, validRows = NULL)
+estimateQrn(
+  Y,
+  A,
+  W,
+  DeltaA,
+  DeltaY,
+  Qn,
+  gn,
+  glm_Qr,
+  SL_Qr,
+  family = stats::gaussian(),
+  a_0,
+  returnModels,
+  validRows = NULL
+)
 }
 \arguments{
 \item{Y}{A vector of continuous or binary outcomes.}

@@ -4,16 +4,41 @@
 \alias{drtmle}
 \title{TMLE estimate of the average treatment effect with doubly-robust inference}
 \usage{
-drtmle(Y, A, W, DeltaA = as.numeric(!is.na(A)),
-  DeltaY = as.numeric(!is.na(Y)), a_0 = unique(A[!is.na(A)]),
-  family = if (all(Y \%in\% c(0, 1))) {     stats::binomial() } else {   
-   stats::gaussian() }, stratify = TRUE, SL_Q = NULL, SL_g = NULL,
-  SL_Qr = NULL, SL_gr = NULL, n_SL = 1, glm_Q = NULL,
-  glm_g = NULL, glm_Qr = NULL, glm_gr = NULL, guard = c("Q", "g"),
-  reduction = "univariate", returnModels = FALSE, cvFolds = 1,
-  maxIter = 3, tolIC = 1/length(Y), tolg = 0.01, verbose = FALSE,
-  Qsteps = 2, parallel = FALSE, future_hpc = NULL, Qn = NULL,
-  gn = NULL, use_future = TRUE, ...)
+drtmle(
+  Y,
+  A,
+  W,
+  DeltaA = as.numeric(!is.na(A)),
+  DeltaY = as.numeric(!is.na(Y)),
+  a_0 = unique(A[!is.na(A)]),
+  family = if (all(Y \%in\% c(0, 1))) {     stats::binomial() } else {    
+    stats::gaussian() },
+  stratify = TRUE,
+  SL_Q = NULL,
+  SL_g = NULL,
+  SL_Qr = NULL,
+  SL_gr = NULL,
+  n_SL = 1,
+  glm_Q = NULL,
+  glm_g = NULL,
+  glm_Qr = NULL,
+  glm_gr = NULL,
+  guard = c("Q", "g"),
+  reduction = "univariate",
+  returnModels = FALSE,
+  cvFolds = 1,
+  maxIter = 3,
+  tolIC = 1/length(Y),
+  tolg = 0.01,
+  verbose = FALSE,
+  Qsteps = 2,
+  parallel = FALSE,
+  future_hpc = NULL,
+  Qn = NULL,
+  gn = NULL,
+  use_future = TRUE,
+  ...
+)
 }
 \arguments{
 \item{Y}{A \code{numeric} continuous or binary outcomes.}
@@ -56,8 +81,8 @@ library to be used for the reduced-dimension outcome regression.}
 \item{SL_gr}{A vector of characters or a list describing the Super Learner
 library to be used for the reduced-dimension propensity score.}
 
-\item{n_SL}{Number of repeated Super Learners to run (default 1) for the 
-each nuisance parameter. Repeat Super Learners more times to obtain more stable 
+\item{n_SL}{Number of repeated Super Learners to run (default 1) for the
+each nuisance parameter. Repeat Super Learners more times to obtain more stable
 inference.}
 
 \item{glm_Q}{A character describing a formula to be used in the call to
@@ -205,17 +230,19 @@ library(SuperLearner)
 set.seed(123456)
 n <- 100
 W <- data.frame(W1 = runif(n), W2 = rnorm(n))
-A <- rbinom(n,1,plogis(W$W1 - W$W2))
-Y <- rbinom(n, 1, plogis(W$W1*W$W2*A))
+A <- rbinom(n, 1, plogis(W$W1 - W$W2))
+Y <- rbinom(n, 1, plogis(W$W1 * W$W2 * A))
 # A quick example of drtmle:
 # We note that more flexible super learner libraries
 # are available, and that we recommend the user use more flexible
 # libraries for SL_Qr and SL_gr for general use.
-fit1 <- drtmle(W = W, A = A, Y = Y, a_0 = c(1,0),
-               family=binomial(),
-               stratify=FALSE,
-               SL_Q = c("SL.glm", "SL.mean", "SL.glm.interaction"),
-               SL_g = c("SL.glm", "SL.mean", "SL.glm.interaction"),
-               SL_Qr = "SL.glm",
-               SL_gr = "SL.glm", maxIter = 1)
+fit1 <- drtmle(
+  W = W, A = A, Y = Y, a_0 = c(1, 0),
+  family = binomial(),
+  stratify = FALSE,
+  SL_Q = c("SL.glm", "SL.mean", "SL.glm.interaction"),
+  SL_g = c("SL.glm", "SL.mean", "SL.glm.interaction"),
+  SL_Qr = "SL.glm",
+  SL_gr = "SL.glm", maxIter = 1
+)
 }

@@ -1,36 +1,44 @@
 branches:
   only:
   - master
-  - develop
+
+env:
+  global:
+  - RGL_USE_NULL=TRUE
 
 language: r
 sudo: required
 cache: packages
+
 warnings_are_errors: true
+r_check_args: '--as-cran'
 
 r:
   - oldrel
   - release
   - devel
 
-r_github_packages:
-  - jimhester/covr
-  
-install:
-  - Rscript -e "if (!require('devtools')) install.packages('devtools')"
-  - Rscript -e "devtools::install_deps(dep = TRUE)"
-  - Rscript -e "devtools::install_github('jimhester/covr')"
-
-r_check_args: --as-cran 
-
-after_success:
-  - Rscript -e 'library(covr); covr::codecov()'
-
 # Install nlopt package to help nloptr install.
 addons:
   apt:
     packages:
       - libnlopt-dev
+
+before_install:
+  - Rscript -e 'update.packages(ask = FALSE)'
+
+r_packages:
+  - devtools
+  - covr
+  - sessioninfo
+  - data.table
+
+r_github_packages:
+  - r-lib/covr
+  - r-lib/sessioninfo
+
+after_success:
+  - Rscript -e 'covr::codecov()'
 
 notifications:
   email:
