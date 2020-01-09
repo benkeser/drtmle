@@ -124,19 +124,23 @@ print.wald_test.adaptive_iptw <- function(x, digits = 3, ...) {
 #' set.seed(123456)
 #' n <- 100
 #' W <- data.frame(W1 = runif(n), W2 = rnorm(n))
-#' A <- rbinom(n,1,plogis(W$W1 - W$W2))
-#' Y <- rbinom(n, 1, plogis(W$W1*W$W2*A))
+#' A <- rbinom(n, 1, plogis(W$W1 - W$W2))
+#' Y <- rbinom(n, 1, plogis(W$W1 * W$W2 * A))
 #' # fit drtmle with maxIter = 1 to run fast
-#' fit1 <- drtmle(W = W, A = A, Y = Y, a_0 = c(1,0),
-#'                family=binomial(),
-#'                stratify=FALSE,
-#'                SL_Q=c("SL.glm","SL.mean","SL.glm.interaction"),
-#'                SL_g=c("SL.glm","SL.mean","SL.glm.interaction"),
-#'                SL_Qr="SL.npreg", SL_gr="SL.npreg",
-#'                maxIter = 1, returnModels = TRUE)
+#' fit1 <- drtmle(
+#'   W = W, A = A, Y = Y, a_0 = c(1, 0),
+#'   family = binomial(),
+#'   stratify = FALSE,
+#'   SL_Q = c("SL.glm", "SL.mean", "SL.glm.interaction"),
+#'   SL_g = c("SL.glm", "SL.mean", "SL.glm.interaction"),
+#'   SL_Qr = "SL.npreg", SL_gr = "SL.npreg",
+#'   maxIter = 1, returnModels = TRUE
+#' )
 #' # plot the reduced-dimension regression fits (not run)
-#' \dontrun{plot(fit1)}
-#
+#' \dontrun{
+#' plot(fit1)
+#' }
+#' #
 plot.drtmle <- function(x, nPoints = 500,
                         ask = TRUE,
                         a_0 = x$a_0[1], ...) {
@@ -157,7 +161,7 @@ plot.drtmle <- function(x, nPoints = 500,
   # ------------------
   # plot Qrn fit
   # ------------------
-  if(!(class(x$QrnMod) == "NULL")){
+  if (!(class(x$QrnMod) == "NULL")) {
     # number of fits (if no CV = 1, if CV > 1)
     nFit <- length(x$QrnMod)
     # xlim = range of gn
@@ -201,7 +205,7 @@ plot.drtmle <- function(x, nPoints = 500,
   # ------------------
   # plot grn fit
   # ------------------
-  if(!(class(x$grnMod) == "NULL")){
+  if (!(class(x$grnMod) == "NULL")) {
     # only plot if univariate reduction
     reduction <- as.list(x$call)$reduction
     if (is.null(reduction)) reduction <- "univariate"
@@ -283,11 +287,11 @@ plot.drtmle <- function(x, nPoints = 500,
   }
 }
 
-# SHOULD MAKE THIS FUNCTION TAKE AS INPUT THE NUMBER OF SUPER LEARNERS AND 
+# SHOULD MAKE THIS FUNCTION TAKE AS INPUT THE NUMBER OF SUPER LEARNERS AND
 # RETURN AS OUTPUT SOMETHING REORDERED/AVERAGED AS NECESSARY
 
 #' Helper function to reorder lists according to cvFolds
-#' 
+#'
 #' @param a_list Structured list of nuisance parameters
 #' @param a_0 Treatment levels
 #' @param validRows List of rows of data in validation data for
@@ -296,67 +300,72 @@ plot.drtmle <- function(x, nPoints = 500,
 #' @param n_SL Number of super learners. If >1, then predictions
 #' are averaged
 #' @param n Sample size
-reorder_list <- function(a_list, 
-                         a_0, 
+reorder_list <- function(a_list,
+                         a_0,
                          validRows,
-                         n_SL = 1, 
+                         n_SL = 1,
                          grn_ind = FALSE,
-                         n){
+                         n) {
   n_cvFolds <- length(validRows) / n_SL
 
 
   reduced_outList <- vector(mode = "list", length = length(a_0))
 
-  for(i in seq_along(reduced_outList)){
-    if(!grn_ind){ 
+  for (i in seq_along(reduced_outList)) {
+    if (!grn_ind) {
       reduced_outList[[i]] <- rep(0, n)
-    }else{
+    } else {
       reduced_outList[[i]] <- data.frame(grn1 = rep(0, n), grn2 = rep(0, n))
     }
   }
 
   # re-order predictions
-  for(v in seq_len(n_SL)){
-    outListValid <- unlist(a_list[(n_cvFolds * (v-1) + 1):(v*n_cvFolds)], 
-                           recursive = FALSE, use.names = FALSE)
-    # this is in 0/1 format 
+  for (v in seq_len(n_SL)) {
+    outListValid <- unlist(a_list[(n_cvFolds * (v - 1) + 1):(v * n_cvFolds)],
+      recursive = FALSE, use.names = FALSE
+    )
+    # this is in 0/1 format
     outListUnOrd <- do.call(Map, c(c, outListValid[seq(1, length(outListValid), 2)]))
     outList <- vector(mode = "list", length = length(a_0))
-    if(!grn_ind){
+    if (!grn_ind) {
       for (i in seq_along(a_0)) {
         outList[[i]] <- rep(NA, n)
         # works because validRows are the same across repeated SLs
         outList[[i]][unlist(validRows)[1:n]] <- outListUnOrd[[i]]
       }
-    }else{
+    } else {
       for (i in seq_along(a_0)) {
         outList[[i]] <- data.frame(grn1 = rep(NA, n), grn2 = rep(NA, n))
-        outList[[i]][unlist(validRows), "grn1"] <- unlist(outListUnOrd[[i]][seq(1, 2*n_cvFolds, by = 2)], 
-                                                          use.names = FALSE)
-        outList[[i]][unlist(validRows), "grn2"] <- unlist(outListUnOrd[[i]][seq(2, 2*n_cvFolds, by = 2)],
-                                                          use.names = FALSE)
+        outList[[i]][unlist(validRows), "grn1"] <- unlist(outListUnOrd[[i]][seq(1, 2 * n_cvFolds, by = 2)],
+          use.names = FALSE
+        )
+        outList[[i]][unlist(validRows), "grn2"] <- unlist(outListUnOrd[[i]][seq(2, 2 * n_cvFolds, by = 2)],
+          use.names = FALSE
+        )
       }
     }
-    reduced_outList <- mapply(x = reduced_outList, y = outList, function(x,y){
+    reduced_outList <- mapply(x = reduced_outList, y = outList, function(x, y) {
       x + y
     }, SIMPLIFY = FALSE)
   }
-  out <- lapply(reduced_outList, function(x){ x / n_SL })
+  out <- lapply(reduced_outList, function(x) {
+    x / n_SL
+  })
   return(out)
 }
 
 #' Help function to extract models from fitted object
 #' @param a_list Structured list of nuisance parameters
-extract_models <- function(a_list){
+extract_models <- function(a_list) {
   outListValid <- unlist(a_list, recursive = FALSE, use.names = FALSE)
   outListValid[seq(2, length(outListValid), 2)]
 }
 
-#' Make list of rows in each validation fold. 
+#' Make list of rows in each validation fold.
 #' @param cvFolds Numeric number of cv folds
 #' @param n Number of observations
 #' @param ... Other arguments
-make_validRows <- function(cvFolds, n, ...){
+make_validRows <- function(cvFolds, n, ...) {
   if (length(cvFolds) > 1) {
     stopifnot(length(cvFolds) == n)
     # comes in as vector of fold assignments
@@ -375,169 +384,199 @@ make_validRows <- function(cvFolds, n, ...){
 }
 
 #' Temporary fix for convex combination method mean squared error
-#' Relative to existing implementation, we reduce the tolerance at which 
+#' Relative to existing implementation, we reduce the tolerance at which
 #' we declare predictions from a given algorithm the same as another
-tmp_method.CC_LS <- function () 
-{
-    computeCoef = function(Z, Y, libraryNames, verbose, obsWeights, 
-        errorsInLibrary = NULL, ...) {
-        cvRisk <- apply(Z, 2, function(x) mean(obsWeights * (x - 
-            Y)^2))
-        names(cvRisk) <- libraryNames
-        compute <- function(x, y, wt = rep(1, length(y))) {
-            wX <- sqrt(wt) * x
-            wY <- sqrt(wt) * y
-            D <- crossprod(wX)
-            d <- crossprod(wX, wY)
-            A <- cbind(rep(1, ncol(wX)), diag(ncol(wX)))
-            bvec <- c(1, rep(0, ncol(wX)))
-            fit <- tryCatch({quadprog::solve.QP(Dmat = D, dvec = d, Amat = A, 
-                bvec = bvec, meq = 1)
-          }, error = function(e){
-            out <- list()
-            class(out) <- "error"
-            out
-          })
-            invisible(fit)
+tmp_method.CC_LS <- function() {
+  computeCoef <- function(Z, Y, libraryNames, verbose, obsWeights,
+                          errorsInLibrary = NULL, ...) {
+    cvRisk <- apply(Z, 2, function(x) {
+      mean(obsWeights * (x -
+        Y)^2)
+    })
+    names(cvRisk) <- libraryNames
+    compute <- function(x, y, wt = rep(1, length(y))) {
+      wX <- sqrt(wt) * x
+      wY <- sqrt(wt) * y
+      D <- crossprod(wX)
+      d <- crossprod(wX, wY)
+      A <- cbind(rep(1, ncol(wX)), diag(ncol(wX)))
+      bvec <- c(1, rep(0, ncol(wX)))
+      fit <- tryCatch(
+        {
+          quadprog::solve.QP(
+            Dmat = D, dvec = d, Amat = A,
+            bvec = bvec, meq = 1
+          )
+        },
+        error = function(e) {
+          out <- list()
+          class(out) <- "error"
+          out
         }
-        modZ <- Z
-        naCols <- which(apply(Z, 2, function(z) {
-            all(z == 0)
-        }))
-        anyNACols <- length(naCols) > 0
-        if (anyNACols) {
-            warning(paste0(paste0(libraryNames[naCols], collapse = ", "), 
-                " have NAs.", "Removing from super learner."))
-        }
-        tol <- 4
-        dupCols <- which(duplicated(round(Z, tol), MARGIN = 2))
-        anyDupCols <- length(dupCols) > 0
-        if (anyDupCols) {
-            warning(paste0(paste0(libraryNames[dupCols], collapse = ", "), 
-                " are duplicates of previous learners.", " Removing from super learner."))
-        }
-        if (anyDupCols | anyNACols) {
-            rmCols <- unique(c(naCols, dupCols))
-            modZ <- Z[, -rmCols, drop = FALSE]
-        }
-        fit <- compute(x = modZ, y = Y, wt = obsWeights)
-        if(class(fit) != "error"){
-          coef <- fit$solution
-        }else{
-          coef <- rep(0, ncol(Z))
-          coef[which.min(cvRisk)] <- 1
-        }
-        if (anyNA(coef)) {
-            warning("Some algorithms have weights of NA, setting to 0.")
-            coef[is.na(coef)] = 0
-        }
-        if(class(fit) != "error"){
-          if (anyDupCols | anyNACols) {
-              ind <- c(seq_along(coef), rmCols - 0.5)
-              coef <- c(coef, rep(0, length(rmCols)))
-              coef <- coef[order(ind)]
-          }
-          coef[coef < 1e-04] <- 0
-          coef <- coef/sum(coef)
-        }
-        if (!sum(coef) > 0) 
-            warning("All algorithms have zero weight", call. = FALSE)
-        list(cvRisk = cvRisk, coef = coef, optimizer = fit)
+      )
+      invisible(fit)
     }
-    computePred = function(predY, coef, ...) {
-        predY %*% matrix(coef)
+    modZ <- Z
+    naCols <- which(apply(Z, 2, function(z) {
+      all(z == 0)
+    }))
+    anyNACols <- length(naCols) > 0
+    if (anyNACols) {
+      warning(paste0(
+        paste0(libraryNames[naCols], collapse = ", "),
+        " have NAs.", "Removing from super learner."
+      ))
     }
-    out <- list(require = "quadprog", computeCoef = computeCoef, 
-        computePred = computePred)
-    invisible(out)
+    tol <- 4
+    dupCols <- which(duplicated(round(Z, tol), MARGIN = 2))
+    anyDupCols <- length(dupCols) > 0
+    if (anyDupCols) {
+      warning(paste0(
+        paste0(libraryNames[dupCols], collapse = ", "),
+        " are duplicates of previous learners.", " Removing from super learner."
+      ))
+    }
+    if (anyDupCols | anyNACols) {
+      rmCols <- unique(c(naCols, dupCols))
+      modZ <- Z[, -rmCols, drop = FALSE]
+    }
+    fit <- compute(x = modZ, y = Y, wt = obsWeights)
+    if (class(fit) != "error") {
+      coef <- fit$solution
+    } else {
+      coef <- rep(0, ncol(Z))
+      coef[which.min(cvRisk)] <- 1
+    }
+    if (anyNA(coef)) {
+      warning("Some algorithms have weights of NA, setting to 0.")
+      coef[is.na(coef)] <- 0
+    }
+    if (class(fit) != "error") {
+      if (anyDupCols | anyNACols) {
+        ind <- c(seq_along(coef), rmCols - 0.5)
+        coef <- c(coef, rep(0, length(rmCols)))
+        coef <- coef[order(ind)]
+      }
+      coef[coef < 1e-04] <- 0
+      coef <- coef / sum(coef)
+    }
+    if (!sum(coef) > 0) {
+      warning("All algorithms have zero weight", call. = FALSE)
+    }
+    list(cvRisk = cvRisk, coef = coef, optimizer = fit)
+  }
+  computePred <- function(predY, coef, ...) {
+    predY %*% matrix(coef)
+  }
+  out <- list(
+    require = "quadprog", computeCoef = computeCoef,
+    computePred = computePred
+  )
+  invisible(out)
 }
 
 
 #' Temporary fix for convex combination method negative log-likelihood loss
-#' Relative to existing implementation, we reduce the tolerance at which 
+#' Relative to existing implementation, we reduce the tolerance at which
 #' we declare predictions from a given algorithm the same as another.
-#' Note that because of the way \code{SuperLearner} is structure, one needs to 
+#' Note that because of the way \code{SuperLearner} is structure, one needs to
 #' install the optimization software separately.
-tmp_method.CC_nloglik <- function () 
-{
-    computePred = function(predY, coef, control, ...) {
-        if (sum(coef != 0) == 0) {
-            stop("All metalearner coefficients are zero, cannot compute prediction.")
-        }
-        stats::plogis(trimLogit(predY[, coef != 0], trim = control$trimLogit) %*% 
-            matrix(coef[coef != 0]))
+tmp_method.CC_nloglik <- function() {
+  computePred <- function(predY, coef, control, ...) {
+    if (sum(coef != 0) == 0) {
+      stop("All metalearner coefficients are zero, cannot compute prediction.")
     }
-    computeCoef = function(Z, Y, libraryNames, obsWeights, control, 
-        verbose, ...) {
-        tol <- 4
-        dupCols <- which(duplicated(round(Z, tol), MARGIN = 2))
-        anyDupCols <- length(dupCols) > 0
-        modZ <- Z
-        if (anyDupCols) {
-            warning(paste0(paste0(libraryNames[dupCols], collapse = ", "), 
-                " are duplicates of previous learners.", " Removing from super learner."))
-            modZ <- modZ[, -dupCols, drop = FALSE]
-        }
-        modlogitZ <- trimLogit(modZ, control$trimLogit)
-        logitZ <- trimLogit(Z, control$trimLogit)
-        cvRisk <- apply(logitZ, 2, function(x) -sum(2 * obsWeights * 
-            ifelse(Y, stats::plogis(x, log.p = TRUE), stats::plogis(x, log.p = TRUE, 
-                lower.tail = FALSE))))
-        names(cvRisk) <- libraryNames
-        obj_and_grad <- function(y, x, w = NULL) {
-            y <- y
-            x <- x
-            function(beta) {
-                xB <- x %*% cbind(beta)
-                loglik <- y * stats::plogis(xB, log.p = TRUE) + (1 - 
-                  y) * stats::plogis(xB, log.p = TRUE, lower.tail = FALSE)
-                if (!is.null(w)) 
-                  loglik <- loglik * w
-                obj <- -2 * sum(loglik)
-                p <- stats::plogis(xB)
-                grad <- if (is.null(w)) 
-                  2 * crossprod(x, cbind(p - y))
-                else 2 * crossprod(x, w * cbind(p - y))
-                list(objective = obj, gradient = grad)
-            }
-        }
-        lower_bounds = rep(0, ncol(modZ))
-        upper_bounds = rep(1, ncol(modZ))
-        if (anyNA(cvRisk)) {
-            upper_bounds[is.na(cvRisk)] = 0
-        }
-        r <- tryCatch({nloptr::nloptr(x0 = rep(1/ncol(modZ), ncol(modZ)), 
-            eval_f = obj_and_grad(Y, modlogitZ), lb = lower_bounds, 
-            ub = upper_bounds, eval_g_eq = function(beta) (sum(beta) - 
-                1), eval_jac_g_eq = function(beta) rep(1, length(beta)), 
-            opts = list(algorithm = "NLOPT_LD_SLSQP", xtol_abs = 1e-08))
-        }, error = function(e){
-          out <- list()
-          class(out) <- "error"
-          out
-        })
-        if (r$status < 1 || r$status > 4) {
-            warning(r$message)
-        }
-        if(class(r) != "error"){
-          coef <- r$solution
-        }else{
-          coef <- rep(0, ncol(Z))
-          coef[which.min(cvRisk)] <- 1
-        }
-        if (anyNA(coef)) {
-            warning("Some algorithms have weights of NA, setting to 0.")
-            coef[is.na(coef)] <- 0
-        }
-        if (anyDupCols) {
-            ind <- c(seq_along(coef), dupCols - 0.5)
-            coef <- c(coef, rep(0, length(dupCols)))
-            coef <- coef[order(ind)]
-        }
-        coef[coef < 1e-04] <- 0
-        coef <- coef/sum(coef)
-        out <- list(cvRisk = cvRisk, coef = coef, optimizer = r)
-        return(out)
+    stats::plogis(trimLogit(predY[, coef != 0], trim = control$trimLogit) %*%
+      matrix(coef[coef != 0]))
+  }
+  computeCoef <- function(Z, Y, libraryNames, obsWeights, control,
+                          verbose, ...) {
+    tol <- 4
+    dupCols <- which(duplicated(round(Z, tol), MARGIN = 2))
+    anyDupCols <- length(dupCols) > 0
+    modZ <- Z
+    if (anyDupCols) {
+      warning(paste0(
+        paste0(libraryNames[dupCols], collapse = ", "),
+        " are duplicates of previous learners.", " Removing from super learner."
+      ))
+      modZ <- modZ[, -dupCols, drop = FALSE]
     }
-    list(require = "nloptr", computeCoef = computeCoef, computePred = computePred)
+    modlogitZ <- trimLogit(modZ, control$trimLogit)
+    logitZ <- trimLogit(Z, control$trimLogit)
+    cvRisk <- apply(logitZ, 2, function(x) {
+      -sum(2 * obsWeights *
+        ifelse(Y, stats::plogis(x, log.p = TRUE), stats::plogis(x,
+          log.p = TRUE,
+          lower.tail = FALSE
+        )))
+    })
+    names(cvRisk) <- libraryNames
+    obj_and_grad <- function(y, x, w = NULL) {
+      y <- y
+      x <- x
+      function(beta) {
+        xB <- x %*% cbind(beta)
+        loglik <- y * stats::plogis(xB, log.p = TRUE) + (1 -
+          y) * stats::plogis(xB, log.p = TRUE, lower.tail = FALSE)
+        if (!is.null(w)) {
+          loglik <- loglik * w
+        }
+        obj <- -2 * sum(loglik)
+        p <- stats::plogis(xB)
+        grad <- if (is.null(w)) {
+          2 * crossprod(x, cbind(p - y))
+        } else {
+          2 * crossprod(x, w * cbind(p - y))
+        }
+        list(objective = obj, gradient = grad)
+      }
+    }
+    lower_bounds <- rep(0, ncol(modZ))
+    upper_bounds <- rep(1, ncol(modZ))
+    if (anyNA(cvRisk)) {
+      upper_bounds[is.na(cvRisk)] <- 0
+    }
+    r <- tryCatch(
+      {
+        nloptr::nloptr(
+          x0 = rep(1 / ncol(modZ), ncol(modZ)),
+          eval_f = obj_and_grad(Y, modlogitZ), lb = lower_bounds,
+          ub = upper_bounds, eval_g_eq = function(beta) {
+            (sum(beta) -
+              1)
+          }, eval_jac_g_eq = function(beta) rep(1, length(beta)),
+          opts = list(algorithm = "NLOPT_LD_SLSQP", xtol_abs = 1e-08)
+        )
+      },
+      error = function(e) {
+        out <- list()
+        class(out) <- "error"
+        out
+      }
+    )
+    if (r$status < 1 || r$status > 4) {
+      warning(r$message)
+    }
+    if (class(r) != "error") {
+      coef <- r$solution
+    } else {
+      coef <- rep(0, ncol(Z))
+      coef[which.min(cvRisk)] <- 1
+    }
+    if (anyNA(coef)) {
+      warning("Some algorithms have weights of NA, setting to 0.")
+      coef[is.na(coef)] <- 0
+    }
+    if (anyDupCols) {
+      ind <- c(seq_along(coef), dupCols - 0.5)
+      coef <- c(coef, rep(0, length(dupCols)))
+      coef <- coef[order(ind)]
+    }
+    coef[coef < 1e-04] <- 0
+    coef <- coef / sum(coef)
+    out <- list(cvRisk = cvRisk, coef = coef, optimizer = r)
+    return(out)
+  }
+  list(require = "nloptr", computeCoef = computeCoef, computePred = computePred)
 }

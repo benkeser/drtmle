@@ -5,13 +5,31 @@
 \title{Compute asymptotically linear IPTW estimators with super learning
 for the propensity score}
 \usage{
-adaptive_iptw(W, A, Y, DeltaY = as.numeric(!is.na(Y)),
-  DeltaA = as.numeric(!is.na(A)), stratify = FALSE, family = if
-  (all(Y \%in\% c(0, 1))) {     stats::binomial() } else {    
-  stats::gaussian() }, a_0 = unique(A[!is.na(A)]), SL_g = NULL,
-  glm_g = NULL, SL_Qr = NULL, glm_Qr = NULL, returnModels = TRUE,
-  verbose = FALSE, maxIter = 2, tolIC = 1/length(Y), tolg = 0.01,
-  cvFolds = 1, parallel = FALSE, future_hpc = NULL, gn = NULL, ...)
+adaptive_iptw(
+  W,
+  A,
+  Y,
+  DeltaY = as.numeric(!is.na(Y)),
+  DeltaA = as.numeric(!is.na(A)),
+  stratify = FALSE,
+  family = if (all(Y \%in\% c(0, 1))) {     stats::binomial() } else {    
+    stats::gaussian() },
+  a_0 = unique(A[!is.na(A)]),
+  SL_g = NULL,
+  glm_g = NULL,
+  SL_Qr = NULL,
+  glm_Qr = NULL,
+  returnModels = TRUE,
+  verbose = FALSE,
+  maxIter = 2,
+  tolIC = 1/length(Y),
+  tolg = 0.01,
+  cvFolds = 1,
+  parallel = FALSE,
+  future_hpc = NULL,
+  gn = NULL,
+  ...
+)
 }
 \arguments{
 \item{W}{A \code{data.frame} of named covariates}
@@ -136,10 +154,12 @@ library(SuperLearner)
 set.seed(123456)
 n <- 100
 W <- data.frame(W1 = runif(n), W2 = rnorm(n))
-A <- rbinom(n,1,plogis(W$W1 - W$W2))
-Y <- rbinom(n, 1, plogis(W$W1*W$W2*A))
+A <- rbinom(n, 1, plogis(W$W1 - W$W2))
+Y <- rbinom(n, 1, plogis(W$W1 * W$W2 * A))
 # fit iptw with maxIter = 1 to run fast
-fit1 <- adaptive_iptw(W = W, A = A, Y = Y, a_0 = c(1,0),
-               SL_g=c("SL.glm","SL.mean","SL.step"),
-               SL_Qr="SL.npreg", maxIter = 1)
+fit1 <- adaptive_iptw(
+  W = W, A = A, Y = Y, a_0 = c(1, 0),
+  SL_g = c("SL.glm", "SL.mean", "SL.step"),
+  SL_Qr = "SL.npreg", maxIter = 1
+)
 }

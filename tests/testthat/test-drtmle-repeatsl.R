@@ -140,7 +140,7 @@ test_that("drtmle executes as expected with stratify = TRUE", {
   expect_true(all(abs(fit5$tmle$est - fit2$tmle$est) < 1e-5))
   expect_true(all(abs(fit5$aiptw$est - fit2$aiptw$est) < 1e-5))
   expect_true(all(abs(fit5$aiptw_c$est - fit2$aiptw_c$est) < 1e-5))
-  
+
   # univariate reduction with
   # single SL + stratify
   fit6 <- drtmle(
@@ -312,7 +312,6 @@ test_that("drtmle executes as expected with stratify = FALSE", {
   expect_true(all(abs(fit6$tmle$est - fit1$tmle$est) < 1e-5))
   expect_true(all(abs(fit6$aiptw$est - fit1$aiptw$est) < 1e-5))
   expect_true(all(abs(fit6$aiptw_c$est - fit1$aiptw_c$est) < 1e-5))
-
 })
 
 
@@ -353,7 +352,7 @@ test_that("drtmle executes as expected with stratify = FALSE and multiple cvFold
   expect_true(is.numeric(fit1$aiptw_c$cov))
 
   # bivariate reduction with
-  # all GLMs + stratify   
+  # all GLMs + stratify
   set.seed(123456)
   fit2 <- drtmle(
     W = W, A = A, Y = Y,
@@ -381,7 +380,7 @@ test_that("drtmle executes as expected with stratify = FALSE and multiple cvFold
 
   # bivariate reduction with
   # all SL + stratify
-  set.seed(123456)  
+  set.seed(123456)
   fit4 <- drtmle(
     W = W, A = A, Y = Y,
     family = gaussian(),
@@ -407,7 +406,7 @@ test_that("drtmle executes as expected with stratify = FALSE and multiple cvFold
   expect_true(is.numeric(fit4$aiptw_c$cov))
   # bivariate reduction with
   # single SL + stratify
-  set.seed(123456)  
+  set.seed(123456)
   fit5 <- drtmle(
     W = W, A = A, Y = Y,
     family = gaussian(),
@@ -438,7 +437,7 @@ test_that("drtmle executes as expected with stratify = FALSE and multiple cvFold
 
   # univariate reduction with
   # single SL + stratify
-  set.seed(123456)  
+  set.seed(123456)
   fit6 <- drtmle(
     W = W, A = A, Y = Y,
     family = gaussian(),
@@ -466,7 +465,6 @@ test_that("drtmle executes as expected with stratify = FALSE and multiple cvFold
   expect_true(all(abs(fit6$tmle$est - fit1$tmle$est) < 1e-5))
   expect_true(all(abs(fit6$aiptw$est - fit1$aiptw$est) < 1e-5))
   expect_true(all(abs(fit6$aiptw_c$est - fit1$aiptw_c$est) < 1e-5))
-
 })
 
 # --------------------------------------------------------------------

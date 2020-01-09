@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 
 > Nonparametric estimators of the average treatment effect with doubly-robust confidence intervals and hypothesis tests
 
-__Author:__ [David Benkeser](https://www.benkeserstatistics.com/)
+__Author:__ [David Benkeser](https://www.sph.emory.edu/faculty/profile/#!dbenkes)
 
 ---
 
@@ -32,15 +32,17 @@ __Author:__ [David Benkeser](https://www.benkeserstatistics.com/)
 `drtmle` is an R package that computes marginal means of an outcome under fixed
 levels of a treatment. The package computes targeted minimum loss-based (TMLE)
 estimators that are doubly robust, not only with respect to consistency, but
-also with respect to asymptotic normality, as discussed in [Benkeser, et al (2017)](https://academic.oup.com/biomet/article-abstract/104/4/863/4554445). This property
-facilitates construction of doubly-robust confidence intervals and hypothesis
-tests.
+also with respect to asymptotic normality, as discussed in [Benkeser, et al.
+(2017)](https://academic.oup.com/biomet/article-abstract/104/4/863/4554445).
+This property facilitates construction of doubly-robust confidence intervals and
+hypothesis tests.
 
 The package additionally includes methods for computing valid confidence
 intervals for an inverse probability of treatment weighted (IPTW) estimator of
 the average treatment effect when the propensity score is estimated via super
 learning, as discussed in
-[van der Laan (2014)](https://www.degruyter.com/downloadpdf/j/ijb.2014.10.issue-1/ijb-2012-0038/ijb-2012-0038.pdf).
+[van der Laan
+(2014)](https://www.degruyter.com/downloadpdf/j/ijb.2014.10.issue-1/ijb-2012-0038/ijb-2012-0038.pdf).
 
 ---
 
@@ -74,7 +76,9 @@ loss-based estimates are doubly robust with respect to both consistency and
 asymptotic normality. The function computes doubly robust covariance estimates
 that can be used to construct doubly robust confidence intervals for marginal
 means and contrasts between means. A simple example on simulated data is shown
-below. We refer users to [the vignette](https://benkeser.github.io/drtmle/articles/using_drtmle.html) for more information and further examples.
+below. We refer users to [the
+vignette](https://benkeser.github.io/drtmle/articles/using_drtmle.html) for more
+information and further examples.
 
 ```{r}
 # load packages
@@ -116,7 +120,11 @@ ci_ate1 <- ci(fit1, contrast = c(-1, 1))
 ci_ate1
 ```
 
-This method requires estimation of additional univariate regressions to ensure doubly robust confidence intervals and hypothesis tests. The method for estimation are input via `SL.Qr` and `SL.gr` or `glm.Qr` and `glm.gr` if parametric models are desired). These additional fits can be visualized by the `plot` method for `drtmle`. 
+This method requires estimation of additional univariate regressions to ensure
+doubly robust confidence intervals and hypothesis tests. The method for
+estimation are input via `SL.Qr` and `SL.gr` or `glm.Qr` and `glm.gr` if
+parametric models are desired). These additional fits can be visualized by the
+`plot` method for `drtmle`.
 ```r
 layout(t(1:3))
 plot(fit1, ask = FALSE)
@@ -182,7 +190,7 @@ After using the `drtmle` R package, please cite the following:
 
 ## License
 
-&copy; 2016-2017 [David C. Benkeser](http://www.benkeserstatistics.com)
+&copy; 2016-2019 [David C. Benkeser](https://www.sph.emory.edu/faculty/profile/#!dbenkes)
 
 The contents of this repository are distributed under the MIT license. See
 below for details:
@@ -209,4 +217,3 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
-

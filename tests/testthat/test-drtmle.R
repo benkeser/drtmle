@@ -163,7 +163,7 @@ test_that("drtmle executes as expected with stratify = TRUE", {
   expect_true(is.numeric(fit5$aiptw$cov))
   expect_true(is.numeric(fit5$aiptw_c$est))
   expect_true(is.numeric(fit5$aiptw_c$cov))
-    fit5 <- drtmle(
+  fit5 <- drtmle(
     W = W, A = A, Y = Y,
     family = gaussian(),
     stratify = TRUE,
@@ -460,7 +460,7 @@ test_that("drtmle executes when user inputs Qn and gn and returnModels = TRUE", 
   tmp <- runif(n)
   gn <- list(tmp, 1 - tmp)
 
-    fit9 <- drtmle(
+  fit9 <- drtmle(
     W = W, A = A, Y = Y,
     family = gaussian(),
     stratify = FALSE,
@@ -490,19 +490,21 @@ test_that("GitHub error #16 resolves", {
   set.seed(123456)
   X <- runif(100, 0, 1)
 
-Q <- X
+  Q <- X
 
-g <- exp(X) / (1 + exp(X))
+  g <- exp(X) / (1 + exp(X))
 
-A <- rbinom(100, 1, g)
+  A <- rbinom(100, 1, g)
 
-Y <- runif(Q, -0.1, 0.1)
+  Y <- runif(Q, -0.1, 0.1)
 
-X <- as.data.frame(X)
+  X <- as.data.frame(X)
 
-a <- drtmle(W = X, A = A, Y = Y, a_0 = 1, glm_Q = 'X', 
-            glm_g = 'X', SL_Qr = 'SL.npreg', 
-            guard = 'Q', returnModel = TRUE)
+  a <- drtmle(
+    W = X, A = A, Y = Y, a_0 = 1, glm_Q = "X",
+    glm_g = "X", SL_Qr = "SL.npreg",
+    guard = "Q", returnModel = TRUE
+  )
   expect_true(is.numeric(a$gcomp$est))
   expect_true(is.numeric(a$tmle$est))
   expect_true(is.numeric(a$tmle$est))
@@ -513,10 +515,12 @@ a <- drtmle(W = X, A = A, Y = Y, a_0 = 1, glm_Q = 'X',
   expect_true(is.numeric(a$aiptw$cov))
   expect_true(is.numeric(a$aiptw_c$est))
   expect_true(is.numeric(a$aiptw_c$cov))
-# and the converse 
-b <- drtmle(W = X, A = A, Y = Y, a_0 = 1, glm_Q = 'X', 
-            glm_g = 'X', SL_gr = 'SL.npreg', 
-            guard = 'g', returnModel = TRUE)
+  # and the converse
+  b <- drtmle(
+    W = X, A = A, Y = Y, a_0 = 1, glm_Q = "X",
+    glm_g = "X", SL_gr = "SL.npreg",
+    guard = "g", returnModel = TRUE
+  )
   expect_true(is.numeric(b$gcomp$est))
   expect_true(is.numeric(b$tmle$est))
   expect_true(is.numeric(b$tmle$est))
@@ -527,5 +531,4 @@ b <- drtmle(W = X, A = A, Y = Y, a_0 = 1, glm_Q = 'X',
   expect_true(is.numeric(b$aiptw$cov))
   expect_true(is.numeric(b$aiptw_c$est))
   expect_true(is.numeric(b$aiptw_c$cov))
-
 })

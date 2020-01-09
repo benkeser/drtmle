@@ -3,17 +3,17 @@
 \name{tmp_method.CC_nloglik}
 \alias{tmp_method.CC_nloglik}
 \title{Temporary fix for convex combination method negative log-likelihood loss
-Relative to existing implementation, we reduce the tolerance at which 
+Relative to existing implementation, we reduce the tolerance at which
 we declare predictions from a given algorithm the same as another.
-Note that because of the way \code{SuperLearner} is structure, one needs to 
+Note that because of the way \code{SuperLearner} is structure, one needs to
 install the optimization software separately.}
 \usage{
 tmp_method.CC_nloglik()
 }
 \description{
 Temporary fix for convex combination method negative log-likelihood loss
-Relative to existing implementation, we reduce the tolerance at which 
+Relative to existing implementation, we reduce the tolerance at which
 we declare predictions from a given algorithm the same as another.
-Note that because of the way \code{SuperLearner} is structure, one needs to 
+Note that because of the way \code{SuperLearner} is structure, one needs to
 install the optimization software separately.
 }
