@@ -143,7 +143,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
           family = stats::binomial(), SL.library = SL_g$A,
           verbose = verbose, method = tmp_method.CC_nloglik()
         ))
-        gn_A <- vector(mode = "list", length = 2)
+        gn_A <- vector(mode = "list", length = 2)        
         gn_A[[1]] <- fm_A[[1]]$SL.predict
         gn_A[[2]] <- 1 - gn_A[[1]]
         # name for this model
