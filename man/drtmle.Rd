@@ -13,12 +13,16 @@ drtmle(
   a_0 = unique(A[!is.na(A)]),
   family = if (all(Y \%in\% c(0, 1))) {     stats::binomial() } else {    
     stats::gaussian() },
-  stratify = TRUE,
+  stratify = FALSE,
   SL_Q = NULL,
   SL_g = NULL,
   SL_Qr = NULL,
   SL_gr = NULL,
   n_SL = 1,
+  avg_over = "drtmle",
+  se_cv = "none",
+  se_cvFolds = ifelse(se_cv == "partial", 10, 1),
+  targeted_se = se_cv != "partial",
   glm_Q = NULL,
   glm_g = NULL,
   glm_Qr = NULL,
@@ -27,14 +31,13 @@ drtmle(
   guard = c("Q", "g"),
   reduction = "univariate",
   returnModels = FALSE,
+  returnNuisance = TRUE,
   cvFolds = 1,
   maxIter = 3,
   tolIC = 1/length(Y),
   tolg = 0.01,
   verbose = FALSE,
   Qsteps = 2,
-  parallel = FALSE,
-  future_hpc = NULL,
   Qn = NULL,
   gn = NULL,
   use_future = TRUE,
@@ -86,6 +89,37 @@ library to be used for the reduced-dimension propensity score.}
 each nuisance parameter. Repeat Super Learners more times to obtain more stable
 inference.}
 
+\item{avg_over}{If multiple Super Learners are run, on which scale should the
+results be aggregated. Options include: \code{"SL"} = 
+repeated nuisance parameter estimates are averaged before subsequently 
+generating a single vector of point estimates based on the averaged models;
+\code{"drtmle"} = repeated vectors of point estimates are generated and 
+averaged. Both can be specified, recognizing that this adds considerable
+computational expense. In this case, the final estimates are the average 
+of \code{n_SL} point estimates where each is built by averaging \code{n_SL} 
+fits. If \code{NULL}, no averaging is performed (in which case \code{n_SL} 
+should be set equal to 1).}
+
+\item{se_cv}{Should cross-validated nuisance parameter estimates be used 
+for computing standard errors? 
+Options are \code{"none"} = no cross-validation is performed; \code{"partial"} = 
+only applicable if Super Learner is used for nuisance parameter estimates; 
+\code{"full"} = full cross-validation is performed. See vignette for further 
+details. Ignored if \code{cvFolds > 1}, since then
+cross-validated nuisance parameter estimates are used by default and it is 
+assumed that you want full cross-validated standard errors.}
+
+\item{se_cvFolds}{If cross-validated nuisance parameter estimates are used
+to compute standard errors, how many folds should be used in this computation. 
+If \code{se_cv = "partial"}, then this option sets the number of folds used
+by the \code{SuperLearner} fitting procedure.}
+
+\item{targeted_se}{A boolean indicating whether the targeted nuisance 
+parameters should be used in standard error computation or the initial 
+estimators. If \code{se_cv} is not set to \code{"none"}, this option is 
+ignored and standard errors are computed based on non-targeted, cross-validated 
+nuisance parameter fits.}
+
 \item{glm_Q}{A character describing a formula to be used in the call to
 \code{glm} for the outcome regression. Ignored if \code{SL_Q!=NULL}.}
 
@@ -128,6 +162,11 @@ bivariate version.}
 \item{returnModels}{A boolean indicating whether to return model fits for the
 outcome regression, propensity score, and reduced-dimension regressions.}
 
+\item{returnNuisance}{A boolean indicating whether to return the estimated 
+nuisance regressions evaluated on the observed data. Defaults to \code{TRUE}. 
+If \code{n_SL} is large and \code{"drtmle"} is in \code{avg_over}, then 
+consider setting to \code{FALSE} in order to reduce size of resultant object.}
+
 \item{cvFolds}{A numeric equal to the number of folds to be used in
 cross-validated fitting of nuisance parameters. If \code{cvFolds = 1}, no
 cross-validation is used. Alternatively, \code{cvFolds} may be entered as a
@@ -150,17 +189,6 @@ submodel for the outcome regression should be fit using a single
 minimization (\code{Qsteps = 1}) or a backfitting-type minimization
 (\code{Qsteps=2}). The latter was found to be more stable in simulations and
 is the default.}
-
-\item{parallel}{A boolean indicating whether to use parallelization based on
-\code{future} when estimating nuisance parameters. Only useful if
-\code{cvFolds > 1}. By default, a \code{multiprocess} evaluation scheme is
-invoked, using forked R processes (if supported on the OS) and background R
-sessions otherwise. Users may also register their own backends using the
-\code{future.batchtools} package.}
-
-\item{future_hpc}{A character string identifying a high-performance computing
-backend to be used with parallelization. This should match exactly one of
-the options available from the \code{future.batchtools} package.}
 
 \item{Qn}{An optional list of outcome regression estimates. If specified, the
 function will ignore the nuisance parameter estimation specified by

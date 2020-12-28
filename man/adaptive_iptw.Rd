@@ -25,8 +25,6 @@ adaptive_iptw(
   tolIC = 1/length(Y),
   tolg = 0.01,
   cvFolds = 1,
-  parallel = FALSE,
-  future_hpc = NULL,
   gn = NULL,
   ...
 )
@@ -93,17 +91,6 @@ propensity score.}
 \item{cvFolds}{A numeric equal to the number of folds to be used in
 cross-validated fitting of nuisance parameters. If \code{cvFolds = 1}, no
 cross-validation is used.}
-
-\item{parallel}{A logical indicating whether to use parallelization based on
-\code{future} to estimate nuisance parameters in parallel. Only useful if
-\code{cvFolds > 1}. By default, a \code{multiprocess} evaluation scheme is
-invoked, using forked R processes (if supported on the OS) and background R
-sessions otherwise. Users may also register their own backends using the
-\code{future.batchtools} package.}
-
-\item{future_hpc}{A character string identifying a high-performance computing
-backend to be used with parallelization. This should match exactly one of
-the options available from the \code{future.batchtools} package.}
 
 \item{gn}{An optional list of propensity score estimates. If specified, the
 function will ignore the nuisance parameter estimation specified by

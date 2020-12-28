@@ -288,9 +288,6 @@ plot.drtmle <- function(x, nPoints = 500,
   }
 }
 
-# SHOULD MAKE THIS FUNCTION TAKE AS INPUT THE NUMBER OF SUPER LEARNERS AND
-# RETURN AS OUTPUT SOMETHING REORDERED/AVERAGED AS NECESSARY
-
 #' Helper function to reorder lists according to cvFolds
 #'
 #' @param a_list Structured list of nuisance parameters
@@ -301,14 +298,17 @@ plot.drtmle <- function(x, nPoints = 500,
 #' @param n_SL Number of super learners. If >1, then predictions
 #' are averaged
 #' @param n Sample size
+#' @param for_se_cv Is this being used to average over 
+#' cross-validated standard errors? Affects index of \code{a_list}. 
 reorder_list <- function(a_list,
                          a_0,
                          validRows,
                          n_SL = 1,
                          grn_ind = FALSE,
-                         n) {
+                         n,
+                         for_se_cv = FALSE) {
   n_cvFolds <- length(validRows) / n_SL
-
+  est_index <- ifelse(for_se_cv, 3, 1)
 
   reduced_outList <- vector(mode = "list", length = length(a_0))
 
@@ -326,7 +326,7 @@ reorder_list <- function(a_list,
       recursive = FALSE, use.names = FALSE
     )
     # this is in 0/1 format
-    outListUnOrd <- do.call(Map, c(c, outListValid[seq(1, length(outListValid), 2)]))
+    outListUnOrd <- do.call(Map, c(c, outListValid[seq(est_index, length(outListValid), length(a_list[[1]]))]))
     outList <- vector(mode = "list", length = length(a_0))
     if (!grn_ind) {
       for (i in seq_along(a_0)) {
@@ -359,7 +359,7 @@ reorder_list <- function(a_list,
 #' @param a_list Structured list of nuisance parameters
 extract_models <- function(a_list) {
   outListValid <- unlist(a_list, recursive = FALSE, use.names = FALSE)
-  outListValid[seq(2, length(outListValid), 2)]
+  outListValid[seq(2, length(outListValid), 3)]
 }
 
 #' Make list of rows in each validation fold.
@@ -431,12 +431,12 @@ tmp_method.CC_LS <- function() {
     tol <- 4
     dupCols <- which(duplicated(round(Z, tol), MARGIN = 2))
     anyDupCols <- length(dupCols) > 0
-    if (anyDupCols) {
-      warning(paste0(
-        paste0(libraryNames[dupCols], collapse = ", "),
-        " are duplicates of previous learners.", " Removing from super learner."
-      ))
-    }
+    # if (anyDupCols) {
+    #   warning(paste0(
+    #     paste0(libraryNames[dupCols], collapse = ", "),
+    #     " are duplicates of previous learners.", " Removing from super learner."
+    #   ))
+    # }
     if (anyDupCols | anyNACols) {
       rmCols <- unique(c(naCols, dupCols))
       modZ <- Z[, -rmCols, drop = FALSE]
@@ -497,10 +497,10 @@ tmp_method.CC_nloglik <- function() {
     anyDupCols <- length(dupCols) > 0
     modZ <- Z
     if (anyDupCols) {
-      warning(paste0(
-        paste0(libraryNames[dupCols], collapse = ", "),
-        " are duplicates of previous learners.", " Removing from super learner."
-      ))
+      # warning(paste0(
+      #   paste0(libraryNames[dupCols], collapse = ", "),
+      #   " are duplicates of previous learners.", " Removing from super learner."
+      # ))
       modZ <- modZ[, -dupCols, drop = FALSE]
     }
     modlogitZ <- trimLogit(modZ, control$trimLogit)
@@ -580,4 +580,104 @@ tmp_method.CC_nloglik <- function() {
     return(out)
   }
   list(require = "nloptr", computeCoef = computeCoef, computePred = computePred)
+}
+
+#' Helper function for averaging lists of estimates
+#' generated in the main \code{for} loop of \code{drtmle}
+#' 
+#' @param est_cov_list A list with named entries \code{est} and \code{cov}
+average_est_cov_list <- function(est_cov_list){
+  length_list <- length(est_cov_list)
+  all_ests <- lapply(est_cov_list, "[[", "est")
+  all_cov <- lapply(est_cov_list, "[[", "cov")
+  avg_est <- Reduce("+", all_ests) / length_list
+  avg_cov <- Reduce("+", all_cov) / length_list
+  return(list(est = avg_est, cov = avg_cov))
+}
+
+#' Helper function to average convergence results and drtmle
+#' influence function estimates over multiple fits
+#' @param ic_list List of influence function estimates
+average_ic_list <- function(ic_list){
+  length_list <- length(ic_list)
+  all_mean_eif <- unlist(lapply(ic_list, "[[", "mean_eif"), use.names = FALSE)
+  all_mean_missQ <- unlist(lapply(ic_list, "[[", "mean_missQ"), use.names = FALSE)
+  all_mean_missg <- unlist(lapply(ic_list, "[[", "mean_missg"), use.names = FALSE)
+  all_ic <- lapply(ic_list, "[[", "ic")
+  avg_ic <- Reduce("+", all_ic) / length_list
+  return(list(mean_eif = all_mean_eif,
+              mean_missQ = all_mean_missQ,
+              mean_missg = all_mean_missg,
+              ic  = avg_ic))
+}
+
+#' Helper function to properly format partially cross-validated predictions 
+#' from a fitted super learner.
+#' 
+#' @param fit_sl A fitted \code{SuperLearner} object with 
+#' \code{control$saveCVFitLibrary = TRUE}
+#' @param a_0 Treatment level to set. If \code{NULL}, assume this function
+#' is being used to get partially cross-validated propensity score predictions.
+#' @param W A \code{data.frame} of named covariates.
+#' @param include A boolean vector indicating which observations were actually
+#' used to fit the regression. 
+#' @param easy A boolean indicating whether the predictions can be 
+#' computed the "easy" way, i.e., based just on the Z matrix from SuperLearner.
+#' This is possible for propensity score models when no missing data AND no 
+#' stratification. 
+partial_cv_preds <- function(fit_sl, a_0, W = NULL,
+                             include = NULL, easy = FALSE){
+  n_algo <- length(fit_sl$cvRisk)
+  n_folds <- length(fit_sl$validRows)
+
+  if(!easy){ 
+    n <- length(W[,1])
+  }else{ # if used in easy scenario, then fit_sl will have been 
+         # fit using all observations and no W will enter, so we'll check
+         # the Z matrix that is used to generate predictions below
+    n <- length(fit_sl$Z[,1])
+  }
+  alpha_hat <- matrix(fit_sl$coef, nrow = n_algo)
+  if(!easy){
+    # rslt_list will eventually hold cross-validated predictions for 
+    # all observations that were actually used to fit the regression
+    rslt_list <- vector(mode = "list", length = n_folds)
+    for(v in seq_len(n_folds)){
+      # who's in the validation fold of the included folks
+      foldv_ids <- fit_sl$validRows[[v]]
+      # these are the people who were not used to fit these models
+      foldv_models <- fit_sl$cvFitLibrary[[v]]
+      rslt <- matrix(NA, nrow = length(foldv_ids), ncol = n_algo)
+      for(k in seq_len(n_algo)){
+        # predict under a_0
+        if(!is.null(a_0)){
+          rslt[ , k] <- predict(foldv_models[[k]], newdata = data.frame(A = a_0, W)[include,][foldv_ids,])
+        }else{
+          rslt[ , k] <- predict(foldv_models[[k]], newdata = W[include,][foldv_ids,])
+        }
+      }
+      rslt_list[[v]] <- rslt
+    }
+    # combine using weights from full super learner
+    pred_list <- vector(mode = "list", length = n_folds)
+    for(v in seq_len(n_folds)){
+      pred_list[[v]] <- rslt_list[[v]] %*% alpha_hat
+    }
+    reorder_preds <- rep(NA, n)
+    # fill in observations in regression with cross-validated prediction
+    reorder_preds[include][unlist(fit_sl$validRows)] <- unlist(pred_list, use.names = FALSE)
+    # all others fill in with prediction from super learner
+    if(any(!include)){
+      if(!is.null(a_0)){
+        reorder_preds[!include] <- predict(fit_sl, newdata = data.frame(A = a_0, W)[!include,])[[1]]
+      }else{
+        reorder_preds[!include] <- predict(fit_sl, newdata = W[!include,])[[1]]
+      }
+    }
+  }else{ # when a_0 is NULL
+    # in this case, we're operating on a propensity score model 
+    # in which case, fit_sl$Z already has cross-validated predictions
+    reorder_preds <- as.numeric(fit_sl$Z %*% alpha_hat)
+  }
+  return(reorder_preds)
 }

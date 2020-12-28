@@ -17,6 +17,8 @@ estimateQ(
   family,
   verbose = FALSE,
   returnModels = FALSE,
+  se_cv = "none",
+  se_cvFolds = 10,
   validRows = NULL,
   ...
 )
@@ -53,6 +55,20 @@ regression separately for observations with \code{A} equal to 0/1 (if
 
 \item{returnModels}{A boolean indicating whether to return model fits for the
 outcome regression, propensity score, and reduced-dimension regressions.}
+
+\item{se_cv}{Should cross-validated nuisance parameter estimates be used 
+for computing standard errors? 
+Options are \code{"none"} = no cross-validation is performed; \code{"partial"} = 
+only applicable if Super Learner is used for nuisance parameter estimates; 
+\code{"full"} = full cross-validation is performed. See vignette for further 
+details. Ignored if \code{cvFolds > 1}, since then
+cross-validated nuisance parameter estimates are used by default and it is 
+assumed that you want full cross-validated standard errors.}
+
+\item{se_cvFolds}{If cross-validated nuisance parameter estimates are used
+to compute standard errors, how many folds should be used in this computation. 
+If \code{se_cv = "partial"}, then this option sets the number of folds used
+by the \code{SuperLearner} fitting procedure.}
 
 \item{validRows}{A \code{list} of length \code{cvFolds} containing the row
 indexes of observations to include in validation fold.}

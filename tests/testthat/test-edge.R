@@ -13,7 +13,7 @@ test_that("drtmle executes as expected when only one value of gn", {
 
   # univariate reduction with
   # all GLMs + stratify
-  expect_warning(fit1 <- drtmle(
+  fit1 <- drtmle(
     W = W, A = A, Y = Y,
     cvFolds = 1, maxIter = 2,
     family = gaussian(),
@@ -24,7 +24,7 @@ test_that("drtmle executes as expected when only one value of gn", {
     glm_gr = "Qn",
     guard = c("Q", "g"),
     reduction = "univariate"
-  ))
+  )
   expect_true(is.numeric(fit1$gcomp$est))
   expect_true(is.numeric(fit1$tmle$est))
   expect_true(is.numeric(fit1$tmle$est))

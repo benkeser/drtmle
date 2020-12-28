@@ -436,6 +436,9 @@ W <- data.frame(W1 = runif(n), W2 = rbinom(n, 1, 0.5))
 A <- rbinom(n, 1, plogis(W$W1 + W$W2))
 Y <- rbinom(n, 1, plogis(W$W1 + W$W2*A))
 ```
+
+### Using `glm` to estimate regressions
+
 Generalized linear models are perhaps the most popular means of estimating
 regression functions. Because of this legacy, these estimators have been
 included as an option for estimating the regression parameters. The user
@@ -480,6 +483,8 @@ glm_fit_biv <- drtmle(W = W, A = A, Y = Y, family = binomial(),
 glm_fit_biv
 ```
 
+### Using `SuperLearner` to estimate regressions
+
 ```{r, echo = FALSE, message = FALSE}
 library(SuperLearner)
 ```
@@ -516,6 +521,7 @@ use a super learner library with a main terms generalized linear model
 package [@earthPackage]).
 
 ```{r, warning = FALSE, message = FALSE, cache = TRUE}
+set.seed(1234)
 sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
                  SL_g = c("SL.glm","SL.mean"),
                  SL_Q = c("SL.glm","SL.mean"),
@@ -573,32 +579,54 @@ npreg_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
 npreg_fit
 ```
 
+### Reducing dependence on random seed
+
 Some users may find it unsettling that when applying the super learner in real data 
 analysis is that the results are dependent on the random seed that is set. To remove 
-this dependence, one can instead average over repeated super learner runs; more 
-repeats will lead to less dependence on the random seed. This feature is implemented 
-via the `n_SL` option. The package is currently parallelized at the level of individual 
-calls to `SuperLearner`. With parallelization over enough cores, repeated super 
+this dependence, one can instead average results over repeated super learner runs; more 
+repeats will lead to less dependence on the random seed. There are generally two approaches
+that can be used: (i) averaging on the scale of the nuisance parameters and (ii) averaging
+on the scale of the point estimates. 
+
+For (i), suppose that we have $n_{SL}$ estimated super 
+learners for the OR, $\bar{Q}_{n,j}, j = 1, \dots, n_{SL}$, and the PS 
+$g_{n,j}, j = 1, \dots, n_{SL}$. We can take the average over these fits, \[
+\bar{Q}_n = \frac{1}{n_{SL}} \sum_{j = 1}^{n_{SL}} \bar{Q}_{n,j}
+\] 
+as our estimate of the OR (similarly for the PS). These averaged estimates are then used to 
+compute the AIPTW or TMLE, as described above. 
+
+For(ii), suppose for example that we have $n_{SL}$ TMLE (similarly, AIPTW) estimates 
+$\psi_{n,j}(1)$ of $\psi_0(1)$, each obtained based on one (or more) super learner of the OR and/or PS.
+We can take the average over these point estimates, \[
+\psi_n(1) = \frac{1}{n_{SL}} \sum_{j=1}^{n_{SL}} \psi_{n,j}(1)
+\]
+as our estimate of $\psi_{0}(1)$.
+
+These feature is implemented via the `n_SL` and `avg_over` options, where the former specifies the
+number of super learners to repeat and the latter specifies the scale(s) to average over. For example, if 
+`avg_over = "drtmle"` and `n_SL = 2`, then two point estimates are computed, each based on a single 
+super learner, and averaged to obtain a final estimate. If instead `avg_over = "SL"` and `n_SL = 2`, 
+then two super learners are fit and averaged before a final point estimate is obtained. Finally, if
+`avg_over = c("drtmle", "SL")` and `n_SL = 2` then averaging on *both* scales is performed. That is,
+the final estimate is the average of two point estimates, each obtained using OR and PS estimates that
+are averaged over two super learners. 
+
+Not surprisingly, averaging over multiple super learners can add considerable computational expense 
+to calls to `drtmle`. The package is currently parallelized at the level of individual calls to 
+`SuperLearner`. With parallelization over enough cores, repeated super 
 learning should not add too much to the computational burden relative to a single 
 call to `SuperLearner`.
 
-```{r, message = FALSE, cache = TRUE}
-repeated_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
-                 SL_g = c("SL.glm", "SL.step.interaction", "SL.mean"),
-                 SL_Q = c("SL.glm", "SL.step.interaction", "SL.mean"),
-                 SL_gr = c("SL.glm", "SL.earth"),
-                 SL_Qr = c("SL.glm", "SL.earth"),
-                 stratify = FALSE, n_SL = 5)
-repeated_sl_fit
-```
+### Outcome-adaptive propensity score
 
-If the outcome-adaptive propensity score is desired, the user may specify this via 
+If the outcome-adaptive PS is desired, the user may specify this via 
 the `adapt_g` option. In this case, the additional targeting steps needed for doubly
 robust inference are "turned off" (i.e., `guard = NULL`), since, as discussed above,
 this estimator is *not* doubly robust. Note that when the `adapt-g = TRUE` the data
-used for the propensity score estimation will be a `data.frame` with column names
+used for the PS estimation will be a `data.frame` with column names
 `QaW` where `a` takes all the values specified in `a_0`. For example if `a_0 = c(0,1)`,
-then the propensity score estimation data frame will have two columns called `Q0W`
+then the PS estimation data frame will have two columns called `Q0W`
 and `Q1W`. This may be relevant for users writing their own `SuperLearner` wrappers
 or those who make use of the `glm_g` setting, as illustrated below. 
 
@@ -614,6 +642,8 @@ adaptg_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
                      SL_g = c("SL.glm", "SL.mean"),
                      adapt_g = TRUE)
 ``` 
+
+### Arbitrary user-specified regressions
 
 The `drtmle` package also allows users to pass in their own estimated OR and PS
 via the `Qn` and `gn` options, respectively. 
@@ -706,6 +736,145 @@ out_fit4
 This flexibility allows users to use any regression technique to externally
 obtain initial estimates of nuisance parameters. The key step is making sure
 that the ordering of `Qn` and `gn` is consistent with `a_0`. 
+
+## Standard error estimation \label{standard_errors}
+
+This section contains some more advanced mathematical material and may be omitted by
+users interested only in implementation. For simplicity, we focus this discussion on the 
+standard TMLE/AIPTW estimators. The ideas generalize immediately to the DRTMLE estimator, 
+but the formulas are more complex.
+
+Reported standard error estimates are based on an estimate the asymptotic variance of 
+the estimators. This variance can be characterized by the estimators influence function.
+For example, let $\psi_{n}(1)$ be an AIPTW estimate of $\psi_0(1)$. Under regularity 
+conditions, \[
+  \psi_{n}(1) - \psi_0(1) = \frac{1}{n} \sum_{i=1}^n D^*(\bar{Q}_0, g_0, Q_{W,0})(O_i) + o_{p}(n^{-1/2}) \ ,
+\]
+where \[
+D^*(\bar{Q}_0, g_0, Q_{W,0})(O_i) = \frac{I(A_i = 1)}{g_0(1 \mid W_i)} \{ Y_i - \bar{Q}_0(1, W_i)\} + \bar{Q}_0(1, W_i) - \int \bar{Q}_0(1, w) dQ_{W,0}(w) \ .
+\]
+Thus, by the central limit theorem, $n^{1/2} \psi_{n}(1)$ converges in distribution to a Normal
+distribution with mean $\psi_0(1)$ and variance \[
+  \sigma^2_0 = E_0( [ D^*(\bar{Q}_0, g_0, Q_{W,0})(O) - E_0\{D^*(\bar{Q}_0, g_0, Q_{W,0})(O)\} ]^2 ) \ .
+\]
+An estimate of $\sigma^2_0$ is naturally obtained by taking the empirical variance of $D_i = D^*(\bar{Q}_n, g_n, Q_{W,n})(O_i)$, \[
+  \sigma^2_n = \frac{1}{n} \sum_{i=1}^n \left\{ D_i - \frac{1}{n} \sum_{j=1}^n D_j \right\}^2 \ . 
+\]
+Thus, a natural estimate of the standard error of $\psi_{n}(1)$ is $\sigma_n / n^{1/2}$. This idea generalizes naturally to estimating the asymptotic covariance matrix of a vector $n^{1/2} (\psi_{n}(a) : a)$. 
+
+### Standard errors for TMLE
+
+For TMLE-based estimators, it is standard practice to construct $D_i$ above using the *targeted* 
+version of the OR (denoted by $\bar{Q}_n^*$ above). Recall that such estimates are obtained by modifying
+an initial OR estimate in such a way as to ensure a particular (set of) equation(s) is (are) solved.
+However, simulations have shown that better standard error estimates for TMLE may be achieved by instead
+using the *initial* OR estimate in the computation of standard errors, as described in the previous
+subsection. The `drtmle` function includes the `targeted_se` option to this end. 
+
+```{r, show_targeted_se, cache = TRUE}
+glm_fit_uni_nontargeted_se <- 
+  drtmle(W = W, A = A, Y = Y, family = binomial(),
+         glm_g = "W1 + W2", glm_Q = "W1 + W2*A",
+         glm_gr = "Qn", glm_Qr = "gn", stratify = FALSE, 
+         targeted_se = FALSE)
+# compare to original call        
+list(
+  glm_fit_uni$drtmle$cov, # based on targeted OR
+  glm_fit_uni_nontargeted_se$drtmle$cov # untargeted OR
+)
+```
+
+### Cross-validated standard errors
+
+In simulations, we often find that when employing machine learning to estimate the OR and/or PS, 
+the estimated standard errors are *too small* in small to moderate-sized samples, leading to 
+under-coverage of confidence intervals and possibly too-large type I errors of hypothesis tests that
+are based on these standard error estimates. This should not be too surprising when studying the form
+of the standard error estimates. In particular, they will include a term that looks like 
+a (weighted) mean squared-error (MSE) of the OR. Because machine learning algorithms often set out 
+to minimize empirical MSE as part of their training, we often find that the empirical MSE is biased 
+too small relative to the true MSE. Thus, in order to more accurately estimate MSE of a machine learning
+algorithm, we typically rely on cross-validation. The same trick can be used here to obtain a more
+conservative standard error estimate.
+
+Suppose we use $V$-fold cross-validation to obtained $V$ training-sample-specific estimates of the OR,
+ $\bar{Q}_{n,v}, v = 1, \dots, V$ and the PS, $g_{n,v}, v = 1, \dots, V$. For $i = 1, \dots, n$, let $\bar{Q}_{n,i}^{cv}(1)$ denote the estimate of $\bar{Q}_{0}(a, W_i)$ obtained when observation $i$ was in the validation fold. That is, $\bar{Q}_{n,i}^{cv}$ is an out-of-sample prediction of $Y_i$. We define
+ $g_{n,i}^{cv}$ similarly. Using these estimates, we can define \[
+ D_i^{cv} = \frac{I(A_i = 1)}{g_{n,i}^{cv}} \{ Y_i - \bar{Q}_{n,i}^{cv}(1)\} + \bar{Q}_{n,i}^{cv}(1) - \frac{1}{n} \sum_{i=1}^n \bar{Q}_{n,i}^{cv}(1) 
+ \]
+and compute an estimate of $\sigma^2_0$ using \[
+  \sigma^2_{n,cv} = \frac{1}{n} \sum_{i=1}^n \left\{ D_i^{cv} - \frac{1}{n} \sum_{j=1}^n D_j^{cv} \right\}^2 \ . 
+\]
+
+Cross-validated standard errors can be obtained by setting `se_cv = "full"` and `se_cvFolds` to a number greater than 1. 
+
+```{r, fit_w_full_cv, warning = FALSE, cache = TRUE}
+glm_fit_uni_cv <- drtmle(W = W, A = A, Y = Y, family = binomial(),
+                         glm_g = "W1 + W2", glm_Q = "W1 + W2*A",
+                         glm_gr = "Qn", glm_Qr = "gn",
+                         se_cv = "full", se_cvFolds = 2, stratify = FALSE,
+                         targeted_se = FALSE) # needed for this to work
+# compare variance to previously obtained
+list(glm_fit_uni$drtmle$cov, glm_fit_uni_cv$drtmle$cov)
+```
+
+### Partially cross-validated standard errors
+
+Obtaining fully cross-validated standard errors can be fairly time intensive when super learner is
+used to estimate the OR and PS. In `drtmle` we give an option to compute standard error estimates that
+are *partially cross-validated* and do not require any additional fitting. Here we describe briefly 
+how these estimates are obtained and show calls to `drtmle` to obtain these estimates. 
+
+Suppose we have $K$ candidate regressions in our super learner library for both the OR and PS 
+(in practice, the number could be different for the OR as for the PS). Recall that a super learner
+estimate of for example $\bar{Q}_0(a, w)$ is obtained as a weighted combination of estimates 
+from each candidate regression. Let $\bar{Q}_{n,k}$ denote the estimate of $\bar{Q}_{0}$ obtained 
+by training algorithm $k$ using the full data set. The super learner estimate of $\bar{Q}_{0}(a,w)$ is \[
+  \bar{Q}_{n,SL}(a, w) = \sum_{k = 1}^K \alpha_{n,k} \bar{Q}_{n,k}(a, w) \ , 
+\]
+where $\alpha_n = (\alpha_{n,1}, \dots, \alpha_{n,K})$ is a weight vector that is selected by minimizing
+a cross-validated risk criteria. That is, each of the $K$ algorithms is trained according to a $V$-fold
+cross-validation scheme, resulting in $V + 1$ fits of each algorithm (one in each of $V$ training folds
+plus one obtained by fitting the algorithm using the full data). Let $\bar{Q}_{n,k,v}$ denote the $k$-th
+algorithm trained using the $v$-th training fold. For $i = 1,\dots,n$, let $\bar{Q}_{n,k,i}^{cv}(1)$ 
+denote the estimate of $\bar{Q}_0(1, W_i)$ implied by the fitted algorithm $\bar{Q}_{n,k,v}$, which 
+was obtained when observation $i$ was in the validation sample. That is, for observations with
+$A_i = 1$, $\bar{Q}_{n,k,i}^{cv}(1)$ is an out of sample prediction of $Y_i$ based on the
+$k$-th algorithm. Now, we can construct a *partially cross-validated* super learner prediction as follows. For $i = 1, \dots, n$ let \[
+  \bar{Q}_{n,SL,i}^{cv}(1) = \sum_{k = 1}^K \alpha_{n,k} \bar{Q}_{n,k,i}^{cv}(1)
+\]
+be the estimate obtained by ensembling the training-set-specific algorithm fits based on $\alpha_n$. 
+We can use these estimates to produce our *partially cross-validated* standard error estimate as follows. We define \[
+ D_i^{pcv} = \frac{I(A_i = 1)}{g_{n,SL,i}^{cv}} \{ Y_i - \bar{Q}_{n,SL,i}^{cv}(1)\} + \bar{Q}_{n,SL,i}^{cv}(1) - \frac{1}{n} \sum_{i=1}^n \bar{Q}_{n,SL,i}^{cv}(1) 
+ \]
+and compute an estimate of $\sigma^2_0$ using \[
+  \sigma^2_{n,pcv} = \frac{1}{n} \sum_{i=1}^n \left\{ D_i^{pcv} - \frac{1}{n} \sum_{j=1}^n D_j^{pcv} \right\}^2 \ . 
+\]
+
+Note that is not a proper cross-validated estimate, since observation $i$ is used to compute the 
+weight vector $\alpha_n$. However, such estimates can be obtained based on the output of a single 
+round of super learning, thereby providing improved standard error estimates at minimal additional
+computational cost. 
+
+Here, we demonstrate how to obtain such estimates using `drtmle`.
+
+```{r, demo_pcv, cache = TRUE, warning = FALSE}
+set.seed(1234)
+sl_fit_pcv <- drtmle(W = W, A = A, Y = Y, family = binomial(),
+                     SL_g = c("SL.glm","SL.mean"),
+                     SL_Q = c("SL.glm","SL.mean"),
+                     SL_gr = c("SL.glm", "SL.earth"),
+                     SL_Qr = c("SL.glm", "SL.earth"),
+                     stratify = FALSE,
+                     se_cv = "partial")
+# compare estimates
+# pt estimates should be same
+# variance should be larger for pcv
+list(
+  sl_fit, # no cv
+  sl_fit_pcv # partial cv
+)
+```
 
 ## Confidence intervals \label{confidence_intervals}
 
@@ -1092,18 +1261,16 @@ cv_sl_fit
 
 Cross-validation may significantly increase the computation time necessary for
 running `drtmle`. Parallelized regression fitting is available by setting the
-option `parallel = TRUE`. Since, internally, all computations are carried out
+option `use_future = TRUE`. Since, internally, all computations are carried out
 using futures (with the API provided by the "future" R package), setting this
 option amounts only to parallelizing with futures [@futurePackage] via
-`future::lapply`. Selecting this option results in parallelization of the
+`future.apply::lapply`. Selecting this option results in parallelization of the
 estimation of the OR, PS, and reduced-dimension regressions.
 
 If no adjustments are made prior to invoking the `drtmle` function, futures are
-computed using the `multiprocess` option, which performs computations in forked
-R processes (non-Windows systems) or spawns and uses
-background R sessions on the current machine. The setup also allows users to
-specify appropriate system-specific back-ends that may better suit their problem
-using the `future.batchtools` package [@futurebatchtoolsPackage]. Below we
+computed sequentially. It is up to the user to specify appropriate system-specific 
+future back-ends that may better suit their problem (e.g., using the `future.batchtools` 
+package [@futurebatchtoolsPackage]). Below we
 demonstrate registration using an ad-hoc cluster on the local system. The choice
 of back-end is flexible, and submission of the job to a wide variety
 of schedulers (e.g., SLURM, TORQUE, etc.) is also permitted. Interested readers
@@ -1123,7 +1290,7 @@ further information.
 #                      SL_gr = c("SL.glm", "SL.earth", "SL.mean"),
 #                      SL_Qr = c("SL.glm", "SL.earth", "SL.mean"),
 #                      stratify = FALSE, a_0 = c(0,1,2),
-#                      cvFolds = 2, parallel = TRUE)
+#                      cvFolds = 2, use_future = TRUE)
 ```
 
 # Inference for IPTW using adaptive PS estimators \label{inference_iptw}

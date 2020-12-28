@@ -45,15 +45,6 @@
 #' @param cvFolds A numeric equal to the number of folds to be used in
 #'  cross-validated fitting of nuisance parameters. If \code{cvFolds = 1}, no
 #'  cross-validation is used.
-#' @param parallel A logical indicating whether to use parallelization based on
-#'  \code{future} to estimate nuisance parameters in parallel. Only useful if
-#'  \code{cvFolds > 1}. By default, a \code{multiprocess} evaluation scheme is
-#'  invoked, using forked R processes (if supported on the OS) and background R
-#'  sessions otherwise. Users may also register their own backends using the
-#'  \code{future.batchtools} package.
-#' @param future_hpc A character string identifying a high-performance computing
-#'  backend to be used with parallelization. This should match exactly one of
-#'  the options available from the \code{future.batchtools} package.
 #' @param gn An optional list of propensity score estimates. If specified, the
 #'  function will ignore the nuisance parameter estimation specified by
 #'  \code{SL_g} and \code{glm_g}. The entries in the list should correspond to
@@ -89,9 +80,7 @@
 #'  \item{\code{call}}{The call to \code{adaptive_iptw}.}
 #' }
 #'
-#' @importFrom future plan
 #' @importFrom future.apply future_lapply
-#' @importFrom doFuture registerDoFuture
 #' @importFrom stats cov
 #'
 #' @export
@@ -131,8 +120,6 @@ adaptive_iptw <- function(W, A, Y,
                           tolIC = 1 / length(Y),
                           tolg = 1e-2,
                           cvFolds = 1,
-                          parallel = FALSE,
-                          future_hpc = NULL,
                           gn = NULL,
                           ...) {
   call <- match.call()
@@ -143,30 +130,7 @@ adaptive_iptw <- function(W, A, Y,
   } else {
     validRows <- list(seq_len(n))
   }
-  # use futures with foreach if parallel mode
-  if (!parallel) {
-    future::plan(future::transparent)
-  } else {
-    doFuture::registerDoFuture()
-    if (all(c("sequential", "uniprocess") %in% class(future::plan())) &
-      is.null(future_hpc)) {
-      future::plan(future::multiprocess)
-    } else if (!is.null(future_hpc)) {
-      if (future_hpc == "batchtools_torque") {
-        future::plan(future.batchtools::batchtools_torque)
-      } else if (future_hpc == "batchtools_slurm") {
-        future::plan(future.batchtools::batchtools_slurm)
-      } else if (future_hpc == "batchtools_sge") {
-        future::plan(future.batchtools::batchtools_sge)
-      } else if (future_hpc == "batchtools_lsf") {
-        future::plan(future.batchtools::batchtools_lsf)
-      } else if (future_hpc == "batchtools_openlava") {
-        future::plan(future.batchtools::batchtools_openlava)
-      } else {
-        stop("The currently specified HPC backend is not (yet) available.")
-      }
-    }
-  }
+
   # -------------------------------
   # estimate propensity score
   # -------------------------------
@@ -182,14 +146,14 @@ adaptive_iptw <- function(W, A, Y,
     )
     # re-order predictions
     gnValid <- unlist(gnOut, recursive = FALSE, use.names = FALSE)
-    gnUnOrd <- do.call(Map, c(c, gnValid[seq(1, length(gnValid), 2)]))
+    gnUnOrd <- do.call(Map, c(c, gnValid[seq(1, length(gnValid), 3)]))
     gn <- vector(mode = "list", length = length(a_0))
     for (i in seq_along(a_0)) {
       gn[[i]] <- rep(NA, n)
       gn[[i]][unlist(validRows)] <- gnUnOrd[[i]]
     }
     # obtain list of propensity score fits
-    gnMod <- gnValid[seq(2, length(gnValid), 2)]
+    gnMod <- gnValid[seq(2, length(gnValid), 3)]
   } else {
     gnMod <- NULL
   }

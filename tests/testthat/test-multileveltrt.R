@@ -53,7 +53,7 @@ test_that("drtmle executes as expected with multiple treatment levels", {
     family = gaussian(),
     stratify = TRUE,
     glm_Q = "W1 + W2",
-    SL_g = c("SL.step", "SL.glm"),
+    SL_g = c("SL.mean", "SL.glm"),
     glm_Qr = "gn",
     glm_gr = "Qn",
     guard = c("Q", "g"),
@@ -119,7 +119,7 @@ test_that("adaptive_iptw executes as expected with multiple treatment levels", {
   # all GLMs + stratify
   fit1 <- adaptive_iptw(
     W = W, A = A, Y = Y, a_0 = c(0, 1, 2),
-    SL_g = c("SL.step", "SL.step.interaction"),
+    SL_g = c("SL.mean", "SL.glm"),
     returnModels = TRUE,
     glm_Qr = "gn"
   )

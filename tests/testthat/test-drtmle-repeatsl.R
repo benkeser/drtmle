@@ -46,6 +46,7 @@ test_that("drtmle executes as expected with stratify = TRUE", {
     glm_Qr = "gn",
     glm_gr = "Qn + gn",
     guard = c("Q", "g"),
+    n_SL = 2, avg_over = "SL",
     reduction = "bivariate"
   )
 
@@ -71,8 +72,10 @@ test_that("drtmle executes as expected with stratify = TRUE", {
     SL_Qr = c("SL.glm", "SL.mean"),
     SL_gr = c("SL.glm", "SL.mean"),
     guard = c("Q", "g"),
-    n_SL = 2,
-    reduction = "univariate"
+    n_SL = 2, avg_over = "SL",
+    reduction = "univariate",
+    returnModels = TRUE,
+    use_future = FALSE
   )
   expect_true(is.numeric(fit3$gcomp$est))
   expect_true(is.numeric(fit3$tmle$est))
@@ -96,7 +99,7 @@ test_that("drtmle executes as expected with stratify = TRUE", {
     SL_Qr = c("SL.glm", "SL.mean"),
     SL_gr = c("SL.glm", "SL.mean"),
     guard = c("Q", "g"),
-    n_SL = 2,
+    n_SL = 2, avg_over = "SL",
     reduction = "bivariate"
   )
   expect_true(is.numeric(fit4$gcomp$est))
@@ -122,7 +125,7 @@ test_that("drtmle executes as expected with stratify = TRUE", {
     SL_Qr = "SL.glm",
     SL_gr = "SL.glm",
     guard = c("Q", "g"),
-    n_SL = 2,
+    n_SL = 2, avg_over = "SL",
     reduction = "bivariate",
     returnModels = TRUE, use_future = FALSE
   )
@@ -151,7 +154,7 @@ test_that("drtmle executes as expected with stratify = TRUE", {
     SL_g = "SL.glm",
     SL_Qr = "SL.glm",
     SL_gr = "SL.glm",
-    n_SL = 2,
+    n_SL = 2, avg_over = "SL",
     guard = c("Q", "g"),
     reduction = "univariate"
   )
@@ -242,7 +245,7 @@ test_that("drtmle executes as expected with stratify = FALSE", {
     SL_Qr = c("SL.glm", "SL.mean"),
     SL_gr = c("SL.glm", "SL.mean"),
     guard = c("Q", "g"),
-    n_SL = 2,
+    n_SL = 2, avg_over = "SL",
     reduction = "bivariate"
   )
   expect_true(is.numeric(fit4$gcomp$est))
@@ -265,7 +268,7 @@ test_that("drtmle executes as expected with stratify = FALSE", {
     SL_g = "SL.glm",
     SL_Qr = "SL.glm",
     SL_gr = "SL.glm",
-    n_SL = 2,
+    n_SL = 2, avg_over = "SL",
     guard = c("Q", "g"),
     reduction = "bivariate"
   )
@@ -294,7 +297,7 @@ test_that("drtmle executes as expected with stratify = FALSE", {
     SL_g = "SL.glm",
     SL_Qr = "SL.glm",
     SL_gr = "SL.glm",
-    n_SL = 2,
+    n_SL = 2, avg_over = "SL",
     guard = c("Q", "g"),
     reduction = "univariate"
   )
@@ -337,7 +340,7 @@ test_that("drtmle executes as expected with stratify = FALSE and multiple cvFold
     glm_gr = "Qn",
     guard = c("Q", "g"),
     reduction = "univariate",
-    cvFolds = 3
+    cvFolds = 3, use_future = FALSE
   )
 
   expect_true(is.numeric(fit1$gcomp$est))
@@ -390,7 +393,7 @@ test_that("drtmle executes as expected with stratify = FALSE and multiple cvFold
     SL_Qr = c("SL.glm", "SL.mean"),
     SL_gr = c("SL.glm", "SL.mean"),
     guard = c("Q", "g"),
-    n_SL = 2,
+    n_SL = 2, avg_over = "SL",
     reduction = "bivariate",
     cvFolds = 3
   )
@@ -415,7 +418,7 @@ test_that("drtmle executes as expected with stratify = FALSE and multiple cvFold
     SL_g = "SL.glm",
     SL_Qr = "SL.glm",
     SL_gr = "SL.glm",
-    n_SL = 2,
+    n_SL = 2, avg_over = "SL",
     guard = c("Q", "g"),
     reduction = "bivariate",
     cvFolds = 3, returnModels = TRUE, use_future = FALSE
@@ -446,7 +449,7 @@ test_that("drtmle executes as expected with stratify = FALSE and multiple cvFold
     SL_g = "SL.glm",
     SL_Qr = "SL.glm",
     SL_gr = "SL.glm",
-    n_SL = 2,
+    n_SL = 2, avg_over = "SL",
     guard = c("Q", "g"),
     reduction = "univariate",
     cvFolds = 3
@@ -501,7 +504,7 @@ test_that("drtmle executes as expected with multiple sl and multiple tx lvl", {
     SL_g = "SL.glm",
     SL_Qr = "SL.glm",
     SL_gr = "SL.glm",
-    n_SL = 3,
+    n_SL = 3, avg_over = "SL",
     guard = c("Q", "g"),
     reduction = "univariate",
     returnModels = TRUE

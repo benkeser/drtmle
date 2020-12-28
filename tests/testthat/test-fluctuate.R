@@ -40,20 +40,10 @@ test_that("Fail safe kicks in", {
       returnModels = returnModels, SL_g = SL_g,
       glm_g = glm_g, a_0 = a_0
     )
-  } else {
-    gnOut <- foreach::foreach(v = 1:cvFolds, .packages = "SuperLearner") %dopar% {
-      estimateG(
-        A = A, W = W, DeltaA = DeltaA, DeltaY = DeltaY,
-        tolg = tolg, verbose = verbose, stratify = stratify,
-        returnModels = returnModels, SL_g = SL_g,
-        glm_g = glm_g, a_0 = a_0, validRows = validRows[[v]]
-      )
-    }
-  }
-
+  } 
   # # re-order predictions
   gnValid <- unlist(gnOut, recursive = FALSE, use.names = FALSE)
-  gnUnOrd <- do.call(Map, c(c, gnValid[seq(1, length(gnValid), 2)]))
+  gnUnOrd <- do.call(Map, c(c, gnValid[seq(1, length(gnValid), 3)]))
   gn <- vector(mode = "list", length = length(a_0))
   for (i in 1:length(a_0)) {
     gn[[i]] <- rep(NA, n)
@@ -69,21 +59,14 @@ test_that("Fail safe kicks in", {
       Y = Y, A = A, W = W, DeltaA = DeltaA, DeltaY = DeltaY,
       verbose = verbose, returnModels = returnModels,
       SL_Q = SL_Q, a_0 = a_0, stratify = stratify,
-      glm_Q = glm_Q, family = family
+      glm_Q = glm_Q, family = family,
+      se_cv = "none", se_cvFolds = 10
     )
-  } else {
-    QnOut <- foreach::foreach(v = 1:cvFolds, .packages = "SuperLearner") %dopar% {
-      estimateQ(
-        Y = Y, A = A, W = W, DeltaA = DeltaA, DeltaY = DeltaY,
-        verbose = verbose, returnModels = returnModels,
-        SL_Q = SL_Q, a_0 = a_0, glm_Q = glm_Q, family = family,
-        stratify = stratify, validRows = validRows[[v]]
-      )
-    }
-  }
+  } 
+
   # re-order predictions
   QnValid <- unlist(QnOut, recursive = FALSE, use.names = FALSE)
-  QnUnOrd <- do.call(Map, c(c, QnValid[seq(1, length(QnValid), 2)]))
+  QnUnOrd <- do.call(Map, c(c, QnValid[seq(1, length(QnValid), 3)]))
   Qn <- vector(mode = "list", length = length(a_0))
   for (i in 1:length(a_0)) {
     Qn[[i]] <- rep(NA, n)
@@ -98,18 +81,7 @@ test_that("Fail safe kicks in", {
       glm_gr = glm_gr, SL_gr = SL_gr, a_0 = a_0,
       reduction = reduction, returnModels = returnModels
     )
-  } else {
-    grnOut <- foreach::foreach(v = 1:cvFolds, .packages = "SuperLearner") %dopar% {
-      estimategrn(
-        Y = Y, A = A, W = W,
-        DeltaA = DeltaA, DeltaY = DeltaY,
-        tolg = tolg, Qn = Qn, gn = gn,
-        glm_gr = glm_gr, SL_gr = SL_gr, a_0 = a_0,
-        reduction = reduction, returnModels = returnModels,
-        validRows = validRows[[v]]
-      )
-    }
-  }
+  } 
   # re-order predictions
   grnValid <- unlist(grnOut, recursive = FALSE, use.names = FALSE)
   grnUnOrd <- do.call(Map, c(rbind, grnValid[seq(1, length(grnValid), 2)]))

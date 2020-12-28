@@ -11,9 +11,9 @@ test_that("drtmle executes as expected with stratify = TRUE", {
   set.seed(123456)
   n <- 200
   W <- data.frame(W1 = runif(n), W2 = rnorm(n))
-  DeltaA <- 1 - rbinom(n, 1, plogis(-4 + W$W1 - W$W2))
+  DeltaA <- 1 - rbinom(n, 1, plogis(-2 + W$W1 - W$W2))
   A <- rbinom(n, 1, plogis(W$W1 - W$W2))
-  DeltaY <- 1 - rbinom(n, 1, plogis(-4 + W$W1 - A))
+  DeltaY <- 1 - rbinom(n, 1, plogis(-2 + W$W1 - A))
   Y <- rnorm(n, W$W1 * W$W2 * A, 2)
   Y[DeltaY == 0] <- NA
   A[DeltaA == 0] <- NA
@@ -85,7 +85,7 @@ test_that("drtmle executes as expected with stratify = TRUE", {
     SL_Qr = c("SL.glm", "SL.mean"),
     SL_gr = c("SL.glm", "SL.mean"),
     guard = c("Q", "g"),
-    reduction = "univariate"
+    reduction = "univariate", use_future = FALSE
   )
   expect_true(is.numeric(fit3$gcomp$est))
   expect_true(is.numeric(fit3$tmle$est))
@@ -176,9 +176,9 @@ test_that("drtmle executes as expected with stratify = FALSE", {
   set.seed(123456)
   n <- 200
   W <- data.frame(W1 = runif(n), W2 = rnorm(n))
-  DeltaA <- 1 - rbinom(n, 1, plogis(-4 + W$W1 - W$W2))
+  DeltaA <- 1 - rbinom(n, 1, plogis(-2 + W$W1 - W$W2))
   A <- rbinom(n, 1, plogis(W$W1 - W$W2))
-  DeltaY <- 1 - rbinom(n, 1, plogis(-4 + W$W1 - A))
+  DeltaY <- 1 - rbinom(n, 1, plogis(-2 + W$W1 - A))
   Y <- rnorm(n, W$W1 * W$W2 * A, 2)
   Y[DeltaY == 0] <- NA
   A[DeltaA == 0] <- NA
@@ -383,9 +383,9 @@ test_that("drtmle executes as expected with stratify = FALSE", {
   set.seed(123456)
   n <- 200
   W <- data.frame(W1 = runif(n), W2 = rnorm(n))
-  DeltaA <- 1 - rbinom(n, 1, plogis(-4 + W$W1 - W$W2))
+  DeltaA <- 1 - rbinom(n, 1, plogis(-2 + W$W1 - W$W2))
   A <- rbinom(n, 1, plogis(W$W1 - W$W2))
-  DeltaY <- 1 - rbinom(n, 1, plogis(-4 + W$W1 - A))
+  DeltaY <- 1 - rbinom(n, 1, plogis(-2 + W$W1 - A))
   Y <- rbinom(n, 1, plogis(W$W1 * W$W2 * A))
   Y[DeltaY == 0] <- NA
   A[DeltaA == 0] <- NA

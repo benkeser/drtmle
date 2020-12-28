@@ -1,3 +1,15 @@
+# drtmle 1.1.0 
+
+* Version 1.1.0 released on GitHub and CRAN.
+* Major changes
+	* add support for averaging over multiple super learner runs
+	* add support for partially/fully cross-validated standard error estimates
+	* default for `stratify` argument changed to `FALSE`
+	* major additions to vignette documenting new features
+* Minor changes
+	* `future` parallel backend must be specified externally by user
+	* accordingly, some dependencies have been updated
+
 # drtmle 1.0.5
 
 As of January 2019:

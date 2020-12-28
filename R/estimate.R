@@ -32,12 +32,25 @@
 #'  in \code{a_0}. Only needed if \code{adapt_g = TRUE}. 
 #' @param adapt_g A boolean indicating whether propensity score is adaptive
 #'  to outcome regression. 
+#' @param se_cv Should cross-validated nuisance parameter estimates be used 
+#' for computing standard errors? 
+#' Options are \code{"none"} = no cross-validation is performed; \code{"partial"} = 
+#' only applicable if Super Learner is used for nuisance parameter estimates; 
+#' \code{"full"} = full cross-validation is performed. See vignette for further 
+#' details. Ignored if \code{cvFolds > 1}, since then
+#' cross-validated nuisance parameter estimates are used by default and it is 
+#' assumed that you want full cross-validated standard errors. 
+#' @param se_cvFolds If cross-validated nuisance parameter estimates are used
+#' to compute standard errors, how many folds should be used in this computation. 
+#' If \code{se_cv = "partial"}, then this option sets the number of folds used
+#' by the \code{SuperLearner} fitting procedure. 
 #' @importFrom SuperLearner SuperLearner trimLogit All
 #' @importFrom stats predict glm as.formula
 #
 estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
                       stratify = FALSE, validRows = NULL, verbose = FALSE,
-                      returnModels = FALSE, Qn = NULL, adapt_g = FALSE) {
+                      returnModels = FALSE, Qn = NULL, adapt_g = FALSE,
+                      se_cv = "none", se_cvFolds = 10) {
   if (is.null(SL_g) & is.null(glm_g)) {
     stop("Specify Super Learner library or GLM formula for g")
   }
@@ -80,6 +93,8 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
     trainDeltaY <- validDeltaY <- DeltaY
   }
 
+  partial_cv <- se_cv == "partial"
+
   if (!is.null(SL_g)) {
     # check for names in SL_g
     namedSL_g <- c("DeltaA", "A", "DeltaY") %in% names(SL_g)
@@ -110,10 +125,17 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
           Y = trainDeltaA,
           X = trainW, newX = validW, family = stats::binomial(),
           SL.library = SL_g$DeltaA, verbose = verbose,
-          method = tmp_method.CC_nloglik()
+          method = tmp_method.CC_nloglik(),
+          cvControl = list(ifelse(partial_cv, se_cvFolds, 10))
         )
         # get predicted probability of missing treatment
         gn_DeltaA <- fm_DeltaA$SL.predict
+
+        # get partially cross-validated estimates
+        if(partial_cv){
+          gn_DeltaA_se <- partial_cv_preds(a_0 = NULL, fit_sl = fm_DeltaA,
+                                           easy = TRUE)
+        }
       } else if (!is.list(SL_g$DeltaA) & length(SL_g$DeltaA) == 1) {
         fm_DeltaA <- do.call(SL_g$DeltaA, args = list(
           Y = trainDeltaA,
@@ -142,7 +164,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
     # if all DeltaA==1 then put NULL model and 1 predictions
     fm_DeltaA <- NULL
     name_DeltaA <- ""
-    gn_DeltaA <- rep(1, length(validDeltaA))
+    gn_DeltaA <- gn_DeltaA_se <- rep(1, length(validDeltaA))
   }
 
   # -----------------------------------
@@ -159,11 +181,20 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
           Y = as.numeric(trainA[trainDeltaA == 1] == a_0[1]),
           X = trainW[trainDeltaA == 1, , drop = FALSE], newX = validW,
           family = stats::binomial(), SL.library = SL_g$A,
-          verbose = verbose, method = tmp_method.CC_nloglik()
+          verbose = verbose, method = tmp_method.CC_nloglik(),
+          cvControl = list(ifelse(partial_cv, se_cvFolds, 10)),
+          control = list(saveCVFitLibrary = partial_cv & !all(trainDeltaA == 1))
         ))
         gn_A <- vector(mode = "list", length = 2)        
         gn_A[[1]] <- fm_A[[1]]$SL.predict
         gn_A[[2]] <- 1 - gn_A[[1]]
+        if(partial_cv){
+          gn_A_se <- vector(mode = "list", length = 2)        
+          gn_A_se[[1]] <- partial_cv_preds(fit_sl = fm_A[[1]], a_0 = NULL,
+                                           W = validW, include = trainDeltaA == 1,
+                                           easy = all(trainDeltaA == 1))
+          gn_A_se[[2]] <- 1 - gn_A_se[[1]]
+        }
         # name for this model
         name_A <- paste0("I(A = ", a_0[1], ") ~ W | DeltaA == 1")
         # if there are more than two unique values of A, then we need
@@ -171,6 +202,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
       } else {
         a_ct <- 0
         gn_A <- vector(mode = "list", length = length(a_0))
+        gn_A_se <- vector(mode = "list", length = length(a_0))
         fm_A <- vector(mode = "list", length = length(a_0) - 1)
         name_A <- rep(NA, length(a_0) - 1)
         for (a in a_0[1:(length(a_0) - 1)]) {
@@ -187,19 +219,37 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
             Y = as.numeric(trainA[include] == a),
             X = trainW[include, , drop = FALSE], newX = validW,
             family = stats::binomial(), SL.library = SL_g$A,
-            verbose = verbose, method = tmp_method.CC_nloglik()
+            verbose = verbose, method = tmp_method.CC_nloglik(),
+            cvControl = list(ifelse(partial_cv, se_cvFolds, 10)),
+            control = list(saveCVFitLibrary = partial_cv & !all(include))
           )
           # get predictions
           tmp_pred <- tmp_fm$SL.pred
-          if (a_ct != 0) {
+          if(partial_cv){
+            tmp_pred_se <- partial_cv_preds(fit_sl = tmp_fm, a_0 = NULL,
+                                            W = validW, include = include,
+                                            easy = all(include))
+          }
+          if (a_ct != 0) { # if not the first level of treatment
             gn_A[[a_ct + 1]] <- tmp_pred * Reduce(
               "*",
               lapply(gn_A[1:a_ct], function(x) {
                 1 - x
               })
             )
-          } else {
+            if(partial_cv){
+              gn_A_se[[a_ct + 1]] <- tmp_pred_se * Reduce(
+                "*",
+                lapply(gn_A_se[1:a_ct], function(x) {
+                  1 - x
+                })
+              )
+            }
+          } else { # if the first level of treatment
             gn_A[[a_ct + 1]] <- tmp_pred
+            if(partial_cv){
+              gn_A_se[[a_ct + 1]] <- tmp_pred_se
+            }
           }
           fm_A[[a_ct + 1]] <- tmp_fm
           name_A[a_ct + 1] <- paste0("I(A = ", a, ") ~ W | DeltaA == 1")
@@ -207,6 +257,9 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
         }
         # add in final predictions
         gn_A[[a_ct + 1]] <- 1 - Reduce("+", gn_A[1:a_ct])
+        if(partial_cv){
+          gn_A_se[[a_ct + 1]] <- 1 - Reduce("+", gn_A_se[1:a_ct])
+        }
       }
     } else if (!is.list(SL_g$A) & length(SL_g$A) == 1) {
       if (length(a_0) == length(unique(A[!is.na(A)])) &
@@ -348,6 +401,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
         if (stratify) {
           fm_DeltaY <- vector(mode = "list", length = length(a_0))
           gn_DeltaY <- vector(mode = "list", length = length(a_0))
+          gn_DeltaY_se <- vector(mode = "list", length = length(a_0))
           name_DeltaY <- rep(NA, length(a_0))
           a_ct <- 0
           for (a in a_0) {
@@ -355,7 +409,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
 
             # only include people with A == a and DeltaA == 1
             include2 <- (trainA == a)
-            include2[is.na(include2)] <- FALSE
+            include2[is.na(include2)] <- FALSE  
 
             # fit super learner
             fm_DeltaY[[a_ct]] <- SuperLearner::SuperLearner(
@@ -363,7 +417,9 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
               X = trainW[include & include2, , drop = FALSE],
               newX = validW, family = stats::binomial(),
               SL.library = SL_g$DeltaY, verbose = verbose,
-              method = tmp_method.CC_nloglik()
+              method = tmp_method.CC_nloglik(),
+              cvControl = list(ifelse(partial_cv, se_cvFolds, 10)),
+              control = list(saveCVFitLibrary = partial_cv & !all(include & include2))
             )
             # name the fit
             name_DeltaY[a_ct] <- paste0(
@@ -372,6 +428,11 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
             )
             # get predictions back on everybody
             gn_DeltaY[[a_ct]] <- fm_DeltaY[[a_ct]]$SL.predict
+            if(partial_cv){
+              gn_DeltaY_se[[a_ct]] <- partial_cv_preds(fit_sl = fm_DeltaY[[a_ct]],
+                                                       a_0 = NULL, include = include & include2, 
+                                                       W = validW, easy = all(include & include2))
+            }
           } # end loop over treatment levels
           # if not stratified, fit a single regression pooling over
           # levels of A
@@ -382,11 +443,14 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
               A = trainA[include], trainW[include, , drop = FALSE]
             ),
             family = stats::binomial(), SL.library = SL_g$DeltaY,
-            verbose = verbose, method = tmp_method.CC_nloglik()
+            verbose = verbose, method = tmp_method.CC_nloglik(),
+            cvControl = list(ifelse(partial_cv, se_cvFolds, 10)),
+            control = list(saveCVFitLibrary = partial_cv & !all(include))
           ))
 
           # get predictions back setting A = a for every a in a_0
           gn_DeltaY <- vector(mode = "list", length = length(a_0))
+          gn_DeltaY_se <- vector(mode = "list", length = length(a_0))
           name_DeltaY <- paste0("DeltaY ~ W + A | DeltaA == 1")
           a_ct <- 0
           for (a in a_0) {
@@ -395,7 +459,13 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
               fm_DeltaY[[1]],
               onlySL = TRUE, newdata = data.frame(A = a, validW)
             )$pred
-          }
+            if(partial_cv){
+              gn_DeltaY_se[[a_ct]] <- partial_cv_preds(fit_sl = fm_DeltaY[[1]],
+                                                       a_0 = a, W = validW,
+                                                       include = include, 
+                                                       easy = all(include))
+            }
+          } # end loop over a_0 levels
         } # end if !stratify
         # if SL_g$DeltaY only a single algorithm, then call directly
       } else if (!is.list(SL_g$DeltaY) & length(SL_g$DeltaY) == 1) {
@@ -518,6 +588,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
     for (i in 1:length(a_0)) {
       gn_DeltaY[[i]] <- rep(1, length(validDeltaY))
     }
+    gn_DeltaY_se <- gn_DeltaY
   }
 
   # ------------------------------------------------------
@@ -534,7 +605,22 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
     g
   })
 
-  out <- list(est = gn, fm = NULL)
+  if(partial_cv){
+    gn_se <- mapply(gn_A = gn_A_se, gn_DeltaY = gn_DeltaY_se, 
+                    FUN = function(gn_A, gn_DeltaY) {
+      gn_A * gn_DeltaY * gn_DeltaA_se
+    }, SIMPLIFY = FALSE)
+
+    # truncate too-small predictions
+    gn_se <- lapply(gn_se, function(g) {
+      g[g < tolg] <- tolg
+      g
+    })
+  }else{
+    gn_se <- NULL
+  }
+
+  out <- list(est = gn, fm = NULL, est_se = gn_se)
   if (returnModels) {
     names(fm_A) <- name_A
     if (!is.null(fm_DeltaA)) {
@@ -548,6 +634,84 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
   return(out)
 }
 
+#' estimateG_loop
+#' 
+#' Helper function to clean up internals of \code{drtmle} function
+#' @param A A vector of binary treatment assignment (assumed to be equal to 0 or
+#'  1)
+#' @param DeltaY Indicator of missing outcome (assumed to be equal to 0 if
+#'  missing 1 if observed)
+#' @param DeltaA Indicator of missing treatment (assumed to be equal to 0 if
+#'  missing 1 if observed)
+#' @param W A \code{data.frame} of named covariates
+#' @param stratify A \code{boolean} indicating whether to estimate the missing
+#'  outcome regression separately for observations with \code{A} equal to 0/1
+#'  (if \code{TRUE}) or to pool across \code{A} (if \code{FALSE}).
+#' @param SL_g A vector of characters describing the super learner library to be
+#'  used for each of the regression (\code{DeltaA}, \code{A}, and
+#'  \code{DeltaY}). To use the same regression for each of the regressions (or
+#'  if there is no missing data in \code{A} nor \code{Y}), a single library may
+#'  be input.
+#' @param tolg A numeric indicating the minimum value for estimates of the
+#'  propensity score.
+#' @param verbose A boolean indicating whether to print status updates.
+#' @param returnModels A boolean indicating whether to return model fits for the
+#'  outcome regression, propensity score, and reduced-dimension regressions.
+#' @param glm_g A character describing a formula to be used in the call to
+#'  \code{glm} for the propensity score.
+#' @param a_0 A vector of fixed treatment values at which to return marginal
+#'  mean estimates.
+#' @param validRows A \code{list} of length \code{cvFolds} containing the row
+#'  indexes of observations to include in validation fold.
+#' @param Qn A \code{list} of estimates of the outcome regression for each value
+#'  in \code{a_0}. Only needed if \code{adapt_g = TRUE}. 
+#' @param adapt_g A boolean indicating whether propensity score is adaptive
+#'  to outcome regression. 
+#' @param use_future Should \code{future} be used for parallelization?
+#' @param se_cv Should cross-validated nuisance parameter estimates be used 
+#' for computing standard errors? 
+#' Options are \code{"none"} = no cross-validation is performed; \code{"partial"} = 
+#' only applicable if Super Learner is used for nuisance parameter estimates; 
+#' \code{"full"} = full cross-validation is performed. See vignette for further 
+#' details. Ignored if \code{cvFolds > 1}, since then
+#' cross-validated nuisance parameter estimates are used by default and it is 
+#' assumed that you want full cross-validated standard errors. 
+#' @param se_cvFolds If cross-validated nuisance parameter estimates are used
+#' to compute standard errors, how many folds should be used in this computation. 
+#' If \code{se_cv = "partial"}, then this option sets the number of folds used
+#' by the \code{SuperLearner} fitting procedure. 
+
+estimateG_loop <- function(
+  validRows, A, W, DeltaA, DeltaY, tolg,
+  verbose, stratify, returnModels, SL_g, 
+  glm_g, a_0, Qn, adapt_g, use_future,
+  se_cv = "none", se_cvFolds = 10
+){
+  if (use_future) {
+    gnOut <- future.apply::future_lapply(
+      X = validRows, FUN = estimateG, A = A,
+      W = W, DeltaA = DeltaA, DeltaY = DeltaY,
+      tolg = tolg, verbose = verbose,
+      stratify = stratify,
+      returnModels = returnModels, SL_g = SL_g,
+      glm_g = glm_g, a_0 = a_0, 
+      Qn = Qn, adapt_g = adapt_g,
+      se_cv = se_cv, se_cvFolds = se_cvFolds
+    )
+  } else {
+    gnOut <- lapply(
+      X = validRows, FUN = estimateG, A = A,
+      W = W, DeltaA = DeltaA, DeltaY = DeltaY,
+      tolg = tolg, verbose = verbose,
+      stratify = stratify,
+      returnModels = returnModels, SL_g = SL_g,
+      glm_g = glm_g, a_0 = a_0,
+      Qn = Qn, adapt_g = adapt_g,
+      se_cv = se_cv, se_cvFolds = se_cvFolds      
+    )
+  }
+  return(gnOut)
+}
 
 
 #' estimateQ
@@ -576,6 +740,18 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
 #'  \code{TRUE}) or to pool across \code{A} (if \code{FALSE}).
 #' @param validRows A \code{list} of length \code{cvFolds} containing the row
 #'  indexes of observations to include in validation fold.
+#' @param se_cv Should cross-validated nuisance parameter estimates be used 
+#' for computing standard errors? 
+#' Options are \code{"none"} = no cross-validation is performed; \code{"partial"} = 
+#' only applicable if Super Learner is used for nuisance parameter estimates; 
+#' \code{"full"} = full cross-validation is performed. See vignette for further 
+#' details. Ignored if \code{cvFolds > 1}, since then
+#' cross-validated nuisance parameter estimates are used by default and it is 
+#' assumed that you want full cross-validated standard errors. 
+#' @param se_cvFolds If cross-validated nuisance parameter estimates are used
+#' to compute standard errors, how many folds should be used in this computation. 
+#' If \code{se_cv = "partial"}, then this option sets the number of folds used
+#' by the \code{SuperLearner} fitting procedure. 
 #' @param ... Additional arguments (not currently used)
 #'
 #' @importFrom SuperLearner SuperLearner trimLogit
@@ -583,7 +759,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
 #
 estimateQ <- function(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify,
                       family, verbose = FALSE, returnModels = FALSE,
-                      validRows = NULL, ...) {
+                      se_cv = "none", se_cvFolds = 10, validRows = NULL, ...) {
   if (is.null(SL_Q) & is.null(glm_Q)) {
     stop("Specify Super Learner library or GLM formula for Q")
   }
@@ -616,6 +792,10 @@ estimateQ <- function(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify,
 
   # include only DeltaA = 1 and DeltaY = 1 folks
   include <- (trainDeltaA == 1) & (trainDeltaY == 1)
+  
+  # check for partially cross-validated standard error request
+  partial_cv <- se_cv == "partial"
+  Qn_se <- NULL
 
   # Super Learner
   if (!is.null(SL_Q)) {
@@ -629,7 +809,9 @@ estimateQ <- function(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify,
             tmp_method.CC_nloglik()
           } else {
             tmp_method.CC_LS()
-          }
+          },
+          control = list(saveCVFitLibrary = partial_cv),
+          cvControl = list(ifelse(partial_cv, se_cvFolds, 10))
         )
 
         Qn <- sapply(a_0, function(x) {
@@ -639,6 +821,13 @@ estimateQ <- function(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify,
             onlySL = TRUE
           )[[1]]
         }, simplify = FALSE)
+
+        if(partial_cv){
+          Qn_se <- sapply(X = a_0, FUN = partial_cv_preds, 
+                          W = validW, fit_sl = fm, 
+                          include = include, simplify = FALSE)
+        }
+
       } else if (length(SL_Q) == 1) {
         fm <- do.call(SL_Q, args = list(
           Y = trainY[include],
@@ -654,7 +843,7 @@ estimateQ <- function(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify,
           ))
         }, simplify = FALSE)
       }
-    } else {
+    } else { # if stratify is TRUE
       if (length(SL_Q) > 1 | is.list(SL_Q)) {
         tmp <- sapply(a_0, function(x) {
           include2 <- trainA == x
@@ -669,12 +858,27 @@ estimateQ <- function(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify,
               tmp_method.CC_nloglik()
             } else {
               tmp_method.CC_LS()
-            }
+            },
+            control = list(saveCVFitLibrary = partial_cv),
+            cvControl = list(ifelse(partial_cv, se_cvFolds, 10))
           )
-          list(est = fm$SL.predict, fm = fm)
+          ##### THE LOGIC HERE IS FLAWED #####
+          # only a subset are used in fitting SL with A = a
+          # so then, for people without A = a, which value do we fill in?
+          # I guess just the regular super learner prediction? Since a
+          # person without A = a was not used in fitting this model, it's
+          # sort of cross-validated anyway. 
+          if(partial_cv){
+            Qn_se_a_0 <- partial_cv_preds(fit_sl = fm, a_0 = x, W = validW, 
+                                          include = include & include2)
+          }else{
+            Qn_se_a_0 <- NULL
+          }
+          return(list(est = fm$SL.predict, fm = fm, est_se = Qn_se_a_0))
         }, simplify = FALSE)
-        Qn <- lapply(tmp, "[[", 1)
-        fm <- lapply(tmp, "[[", 2)
+        Qn <- lapply(tmp, "[[", "est")
+        fm <- lapply(tmp, "[[", "fm")
+        Qn_se <- lapply(tmp, "[[", "est_se")
       } else if (length(SL_Q) == 1) {
         tmp <- sapply(a_0, function(x) {
           include2 <- trainA == x
@@ -735,11 +939,89 @@ estimateQ <- function(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify,
       fm <- lapply(tmp, "[[", 2)
     }
   }
-  out <- list(est = Qn, fm = NULL)
+  out <- list(est = Qn, fm = NULL, est_se = Qn_se)
   if (returnModels) {
     out$fm <- fm
   }
   return(out)
+}
+
+
+#' estimateQ_loop
+#' 
+#' A helper loop function to clean up the internals of \code{drtmle}
+#' function.
+#' @param Y A vector of continuous or binary outcomes.
+#' @param A A vector of binary treatment assignment (assumed to be equal to 0 or
+#'  1)
+#' @param W A \code{data.frame} of named covariates
+#' @param DeltaY Indicator of missing outcome (assumed to be equal to 0 if
+#'  missing 1 if observed)
+#' @param DeltaA Indicator of missing treatment (assumed to be equal to 0 if
+#'  missing 1 if observed)
+#' @param a_0 A list of fixed treatment values.
+#' @param returnModels A boolean indicating whether to return model fits for the
+#'  outcome regression, propensity score, and reduced-dimension regressions.
+#' @param family Should be gaussian() unless called from adaptive_iptw with
+#'  binary \code{Y}.
+#' @param validRows A \code{list} of length \code{cvFolds} containing the row
+#'  indexes of observations to include in validation fold.
+#' @param se_cv Should cross-validated nuisance parameter estimates be used 
+#' for computing standard errors? 
+#' Options are \code{"none"} = no cross-validation is performed; \code{"partial"} = 
+#' only applicable if Super Learner is used for nuisance parameter estimates; 
+#' \code{"full"} = full cross-validation is performed. See vignette for further 
+#' details. Ignored if \code{cvFolds > 1}, since then
+#' cross-validated nuisance parameter estimates are used by default and it is 
+#' assumed that you want full cross-validated standard errors. 
+#' @param se_cvFolds If cross-validated nuisance parameter estimates are used
+#' to compute standard errors, how many folds should be used in this computation. 
+#' If \code{se_cv = "partial"}, then this option sets the number of folds used
+#' by the \code{SuperLearner} fitting procedure. 
+#' @param verbose A boolean indicating whether to print status updates.
+#' @param SL_Q A vector of characters or a list describing the Super Learner
+#'  library to be used for the outcome regression. See
+#'  \code{\link[SuperLearner]{SuperLearner}} for details.
+#' @param glm_Q A character describing a formula to be used in the call to
+#'  \code{glm} for the outcome regression. Ignored if \code{SL_Q!=NULL}.
+#' @param use_future Boolean indicating whether to use \code{future_lapply} or
+#' instead to just use lapply. The latter can be easier to run down errors.
+#' @param stratify A \code{boolean} indicating whether to estimate the outcome
+#'  regression separately for different values of \code{A} (if \code{TRUE}) or
+#'  to pool across \code{A} (if \code{FALSE}).
+
+estimateQ_loop <- function(
+  validRows, Y, A, W, DeltaA, DeltaY, verbose, returnModels, 
+  SL_Q, a_0, stratify, glm_Q, family, use_future, se_cv, se_cvFolds                   
+){
+  if (use_future) {
+    QnOut <- future.apply::future_lapply(
+      X = validRows, FUN = estimateQ,
+      Y = Y, A = A, W = W,
+      DeltaA = DeltaA, DeltaY = DeltaY,
+      verbose = verbose,
+      returnModels = returnModels,
+      SL_Q = SL_Q, a_0 = a_0,
+      stratify = stratify,
+      glm_Q = glm_Q,
+      family = family,
+      se_cv = se_cv, se_cvFolds = se_cvFolds
+    )
+  } else {
+    QnOut <- lapply(
+      X = validRows, FUN = estimateQ,
+      Y = Y, A = A, W = W,
+      DeltaA = DeltaA, DeltaY = DeltaY,
+      verbose = verbose,
+      returnModels = returnModels,
+      SL_Q = SL_Q, a_0 = a_0,
+      stratify = stratify,
+      glm_Q = glm_Q,
+      family = family,
+      se_cv = se_cv, se_cvFolds = se_cvFolds
+    )
+  }
+  return(QnOut)
 }
 
 #' estimateQrn
@@ -835,10 +1117,10 @@ estimateQrn <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, glm_Qr, SL_Qr,
         Aeqa <- trainA == a
         Aeqa[is.na(Aeqa)] <- FALSE
         if (length(unique(train_g)) == 1) {
-          warning(paste0(
-            "Only one unique value of gn", a,
-            ". Using empirical average as Qr estimate."
-          ))
+          # warning(paste0(
+          #   "Only one unique value of gn", a,
+          #   ". Using empirical average as Qr estimate."
+          # ))
           m1 <- mean((trainY - train_Q)[Aeqa & trainDeltaA == 1 &
             trainDeltaY == 1])
           est <- rep(m1, length(validY))
@@ -890,10 +1172,10 @@ estimateQrn <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, glm_Qr, SL_Qr,
         Aeqa <- trainA == a
         Aeqa[is.na(Aeqa)] <- FALSE
         if (length(unique(train_g)) == 1) {
-          warning(paste0(
-            "Only one unique value of gn", a,
-            ". Using empirical average as Qr estimate."
-          ))
+          # warning(paste0(
+          #   "Only one unique value of gn", a,
+          #   ". Using empirical average as Qr estimate."
+          # ))
           glm_Qr <- "1"
         }
         fm <- stats::glm(
@@ -926,6 +1208,64 @@ estimateQrn <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, glm_Qr, SL_Qr,
   })))
   Qrn
 }
+
+#' estimateQrn_loop
+#' 
+#' Helper function to clean up internal code of \code{drtmle} function.
+#' 
+#' @param Y A vector of continuous or binary outcomes.
+#' @param A A vector of binary treatment assignment (assumed to be equal to 0 or
+#'  1)
+#' @param W A \code{data.frame} of named covariates
+#' @param DeltaY Indicator of missing outcome (assumed to be equal to 0 if
+#'  missing 1 if observed)
+#' @param DeltaA Indicator of missing treatment (assumed to be equal to 0 if
+#'  missing 1 if observed)
+#' @param Qn A list of outcome regression estimates evaluated on observed data.
+#'  If NULL then 0 is used for all Qn (as is needed to estimate reduced
+#'  dimension regression for adaptive_iptw)
+#' @param gn A list of propensity regression estimates evaluated on observed
+#'  data
+#' @param SL_Qr A vector of characters or a list describing the Super Learner
+#'  library to be used for the first reduced-dimension regression.
+#' @param glm_Qr A character describing a formula to be used in the call to
+#'  \code{glm} for the first reduced-dimension regression. Ignored if
+#'  \code{SL_gr!=NULL}.
+#' @param a_0 A list of fixed treatment values.
+#' @param returnModels A boolean indicating whether to return model fits for the
+#'  outcome regression, propensity score, and reduced-dimension regressions.
+#' @param family Should be gaussian() unless called from adaptive_iptw with
+#'  binary \code{Y}.
+#' @param validRows A \code{list} of length \code{cvFolds} containing the row
+#'  indexes of observations to include in validation fold.
+#' @param use_future Should \code{future} be used in the fitting process. 
+estimateQrn_loop <- function(
+  validRows, Y, A, W, DeltaA, DeltaY, 
+  Qn, gn, SL_Qr, glm_Qr, family, a_0, returnModels,
+  use_future
+){
+  if (use_future) {
+    QrnOut <- future.apply::future_lapply(
+      X = validRows, FUN = estimateQrn,
+      Y = Y, A = A, W = W,
+      DeltaA = DeltaA, DeltaY = DeltaY,
+      Qn = Qn, gn = gn, glm_Qr = glm_Qr,
+      family = stats::gaussian(), SL_Qr = SL_Qr,
+      a_0 = a_0, returnModels = returnModels
+    )
+  } else {
+    QrnOut <- lapply(
+      X = validRows, FUN = estimateQrn,
+      Y = Y, A = A, W = W,
+      DeltaA = DeltaA, DeltaY = DeltaY,
+      Qn = Qn, gn = gn, glm_Qr = glm_Qr,
+      family = stats::gaussian(), SL_Qr = SL_Qr,
+      a_0 = a_0, returnModels = returnModels
+    )
+  }
+  return(QrnOut)
+}
+
 
 #' estimategrn
 #'
@@ -1007,10 +1347,10 @@ estimategrn <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, SL_gr, tolg, glm_gr,
         Aeqa <- trainA == a
         Aeqa[is.na(Aeqa)] <- FALSE
         if (length(unique(train_Q)) == 1) {
-          warning(paste0(
-            "Only one unique value of Qn.",
-            "Proceeding with empirical mean for grn"
-          ))
+          # warning(paste0(
+          #   "Only one unique value of Qn.",
+          #   "Proceeding with empirical mean for grn"
+          # ))
           if (reduction == "univariate") {
             m1 <- mean((as.numeric(Aeqa & trainDeltaA == 1 &
               trainDeltaY == 1) - train_g) / train_g)
@@ -1201,4 +1541,63 @@ estimategrn <- function(Y, A, W, DeltaA, DeltaY, Qn, gn, SL_gr, tolg, glm_gr,
     list(fm1 = x$fm1, fm2 = x$fm2)
   })
   return(list(est = tmp1, fm = tmp2))
+}
+
+
+#' estimategrn_loop
+#' 
+#' Helper function to clean up the internal code of \code{drtmle}
+#' @param Y A vector of continuous or binary outcomes.
+#' @param A A vector of binary treatment assignment (assumed to be equal to 0 or
+#'  1).
+#' @param W A \code{data.frame} of named covariates.
+#' @param DeltaY Indicator of missing outcome (assumed to be equal to 0 if
+#'  missing 1 if observed).
+#' @param DeltaA Indicator of missing treatment (assumed to be equal to 0 if
+#'  missing 1 if observed).
+#' @param Qn A list of outcome regression estimates evaluated on observed data.
+#' @param gn A list of propensity regression estimates evaluated on observed
+#'  data.
+#' @param SL_gr A vector of characters or a list describing the Super Learner
+#'  library to be used for the reduced-dimension propensity score.
+#' @param glm_gr A character describing a formula to be used in the call to
+#'  \code{glm} for the second reduced-dimension regression. Ignored if
+#'  \code{SL_gr!=NULL}.
+#' @param reduction A character equal to \code{'univariate'} for a univariate
+#'  misspecification correction or \code{'bivariate'} for the bivariate version.
+#' @param tolg A numeric indicating the minimum value for estimates of the
+#'  propensity score.
+#' @param a_0 A list of fixed treatment values .
+#' @param returnModels A boolean indicating whether to return model fits for the
+#'  outcome regression, propensity score, and reduced-dimension regressions.
+#' @param validRows A \code{list} of length \code{cvFolds} containing the row
+#'  indexes of observations to include in validation fold.
+#' @param use_future Should \code{future} be used to parallelize?
+estimategrn_loop <- function(
+  validRows, Y, A, W, DeltaA, DeltaY, 
+  tolg, Qn, gn, glm_gr, SL_gr, a_0, reduction,
+  returnModels, use_future                             
+){
+  if (use_future) {
+    grnOut <- future.apply::future_lapply(
+      X = validRows, FUN = estimategrn,
+      Y = Y, A = A, W = W,
+      DeltaA = DeltaA, DeltaY = DeltaY,
+      tolg = tolg, Qn = Qn, gn = gn,
+      glm_gr = glm_gr, SL_gr = SL_gr, a_0 = a_0,
+      reduction = reduction,
+      returnModels = returnModels
+    )
+  } else {
+    grnOut <- lapply(
+      X = validRows, FUN = estimategrn,
+      Y = Y, A = A, W = W,
+      DeltaA = DeltaA, DeltaY = DeltaY,
+      tolg = tolg, Qn = Qn, gn = gn,
+      glm_gr = glm_gr, SL_gr = SL_gr, a_0 = a_0,
+      reduction = reduction,
+      returnModels = returnModels
+    )
+  }
+  return(grnOut)
 }
