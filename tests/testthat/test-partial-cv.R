@@ -323,7 +323,8 @@ test_that("Same point estimates, different variance estimates, missing data trea
     SL_gr = c("SL.glm", "SL.mean"),
     guard = c("Q", "g"),
     reduction = "univariate",
-    returnModels = TRUE
+    returnModels = TRUE,
+    use_future = FALSE
   )
 
   set.seed(1234)
@@ -378,7 +379,8 @@ test_that("Same point estimates, different variance estimates, missing data trea
     SL_gr = c("SL.glm", "SL.mean"),
     guard = c("Q", "g"),
     reduction = "univariate",
-    returnModels = TRUE
+    returnModels = FALSE,
+    use_future = FALSE
   )
 
   set.seed(1234)
@@ -394,7 +396,7 @@ test_that("Same point estimates, different variance estimates, missing data trea
     se_cv = "partial", se_cvFolds = 10,
     targeted_se = FALSE, 
     reduction = "univariate",
-    returnModels = TRUE,
+    returnModels = FALSE,
     use_future = FALSE
   )
 
