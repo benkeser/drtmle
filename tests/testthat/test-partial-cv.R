@@ -23,7 +23,8 @@ test_that("Same point estimates, different variance estimates, single treatment"
     SL_gr = c("SL.glm", "SL.mean"),
     guard = c("Q", "g"),
     reduction = "univariate",
-    returnModels = TRUE
+    returnModels = TRUE,
+    use_future = FALSE
   )
 
   set.seed(1234)
