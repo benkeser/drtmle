@@ -78,7 +78,8 @@ test_that("Same point estimates, different variance estimates, single treatment"
     SL_gr = c("SL.glm", "SL.mean"),
     guard = c("Q", "g"),
     reduction = "univariate",
-    returnModels = TRUE
+    returnModels = TRUE,
+    use_future = FALSE
   )
 
   set.seed(1234)
@@ -142,7 +143,8 @@ test_that("Same point estimates, different variance estimates, multi treatment",
     SL_gr = c("SL.glm", "SL.mean"),
     guard = c("Q", "g"),
     reduction = "univariate",
-    returnModels = TRUE
+    returnModels = TRUE,
+    use_future = FALSE
   )
 
   set.seed(1234)
@@ -197,7 +199,8 @@ test_that("Same point estimates, different variance estimates, multi treatment",
     SL_gr = c("SL.glm", "SL.mean"),
     guard = c("Q", "g"),
     reduction = "univariate",
-    returnModels = TRUE
+    returnModels = TRUE,
+    use_future = FALSE
   )
 
   set.seed(1234)
@@ -260,7 +263,8 @@ test_that("drtmle executes as expected with multiple sl and multiple tx lvl", {
     glm_gr = "Qn",
     guard = c("Q", "g"),
     reduction = "univariate",
-    returnModels = TRUE
+    returnModels = TRUE,
+    use_future = FALSE
   )
 
   # univariate reduction with
@@ -276,7 +280,8 @@ test_that("drtmle executes as expected with multiple sl and multiple tx lvl", {
     n_SL = 2, avg_over = "drtmle", 
     guard = c("Q", "g"),
     reduction = "univariate",
-    returnModels = TRUE
+    returnModels = TRUE,
+    use_future = FALSE
   )
   expect_true(all(abs(fit2$drtmle$est - fit1$drtmle$est) < 1e-5))
   expect_true(all(abs(fit2$tmle$est - fit1$tmle$est) < 1e-5))
@@ -295,7 +300,8 @@ test_that("drtmle executes as expected with multiple sl and multiple tx lvl", {
     n_SL = 1, avg_over = "drtmle", 
     guard = c("Q", "g"),
     reduction = "univariate",
-    returnModels = TRUE
+    returnModels = TRUE,
+    use_future = FALSE
   )
   expect_true(all(abs(fit3$drtmle$est - fit1$drtmle$est) < 1e-5))
   expect_true(all(abs(fit3$tmle$est - fit1$tmle$est) < 1e-5))
