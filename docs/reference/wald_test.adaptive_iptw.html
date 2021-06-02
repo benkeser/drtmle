@@ -8,21 +8,29 @@
 
 <title>Wald tests for adaptive_iptw objects — wald_test.adaptive_iptw • drtmle</title>
 
+
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
-<!-- sticky kit -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+<!-- headroom.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -30,10 +38,10 @@
 
 
 
-<meta property="og:title" content="Wald tests for adaptive_iptw objects — wald_test.adaptive_iptw" />
 
+<meta property="og:title" content="Wald tests for adaptive_iptw objects — wald_test.adaptive_iptw" />
 <meta property="og:description" content="Wald tests for adaptive_iptw objects" />
-<meta name="twitter:card" content="summary" />
+
 
 
 
@@ -47,9 +55,10 @@
 <![endif]-->
 
 
+
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -63,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">drtmle</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
       </span>
     </div>
 
@@ -71,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -94,11 +103,10 @@
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/benkeser/drtmle">
-    <span class="fa fa-github fa-lg"></span>
+  <a href="https://github.com/benkeser/drtmle/">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -109,6 +117,7 @@
 </div><!--/.navbar -->
 
       
+
       </header>
 
 <div class="row">
@@ -120,14 +129,12 @@
     </div>
 
     <div class="ref-description">
-    
     <p>Wald tests for adaptive_iptw objects</p>
-    
     </div>
 
     <pre class="usage"><span class='co'># S3 method for adaptive_iptw</span>
-<span class='fu'><a href='wald_test.html'>wald_test</a></span>(<span class='no'>object</span>, <span class='kw'>est</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"iptw_tmle"</span>), <span class='kw'>null</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>contrast</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</pre>
-    
+<span class='fu'><a href='wald_test.html'>wald_test</a></span><span class='op'>(</span><span class='va'>object</span>, est <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"iptw_tmle"</span><span class='op'>)</span>, null <span class='op'>=</span> <span class='fl'>0</span>, contrast <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -171,65 +178,60 @@ See examples.</p></td>
       <td><p>Other options (not currently used).</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>An object of class <code>"ci.adaptive_iptw"</code> with point estimates and
  confidence intervals of the specified level.</p>
-    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># load super learner</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/library'>library</a></span>(<span class='no'>SuperLearner</span>)
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/ecpolley/SuperLearner'>SuperLearner</a></span><span class='op'>)</span>
 <span class='co'># fit adaptive_iptw</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Random'>set.seed</a></span>(<span class='fl'>123456</span>)
-<span class='no'>n</span> <span class='kw'>&lt;-</span> <span class='fl'>200</span>
-<span class='no'>W</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/data.frame'>data.frame</a></span>(<span class='kw'>W1</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Uniform'>runif</a></span>(<span class='no'>n</span>), <span class='kw'>W2</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Normal'>rnorm</a></span>(<span class='no'>n</span>))
-<span class='no'>A</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Binomial'>rbinom</a></span>(<span class='no'>n</span>, <span class='fl'>1</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Logistic'>plogis</a></span>(<span class='no'>W</span>$<span class='no'>W1</span> - <span class='no'>W</span>$<span class='no'>W2</span>))
-<span class='no'>Y</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Binomial'>rbinom</a></span>(<span class='no'>n</span>, <span class='fl'>1</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Logistic'>plogis</a></span>(<span class='no'>W</span>$<span class='no'>W1</span> * <span class='no'>W</span>$<span class='no'>W2</span> * <span class='no'>A</span>))
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123456</span><span class='op'>)</span>
+<span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fl'>200</span>
+<span class='va'>W</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>W1 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='va'>n</span><span class='op'>)</span>, W2 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>A</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Binomial.html'>rbinom</a></span><span class='op'>(</span><span class='va'>n</span>, <span class='fl'>1</span>, <span class='fu'><a href='https://rdrr.io/r/stats/Logistic.html'>plogis</a></span><span class='op'>(</span><span class='va'>W</span><span class='op'>$</span><span class='va'>W1</span> <span class='op'>-</span> <span class='va'>W</span><span class='op'>$</span><span class='va'>W2</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>Y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Binomial.html'>rbinom</a></span><span class='op'>(</span><span class='va'>n</span>, <span class='fl'>1</span>, <span class='fu'><a href='https://rdrr.io/r/stats/Logistic.html'>plogis</a></span><span class='op'>(</span><span class='va'>W</span><span class='op'>$</span><span class='va'>W1</span> <span class='op'>*</span> <span class='va'>W</span><span class='op'>$</span><span class='va'>W2</span> <span class='op'>*</span> <span class='va'>A</span><span class='op'>)</span><span class='op'>)</span>
 
-<span class='no'>fit1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='adaptive_iptw.html'>adaptive_iptw</a></span>(
-  <span class='kw'>W</span> <span class='kw'>=</span> <span class='no'>W</span>, <span class='kw'>A</span> <span class='kw'>=</span> <span class='no'>A</span>, <span class='kw'>Y</span> <span class='kw'>=</span> <span class='no'>Y</span>, <span class='kw'>a_0</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>1</span>, <span class='fl'>0</span>),
-  <span class='kw'>SL_g</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"SL.glm"</span>, <span class='st'>"SL.mean"</span>, <span class='st'>"SL.step"</span>),
-  <span class='kw'>SL_Qr</span> <span class='kw'>=</span> <span class='st'>"SL.glm"</span>
-)
-
+<span class='va'>fit1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='adaptive_iptw.html'>adaptive_iptw</a></span><span class='op'>(</span>
+  W <span class='op'>=</span> <span class='va'>W</span>, A <span class='op'>=</span> <span class='va'>A</span>, Y <span class='op'>=</span> <span class='va'>Y</span>, a_0 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>0</span><span class='op'>)</span>,
+  SL_g <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"SL.glm"</span>, <span class='st'>"SL.mean"</span>, <span class='st'>"SL.step"</span><span class='op'>)</span>,
+  SL_Qr <span class='op'>=</span> <span class='st'>"SL.glm"</span>
+<span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='warning'>Warning: UNRELIABLE VALUE: Future (‘future_lapply-1’) unexpectedly generated random numbers without specifying argument 'future.seed'. There is a risk that those random numbers are not statistically sound and the overall results might be invalid. To fix this, specify 'future.seed=TRUE'. This ensures that proper, parallel-safe random numbers are produced via the L'Ecuyer-CMRG method. To disable this check, use 'future.seed=NULL', or set option 'future.rng.onMisuse' to "ignore".</span></div><div class='input'>
 <span class='co'># get test that each mean = 0.5</span>
-<span class='no'>test_mean</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='wald_test.html'>wald_test</a></span>(<span class='no'>fit1</span>, <span class='kw'>null</span> <span class='kw'>=</span> <span class='fl'>0.5</span>)
+<span class='va'>test_mean</span> <span class='op'>&lt;-</span> <span class='fu'><a href='wald_test.html'>wald_test</a></span><span class='op'>(</span><span class='va'>fit1</span>, null <span class='op'>=</span> <span class='fl'>0.5</span><span class='op'>)</span>
 
 <span class='co'># get test that the ATE = 0</span>
-<span class='no'>ci_ATE</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ci.html'>ci</a></span>(<span class='no'>fit1</span>, <span class='kw'>contrast</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>1</span>, -<span class='fl'>1</span>), <span class='kw'>null</span> <span class='kw'>=</span> <span class='fl'>0</span>)
+<span class='va'>ci_ATE</span> <span class='op'>&lt;-</span> <span class='fu'><a href='ci.html'>ci</a></span><span class='op'>(</span><span class='va'>fit1</span>, contrast <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='op'>-</span><span class='fl'>1</span><span class='op'>)</span>, null <span class='op'>=</span> <span class='fl'>0</span><span class='op'>)</span>
 
 <span class='co'># get test for risk ratio = 1 on log scale</span>
-<span class='no'>myContrast</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(
-  <span class='kw'>f</span> <span class='kw'>=</span> <span class='kw'>function</span>(<span class='no'>eff</span>) {
-    <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Log'>log</a></span>(<span class='no'>eff</span>)
-  },
-  <span class='kw'>f_inv</span> <span class='kw'>=</span> <span class='kw'>function</span>(<span class='no'>eff</span>) {
-    <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Log'>exp</a></span>(<span class='no'>eff</span>)
-  }, <span class='co'># not necessary</span>
-  <span class='kw'>h</span> <span class='kw'>=</span> <span class='kw'>function</span>(<span class='no'>est</span>) {
-    <span class='no'>est</span>[<span class='fl'>1</span>] / <span class='no'>est</span>[<span class='fl'>2</span>]
-  },
-  <span class='kw'>fh_grad</span> <span class='kw'>=</span> <span class='kw'>function</span>(<span class='no'>est</span>) {
-    <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>1</span> / <span class='no'>est</span>[<span class='fl'>1</span>], -<span class='fl'>1</span> / <span class='no'>est</span>[<span class='fl'>2</span>])
-  }
-)
-<span class='no'>ci_RR</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ci.html'>ci</a></span>(<span class='no'>fit1</span>, <span class='kw'>contrast</span> <span class='kw'>=</span> <span class='no'>myContrast</span>, <span class='kw'>null</span> <span class='kw'>=</span> <span class='fl'>1</span>)
-<span class='co'>#</span></div></pre>
+<span class='va'>myContrast</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>
+  f <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>eff</span><span class='op'>)</span> <span class='op'>{</span>
+    <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span><span class='op'>(</span><span class='va'>eff</span><span class='op'>)</span>
+  <span class='op'>}</span>,
+  f_inv <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>eff</span><span class='op'>)</span> <span class='op'>{</span>
+    <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>eff</span><span class='op'>)</span>
+  <span class='op'>}</span>, <span class='co'># not necessary</span>
+  h <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>est</span><span class='op'>)</span> <span class='op'>{</span>
+    <span class='va'>est</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span> <span class='op'>/</span> <span class='va'>est</span><span class='op'>[</span><span class='fl'>2</span><span class='op'>]</span>
+  <span class='op'>}</span>,
+  fh_grad <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>est</span><span class='op'>)</span> <span class='op'>{</span>
+    <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span> <span class='op'>/</span> <span class='va'>est</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, <span class='op'>-</span><span class='fl'>1</span> <span class='op'>/</span> <span class='va'>est</span><span class='op'>[</span><span class='fl'>2</span><span class='op'>]</span><span class='op'>)</span>
+  <span class='op'>}</span>
+<span class='op'>)</span>
+<span class='va'>ci_RR</span> <span class='op'>&lt;-</span> <span class='fu'><a href='ci.html'>ci</a></span><span class='op'>(</span><span class='va'>fit1</span>, contrast <span class='op'>=</span> <span class='va'>myContrast</span>, null <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
+<span class='co'>#</span>
+</div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      
-      <li><a href="#value">Value</a></li>
-      
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
+
 
       <footer>
       <div class="copyright">
@@ -237,13 +239,16 @@ See examples.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
+
       </footer>
    </div>
 
   
 
+
   </body>
 </html>
+
 

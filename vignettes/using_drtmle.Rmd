@@ -38,7 +38,7 @@ preamble: >
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{drtmle: Doubly-Robust Inference in R}
+  %\VignetteIndexEntry{`drtmle`: Doubly-Robust Inference in R}
   %\VignetteEncoding{UTF-8}
 bibliography: refs.bib
 ---

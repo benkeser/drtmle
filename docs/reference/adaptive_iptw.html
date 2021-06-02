@@ -9,21 +9,29 @@
 <title>Compute asymptotically linear IPTW estimators with super learning
 for the propensity score — adaptive_iptw • drtmle</title>
 
+
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
-<!-- sticky kit -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+<!-- headroom.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -31,12 +39,12 @@ for the propensity score — adaptive_iptw • drtmle</title>
 
 
 
+
 <meta property="og:title" content="Compute asymptotically linear IPTW estimators with super learning
 for the propensity score — adaptive_iptw" />
-
 <meta property="og:description" content="Compute asymptotically linear IPTW estimators with super learning
 for the propensity score" />
-<meta name="twitter:card" content="summary" />
+
 
 
 
@@ -50,9 +58,10 @@ for the propensity score" />
 <![endif]-->
 
 
+
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -66,7 +75,7 @@ for the propensity score" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">drtmle</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
       </span>
     </div>
 
@@ -74,7 +83,7 @@ for the propensity score" />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -97,11 +106,10 @@ for the propensity score" />
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/benkeser/drtmle">
-    <span class="fa fa-github fa-lg"></span>
+  <a href="https://github.com/benkeser/drtmle/">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -112,6 +120,7 @@ for the propensity score" />
 </div><!--/.navbar -->
 
       
+
       </header>
 
 <div class="row">
@@ -124,38 +133,34 @@ for the propensity score</h1>
     </div>
 
     <div class="ref-description">
-    
     <p>Compute asymptotically linear IPTW estimators with super learning
 for the propensity score</p>
-    
     </div>
 
-    <pre class="usage"><span class='fu'>adaptive_iptw</span>(
-  <span class='no'>W</span>,
-  <span class='no'>A</span>,
-  <span class='no'>Y</span>,
-  <span class='kw'>DeltaY</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/numeric'>as.numeric</a></span>(!<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/NA'>is.na</a></span>(<span class='no'>Y</span>)),
-  <span class='kw'>DeltaA</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/numeric'>as.numeric</a></span>(!<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/NA'>is.na</a></span>(<span class='no'>A</span>)),
-  <span class='kw'>stratify</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>family</span> <span class='kw'>=</span> <span class='kw'>if</span> (<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/all'>all</a></span>(<span class='no'>Y</span> <span class='kw'>%in%</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>1</span>))) {     <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/family'>binomial</a></span>() } <span class='kw'>else</span> {
-    <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/family'>gaussian</a></span>() },
-  <span class='kw'>a_0</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/unique'>unique</a></span>(<span class='no'>A</span>[!<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/NA'>is.na</a></span>(<span class='no'>A</span>)]),
-  <span class='kw'>SL_g</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>glm_g</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>SL_Qr</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>glm_Qr</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>returnModels</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>maxIter</span> <span class='kw'>=</span> <span class='fl'>2</span>,
-  <span class='kw'>tolIC</span> <span class='kw'>=</span> <span class='fl'>1</span>/<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='no'>Y</span>),
-  <span class='kw'>tolg</span> <span class='kw'>=</span> <span class='fl'>0.01</span>,
-  <span class='kw'>cvFolds</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>parallel</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>future_hpc</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>gn</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='no'>...</span>
-)</pre>
-    
+    <pre class="usage"><span class='fu'>adaptive_iptw</span><span class='op'>(</span>
+  <span class='va'>W</span>,
+  <span class='va'>A</span>,
+  <span class='va'>Y</span>,
+  DeltaY <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span><span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>Y</span><span class='op'>)</span><span class='op'>)</span>,
+  DeltaA <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span><span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>A</span><span class='op'>)</span><span class='op'>)</span>,
+  stratify <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  family <span class='op'>=</span> <span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span><span class='op'>(</span><span class='va'>Y</span> <span class='op'>%in%</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>     <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/family.html'>binomial</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>}</span> <span class='kw'>else</span> <span class='op'>{</span>    
+    <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/family.html'>gaussian</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>}</span>,
+  a_0 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/unique.html'>unique</a></span><span class='op'>(</span><span class='va'>A</span><span class='op'>[</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>A</span><span class='op'>)</span><span class='op'>]</span><span class='op'>)</span>,
+  SL_g <span class='op'>=</span> <span class='cn'>NULL</span>,
+  glm_g <span class='op'>=</span> <span class='cn'>NULL</span>,
+  SL_Qr <span class='op'>=</span> <span class='cn'>NULL</span>,
+  glm_Qr <span class='op'>=</span> <span class='cn'>NULL</span>,
+  returnModels <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  verbose <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  maxIter <span class='op'>=</span> <span class='fl'>2</span>,
+  tolIC <span class='op'>=</span> <span class='fl'>1</span><span class='op'>/</span><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>Y</span><span class='op'>)</span>,
+  tolg <span class='op'>=</span> <span class='fl'>0.01</span>,
+  cvFolds <span class='op'>=</span> <span class='fl'>1</span>,
+  gn <span class='op'>=</span> <span class='cn'>NULL</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -190,8 +195,8 @@ outcome regression separately for observations with different levels of
     </tr>
     <tr>
       <th>family</th>
-      <td><p>A <code>family</code> object equal to either <code><a href='https://www.rdocumentation.org/packages/stats/topics/family'>binomial()</a></code> or
-<code><a href='https://www.rdocumentation.org/packages/stats/topics/family'>gaussian()</a></code>, to be passed to the <code>SuperLearner</code> or <code>glm</code>
+      <td><p>A <code>family</code> object equal to either <code><a href='https://rdrr.io/r/stats/family.html'>binomial()</a></code> or
+<code><a href='https://rdrr.io/r/stats/family.html'>gaussian()</a></code>, to be passed to the <code>SuperLearner</code> or <code>glm</code>
 function.</p></td>
     </tr>
     <tr>
@@ -258,21 +263,6 @@ cross-validated fitting of nuisance parameters. If <code>cvFolds = 1</code>, no
 cross-validation is used.</p></td>
     </tr>
     <tr>
-      <th>parallel</th>
-      <td><p>A logical indicating whether to use parallelization based on
-<code>future</code> to estimate nuisance parameters in parallel. Only useful if
-<code>cvFolds &gt; 1</code>. By default, a <code>multiprocess</code> evaluation scheme is
-invoked, using forked R processes (if supported on the OS) and background R
-sessions otherwise. Users may also register their own backends using the
-<code>future.batchtools</code> package.</p></td>
-    </tr>
-    <tr>
-      <th>future_hpc</th>
-      <td><p>A character string identifying a high-performance computing
-backend to be used with parallelization. This should match exactly one of
-the options available from the <code>future.batchtools</code> package.</p></td>
-    </tr>
-    <tr>
       <th>gn</th>
       <td><p>An optional list of propensity score estimates. If specified, the
 function will ignore the nuisance parameter estimation specified by
@@ -287,10 +277,10 @@ of <code>A</code> = 1).</p></td>
       <td><p>Other options (not currently used).</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An object of class <code>"adaptive_iptw"</code>.</p><dl class='dl-horizontal'>
+    <p>An object of class <code>"adaptive_iptw"</code>.</p><dl>
  <dt><code>iptw_tmle</code></dt><dd><p>A <code>list</code> of point estimates and
        covariance matrix for the IPTW estimator based on a targeted
        propensity score.</p></dd>
@@ -314,36 +304,36 @@ of <code>A</code> = 1).</p></td>
  <dt><code>a_0</code></dt><dd><p>The treatment levels that were requested for computation
        of covariate-adjusted means.</p></dd>
  <dt><code>call</code></dt><dd><p>The call to <code>adaptive_iptw</code>.</p></dd>
+
 </dl>
 
-    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># load super learner</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/library'>library</a></span>(<span class='no'>SuperLearner</span>)</div><div class='output co'>#&gt; <span class='message'>Loading required package: nnls</span></div><div class='output co'>#&gt; <span class='message'>Super Learner</span></div><div class='output co'>#&gt; <span class='message'>Version: 2.0-25</span></div><div class='output co'>#&gt; <span class='message'>Package created on 2019-08-05</span></div><div class='input'><span class='co'># simulate data</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Random'>set.seed</a></span>(<span class='fl'>123456</span>)
-<span class='no'>n</span> <span class='kw'>&lt;-</span> <span class='fl'>100</span>
-<span class='no'>W</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/data.frame'>data.frame</a></span>(<span class='kw'>W1</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Uniform'>runif</a></span>(<span class='no'>n</span>), <span class='kw'>W2</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Normal'>rnorm</a></span>(<span class='no'>n</span>))
-<span class='no'>A</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Binomial'>rbinom</a></span>(<span class='no'>n</span>, <span class='fl'>1</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Logistic'>plogis</a></span>(<span class='no'>W</span>$<span class='no'>W1</span> - <span class='no'>W</span>$<span class='no'>W2</span>))
-<span class='no'>Y</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Binomial'>rbinom</a></span>(<span class='no'>n</span>, <span class='fl'>1</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Logistic'>plogis</a></span>(<span class='no'>W</span>$<span class='no'>W1</span> * <span class='no'>W</span>$<span class='no'>W2</span> * <span class='no'>A</span>))
-<span class='co'># fit iptw with maxIter = 1 to run fast</span></div><div class='input'><span class='no'>fit1</span> <span class='kw'>&lt;-</span> <span class='fu'>adaptive_iptw</span>(
-  <span class='kw'>W</span> <span class='kw'>=</span> <span class='no'>W</span>, <span class='kw'>A</span> <span class='kw'>=</span> <span class='no'>A</span>, <span class='kw'>Y</span> <span class='kw'>=</span> <span class='no'>Y</span>, <span class='kw'>a_0</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>1</span>, <span class='fl'>0</span>),
-  <span class='kw'>SL_g</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"SL.glm"</span>, <span class='st'>"SL.mean"</span>, <span class='st'>"SL.step"</span>),
-  <span class='kw'>SL_Qr</span> <span class='kw'>=</span> <span class='st'>"SL.npreg"</span>, <span class='kw'>maxIter</span> <span class='kw'>=</span> <span class='fl'>1</span>
-)</div><div class='output co'>#&gt; <span class='message'>Loading required package: nloptr</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: nloptr</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: nloptr</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: nloptr</span></div></pre>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/ecpolley/SuperLearner'>SuperLearner</a></span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>Loading required package: nnls</span></div><div class='output co'>#&gt; <span class='message'>Super Learner</span></div><div class='output co'>#&gt; <span class='message'>Version: 2.0-26</span></div><div class='output co'>#&gt; <span class='message'>Package created on 2019-10-27</span></div><div class='input'><span class='co'># simulate data</span>
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123456</span><span class='op'>)</span>
+<span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fl'>100</span>
+<span class='va'>W</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>W1 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='va'>n</span><span class='op'>)</span>, W2 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>A</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Binomial.html'>rbinom</a></span><span class='op'>(</span><span class='va'>n</span>, <span class='fl'>1</span>, <span class='fu'><a href='https://rdrr.io/r/stats/Logistic.html'>plogis</a></span><span class='op'>(</span><span class='va'>W</span><span class='op'>$</span><span class='va'>W1</span> <span class='op'>-</span> <span class='va'>W</span><span class='op'>$</span><span class='va'>W2</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>Y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Binomial.html'>rbinom</a></span><span class='op'>(</span><span class='va'>n</span>, <span class='fl'>1</span>, <span class='fu'><a href='https://rdrr.io/r/stats/Logistic.html'>plogis</a></span><span class='op'>(</span><span class='va'>W</span><span class='op'>$</span><span class='va'>W1</span> <span class='op'>*</span> <span class='va'>W</span><span class='op'>$</span><span class='va'>W2</span> <span class='op'>*</span> <span class='va'>A</span><span class='op'>)</span><span class='op'>)</span>
+<span class='co'># fit iptw with maxIter = 1 to run fast</span>
+<span class='co'># \donttest{</span>
+<span class='va'>fit1</span> <span class='op'>&lt;-</span> <span class='fu'>adaptive_iptw</span><span class='op'>(</span>
+  W <span class='op'>=</span> <span class='va'>W</span>, A <span class='op'>=</span> <span class='va'>A</span>, Y <span class='op'>=</span> <span class='va'>Y</span>, a_0 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>0</span><span class='op'>)</span>,
+  SL_g <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"SL.glm"</span>, <span class='st'>"SL.mean"</span>, <span class='st'>"SL.step"</span><span class='op'>)</span>,
+  SL_Qr <span class='op'>=</span> <span class='st'>"SL.npreg"</span>, maxIter <span class='op'>=</span> <span class='fl'>1</span>
+<span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>Loading required package: nloptr</span></div><div class='output co'>#&gt; <span class='warning'>Warning: UNRELIABLE VALUE: Future (‘future_lapply-1’) unexpectedly generated random numbers without specifying argument 'future.seed'. There is a risk that those random numbers are not statistically sound and the overall results might be invalid. To fix this, specify 'future.seed=TRUE'. This ensures that proper, parallel-safe random numbers are produced via the L'Ecuyer-CMRG method. To disable this check, use 'future.seed=NULL', or set option 'future.rng.onMisuse' to "ignore".</span></div><div class='output co'>#&gt; <span class='warning'>Warning: UNRELIABLE VALUE: Future (‘future_lapply-1’) unexpectedly generated random numbers without specifying argument 'future.seed'. There is a risk that those random numbers are not statistically sound and the overall results might be invalid. To fix this, specify 'future.seed=TRUE'. This ensures that proper, parallel-safe random numbers are produced via the L'Ecuyer-CMRG method. To disable this check, use 'future.seed=NULL', or set option 'future.rng.onMisuse' to "ignore".</span></div><div class='output co'>#&gt; <span class='warning'>Warning: UNRELIABLE VALUE: Future (‘future_lapply-1’) unexpectedly generated random numbers without specifying argument 'future.seed'. There is a risk that those random numbers are not statistically sound and the overall results might be invalid. To fix this, specify 'future.seed=TRUE'. This ensures that proper, parallel-safe random numbers are produced via the L'Ecuyer-CMRG method. To disable this check, use 'future.seed=NULL', or set option 'future.rng.onMisuse' to "ignore".</span></div><div class='input'><span class='co'># }</span>
+</div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      
-      <li><a href="#value">Value</a></li>
-      
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
+
 
       <footer>
       <div class="copyright">
@@ -351,13 +341,16 @@ of <code>A</code> = 1).</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
+
       </footer>
    </div>
 
   
 
+
   </body>
 </html>
+
 

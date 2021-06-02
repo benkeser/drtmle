@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Super learner wrapper for kernel regression — SL.npreg • drtmle</title>
+<title>estimategrn_loop — estimategrn_loop • drtmle</title>
 
 
 <!-- jquery -->
@@ -39,10 +39,8 @@
 
 
 
-<meta property="og:title" content="Super learner wrapper for kernel regression — SL.npreg" />
-<meta property="og:description" content="Kernel regression based on the np
-package. Uses leave-one-out cross-validation to fit a kernel regression.
-See ?npreg for more details." />
+<meta property="og:title" content="estimategrn_loop — estimategrn_loop" />
+<meta property="og:description" content="Helper function to clean up the internal code of drtmle" />
 
 
 
@@ -125,75 +123,110 @@ See ?npreg for more details." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Super learner wrapper for kernel regression</h1>
-    <small class="dont-index">Source: <a href='https://github.com/benkeser/drtmle/blob/master/R/sl_npreg.R'><code>R/sl_npreg.R</code></a></small>
-    <div class="hidden name"><code>SL.npreg.Rd</code></div>
+    <h1>estimategrn_loop</h1>
+    <small class="dont-index">Source: <a href='https://github.com/benkeser/drtmle/blob/master/R/estimate.R'><code>R/estimate.R</code></a></small>
+    <div class="hidden name"><code>estimategrn_loop.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Kernel regression based on the <a href='https://CRAN.R-project.org/package=np'>np</a>
-package. Uses leave-one-out cross-validation to fit a kernel regression.
-See <code>?npreg</code> for more details.</p>
+    <p>Helper function to clean up the internal code of <code>drtmle</code></p>
     </div>
 
-    <pre class="usage"><span class='fu'>SL.npreg</span><span class='op'>(</span>
+    <pre class="usage"><span class='fu'>estimategrn_loop</span><span class='op'>(</span>
+  <span class='va'>validRows</span>,
   <span class='va'>Y</span>,
-  <span class='va'>X</span>,
-  <span class='va'>newX</span>,
-  family <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/family.html'>gaussian</a></span><span class='op'>(</span><span class='op'>)</span>,
-  obsWeights <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>Y</span><span class='op'>)</span><span class='op'>)</span>,
-  rangeThresh <span class='op'>=</span> <span class='fl'>1e-07</span>,
-  <span class='va'>...</span>
+  <span class='va'>A</span>,
+  <span class='va'>W</span>,
+  <span class='va'>DeltaA</span>,
+  <span class='va'>DeltaY</span>,
+  <span class='va'>tolg</span>,
+  <span class='va'>Qn</span>,
+  <span class='va'>gn</span>,
+  <span class='va'>glm_gr</span>,
+  <span class='va'>SL_gr</span>,
+  <span class='va'>a_0</span>,
+  <span class='va'>reduction</span>,
+  <span class='va'>returnModels</span>,
+  <span class='va'>use_future</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
+      <th>validRows</th>
+      <td><p>A <code>list</code> of length <code>cvFolds</code> containing the row
+indexes of observations to include in validation fold.</p></td>
+    </tr>
+    <tr>
       <th>Y</th>
-      <td><p>A vector of outcomes.</p></td>
+      <td><p>A vector of continuous or binary outcomes.</p></td>
     </tr>
     <tr>
-      <th>X</th>
-      <td><p>A matrix or data.frame of training data predictors.</p></td>
+      <th>A</th>
+      <td><p>A vector of binary treatment assignment (assumed to be equal to 0 or
+1).</p></td>
     </tr>
     <tr>
-      <th>newX</th>
-      <td><p>A test set of predictors.</p></td>
+      <th>W</th>
+      <td><p>A <code>data.frame</code> of named covariates.</p></td>
     </tr>
     <tr>
-      <th>family</th>
-      <td><p>Not used by the function directly, but ensures compatibility
-with <code>SuperLearner</code>.</p></td>
+      <th>DeltaA</th>
+      <td><p>Indicator of missing treatment (assumed to be equal to 0 if
+missing 1 if observed).</p></td>
     </tr>
     <tr>
-      <th>obsWeights</th>
-      <td><p>Not used by the function directly, but ensures
-compatibility with <code>SuperLearner</code>.</p></td>
+      <th>DeltaY</th>
+      <td><p>Indicator of missing outcome (assumed to be equal to 0 if
+missing 1 if observed).</p></td>
     </tr>
     <tr>
-      <th>rangeThresh</th>
-      <td><p>If the the range of the outcomes is smaller than this
-number, the method returns the empirical average of the outcomes. Used for
-computational expediency and stability.</p></td>
+      <th>tolg</th>
+      <td><p>A numeric indicating the minimum value for estimates of the
+propensity score.</p></td>
     </tr>
     <tr>
-      <th>...</th>
-      <td><p>Other arguments (not currently used).</p></td>
+      <th>Qn</th>
+      <td><p>A list of outcome regression estimates evaluated on observed data.</p></td>
+    </tr>
+    <tr>
+      <th>gn</th>
+      <td><p>A list of propensity regression estimates evaluated on observed
+data.</p></td>
+    </tr>
+    <tr>
+      <th>glm_gr</th>
+      <td><p>A character describing a formula to be used in the call to
+<code>glm</code> for the second reduced-dimension regression. Ignored if
+<code>SL_gr!=NULL</code>.</p></td>
+    </tr>
+    <tr>
+      <th>SL_gr</th>
+      <td><p>A vector of characters or a list describing the Super Learner
+library to be used for the reduced-dimension propensity score.</p></td>
+    </tr>
+    <tr>
+      <th>a_0</th>
+      <td><p>A list of fixed treatment values .</p></td>
+    </tr>
+    <tr>
+      <th>reduction</th>
+      <td><p>A character equal to <code>'univariate'</code> for a univariate
+misspecification correction or <code>'bivariate'</code> for the bivariate version.</p></td>
+    </tr>
+    <tr>
+      <th>returnModels</th>
+      <td><p>A boolean indicating whether to return model fits for the
+outcome regression, propensity score, and reduced-dimension regressions.</p></td>
+    </tr>
+    <tr>
+      <th>use_future</th>
+      <td><p>Should <code>future</code> be used to parallelize?</p></td>
     </tr>
     </table>
 
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># simulate data</span>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>1234</span><span class='op'>)</span>
-<span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fl'>100</span>
-<span class='va'>X</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>X1 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n</span><span class='op'>)</span><span class='op'>)</span>
-<span class='va'>Y</span> <span class='op'>&lt;-</span> <span class='va'>X</span><span class='op'>$</span><span class='va'>X1</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n</span><span class='op'>)</span>
-<span class='co'># fit npreg</span>
-<span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'>SL.npreg</span><span class='op'>(</span>Y <span class='op'>=</span> <span class='va'>Y</span>, X <span class='op'>=</span> <span class='va'>X</span>, newX <span class='op'>=</span> <span class='va'>X</span><span class='op'>)</span>
-<span class='co'>#</span>
-</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
