@@ -25,7 +25,7 @@ abstract: >
   statistical inference about an estimated treatment effect. While doubly-robust
   estimators facilitate inference when *all* relevant regression functions are
   consistently estimated, the same cannot be said when at least one estimator is
-  inconsistent. `drtmle` is a recently developed R package that implements
+  inconsistent. `drtmle` implements
   doubly-robust confidence intervals and hypothesis tests about targeted minimum
   loss-based estimates of the average treatment effect. The package additionally
   implements an inverse probability of treatment weighted estimator that yields
