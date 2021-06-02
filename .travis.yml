@@ -24,9 +24,6 @@ addons:
     packages:
       - libnlopt-dev
 
-before_install:
-  - Rscript -e 'update.packages(ask = FALSE)'
-
 r_packages:
   - devtools
   - covr
