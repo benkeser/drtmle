@@ -16,3 +16,4 @@
 ^\.Rproj\.user$
 ^README\.Rmd$
 ^README-.*\.png$
+^CRAN-RELEASE$
