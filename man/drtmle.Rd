@@ -40,7 +40,7 @@ drtmle(
   Qsteps = 2,
   Qn = NULL,
   gn = NULL,
-  use_future = TRUE,
+  use_future = FALSE,
   ...
 )
 }
