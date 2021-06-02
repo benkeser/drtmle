@@ -237,7 +237,7 @@ drtmle <- function(Y, A, W,
                    Qsteps = 2,
                    Qn = NULL,
                    gn = NULL,
-                   use_future = TRUE,
+                   use_future = FALSE,
                    ...) {
   call <- match.call()
   n <- length(Y)
