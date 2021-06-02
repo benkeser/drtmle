@@ -300,7 +300,7 @@ g_{r,n,2}^*(a \mid W_i) \ \{Y_i - \bar{Q}_n^*(a,W_i)\} = 0 \ ,
 ##     out &lt;- list(pred = pred, fit = fit)
 ##     return(out)
 ## }
-## &lt;bytecode: 0x7febd61b1ee0&gt;
+## &lt;bytecode: 0x7ff36f875968&gt;
 ## &lt;environment: namespace:drtmle&gt;</code></pre>
 <p>In the above code, we see that a user-specified function should have options <code>Y, X, newX, family, obsWeights, ...</code>, along with other options specific to the function. The option <code>Y</code> corresponds to the outcome of the regression and <code>X</code> to the variables onto which the outcome is regressed. The option <code>newX</code> should be of the same class and dimension as <code>X</code> and is meant to contain new values of variables at which to evaluate the regression fit. The <code>family</code> and <code>obsWeights</code> options are not strictly necessary (indeed, they are not used by <code>SL.npreg</code>), they are useful to include if one wishes to utilize the function as part of a super learner library. The <code>SL.npreg</code> function proceeds by checking whether there is sufficient variation in <code>Y</code> to even both fitting the kernel regression (as specified by option <code>rangeThresh</code>), and if so, fits a kernel regression with cross-validated bandwidth selection via the <code>npregbw</code> function. The output is then formatted in a specific way so that <code>drtmle</code> is able to retrieve the appropriate objects from the fitted regression. In particular the output should be a list with named objects <code>pred</code> and <code>fit</code>; the former including predictions made from the fitted regression on <code>newX</code>, the latter including any information that may be needed to predict new values based on the fitted object. A class is assigned to the <code>fit</code> object, so that an S3 <code>predict</code> method may later be used to predict new values based on the fitted regression object. The user must also specify this <code>predict</code> method. Use <code>drtmle:::predict.SL.npreg</code> to view the simple <code>predict</code> method for <code>SL.npreg</code>.</p>
 <p>In the code below, we demonstrate a call to <code>drtmle</code> with <code>SL.npreg</code> used to estimate each nuisance parameter. Here, we also illustrate the use of <code>stratify = TRUE</code>, which fits a separate kernel regression of <span class="math inline">\(Y\)</span> onto <span class="math inline">\(W\)</span> in observations with <span class="math inline">\(A = 1\)</span> and <span class="math inline">\(A = 0\)</span>.</p>
@@ -950,33 +950,27 @@ W_i)} \ \{ I(A_i = a) - g_n(a \mid W = W_i)\} = 0 \ ,\]</span> then the IPTW est
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] future.batchtools_0.10.0 future_1.21.0            earth_5.3.0             
-##  [4] plotmo_3.6.0             Formula_1.2-4            TeachingDemos_2.12      
-##  [7] plotrix_3.8-1            quadprog_1.5-8           nloptr_1.2.2.2          
-## [10] SuperLearner_2.0-26      nnls_1.4                 drtmle_1.1.0            
+## [1] nloptr_1.2.2.2      SuperLearner_2.0-26 nnls_1.4           
+## [4] drtmle_1.1.0       
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] Rcpp_1.0.6           lattice_0.20-41      listenv_0.8.0       
-##  [4] prettyunits_1.1.1    assertthat_0.2.1     rprojroot_2.0.2     
-##  [7] digest_0.6.27        parallelly_1.23.0    R6_2.5.0            
-## [10] backports_1.2.1      MatrixModels_0.4-1   evaluate_0.14       
-## [13] rlang_0.4.10         progress_1.2.2       cubature_2.0.4.1    
-## [16] data.table_1.14.0    SparseM_1.81         jquerylib_0.1.3     
-## [19] Matrix_1.3-2         checkmate_2.0.0      rmarkdown_2.7       
-## [22] pkgdown_1.6.1        textshaping_0.3.4    desc_1.2.0          
-## [25] stringr_1.4.0        compiler_4.0.3       xfun_0.21           
-## [28] pkgconfig_2.0.3      systemfonts_1.0.1    globals_0.14.0      
-## [31] htmltools_0.5.1.9000 batchtools_0.9.15    codetools_0.2-18    
-## [34] matrixStats_0.58.0   np_0.60-10           withr_2.4.1         
-## [37] crayon_1.4.1         conquer_1.0.2        rappdirs_0.3.3      
-## [40] grid_4.0.3           jsonlite_1.7.2       lifecycle_1.0.0     
-## [43] magrittr_2.0.1       future.apply_1.7.0   stringi_1.5.3       
-## [46] cachem_1.0.4         fs_1.5.0             bslib_0.2.4.9000    
-## [49] ellipsis_0.3.1       brew_1.0-6           ragg_1.1.2          
-## [52] vctrs_0.3.6          boot_1.3-27          tools_4.0.3         
-## [55] hms_1.0.0            parallel_4.0.3       fastmap_1.1.0       
-## [58] yaml_2.2.1           base64url_1.4        memoise_2.0.0       
-## [61] knitr_1.31           sass_0.3.1.9000      quantreg_5.85</code></pre>
+##  [1] np_0.60-10           Rcpp_1.0.6           bslib_0.2.4.9000    
+##  [4] compiler_4.0.3       jquerylib_0.1.3      tools_4.0.3         
+##  [7] boot_1.3-27          digest_0.6.27        lattice_0.20-41     
+## [10] jsonlite_1.7.2       evaluate_0.14        memoise_2.0.0       
+## [13] rlang_0.4.10         Matrix_1.3-2         yaml_2.2.1          
+## [16] parallel_4.0.3       SparseM_1.81         pkgdown_1.6.1       
+## [19] xfun_0.21            fastmap_1.1.0        stringr_1.4.0       
+## [22] knitr_1.31           MatrixModels_0.4-1   desc_1.2.0          
+## [25] fs_1.5.0             sass_0.3.1.9000      systemfonts_1.0.1   
+## [28] globals_0.14.0       grid_4.0.3           rprojroot_2.0.2     
+## [31] listenv_0.8.0        R6_2.5.0             textshaping_0.3.4   
+## [34] future.apply_1.7.0   parallelly_1.23.0    rmarkdown_2.7       
+## [37] conquer_1.0.2        magrittr_2.0.1       matrixStats_0.58.0  
+## [40] codetools_0.2-18     htmltools_0.5.1.9000 assertthat_0.2.1    
+## [43] future_1.21.0        cubature_2.0.4.1     quadprog_1.5-8      
+## [46] quantreg_5.85        ragg_1.1.2           stringi_1.5.3       
+## [49] cachem_1.0.4         crayon_1.4.1</code></pre>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-futurePackage" class="csl-entry">
 Bengtsson, Henrik. 2017a. <em><span class="nocase">future</span>: A Future <span>API</span> for <span>R</span></em>. https://cran.r-project.org/web/packages/future. <a href="https://github.com/HenrikBengtsson/future">https://github.com/HenrikBengtsson/future</a>.
@@ -988,7 +982,7 @@ Bengtsson, Henrik. 2017a. <em><span class="nocase">future</span>: A Future <span
 Benkeser, D, M Carone, M van der Laan, and P Gilbert. 2017. <span>“Doubly-Robust Nonparametric Inference on the Average Treatment Effect.”</span> <em>Biometrika</em>.
 </div>
 <div id="ref-npPackage" class="csl-entry">
-Hayfield, Tristen, and Jeffrey Racine. 2008. <span>“Nonparametric Econometrics: The Np Package.”</span> <em>Journal of Statistical Software</em> 27 (5). <a href="http://www.jstatsoft.org/v27/i05/">http://www.jstatsoft.org/v27/i05/</a>.
+Hayfield, Tristen, and Jeffrey Racine. 2008. <span>“Nonparametric Econometrics: The Np Package.”</span> <em>Journal of Statistical Software</em> 27 (5). <a href="https://www.jstatsoft.org/v27/i05/">https://www.jstatsoft.org/v27/i05/</a>.
 </div>
 <div id="ref-horvitzthompson:1952:jasa" class="csl-entry">
 Horvitz, D, and D Thompson. 1952. <span>“A Generalization of Sampling Without Replacement from a Finite Universe.”</span> <em>Journal of the American Statistical Association</em> 47 (260): 663–85. <a href="https://doi.org/10.1080/01621459.1952.10483446">https://doi.org/10.1080/01621459.1952.10483446</a>.
@@ -1030,7 +1024,7 @@ van der Laan, M, and D Rubin. 2006. <span>“Targeted Maximum Likelihood Learnin
 Wolpert, D. 1992. <span>“Stacked Generalization.”</span> <em>Neural Networks</em> 5 (2): 241–59. <a href="https://doi.org/10.1016/S0893-6080(05)80023-1">https://doi.org/10.1016/S0893-6080(05)80023-1</a>.
 </div>
 <div id="ref-zheng:2010:working" class="csl-entry">
-Zheng, W, and M van der Laan. 2010. <span>“Asymptotic Theory for Cross-Validated Targeted Maximum Likelihood Estimation.”</span> <em>U.C. Berkeley Division of Biostatistics Working Paper Series</em>. <a href="http://biostats.bepress.com/ucbbiostat/paper273">http://biostats.bepress.com/ucbbiostat/paper273</a>.
+Zheng, W, and M van der Laan. 2010. <span>“Asymptotic Theory for Cross-Validated Targeted Maximum Likelihood Estimation.”</span> <em>U.C. Berkeley Division of Biostatistics Working Paper Series</em>. <a href="https://biostats.bepress.com/ucbbiostat/paper273/">https://biostats.bepress.com/ucbbiostat/paper273/</a>.
 </div>
 </div>
 </div>
