@@ -28,7 +28,8 @@ Suggests:
     nloptr,
     parallel,
     foreach,
-    stringi
+    stringi,
+    future.batchtools
 License: MIT + file LICENSE
 URL: https://github.com/benkeser/drtmle
 BugReports: https://github.com/benkeser/drtmle/issues
