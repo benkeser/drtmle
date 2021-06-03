@@ -40,7 +40,7 @@
 
 
 <meta property="og:title" content="estimateQ_loop — estimateQ_loop" />
-<meta property="og:description" content="A helper loop function to clean up the internals of drtmle
+<meta property="og:description" content="A helper loop function to clean up the internals of the drtmle
 function." />
 
 
@@ -73,7 +73,7 @@ function." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">drtmle</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0.9000</span>
       </span>
     </div>
 
@@ -130,28 +130,12 @@ function." />
     </div>
 
     <div class="ref-description">
-    <p>A helper loop function to clean up the internals of <code>drtmle</code>
+    <p>A helper loop function to clean up the internals of the <code>drtmle</code>
 function.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>estimateQ_loop</span><span class='op'>(</span>
-  <span class='va'>validRows</span>,
-  <span class='va'>Y</span>,
-  <span class='va'>A</span>,
-  <span class='va'>W</span>,
-  <span class='va'>DeltaA</span>,
-  <span class='va'>DeltaY</span>,
-  <span class='va'>verbose</span>,
-  <span class='va'>returnModels</span>,
-  <span class='va'>SL_Q</span>,
-  <span class='va'>a_0</span>,
-  <span class='va'>stratify</span>,
-  <span class='va'>glm_Q</span>,
-  <span class='va'>family</span>,
-  <span class='va'>use_future</span>,
-  <span class='va'>se_cv</span>,
-  <span class='va'>se_cvFolds</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>estimateQ_loop</span><span class='op'>(</span><span class='va'>validRows</span>, <span class='va'>Y</span>, <span class='va'>A</span>, <span class='va'>W</span>, <span class='va'>DeltaA</span>, <span class='va'>DeltaY</span>, <span class='va'>verbose</span>, <span class='va'>returnModels</span>, <span class='va'>SL_Q</span>,
+  <span class='va'>a_0</span>, <span class='va'>stratify</span>, <span class='va'>glm_Q</span>, <span class='va'>family</span>, <span class='va'>use_future</span>, <span class='va'>se_cv</span>, <span class='va'>se_cvFolds</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -159,7 +143,7 @@ function.</p>
     <tr>
       <th>validRows</th>
       <td><p>A <code>list</code> of length <code>cvFolds</code> containing the row
-indexes of observations to include in validation fold.</p></td>
+indices of observations to include in validation fold.</p></td>
     </tr>
     <tr>
       <th>Y</th>
@@ -167,22 +151,22 @@ indexes of observations to include in validation fold.</p></td>
     </tr>
     <tr>
       <th>A</th>
-      <td><p>A vector of binary treatment assignment (assumed to be equal to 0 or
-1)</p></td>
+      <td><p>A vector of binary treatment assignment (assumed to be equal to
+either 0 or 1).</p></td>
     </tr>
     <tr>
       <th>W</th>
-      <td><p>A <code>data.frame</code> of named covariates</p></td>
+      <td><p>A <code>data.frame</code> of named covariates.</p></td>
     </tr>
     <tr>
       <th>DeltaA</th>
       <td><p>Indicator of missing treatment (assumed to be equal to 0 if
-missing 1 if observed)</p></td>
+missing 1 if observed).</p></td>
     </tr>
     <tr>
       <th>DeltaY</th>
       <td><p>Indicator of missing outcome (assumed to be equal to 0 if
-missing 1 if observed)</p></td>
+missing 1 if observed).</p></td>
     </tr>
     <tr>
       <th>verbose</th>
@@ -190,8 +174,8 @@ missing 1 if observed)</p></td>
     </tr>
     <tr>
       <th>returnModels</th>
-      <td><p>A boolean indicating whether to return model fits for the
-outcome regression, propensity score, and reduced-dimension regressions.</p></td>
+      <td><p>A boolean indicating whether to return model fits for
+the outcome, propensity score, and reduced-dimension regressions.</p></td>
     </tr>
     <tr>
       <th>SL_Q</th>
@@ -226,21 +210,23 @@ instead to just use lapply. The latter can be easier to run down errors.</p></td
     </tr>
     <tr>
       <th>se_cv</th>
-      <td><p>Should cross-validated nuisance parameter estimates be used 
-for computing standard errors? 
-Options are <code>"none"</code> = no cross-validation is performed; <code>"partial"</code> = 
-only applicable if Super Learner is used for nuisance parameter estimates; 
-<code>"full"</code> = full cross-validation is performed. See vignette for further 
-details. Ignored if <code>cvFolds &gt; 1</code>, since then
-cross-validated nuisance parameter estimates are used by default and it is 
-assumed that you want full cross-validated standard errors.</p></td>
+      <td><p>Should cross-validated nuisance parameter estimates be used for
+computing standard errors? Options are</p><ul>
+<li><p><code>"none"</code> = no cross-validation is performed;</p></li>
+<li><p><code>"partial"</code> = only applicable if Super Learner is used for nuisance
+parameter estimates;</p></li>
+<li><p><code>"full"</code> = full cross-validation is performed. See vignette for
+further details. Ignored if <code>cvFolds &gt; 1</code>, since cross-validated
+nuisance parameter estimates are used by default and it is assumed that
+you want full cross-validated standard errors.</p></li>
+</ul></td>
     </tr>
     <tr>
       <th>se_cvFolds</th>
       <td><p>If cross-validated nuisance parameter estimates are used
-to compute standard errors, how many folds should be used in this computation. 
-If <code>se_cv = "partial"</code>, then this option sets the number of folds used
-by the <code>SuperLearner</code> fitting procedure.</p></td>
+to compute standard errors, how many folds should be used in this
+computation. If <code>se_cv = "partial"</code>, then this option sets the number
+of folds used by the <code>SuperLearner</code> fitting procedure.</p></td>
     </tr>
     </table>
 

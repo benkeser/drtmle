@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">drtmle</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0.9000</span>
       </span>
     </div>
 
@@ -132,23 +132,8 @@
     <p>Helper function to clean up the internal code of <code>drtmle</code></p>
     </div>
 
-    <pre class="usage"><span class='fu'>estimategrn_loop</span><span class='op'>(</span>
-  <span class='va'>validRows</span>,
-  <span class='va'>Y</span>,
-  <span class='va'>A</span>,
-  <span class='va'>W</span>,
-  <span class='va'>DeltaA</span>,
-  <span class='va'>DeltaY</span>,
-  <span class='va'>tolg</span>,
-  <span class='va'>Qn</span>,
-  <span class='va'>gn</span>,
-  <span class='va'>glm_gr</span>,
-  <span class='va'>SL_gr</span>,
-  <span class='va'>a_0</span>,
-  <span class='va'>reduction</span>,
-  <span class='va'>returnModels</span>,
-  <span class='va'>use_future</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>estimategrn_loop</span><span class='op'>(</span><span class='va'>validRows</span>, <span class='va'>Y</span>, <span class='va'>A</span>, <span class='va'>W</span>, <span class='va'>DeltaA</span>, <span class='va'>DeltaY</span>, <span class='va'>tolg</span>, <span class='va'>Qn</span>, <span class='va'>gn</span>, <span class='va'>glm_gr</span>,
+  <span class='va'>SL_gr</span>, <span class='va'>a_0</span>, <span class='va'>reduction</span>, <span class='va'>returnModels</span>, <span class='va'>use_future</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -164,8 +149,8 @@ indexes of observations to include in validation fold.</p></td>
     </tr>
     <tr>
       <th>A</th>
-      <td><p>A vector of binary treatment assignment (assumed to be equal to 0 or
-1).</p></td>
+      <td><p>A vector of binary treatment assignment (assumed to be equal to
+either 0 or 1).</p></td>
     </tr>
     <tr>
       <th>W</th>

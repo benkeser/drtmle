@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">drtmle</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0.9000</span>
       </span>
     </div>
 
@@ -132,45 +132,18 @@
     <p>TMLE estimate of the average treatment effect with doubly-robust inference</p>
     </div>
 
-    <pre class="usage"><span class='fu'>drtmle</span><span class='op'>(</span>
-  <span class='va'>Y</span>,
-  <span class='va'>A</span>,
-  <span class='va'>W</span>,
-  DeltaA <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span><span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>A</span><span class='op'>)</span><span class='op'>)</span>,
-  DeltaY <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span><span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>Y</span><span class='op'>)</span><span class='op'>)</span>,
-  a_0 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/unique.html'>unique</a></span><span class='op'>(</span><span class='va'>A</span><span class='op'>[</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>A</span><span class='op'>)</span><span class='op'>]</span><span class='op'>)</span>,
-  family <span class='op'>=</span> <span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span><span class='op'>(</span><span class='va'>Y</span> <span class='op'>%in%</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>     <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/family.html'>binomial</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>}</span> <span class='kw'>else</span> <span class='op'>{</span>    
-    <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/family.html'>gaussian</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>}</span>,
-  stratify <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  SL_Q <span class='op'>=</span> <span class='cn'>NULL</span>,
-  SL_g <span class='op'>=</span> <span class='cn'>NULL</span>,
-  SL_Qr <span class='op'>=</span> <span class='cn'>NULL</span>,
-  SL_gr <span class='op'>=</span> <span class='cn'>NULL</span>,
-  n_SL <span class='op'>=</span> <span class='fl'>1</span>,
-  avg_over <span class='op'>=</span> <span class='st'>"drtmle"</span>,
-  se_cv <span class='op'>=</span> <span class='st'>"none"</span>,
-  se_cvFolds <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span><span class='op'>(</span><span class='va'>se_cv</span> <span class='op'>==</span> <span class='st'>"partial"</span>, <span class='fl'>10</span>, <span class='fl'>1</span><span class='op'>)</span>,
-  targeted_se <span class='op'>=</span> <span class='va'>se_cv</span> <span class='op'>!=</span> <span class='st'>"partial"</span>,
-  glm_Q <span class='op'>=</span> <span class='cn'>NULL</span>,
-  glm_g <span class='op'>=</span> <span class='cn'>NULL</span>,
-  glm_Qr <span class='op'>=</span> <span class='cn'>NULL</span>,
-  glm_gr <span class='op'>=</span> <span class='cn'>NULL</span>,
-  adapt_g <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  guard <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Q"</span>, <span class='st'>"g"</span><span class='op'>)</span>,
-  reduction <span class='op'>=</span> <span class='st'>"univariate"</span>,
-  returnModels <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  returnNuisance <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  cvFolds <span class='op'>=</span> <span class='fl'>1</span>,
-  maxIter <span class='op'>=</span> <span class='fl'>3</span>,
-  tolIC <span class='op'>=</span> <span class='fl'>1</span><span class='op'>/</span><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>Y</span><span class='op'>)</span>,
-  tolg <span class='op'>=</span> <span class='fl'>0.01</span>,
-  verbose <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  Qsteps <span class='op'>=</span> <span class='fl'>2</span>,
-  Qn <span class='op'>=</span> <span class='cn'>NULL</span>,
-  gn <span class='op'>=</span> <span class='cn'>NULL</span>,
-  use_future <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  <span class='va'>...</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>drtmle</span><span class='op'>(</span><span class='va'>Y</span>, <span class='va'>A</span>, <span class='va'>W</span>, DeltaA <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span><span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>A</span><span class='op'>)</span><span class='op'>)</span>,
+  DeltaY <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span><span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>Y</span><span class='op'>)</span><span class='op'>)</span>, a_0 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/unique.html'>unique</a></span><span class='op'>(</span><span class='va'>A</span><span class='op'>[</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>A</span><span class='op'>)</span><span class='op'>]</span><span class='op'>)</span>, family <span class='op'>=</span> <span class='kw'>if</span>
+  <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span><span class='op'>(</span><span class='va'>Y</span> <span class='op'>%in%</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>     <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/family.html'>binomial</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>}</span> <span class='kw'>else</span> <span class='op'>{</span>    
+  <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/family.html'>gaussian</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>}</span>, stratify <span class='op'>=</span> <span class='cn'>FALSE</span>, SL_Q <span class='op'>=</span> <span class='cn'>NULL</span>, SL_g <span class='op'>=</span> <span class='cn'>NULL</span>,
+  SL_Qr <span class='op'>=</span> <span class='cn'>NULL</span>, SL_gr <span class='op'>=</span> <span class='cn'>NULL</span>, n_SL <span class='op'>=</span> <span class='fl'>1</span>, avg_over <span class='op'>=</span> <span class='st'>"drtmle"</span>,
+  se_cv <span class='op'>=</span> <span class='st'>"none"</span>, se_cvFolds <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span><span class='op'>(</span><span class='va'>se_cv</span> <span class='op'>==</span> <span class='st'>"partial"</span>, <span class='fl'>10</span>, <span class='fl'>1</span><span class='op'>)</span>,
+  targeted_se <span class='op'>=</span> <span class='va'>se_cv</span> <span class='op'>!=</span> <span class='st'>"partial"</span>, glm_Q <span class='op'>=</span> <span class='cn'>NULL</span>, glm_g <span class='op'>=</span> <span class='cn'>NULL</span>,
+  glm_Qr <span class='op'>=</span> <span class='cn'>NULL</span>, glm_gr <span class='op'>=</span> <span class='cn'>NULL</span>, adapt_g <span class='op'>=</span> <span class='cn'>FALSE</span>, guard <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Q"</span>, <span class='st'>"g"</span><span class='op'>)</span>,
+  reduction <span class='op'>=</span> <span class='st'>"univariate"</span>, returnModels <span class='op'>=</span> <span class='cn'>FALSE</span>, returnNuisance <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  cvFolds <span class='op'>=</span> <span class='fl'>1</span>, maxIter <span class='op'>=</span> <span class='fl'>3</span>, tolIC <span class='op'>=</span> <span class='fl'>1</span><span class='op'>/</span><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>Y</span><span class='op'>)</span>, tolg <span class='op'>=</span> <span class='fl'>0.01</span>,
+  verbose <span class='op'>=</span> <span class='cn'>FALSE</span>, Qsteps <span class='op'>=</span> <span class='fl'>2</span>, Qn <span class='op'>=</span> <span class='cn'>NULL</span>, gn <span class='op'>=</span> <span class='cn'>NULL</span>,
+  use_future <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -248,40 +221,40 @@ inference.</p></td>
     <tr>
       <th>avg_over</th>
       <td><p>If multiple Super Learners are run, on which scale should the
-results be aggregated. Options include: <code>"SL"</code> = 
-repeated nuisance parameter estimates are averaged before subsequently 
+results be aggregated. Options include: <code>"SL"</code> =
+repeated nuisance parameter estimates are averaged before subsequently
 generating a single vector of point estimates based on the averaged models;
-<code>"drtmle"</code> = repeated vectors of point estimates are generated and 
+<code>"drtmle"</code> = repeated vectors of point estimates are generated and
 averaged. Both can be specified, recognizing that this adds considerable
-computational expense. In this case, the final estimates are the average 
-of <code>n_SL</code> point estimates where each is built by averaging <code>n_SL</code> 
-fits. If <code>NULL</code>, no averaging is performed (in which case <code>n_SL</code> 
+computational expense. In this case, the final estimates are the average
+of <code>n_SL</code> point estimates where each is built by averaging <code>n_SL</code>
+fits. If <code>NULL</code>, no averaging is performed (in which case <code>n_SL</code>
 should be set equal to 1).</p></td>
     </tr>
     <tr>
       <th>se_cv</th>
-      <td><p>Should cross-validated nuisance parameter estimates be used 
-for computing standard errors? 
-Options are <code>"none"</code> = no cross-validation is performed; <code>"partial"</code> = 
-only applicable if Super Learner is used for nuisance parameter estimates; 
-<code>"full"</code> = full cross-validation is performed. See vignette for further 
+      <td><p>Should cross-validated nuisance parameter estimates be used
+for computing standard errors?
+Options are <code>"none"</code> = no cross-validation is performed; <code>"partial"</code> =
+only applicable if Super Learner is used for nuisance parameter estimates;
+<code>"full"</code> = full cross-validation is performed. See vignette for further
 details. Ignored if <code>cvFolds &gt; 1</code>, since then
-cross-validated nuisance parameter estimates are used by default and it is 
+cross-validated nuisance parameter estimates are used by default and it is
 assumed that you want full cross-validated standard errors.</p></td>
     </tr>
     <tr>
       <th>se_cvFolds</th>
       <td><p>If cross-validated nuisance parameter estimates are used
-to compute standard errors, how many folds should be used in this computation. 
+to compute standard errors, how many folds should be used in this computation.
 If <code>se_cv = "partial"</code>, then this option sets the number of folds used
 by the <code>SuperLearner</code> fitting procedure.</p></td>
     </tr>
     <tr>
       <th>targeted_se</th>
-      <td><p>A boolean indicating whether the targeted nuisance 
-parameters should be used in standard error computation or the initial 
-estimators. If <code>se_cv</code> is not set to <code>"none"</code>, this option is 
-ignored and standard errors are computed based on non-targeted, cross-validated 
+      <td><p>A boolean indicating whether the targeted nuisance
+parameters should be used in standard error computation or the initial
+estimators. If <code>se_cv</code> is not set to <code>"none"</code>, this option is
+ignored and standard errors are computed based on non-targeted, cross-validated
 nuisance parameter fits.</p></td>
     </tr>
     <tr>
@@ -295,7 +268,7 @@ nuisance parameter fits.</p></td>
 for each of the propensity score regressions (<code>DeltaA</code>, <code>A</code>, and
 <code>DeltaY</code>). To use the same formula for each of the regressions (or if
 there are no missing data in <code>A</code> nor <code>Y</code>), a single character
-formula may be input. In general the formulas can reference any variable in 
+formula may be input. In general the formulas can reference any variable in
 <code><a href='https://rdrr.io/r/base/colnames.html'>colnames(W)</a></code>, unless <code>adapt_g = TRUE</code> in which case the formulas
 should reference variables <code>QaW</code> where <code>a</code> takes values in <code>a_0</code>.</p></td>
     </tr>
@@ -314,7 +287,7 @@ should reference variables <code>QaW</code> where <code>a</code> takes values in
     </tr>
     <tr>
       <th>adapt_g</th>
-      <td><p>A boolean indicating whether the propensity score should be 
+      <td><p>A boolean indicating whether the propensity score should be
 outcome adaptive. If <code>TRUE</code> then the propensity score is estimated as the
 regression of <code>A</code> onto covariates <code>QaW</code> for <code>a</code> in each value
 contained in <code>a_0</code>. See vignette for more details.</p></td>
@@ -344,9 +317,9 @@ outcome regression, propensity score, and reduced-dimension regressions.</p></td
     </tr>
     <tr>
       <th>returnNuisance</th>
-      <td><p>A boolean indicating whether to return the estimated 
-nuisance regressions evaluated on the observed data. Defaults to <code>TRUE</code>. 
-If <code>n_SL</code> is large and <code>"drtmle"</code> is in <code>avg_over</code>, then 
+      <td><p>A boolean indicating whether to return the estimated
+nuisance regressions evaluated on the observed data. Defaults to <code>TRUE</code>.
+If <code>n_SL</code> is large and <code>"drtmle"</code> is in <code>avg_over</code>, then
 consider setting to <code>FALSE</code> in order to reduce size of resultant object.</p></td>
     </tr>
     <tr>
@@ -419,45 +392,45 @@ instead to just use lapply. The latter can be easier to run down errors.</p></td
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>An object of class <code>"drtmle"</code>.</p><dl>
- <dt><code>drtmle</code></dt><dd><p>A <code>list</code> of doubly-robust point estimates and
-       a doubly-robust covariance matrix</p></dd>
- <dt><code>nuisance_drtmle</code></dt><dd><p>A <code>list</code> of the final TMLE estimates of
-       the outcome regression (<code>$QnStar</code>), propensity score
-       (<code>$gnStar</code>), and reduced-dimension regressions (<code>$QrnStar</code>,
-       <code>$grnStar</code>) evaluated at the observed data values.</p></dd>
- <dt><code>ic_drtmle</code></dt><dd><p>A <code>list</code> of the empirical mean of the efficient
-       influence function (<code>$eif</code>) and the extra pieces of the influence
-       function resulting from misspecification. All should be smaller than
-       <code>tolIC</code> (unless <code>maxIter</code> was reached first). Also includes
-       a matrix of the influence function values at the estimated nuisance
-       parameters evaluated at the observed data.</p></dd>
- <dt><code>aiptw_c</code></dt><dd><p>A <code>list</code> of doubly-robust point estimates and
-       a non-doubly-robust covariance matrix. Theory does not guarantee
-       performance of inference for these estimators, but simulation studies
-       showed they often perform adequately.</p></dd>
- <dt><code>nuisance_aiptw</code></dt><dd><p>A <code>list</code> of the initial estimates of the
-       outcome regression, propensity score, and reduced-dimension
-       regressions evaluated at the observed data values.</p></dd>
- <dt><code>tmle</code></dt><dd><p>A <code>list</code> of doubly-robust point estimates and
-       non-doubly-robust covariance for the standard TMLE estimator.</p></dd>
- <dt><code>aiptw</code></dt><dd><p>A <code>list</code> of doubly-robust point estimates and
-       non-doubly-robust covariance matrix for the standard AIPTW estimator.</p></dd>
- <dt><code>gcomp</code></dt><dd><p>A <code>list</code> of non-doubly-robust point estimates and
-       non-doubly-robust covariance matrix for the standard G-computation
-       estimator. If super learner is used there is no guarantee of correct
-       inference for this estimator.</p></dd>
- <dt><code>QnMod</code></dt><dd><p>The fitted object for the outcome regression. Returns
-       <code>NULL</code> if <code>returnModels = FALSE</code>.</p></dd>
- <dt><code>gnMod</code></dt><dd><p>The fitted object for the propensity score. Returns
-       <code>NULL</code> if <code>returnModels = FALSE</code>.</p></dd>
- <dt><code>QrnMod</code></dt><dd><p>The fitted object for the reduced-dimension regression
-       that guards against misspecification of the outcome regression.
-       Returns <code>NULL</code> if <code>returnModels = FALSE</code>.</p></dd>
- <dt><code>grnMod</code></dt><dd><p>The fitted object for the reduced-dimension regression
-       that guards against misspecification of the propensity score. Returns
-       <code>NULL</code> if <code>returnModels = FALSE</code>.</p></dd>
- <dt><code>a_0</code></dt><dd><p>The treatment levels that were requested for computation
-       of covariate-adjusted means.</p></dd>
+<dt><code>drtmle</code></dt><dd><p>A <code>list</code> of doubly-robust point estimates and
+a doubly-robust covariance matrix</p></dd>
+<dt><code>nuisance_drtmle</code></dt><dd><p>A <code>list</code> of the final TMLE estimates of
+the outcome regression (<code>$QnStar</code>), propensity score
+(<code>$gnStar</code>), and reduced-dimension regressions (<code>$QrnStar</code>,
+<code>$grnStar</code>) evaluated at the observed data values.</p></dd>
+<dt><code>ic_drtmle</code></dt><dd><p>A <code>list</code> of the empirical mean of the efficient
+influence function (<code>$eif</code>) and the extra pieces of the influence
+function resulting from misspecification. All should be smaller than
+<code>tolIC</code> (unless <code>maxIter</code> was reached first). Also includes
+a matrix of the influence function values at the estimated nuisance
+parameters evaluated at the observed data.</p></dd>
+<dt><code>aiptw_c</code></dt><dd><p>A <code>list</code> of doubly-robust point estimates and
+a non-doubly-robust covariance matrix. Theory does not guarantee
+performance of inference for these estimators, but simulation studies
+showed they often perform adequately.</p></dd>
+<dt><code>nuisance_aiptw</code></dt><dd><p>A <code>list</code> of the initial estimates of the
+outcome regression, propensity score, and reduced-dimension
+regressions evaluated at the observed data values.</p></dd>
+<dt><code>tmle</code></dt><dd><p>A <code>list</code> of doubly-robust point estimates and
+non-doubly-robust covariance for the standard TMLE estimator.</p></dd>
+<dt><code>aiptw</code></dt><dd><p>A <code>list</code> of doubly-robust point estimates and
+non-doubly-robust covariance matrix for the standard AIPTW estimator.</p></dd>
+<dt><code>gcomp</code></dt><dd><p>A <code>list</code> of non-doubly-robust point estimates and
+non-doubly-robust covariance matrix for the standard G-computation
+estimator. If super learner is used there is no guarantee of correct
+inference for this estimator.</p></dd>
+<dt><code>QnMod</code></dt><dd><p>The fitted object for the outcome regression. Returns
+<code>NULL</code> if <code>returnModels = FALSE</code>.</p></dd>
+<dt><code>gnMod</code></dt><dd><p>The fitted object for the propensity score. Returns
+<code>NULL</code> if <code>returnModels = FALSE</code>.</p></dd>
+<dt><code>QrnMod</code></dt><dd><p>The fitted object for the reduced-dimension regression
+that guards against misspecification of the outcome regression.
+Returns <code>NULL</code> if <code>returnModels = FALSE</code>.</p></dd>
+<dt><code>grnMod</code></dt><dd><p>The fitted object for the reduced-dimension regression
+that guards against misspecification of the propensity score. Returns
+<code>NULL</code> if <code>returnModels = FALSE</code>.</p></dd>
+<dt><code>a_0</code></dt><dd><p>The treatment levels that were requested for computation
+of covariate-adjusted means.</p></dd>
 
 </dl>
 

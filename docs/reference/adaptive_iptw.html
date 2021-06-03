@@ -75,7 +75,7 @@ for the propensity score" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">drtmle</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0.9000</span>
       </span>
     </div>
 
@@ -137,29 +137,12 @@ for the propensity score</h1>
 for the propensity score</p>
     </div>
 
-    <pre class="usage"><span class='fu'>adaptive_iptw</span><span class='op'>(</span>
-  <span class='va'>W</span>,
-  <span class='va'>A</span>,
-  <span class='va'>Y</span>,
-  DeltaY <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span><span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>Y</span><span class='op'>)</span><span class='op'>)</span>,
-  DeltaA <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span><span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>A</span><span class='op'>)</span><span class='op'>)</span>,
-  stratify <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  family <span class='op'>=</span> <span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span><span class='op'>(</span><span class='va'>Y</span> <span class='op'>%in%</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>     <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/family.html'>binomial</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>}</span> <span class='kw'>else</span> <span class='op'>{</span>    
-    <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/family.html'>gaussian</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>}</span>,
-  a_0 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/unique.html'>unique</a></span><span class='op'>(</span><span class='va'>A</span><span class='op'>[</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>A</span><span class='op'>)</span><span class='op'>]</span><span class='op'>)</span>,
-  SL_g <span class='op'>=</span> <span class='cn'>NULL</span>,
-  glm_g <span class='op'>=</span> <span class='cn'>NULL</span>,
-  SL_Qr <span class='op'>=</span> <span class='cn'>NULL</span>,
-  glm_Qr <span class='op'>=</span> <span class='cn'>NULL</span>,
-  returnModels <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  verbose <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  maxIter <span class='op'>=</span> <span class='fl'>2</span>,
-  tolIC <span class='op'>=</span> <span class='fl'>1</span><span class='op'>/</span><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>Y</span><span class='op'>)</span>,
-  tolg <span class='op'>=</span> <span class='fl'>0.01</span>,
-  cvFolds <span class='op'>=</span> <span class='fl'>1</span>,
-  gn <span class='op'>=</span> <span class='cn'>NULL</span>,
-  <span class='va'>...</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>adaptive_iptw</span><span class='op'>(</span><span class='va'>W</span>, <span class='va'>A</span>, <span class='va'>Y</span>, DeltaY <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span><span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>Y</span><span class='op'>)</span><span class='op'>)</span>,
+  DeltaA <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span><span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>A</span><span class='op'>)</span><span class='op'>)</span>, stratify <span class='op'>=</span> <span class='cn'>FALSE</span>, family <span class='op'>=</span> <span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span><span class='op'>(</span><span class='va'>Y</span>
+  <span class='op'>%in%</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>     <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/family.html'>binomial</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>}</span> <span class='kw'>else</span> <span class='op'>{</span>     <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/family.html'>gaussian</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>}</span>,
+  a_0 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/unique.html'>unique</a></span><span class='op'>(</span><span class='va'>A</span><span class='op'>[</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>A</span><span class='op'>)</span><span class='op'>]</span><span class='op'>)</span>, SL_g <span class='op'>=</span> <span class='cn'>NULL</span>, glm_g <span class='op'>=</span> <span class='cn'>NULL</span>, SL_Qr <span class='op'>=</span> <span class='cn'>NULL</span>,
+  glm_Qr <span class='op'>=</span> <span class='cn'>NULL</span>, returnModels <span class='op'>=</span> <span class='cn'>TRUE</span>, verbose <span class='op'>=</span> <span class='cn'>FALSE</span>, maxIter <span class='op'>=</span> <span class='fl'>2</span>,
+  tolIC <span class='op'>=</span> <span class='fl'>1</span><span class='op'>/</span><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>Y</span><span class='op'>)</span>, tolg <span class='op'>=</span> <span class='fl'>0.01</span>, cvFolds <span class='op'>=</span> <span class='fl'>1</span>, gn <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -281,29 +264,29 @@ of <code>A</code> = 1).</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>An object of class <code>"adaptive_iptw"</code>.</p><dl>
- <dt><code>iptw_tmle</code></dt><dd><p>A <code>list</code> of point estimates and
-       covariance matrix for the IPTW estimator based on a targeted
-       propensity score.</p></dd>
- <dt><code>iptw_tmle_nuisance</code></dt><dd><p>A <code>list</code> of the final TMLE estimates
-       of the propensity score (<code>$gnStar</code>) and reduced-dimension
-       regression (<code>$QrnStar</code>) evaluated at the observed data values.</p></dd>
- <dt><code>iptw_os</code></dt><dd><p>A <code>list</code> of point estimates and covariance matrix
-       for the one-step correct IPTW estimator.</p></dd>
- <dt><code>iptw_os_nuisance</code></dt><dd><p>A <code>list</code> of the initial estimates of the
-       propensity score and reduced-dimension regression evaluated at the
-       observed data values.</p></dd>
- <dt><code>iptw</code></dt><dd><p>A <code>list</code> of point estimates for the standard IPTW
-       estimator. No estimate of the covariance matrix is provided because
-       theory does not support asymptotic Normality of the IPTW estimator if
-       super learning is used to estimate the propensity score.</p></dd>
- <dt><code>gnMod</code></dt><dd><p>The fitted object for the propensity score. Returns
-       <code>NULL</code> if <code>returnModels = FALSE</code>.</p></dd>
- <dt><code>QrnMod</code></dt><dd><p>The fitted object for the reduced-dimension regression
-       that guards against misspecification of the outcome regression.
-       Returns <code>NULL</code> if <code>returnModels = FALSE</code>.</p></dd>
- <dt><code>a_0</code></dt><dd><p>The treatment levels that were requested for computation
-       of covariate-adjusted means.</p></dd>
- <dt><code>call</code></dt><dd><p>The call to <code>adaptive_iptw</code>.</p></dd>
+<dt><code>iptw_tmle</code></dt><dd><p>A <code>list</code> of point estimates and
+covariance matrix for the IPTW estimator based on a targeted
+propensity score.</p></dd>
+<dt><code>iptw_tmle_nuisance</code></dt><dd><p>A <code>list</code> of the final TMLE estimates
+of the propensity score (<code>$gnStar</code>) and reduced-dimension
+regression (<code>$QrnStar</code>) evaluated at the observed data values.</p></dd>
+<dt><code>iptw_os</code></dt><dd><p>A <code>list</code> of point estimates and covariance matrix
+for the one-step correct IPTW estimator.</p></dd>
+<dt><code>iptw_os_nuisance</code></dt><dd><p>A <code>list</code> of the initial estimates of the
+propensity score and reduced-dimension regression evaluated at the
+observed data values.</p></dd>
+<dt><code>iptw</code></dt><dd><p>A <code>list</code> of point estimates for the standard IPTW
+estimator. No estimate of the covariance matrix is provided because
+theory does not support asymptotic Normality of the IPTW estimator if
+super learning is used to estimate the propensity score.</p></dd>
+<dt><code>gnMod</code></dt><dd><p>The fitted object for the propensity score. Returns
+<code>NULL</code> if <code>returnModels = FALSE</code>.</p></dd>
+<dt><code>QrnMod</code></dt><dd><p>The fitted object for the reduced-dimension regression
+that guards against misspecification of the outcome regression.
+Returns <code>NULL</code> if <code>returnModels = FALSE</code>.</p></dd>
+<dt><code>a_0</code></dt><dd><p>The treatment levels that were requested for computation
+of covariate-adjusted means.</p></dd>
+<dt><code>call</code></dt><dd><p>The call to <code>adaptive_iptw</code>.</p></dd>
 
 </dl>
 
@@ -311,7 +294,7 @@ of <code>A</code> = 1).</p></td>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># load super learner</span>
 <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/ecpolley/SuperLearner'>SuperLearner</a></span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Loading required package: nnls</span></div><div class='output co'>#&gt; <span class='message'>Super Learner</span></div><div class='output co'>#&gt; <span class='message'>Version: 2.0-26</span></div><div class='output co'>#&gt; <span class='message'>Package created on 2019-10-27</span></div><div class='input'><span class='co'># simulate data</span>
+</div><div class='output co'>#&gt; <span class='message'>Loading required package: nnls</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: gam</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: splines</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: foreach</span></div><div class='output co'>#&gt; <span class='message'>Loaded gam 1.20</span></div><div class='output co'>#&gt; <span class='message'>Super Learner</span></div><div class='output co'>#&gt; <span class='message'>Version: 2.0-28</span></div><div class='output co'>#&gt; <span class='message'>Package created on 2021-05-04</span></div><div class='input'><span class='co'># simulate data</span>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123456</span><span class='op'>)</span>
 <span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fl'>100</span>
 <span class='va'>W</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>W1 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='va'>n</span><span class='op'>)</span>, W2 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n</span><span class='op'>)</span><span class='op'>)</span>
@@ -324,7 +307,7 @@ of <code>A</code> = 1).</p></td>
   SL_g <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"SL.glm"</span>, <span class='st'>"SL.mean"</span>, <span class='st'>"SL.step"</span><span class='op'>)</span>,
   SL_Qr <span class='op'>=</span> <span class='st'>"SL.npreg"</span>, maxIter <span class='op'>=</span> <span class='fl'>1</span>
 <span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Loading required package: nloptr</span></div><div class='output co'>#&gt; <span class='warning'>Warning: UNRELIABLE VALUE: Future (‘future_lapply-1’) unexpectedly generated random numbers without specifying argument 'future.seed'. There is a risk that those random numbers are not statistically sound and the overall results might be invalid. To fix this, specify 'future.seed=TRUE'. This ensures that proper, parallel-safe random numbers are produced via the L'Ecuyer-CMRG method. To disable this check, use 'future.seed=NULL', or set option 'future.rng.onMisuse' to "ignore".</span></div><div class='output co'>#&gt; <span class='warning'>Warning: UNRELIABLE VALUE: Future (‘future_lapply-1’) unexpectedly generated random numbers without specifying argument 'future.seed'. There is a risk that those random numbers are not statistically sound and the overall results might be invalid. To fix this, specify 'future.seed=TRUE'. This ensures that proper, parallel-safe random numbers are produced via the L'Ecuyer-CMRG method. To disable this check, use 'future.seed=NULL', or set option 'future.rng.onMisuse' to "ignore".</span></div><div class='output co'>#&gt; <span class='warning'>Warning: UNRELIABLE VALUE: Future (‘future_lapply-1’) unexpectedly generated random numbers without specifying argument 'future.seed'. There is a risk that those random numbers are not statistically sound and the overall results might be invalid. To fix this, specify 'future.seed=TRUE'. This ensures that proper, parallel-safe random numbers are produced via the L'Ecuyer-CMRG method. To disable this check, use 'future.seed=NULL', or set option 'future.rng.onMisuse' to "ignore".</span></div><div class='input'><span class='co'># }</span>
+</div><div class='output co'>#&gt; <span class='message'>Loading required package: nloptr</span></div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
