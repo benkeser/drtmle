@@ -56,8 +56,8 @@ knitr::opts_chunk$set(warning=FALSE, message=FALSE)
 
 In many fields researchers are interested in assessing the population-level
 effect of a particular treatment on an outcome of interest. The treatment might
-correspond to a drug, a potentially harmful exposure exposure, or a policy
-intervention. Often, the treatment may not be randomized due to ethical or
+correspond to a drug, a potentially harmful exposure, or a policy
+intervention. Often, the treatment cannot be randomized due to ethical or
 logistical reasons. This has sparked great interest in developing statistical
 methodology to estimate population-level effects from observational data.
 Estimation of these effects often requires accounting for putative confounding
@@ -83,7 +83,7 @@ confounding while still yielding valid inference. These techniques include
 augmented inverse probability of treatment estimation (AIPTW)
 [@robins:1994:jasa] and targeted minimum loss-based estimation (TMLE)
 [@vdlrubin:2006:ijb]. Under assumptions, these estimators have limiting normal
-distributions with estimable variance. The asymptotic variance estimates then
+distributions with estimable variance. Estimates of the asymptotic variance then
 serve as the basis for constructing confidence intervals and hypothesis tests.
 
 As an intermediate step, the AIPTW and TMLE estimators require estimation of
@@ -148,7 +148,7 @@ to as the *marginal mean* under treatment $A=a$. The marginal effect of the
 treatment on the outcome can be assessed by comparing marginal means under
 different treatment levels. For example, the average treatment effect is often
 defined as $\psi_0 := \psi_0(1) - \psi_0(0)$. Under additional assumptions,
-these parameters have richer interpretations as mean counterfactual outcomes
+these parameters have interpretations as mean counterfactual outcomes
 under the different treatments and contrasts between these means define causal
 effects.
 
@@ -158,7 +158,7 @@ An estimator of $\psi_0(a)$ may be motivated directly by (1). Suppose we have
 available an estimate of the OR, $\bar{Q}_n$, and an estimate of the
 distribution function of baseline covariates, $Q_{W,n}$. An estimator of
 $\psi_0(a)$ may be obtained by plugging these into (1), $\psi_n(a) = \int
-\bar{Q}_0(a,w) dQ_{W,n}(w).$ Often the empirical distribution function of
+\bar{Q}_0(a,w) dQ_{W,n}(w).$ Typically, the empirical distribution function of
 covariates is used so that this estimator can be equivalently written as
 \begin{equation*}
 \psi_{n,GCOMP}(a) = \frac{1}{n}\sum\limits_{i=1}^n \bar{Q}_n(a, W_i) \ .
@@ -349,7 +349,7 @@ consistency, for doubly-robust inference, TMLE is preferred.
 The main function of the package is the eponymous `drtmle` function. This
 function estimates the treatment-specific marginal mean for user-specified
 levels of a discrete-valued treatment and computes a doubly-robust covariance
-matrix for these estimates. The `drtmle` function implements either the
+matrix for these estimates. The function implements either the
 estimators of \citet{vdl:2014:ijb} (if `reduction = "bivariate"`) or the
 improved estimators of \citet{benkeser:2017:biometrika} (`reduction = "univariate"`). The
 package includes utility functions for combining these estimates into estimates
@@ -357,8 +357,8 @@ of average treatment effects, as well as other contrasts, as discussed below.
 
 The main data arguments for `drtmle` are `W, A, Y`, which, as above, represent
 the covariates, a discrete-valued treatment, and an outcome, respectively.
-Missing data are allowed in `A` and `Y`; this is discussed further in a section
-below. Beyond the data arguments, it is necessary to specify how to estimate
+Missing data are allowed in `A` and `Y`, as discussed below.
+Beyond the data arguments, it is necessary to specify how to estimate
 each of the OR, PS, R-OR, and R-PS (or R-PS1, R-PS2). The package provides
 flexibility in how these regression parameters may be estimated. Once the user
 has specified the data arguments and how to estimate each regression parameter,
@@ -420,31 +420,33 @@ Generalized linear models are perhaps the most popular means of estimating
 regression functions. Because of this legacy, these estimators have been
 included as an option for estimating the regression parameters. The user
 specifies the right-hand-side of a regression formula as a character in the
-`glm_Q`, `glm_g`, `glm_Qr`, and `glm_gr` options to estimate the OR, PS, R-OR,
+`glm_g`, `glm_Q`, `glm_Qr`, and `glm_gr` options to estimate the OR, PS, R-OR,
 and R-PS. These regressions are fit by calling the `glm` function in base R.
 Thus, the model specification should be able to be parsed as a valid formula,
-as required by `glm`. Recall that the R-OR parameter involves a regression onto
-the estimated propensity. Thus, the formula that is input via `glm_Qr` should
-assume data with a single column named `"gn"`. Similarly, the R-PS1 and R-PS2
+as required by `glm`. For the PS formula specified by `glm_g`, `colnames(W)` are 
+available to use in the formula. For the OR (`glm_Q`) available names
+of variables to be used in the formula depends on the `stratify` option.
+If `stratify = FALSE`, a single OR is fit to
+estimate $\bar{Q}_0(A,W)$. In this case, the OR regression is fit passing a `data.frame` into the `data` argument of `glm` that contains `W` and `A`. Thus, both `colnames(W)` and `"A"` may appear in the formula `glm_Q`. If `stratify = TRUE`, regressions are fit stratified by `A` to separately 
+estimate $\bar{Q}_0(1,W)$ and $\bar{Q}_0(0,W)$. In this case, the `glm_Q` option 
+may not include `"A"`.
+
+To understand the variable names available for R-OR, recall that the parameter 
+involves a regression onto the estimated propensity. Thus, the formula that is 
+input via `glm_Qr` should
+assume a data with a single column, `"gn"`. 
+Similarly, the R-PS1 and R-PS2
 that are computed for the estimators of \citet{benkeser:2017:biometrika} (the default
 estimators, computed whenever `reduction = "univariate"`) involve regressions
 onto the estimated outcome regression. Thus, the formula `glm_gr` should assume
 data with a single column named `"Qn"` if `reduction = "univariate"`. If
-instead, the estimators of \citet{vdl:2014:ijb} are preferred, we can set the
-option `reduction = "bivariate"` and input a `glm_gr` formula that assumes data
-with two columns named `"Qn"` and `"gn"`.
+instead, the estimators of \citet{vdl:2014:ijb} are preferred (`reduction = "bivariate"`) the 
+`glm_gr` formula assumes data with two columns, `"Qn"` and `"gn"`.
 
 The code below illustrates how generalized linear models can be used to
 estimate the regression parameters. In this call to `drtmle`, we specify
 `family = binomial()` so that logistic regression is used to estimate the OR.
-We specify `stratify = FALSE` to indicate that we wish to fit a single OR to
-estimate $\bar{Q}_0(A,W)$, as opposed to fitting two separate regressions to
-estimate $\bar{Q}_0(1,W)$ and $\bar{Q}_0(0,W)$. If the former fitting is
-specified, then the OR regression is fit using a data frame that contains `W`
-and `A`. Thus, both `colnames(W)` and `"A"` may appear in `glm_Q`. However, if
-`stratify = TRUE` then the OR model is fit separately in observations with $A =
-1$ and $A = 0$. In this case, the `glm_Q` option may not include `"A"`. We
-illustrate non-stratified regression for both the univariate and bivariate
+We illustrate non-stratified regression for both the univariate (default) and bivariate
 reductions.
 
 ```{r}
@@ -455,7 +457,7 @@ glm_fit_uni
 
 glm_fit_biv <- drtmle(W = W, A = A, Y = Y, family = binomial(),
                       glm_g = "W1 + W2", glm_Q = "W1 + W2*A",
-                      glm_gr = "Qn", glm_Qr = "gn", stratify = FALSE,
+                      glm_gr = "Qn", glm_Qr = "gn + Qn", stratify = FALSE,
                       reduction = "bivariate")
 glm_fit_biv
 ```
@@ -466,8 +468,8 @@ glm_fit_biv
 library(SuperLearner)
 ```
 Super learning is a loss-based ensemble machine learning technique
-[@vdl:2007:statapp] that is a generalization of stacking and stacked regression
-[@wolpert:1992:nnet]breiman:1996:ml}. The user specifies many potential
+[@vdl:2007:statapp] that generalizes stacking and stacked regression
+\citep{wolpert:1992:nnet,breiman:1996:ml}. The user specifies many potential
 candidate regression estimators, referred to as a *library* of candidate
 estimators, and the super learner algorithm estimates the convex combination of
 regression estimators that minimizes $V$-fold cross-validated risk based on a
@@ -479,7 +481,7 @@ Practically, the super learner provides the best chance for obtaining a
 consistent estimator for both the OR and PS, and thereby an efficient estimator
 of the marginal means of interest.
 
-Super learning is implemented in the R package `SuperLearner`
+Super learning is implemented in the R package \pkg{SuperLearner}
 [@SuperLearnerPackage] and `drtmle` provides the option to utilize super
 learning for estimation of the OR, PS, and reduced-dimension regressions via
 the `SL_Q`, `SL_g`, `SL_Qr`, and `SL_gr` options. When calling `drtmle` either
@@ -559,8 +561,8 @@ npreg_fit
 ### Reducing dependence on random seed
 
 Some users may find it unsettling that when applying the super learner in real data 
-analysis is that the results are dependent on the random seed that is set. To remove 
-this dependence, one can instead average results over repeated super learner runs; more 
+analysis the results are dependent on the random seed that is set. To remove 
+this dependence, one can average results over repeated super learner runs; more 
 repeats will lead to less dependence on the random seed. There are generally two approaches
 that can be used: (i) averaging on the scale of the nuisance parameters and (ii) averaging
 on the scale of the point estimates. 
@@ -573,7 +575,7 @@ $g_{n,j}, j = 1, \dots, n_{SL}$. We can take the average over these fits, \[
 as our estimate of the OR (similarly for the PS). These averaged estimates are then used to 
 compute the AIPTW or TMLE, as described above. 
 
-For(ii), suppose for example that we have $n_{SL}$ TMLE (similarly, AIPTW) estimates 
+For (ii), suppose for example that we have $n_{SL}$ TMLE (similarly, AIPTW) estimates 
 $\psi_{n,j}(1)$ of $\psi_0(1)$, each obtained based on one (or more) super learner of the OR and/or PS.
 We can take the average over these point estimates, \[
 \psi_n(1) = \frac{1}{n_{SL}} \sum_{j=1}^{n_{SL}} \psi_{n,j}(1)
@@ -594,31 +596,6 @@ to calls to `drtmle`. The package is currently parallelized at the level of indi
 `SuperLearner`. With parallelization over enough cores, repeated super 
 learning should not add too much to the computational burden relative to a single 
 call to `SuperLearner`.
-
-### Outcome-adaptive propensity score
-
-If the outcome-adaptive PS is desired, the user may specify this via 
-the `adapt_g` option. In this case, the additional targeting steps needed for doubly
-robust inference are "turned off" (i.e., `guard = NULL`), since, as discussed above,
-this estimator is *not* doubly robust. Note that when the `adapt-g = TRUE` the data
-used for the PS estimation will be a `data.frame` with column names
-`QaW` where `a` takes all the values specified in `a_0`. For example if `a_0 = c(0,1)`,
-then the PS estimation data frame will have two columns called `Q0W`
-and `Q1W`. This may be relevant for users writing their own `SuperLearner` wrappers
-or those who make use of the `glm_g` setting, as illustrated below. 
-
-```{r, message = FALSE}
-# outcome adaptive propensity score fit using glms
-adaptg_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
-                     glm_Q = ".^2", glm_g = "Q1W + Q0W",
-                     adapt_g = TRUE)
-
-# outcome adaptive propensity score fit using super learner
-adaptg_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
-                     SL_Q = c("SL.glm", "SL.mean"), 
-                     SL_g = c("SL.glm", "SL.mean"),
-                     adapt_g = TRUE)
-``` 
 
 ### Arbitrary user-specified regressions
 
@@ -799,8 +776,8 @@ list(glm_fit_uni$drtmle$cov, glm_fit_uni_cv$drtmle$cov)
 
 Obtaining fully cross-validated standard errors can be fairly time intensive when super learner is
 used to estimate the OR and PS. In `drtmle` we give an option to compute standard error estimates that
-are *partially cross-validated* and do not require any additional fitting. Here we describe briefly 
-how these estimates are obtained and show calls to `drtmle` to obtain these estimates. 
+are *partially cross-validated* and do not require any additional fitting beyond a standard super learner. 
+Here we describe briefly how these estimates are obtained and show calls to `drtmle` to obtain these estimates. 
 
 Suppose we have $K$ candidate regressions in our super learner library for both the OR and PS 
 (in practice, the number could be different for the OR as for the PS). Recall that a super learner
@@ -1352,6 +1329,32 @@ is not doubly robust -- the asymptotics rely on the outcome regression being
 consistently estimated at $n^{-1/4}$ rate. In this sense, this estimator trades off
 robustness in the name of achieving greater stability and efficiency. See our
 paper for further discussion.
+
+
+### Implementation of outcome-adaptive propensity score
+
+If the outcome-adaptive PS is desired, the user may specify this via 
+the `adapt_g` option. In this case, the additional targeting steps needed for doubly
+robust inference are "turned off" (i.e., `guard = NULL`), since, as discussed above,
+this estimator is *not* doubly robust. Note that when the `adapt_g = TRUE` the data
+used for the PS estimation will be a `data.frame` with column names
+`QaW` where `a` takes all the values specified in `a_0`. For example if `a_0 = c(0,1)`,
+then the PS estimation data frame will have two columns called `Q0W`
+and `Q1W`. This may be relevant for users writing their own `SuperLearner` wrappers
+or those who make use of the `glm_g` setting.
+
+```{r, message = FALSE}
+# outcome adaptive propensity score fit using glms
+adaptg_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
+                     glm_Q = ".^2", glm_g = "Q1W + Q0W",
+                     adapt_g = TRUE)
+
+# outcome adaptive propensity score fit using super learner
+adaptg_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
+                     SL_Q = c("SL.glm", "SL.mean"), 
+                     SL_g = c("SL.glm", "SL.mean"),
+                     adapt_g = TRUE)
+``` 
 
 # Discussion
 
