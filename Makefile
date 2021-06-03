@@ -25,3 +25,8 @@ buildfast:
 
 style:
 	Rscript -e "styler::style_pkg()"
+
+jss:
+	cd JSS && Rscript -e "rmarkdown::render('using_drtmle_jss.Rmd')"
+
+.PHONY: jss
