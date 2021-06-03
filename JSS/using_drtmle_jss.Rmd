@@ -8,9 +8,11 @@ author:
       | Mailstop: 002-3AA
       | Atlanta, Georgia, 30322, U.S.A.
     email: \email{benkeser@emory.edu}
-  - name: Nima Hejazi
+    orcdi: 0000-0002-1019-8343
+  - name: Nima S. Hejazi
     affiliation: University of California, Berkeley
     email: \email{nhejazi@berkeley.edu}
+    orcdi: 0000-0002-7127-2789
 title:
   formatted: "Doubly-Robust Inference in R using \\pkg{drtmle}"
   plain: "Doubly-Robust Inference in R using drtmle"
@@ -29,20 +31,20 @@ abstract: >
   parameters, which are often regression functions. Typically, regressions are
   estimated using maximum likelihood and parametric models. Confidence intervals
   and p-values may be computed based on standard asymptotic results, such as the
-  central limit theorem, the delta method, and the nonparametric bootstrap. 
-  However, in high-dimensional settings maximum likelihood estimation often breaks 
-  down and standard procedures no longer yield correct inference. Instead, we may 
-  rely on adaptive estimators of nuisance parameters to construct flexible regression estimators.
-  However, use of adaptive estimators poses a challenge for performing
-  statistical inference about an estimated treatment effect. While doubly-robust
-  estimators facilitate inference when *all* relevant regression functions are
-  consistently estimated, the same cannot be said when at least one estimator is
-  inconsistent. \pkg{drtmle} implements
-  doubly-robust confidence intervals and hypothesis tests about targeted minimum
-  loss-based estimates of the average treatment effect. The package additionally
-  implements an inverse probability of treatment weighted estimator that yields
-  valid inference even when the probability of treatment is estimated via
-  adaptive methods.
+  central limit theorem, the delta method, and the nonparametric bootstrap.
+  However, in high-dimensional settings maximum likelihood estimation often
+  breaks down and standard procedures no longer yield correct inference.
+  Instead, we may rely on adaptive estimators of nuisance parameters to
+  construct flexible regression estimators.  However, use of adaptive estimators
+  poses a challenge for performing statistical inference about an estimated
+  treatment effect. While doubly-robust estimators facilitate inference when
+  *all* relevant regression functions are consistently estimated, the same
+  cannot be said when at least one estimator is inconsistent. \pkg{drtmle}
+  implements doubly-robust confidence intervals and hypothesis tests about
+  targeted minimum loss-based estimates of the average treatment effect. The
+  package additionally implements an inverse probability of treatment weighted
+  estimator that yields valid inference even when the probability of treatment
+  is estimated via adaptive methods.
 output: rticles::jss_article
 bibliography: refs
 ---
@@ -56,18 +58,18 @@ knitr::opts_chunk$set(warning=FALSE, message=FALSE)
 
 In many fields researchers are interested in assessing the population-level
 effect of a particular treatment on an outcome of interest. The treatment might
-correspond to a drug, a potentially harmful exposure, or a policy
-intervention. Often, the treatment cannot be randomized due to ethical or
-logistical reasons. This has sparked great interest in developing statistical
-methodology to estimate population-level effects from observational data.
-Estimation of these effects often requires accounting for putative confounding
-factors, that is, factors related to whether a participant receives treatment
-and to the participant's outcome. In many settings, researchers measure many
-potential confounders, for example using administrative databases or genetic
-sequencing technology. Due to the curse-of-dimensionality, common statistical
-estimation techniques are not feasible for such high-dimensional data without
-restrictive modeling assumptions. When these assumptions are violated,
-estimates of the population-level effect of a treatment may have large bias.
+correspond to a drug, a potentially harmful exposure, or a policy intervention.
+Often, the treatment cannot be randomized due to ethical or logistical reasons.
+This has sparked great interest in developing statistical methodology to
+estimate population-level effects from observational data.  Estimation of these
+effects often requires accounting for putative confounding factors, that is,
+factors related to whether a participant receives treatment and to the
+participant's outcome. In many settings, researchers measure many potential
+confounders, for example using administrative databases or genetic sequencing
+technology. Due to the curse-of-dimensionality, common statistical estimation
+techniques are not feasible for such high-dimensional data without restrictive
+modeling assumptions. When these assumptions are violated, estimates of the
+population-level effect of a treatment may have large bias.
 
 This has sparked an interest in using adaptive estimation techniques from the
 machine learning literature to control for high-dimensional confounders when
