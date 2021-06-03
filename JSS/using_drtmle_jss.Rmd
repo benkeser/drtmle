@@ -457,7 +457,7 @@ glm_fit_uni
 
 glm_fit_biv <- drtmle(W = W, A = A, Y = Y, family = binomial(),
                       glm_g = "W1 + W2", glm_Q = "W1 + W2*A",
-                      glm_gr = "Qn", glm_Qr = "gn + Qn", stratify = FALSE,
+                      glm_gr = "Qn + gn", glm_Qr = "gn", stratify = FALSE,
                       reduction = "bivariate")
 glm_fit_biv
 ```
@@ -1344,6 +1344,13 @@ and `Q1W`. This may be relevant for users writing their own `SuperLearner` wrapp
 or those who make use of the `glm_g` setting.
 
 ```{r, message = FALSE}
+# use simplified data
+set.seed(1234)
+n <- 200
+W <- data.frame(W1 = runif(n), W2 = rbinom(n, 1, 0.5))
+A <- rbinom(n, 1, plogis(W$W1 + W$W2))
+Y <- rbinom(n, 1, plogis(W$W1 + W$W2*A))
+
 # outcome adaptive propensity score fit using glms
 adaptg_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
                      glm_Q = ".^2", glm_g = "Q1W + Q0W",
