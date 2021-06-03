@@ -4,45 +4,18 @@
 \alias{drtmle}
 \title{TMLE estimate of the average treatment effect with doubly-robust inference}
 \usage{
-drtmle(
-  Y,
-  A,
-  W,
-  DeltaA = as.numeric(!is.na(A)),
-  DeltaY = as.numeric(!is.na(Y)),
-  a_0 = unique(A[!is.na(A)]),
-  family = if (all(Y \%in\% c(0, 1))) {     stats::binomial() } else {    
-    stats::gaussian() },
-  stratify = FALSE,
-  SL_Q = NULL,
-  SL_g = NULL,
-  SL_Qr = NULL,
-  SL_gr = NULL,
-  n_SL = 1,
-  avg_over = "drtmle",
-  se_cv = "none",
-  se_cvFolds = ifelse(se_cv == "partial", 10, 1),
-  targeted_se = se_cv != "partial",
-  glm_Q = NULL,
-  glm_g = NULL,
-  glm_Qr = NULL,
-  glm_gr = NULL,
-  adapt_g = FALSE,
-  guard = c("Q", "g"),
-  reduction = "univariate",
-  returnModels = FALSE,
-  returnNuisance = TRUE,
-  cvFolds = 1,
-  maxIter = 3,
-  tolIC = 1/length(Y),
-  tolg = 0.01,
-  verbose = FALSE,
-  Qsteps = 2,
-  Qn = NULL,
-  gn = NULL,
-  use_future = FALSE,
-  ...
-)
+drtmle(Y, A, W, DeltaA = as.numeric(!is.na(A)),
+  DeltaY = as.numeric(!is.na(Y)), a_0 = unique(A[!is.na(A)]), family = if
+  (all(Y \%in\% c(0, 1))) {     stats::binomial() } else {    
+  stats::gaussian() }, stratify = FALSE, SL_Q = NULL, SL_g = NULL,
+  SL_Qr = NULL, SL_gr = NULL, n_SL = 1, avg_over = "drtmle",
+  se_cv = "none", se_cvFolds = ifelse(se_cv == "partial", 10, 1),
+  targeted_se = se_cv != "partial", glm_Q = NULL, glm_g = NULL,
+  glm_Qr = NULL, glm_gr = NULL, adapt_g = FALSE, guard = c("Q", "g"),
+  reduction = "univariate", returnModels = FALSE, returnNuisance = TRUE,
+  cvFolds = 1, maxIter = 3, tolIC = 1/length(Y), tolg = 0.01,
+  verbose = FALSE, Qsteps = 2, Qn = NULL, gn = NULL,
+  use_future = FALSE, ...)
 }
 \arguments{
 \item{Y}{A \code{numeric} continuous or binary outcomes.}
@@ -90,34 +63,34 @@ each nuisance parameter. Repeat Super Learners more times to obtain more stable
 inference.}
 
 \item{avg_over}{If multiple Super Learners are run, on which scale should the
-results be aggregated. Options include: \code{"SL"} = 
-repeated nuisance parameter estimates are averaged before subsequently 
+results be aggregated. Options include: \code{"SL"} =
+repeated nuisance parameter estimates are averaged before subsequently
 generating a single vector of point estimates based on the averaged models;
-\code{"drtmle"} = repeated vectors of point estimates are generated and 
+\code{"drtmle"} = repeated vectors of point estimates are generated and
 averaged. Both can be specified, recognizing that this adds considerable
-computational expense. In this case, the final estimates are the average 
-of \code{n_SL} point estimates where each is built by averaging \code{n_SL} 
-fits. If \code{NULL}, no averaging is performed (in which case \code{n_SL} 
+computational expense. In this case, the final estimates are the average
+of \code{n_SL} point estimates where each is built by averaging \code{n_SL}
+fits. If \code{NULL}, no averaging is performed (in which case \code{n_SL}
 should be set equal to 1).}
 
-\item{se_cv}{Should cross-validated nuisance parameter estimates be used 
-for computing standard errors? 
-Options are \code{"none"} = no cross-validation is performed; \code{"partial"} = 
-only applicable if Super Learner is used for nuisance parameter estimates; 
-\code{"full"} = full cross-validation is performed. See vignette for further 
+\item{se_cv}{Should cross-validated nuisance parameter estimates be used
+for computing standard errors?
+Options are \code{"none"} = no cross-validation is performed; \code{"partial"} =
+only applicable if Super Learner is used for nuisance parameter estimates;
+\code{"full"} = full cross-validation is performed. See vignette for further
 details. Ignored if \code{cvFolds > 1}, since then
-cross-validated nuisance parameter estimates are used by default and it is 
+cross-validated nuisance parameter estimates are used by default and it is
 assumed that you want full cross-validated standard errors.}
 
 \item{se_cvFolds}{If cross-validated nuisance parameter estimates are used
-to compute standard errors, how many folds should be used in this computation. 
+to compute standard errors, how many folds should be used in this computation.
 If \code{se_cv = "partial"}, then this option sets the number of folds used
 by the \code{SuperLearner} fitting procedure.}
 
-\item{targeted_se}{A boolean indicating whether the targeted nuisance 
-parameters should be used in standard error computation or the initial 
-estimators. If \code{se_cv} is not set to \code{"none"}, this option is 
-ignored and standard errors are computed based on non-targeted, cross-validated 
+\item{targeted_se}{A boolean indicating whether the targeted nuisance
+parameters should be used in standard error computation or the initial
+estimators. If \code{se_cv} is not set to \code{"none"}, this option is
+ignored and standard errors are computed based on non-targeted, cross-validated
 nuisance parameter fits.}
 
 \item{glm_Q}{A character describing a formula to be used in the call to
@@ -127,7 +100,7 @@ nuisance parameter fits.}
 for each of the propensity score regressions (\code{DeltaA}, \code{A}, and
 \code{DeltaY}). To use the same formula for each of the regressions (or if
 there are no missing data in \code{A} nor \code{Y}), a single character
-formula may be input. In general the formulas can reference any variable in 
+formula may be input. In general the formulas can reference any variable in
 \code{colnames(W)}, unless \code{adapt_g = TRUE} in which case the formulas
 should reference variables \code{QaW} where \code{a} takes values in \code{a_0}.}
 
@@ -140,7 +113,7 @@ should reference variables \code{QaW} where \code{a} takes values in \code{a_0}.
 \code{SL_gr!=NULL}. The formula should use the variable name \code{'Qn'} and
 \code{'gn'} if \code{reduction='bivariate'} and \code{'Qn'} otherwise.}
 
-\item{adapt_g}{A boolean indicating whether the propensity score should be 
+\item{adapt_g}{A boolean indicating whether the propensity score should be
 outcome adaptive. If \code{TRUE} then the propensity score is estimated as the
 regression of \code{A} onto covariates \code{QaW} for \code{a} in each value
 contained in \code{a_0}. See vignette for more details.}
@@ -162,9 +135,9 @@ bivariate version.}
 \item{returnModels}{A boolean indicating whether to return model fits for the
 outcome regression, propensity score, and reduced-dimension regressions.}
 
-\item{returnNuisance}{A boolean indicating whether to return the estimated 
-nuisance regressions evaluated on the observed data. Defaults to \code{TRUE}. 
-If \code{n_SL} is large and \code{"drtmle"} is in \code{avg_over}, then 
+\item{returnNuisance}{A boolean indicating whether to return the estimated
+nuisance regressions evaluated on the observed data. Defaults to \code{TRUE}.
+If \code{n_SL} is large and \code{"drtmle"} is in \code{avg_over}, then
 consider setting to \code{FALSE} in order to reduce size of resultant object.}
 
 \item{cvFolds}{A numeric equal to the number of folds to be used in
@@ -215,45 +188,45 @@ instead to just use lapply. The latter can be easier to run down errors.}
 \value{
 An object of class \code{"drtmle"}.
 \describe{
- \item{\code{drtmle}}{A \code{list} of doubly-robust point estimates and
-       a doubly-robust covariance matrix}
- \item{\code{nuisance_drtmle}}{A \code{list} of the final TMLE estimates of
-       the outcome regression (\code{$QnStar}), propensity score
-       (\code{$gnStar}), and reduced-dimension regressions (\code{$QrnStar},
-       \code{$grnStar}) evaluated at the observed data values.}
- \item{\code{ic_drtmle}}{A \code{list} of the empirical mean of the efficient
-       influence function (\code{$eif}) and the extra pieces of the influence
-       function resulting from misspecification. All should be smaller than
-       \code{tolIC} (unless \code{maxIter} was reached first). Also includes
-       a matrix of the influence function values at the estimated nuisance
-       parameters evaluated at the observed data.}
- \item{\code{aiptw_c}}{A \code{list} of doubly-robust point estimates and
-       a non-doubly-robust covariance matrix. Theory does not guarantee
-       performance of inference for these estimators, but simulation studies
-       showed they often perform adequately.}
- \item{\code{nuisance_aiptw}}{A \code{list} of the initial estimates of the
-       outcome regression, propensity score, and reduced-dimension
-       regressions evaluated at the observed data values.}
- \item{\code{tmle}}{A \code{list} of doubly-robust point estimates and
-       non-doubly-robust covariance for the standard TMLE estimator.}
- \item{\code{aiptw}}{A \code{list} of doubly-robust point estimates and
-       non-doubly-robust covariance matrix for the standard AIPTW estimator.}
- \item{\code{gcomp}}{A \code{list} of non-doubly-robust point estimates and
-       non-doubly-robust covariance matrix for the standard G-computation
-       estimator. If super learner is used there is no guarantee of correct
-       inference for this estimator.}
- \item{\code{QnMod}}{The fitted object for the outcome regression. Returns
-       \code{NULL} if \code{returnModels = FALSE}.}
- \item{\code{gnMod}}{The fitted object for the propensity score. Returns
-       \code{NULL} if \code{returnModels = FALSE}.}
- \item{\code{QrnMod}}{The fitted object for the reduced-dimension regression
-       that guards against misspecification of the outcome regression.
-       Returns \code{NULL} if \code{returnModels = FALSE}.}
- \item{\code{grnMod}}{The fitted object for the reduced-dimension regression
-       that guards against misspecification of the propensity score. Returns
-       \code{NULL} if \code{returnModels = FALSE}.}
- \item{\code{a_0}}{The treatment levels that were requested for computation
-       of covariate-adjusted means.}
+\item{\code{drtmle}}{A \code{list} of doubly-robust point estimates and
+a doubly-robust covariance matrix}
+\item{\code{nuisance_drtmle}}{A \code{list} of the final TMLE estimates of
+the outcome regression (\code{$QnStar}), propensity score
+(\code{$gnStar}), and reduced-dimension regressions (\code{$QrnStar},
+\code{$grnStar}) evaluated at the observed data values.}
+\item{\code{ic_drtmle}}{A \code{list} of the empirical mean of the efficient
+influence function (\code{$eif}) and the extra pieces of the influence
+function resulting from misspecification. All should be smaller than
+\code{tolIC} (unless \code{maxIter} was reached first). Also includes
+a matrix of the influence function values at the estimated nuisance
+parameters evaluated at the observed data.}
+\item{\code{aiptw_c}}{A \code{list} of doubly-robust point estimates and
+a non-doubly-robust covariance matrix. Theory does not guarantee
+performance of inference for these estimators, but simulation studies
+showed they often perform adequately.}
+\item{\code{nuisance_aiptw}}{A \code{list} of the initial estimates of the
+outcome regression, propensity score, and reduced-dimension
+regressions evaluated at the observed data values.}
+\item{\code{tmle}}{A \code{list} of doubly-robust point estimates and
+non-doubly-robust covariance for the standard TMLE estimator.}
+\item{\code{aiptw}}{A \code{list} of doubly-robust point estimates and
+non-doubly-robust covariance matrix for the standard AIPTW estimator.}
+\item{\code{gcomp}}{A \code{list} of non-doubly-robust point estimates and
+non-doubly-robust covariance matrix for the standard G-computation
+estimator. If super learner is used there is no guarantee of correct
+inference for this estimator.}
+\item{\code{QnMod}}{The fitted object for the outcome regression. Returns
+\code{NULL} if \code{returnModels = FALSE}.}
+\item{\code{gnMod}}{The fitted object for the propensity score. Returns
+\code{NULL} if \code{returnModels = FALSE}.}
+\item{\code{QrnMod}}{The fitted object for the reduced-dimension regression
+that guards against misspecification of the outcome regression.
+Returns \code{NULL} if \code{returnModels = FALSE}.}
+\item{\code{grnMod}}{The fitted object for the reduced-dimension regression
+that guards against misspecification of the propensity score. Returns
+\code{NULL} if \code{returnModels = FALSE}.}
+\item{\code{a_0}}{The treatment levels that were requested for computation
+of covariate-adjusted means.}
 }
 }
 \description{

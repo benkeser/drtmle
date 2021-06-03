@@ -5,29 +5,12 @@
 \title{Compute asymptotically linear IPTW estimators with super learning
 for the propensity score}
 \usage{
-adaptive_iptw(
-  W,
-  A,
-  Y,
-  DeltaY = as.numeric(!is.na(Y)),
-  DeltaA = as.numeric(!is.na(A)),
-  stratify = FALSE,
-  family = if (all(Y \%in\% c(0, 1))) {     stats::binomial() } else {    
-    stats::gaussian() },
-  a_0 = unique(A[!is.na(A)]),
-  SL_g = NULL,
-  glm_g = NULL,
-  SL_Qr = NULL,
-  glm_Qr = NULL,
-  returnModels = TRUE,
-  verbose = FALSE,
-  maxIter = 2,
-  tolIC = 1/length(Y),
-  tolg = 0.01,
-  cvFolds = 1,
-  gn = NULL,
-  ...
-)
+adaptive_iptw(W, A, Y, DeltaY = as.numeric(!is.na(Y)),
+  DeltaA = as.numeric(!is.na(A)), stratify = FALSE, family = if (all(Y
+  \%in\% c(0, 1))) {     stats::binomial() } else {     stats::gaussian() },
+  a_0 = unique(A[!is.na(A)]), SL_g = NULL, glm_g = NULL, SL_Qr = NULL,
+  glm_Qr = NULL, returnModels = TRUE, verbose = FALSE, maxIter = 2,
+  tolIC = 1/length(Y), tolg = 0.01, cvFolds = 1, gn = NULL, ...)
 }
 \arguments{
 \item{W}{A \code{data.frame} of named covariates}
@@ -105,29 +88,29 @@ of \code{A} = 1).}
 \value{
 An object of class \code{"adaptive_iptw"}.
 \describe{
- \item{\code{iptw_tmle}}{A \code{list} of point estimates and
-       covariance matrix for the IPTW estimator based on a targeted
-       propensity score. }
- \item{\code{iptw_tmle_nuisance}}{A \code{list} of the final TMLE estimates
-       of the propensity score (\code{$gnStar}) and reduced-dimension
-       regression (\code{$QrnStar}) evaluated at the observed data values.}
- \item{\code{iptw_os}}{A \code{list} of point estimates and covariance matrix
-       for the one-step correct IPTW estimator.}
- \item{\code{iptw_os_nuisance}}{A \code{list} of the initial estimates of the
-       propensity score and reduced-dimension regression evaluated at the
-       observed data values.}
- \item{\code{iptw}}{A \code{list} of point estimates for the standard IPTW
-       estimator. No estimate of the covariance matrix is provided because
-       theory does not support asymptotic Normality of the IPTW estimator if
-       super learning is used to estimate the propensity score.}
- \item{\code{gnMod}}{The fitted object for the propensity score. Returns
-       \code{NULL} if \code{returnModels = FALSE}.}
- \item{\code{QrnMod}}{The fitted object for the reduced-dimension regression
-       that guards against misspecification of the outcome regression.
-       Returns \code{NULL} if \code{returnModels = FALSE}.}
- \item{\code{a_0}}{The treatment levels that were requested for computation
-       of covariate-adjusted means.}
- \item{\code{call}}{The call to \code{adaptive_iptw}.}
+\item{\code{iptw_tmle}}{A \code{list} of point estimates and
+covariance matrix for the IPTW estimator based on a targeted
+propensity score. }
+\item{\code{iptw_tmle_nuisance}}{A \code{list} of the final TMLE estimates
+of the propensity score (\code{$gnStar}) and reduced-dimension
+regression (\code{$QrnStar}) evaluated at the observed data values.}
+\item{\code{iptw_os}}{A \code{list} of point estimates and covariance matrix
+for the one-step correct IPTW estimator.}
+\item{\code{iptw_os_nuisance}}{A \code{list} of the initial estimates of the
+propensity score and reduced-dimension regression evaluated at the
+observed data values.}
+\item{\code{iptw}}{A \code{list} of point estimates for the standard IPTW
+estimator. No estimate of the covariance matrix is provided because
+theory does not support asymptotic Normality of the IPTW estimator if
+super learning is used to estimate the propensity score.}
+\item{\code{gnMod}}{The fitted object for the propensity score. Returns
+\code{NULL} if \code{returnModels = FALSE}.}
+\item{\code{QrnMod}}{The fitted object for the reduced-dimension regression
+that guards against misspecification of the outcome regression.
+Returns \code{NULL} if \code{returnModels = FALSE}.}
+\item{\code{a_0}}{The treatment levels that were requested for computation
+of covariate-adjusted means.}
+\item{\code{call}}{The call to \code{adaptive_iptw}.}
 }
 }
 \description{

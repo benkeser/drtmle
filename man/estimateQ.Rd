@@ -4,30 +4,15 @@
 \alias{estimateQ}
 \title{estimateQ}
 \usage{
-estimateQ(
-  Y,
-  A,
-  W,
-  DeltaA,
-  DeltaY,
-  SL_Q,
-  glm_Q,
-  a_0,
-  stratify,
-  family,
-  verbose = FALSE,
-  returnModels = FALSE,
-  se_cv = "none",
-  se_cvFolds = 10,
-  validRows = NULL,
-  ...
-)
+estimateQ(Y, A, W, DeltaA, DeltaY, SL_Q, glm_Q, a_0, stratify, family,
+  verbose = FALSE, returnModels = FALSE, se_cv = "none",
+  se_cvFolds = 10, validRows = NULL, ...)
 }
 \arguments{
 \item{Y}{A vector of continuous or binary outcomes.}
 
-\item{A}{A vector of binary treatment assignment (assumed to be equal to 0 or
-1).}
+\item{A}{A vector of binary treatment assignment (assumed to be equal to
+either 0 or 1).}
 
 \item{W}{A \code{data.frame} of named covariates.}
 
@@ -49,31 +34,34 @@ library to be used for the outcome regression.}
 regression separately for observations with \code{A} equal to 0/1 (if
 \code{TRUE}) or to pool across \code{A} (if \code{FALSE}).}
 
-\item{family}{A character passed to \code{SuperLearner}}
+\item{family}{A character passed to \code{SuperLearner}.}
 
 \item{verbose}{A boolean indicating whether to print status updates.}
 
-\item{returnModels}{A boolean indicating whether to return model fits for the
-outcome regression, propensity score, and reduced-dimension regressions.}
+\item{returnModels}{A boolean indicating whether to return model fits for
+the outcome, propensity score, and reduced-dimension regressions.}
 
-\item{se_cv}{Should cross-validated nuisance parameter estimates be used 
-for computing standard errors? 
-Options are \code{"none"} = no cross-validation is performed; \code{"partial"} = 
-only applicable if Super Learner is used for nuisance parameter estimates; 
-\code{"full"} = full cross-validation is performed. See vignette for further 
-details. Ignored if \code{cvFolds > 1}, since then
-cross-validated nuisance parameter estimates are used by default and it is 
-assumed that you want full cross-validated standard errors.}
+\item{se_cv}{Should cross-validated nuisance parameter estimates be used for
+computing standard errors? Options are
+\itemize{
+\item \code{"none"} = no cross-validation is performed;
+\item \code{"partial"} = only applicable if Super Learner is used for nuisance
+parameter estimates;
+\item \code{"full"} = full cross-validation is performed. See vignette for
+further details. Ignored if \code{cvFolds > 1}, since cross-validated
+nuisance parameter estimates are used by default and it is assumed that
+you want full cross-validated standard errors.
+}}
 
 \item{se_cvFolds}{If cross-validated nuisance parameter estimates are used
-to compute standard errors, how many folds should be used in this computation. 
-If \code{se_cv = "partial"}, then this option sets the number of folds used
-by the \code{SuperLearner} fitting procedure.}
+to compute standard errors, how many folds should be used in this
+computation. If \code{se_cv = "partial"}, then this option sets the number
+of folds used by the \code{SuperLearner} fitting procedure.}
 
 \item{validRows}{A \code{list} of length \code{cvFolds} containing the row
 indexes of observations to include in validation fold.}
 
-\item{...}{Additional arguments (not currently used)}
+\item{...}{Additional arguments (not currently used).}
 }
 \description{
 Function to estimate initial outcome regression

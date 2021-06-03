@@ -695,7 +695,8 @@ drtmle <- function(Y, A, W,
               glm_Qr = glm_Qr,
               family = stats::gaussian(),
               SL_Qr = SL_Qr, a_0 = a_0,
-              returnModels = returnModels
+              returnModels = returnModels,
+              future.seed = TRUE
             )
           } else {
             QrnStarOut <- lapply(

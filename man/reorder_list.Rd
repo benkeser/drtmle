@@ -4,15 +4,8 @@
 \alias{reorder_list}
 \title{Helper function to reorder lists according to cvFolds}
 \usage{
-reorder_list(
-  a_list,
-  a_0,
-  validRows,
-  n_SL = 1,
-  grn_ind = FALSE,
-  n,
-  for_se_cv = FALSE
-)
+reorder_list(a_list, a_0, validRows, n_SL = 1, grn_ind = FALSE, n,
+  for_se_cv = FALSE)
 }
 \arguments{
 \item{a_list}{Structured list of nuisance parameters}
@@ -29,7 +22,7 @@ are averaged}
 
 \item{n}{Sample size}
 
-\item{for_se_cv}{Is this being used to average over 
+\item{for_se_cv}{Is this being used to average over
 cross-validated standard errors? Affects index of \code{a_list}.}
 }
 \description{
