@@ -35,4 +35,5 @@ URL: https://github.com/benkeser/drtmle
 BugReports: https://github.com/benkeser/drtmle/issues
 Encoding: UTF-8
 VignetteBuilder: knitr
+Roxygen: list(markdown = TRUE, old_usage = TRUE, r6 = FALSE)
 RoxygenNote: 7.1.1
