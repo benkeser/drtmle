@@ -4,39 +4,24 @@
 \alias{estimateG}
 \title{estimateG}
 \usage{
-estimateG(
-  A,
-  W,
-  DeltaY,
-  DeltaA,
-  SL_g,
-  glm_g,
-  a_0,
-  tolg,
-  stratify = FALSE,
-  validRows = NULL,
-  verbose = FALSE,
-  returnModels = FALSE,
-  Qn = NULL,
-  adapt_g = FALSE,
-  se_cv = "none",
-  se_cvFolds = 10
-)
+estimateG(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg, stratify = FALSE,
+  validRows = NULL, verbose = FALSE, returnModels = FALSE, Qn = NULL,
+  adapt_g = FALSE, se_cv = "none", se_cvFolds = 10)
 }
 \arguments{
-\item{A}{A vector of binary treatment assignment (assumed to be equal to 0 or
-1)}
+\item{A}{A vector of binary treatment assignment (assumed to be equal to
+either 0 or 1).}
 
-\item{W}{A \code{data.frame} of named covariates}
+\item{W}{A \code{data.frame} of named covariates.}
 
 \item{DeltaY}{Indicator of missing outcome (assumed to be equal to 0 if
-missing 1 if observed)}
+missing 1 if observed).}
 
 \item{DeltaA}{Indicator of missing treatment (assumed to be equal to 0 if
-missing 1 if observed)}
+missing 1 if observed).}
 
-\item{SL_g}{A vector of characters describing the super learner library to be
-used for each of the regression (\code{DeltaA}, \code{A}, and
+\item{SL_g}{A vector of characters describing the super learner library to
+be used for each of the regression (\code{DeltaA}, \code{A}, and
 \code{DeltaY}). To use the same regression for each of the regressions (or
 if there is no missing data in \code{A} nor \code{Y}), a single library may
 be input.}
@@ -59,28 +44,31 @@ indexes of observations to include in validation fold.}
 
 \item{verbose}{A boolean indicating whether to print status updates.}
 
-\item{returnModels}{A boolean indicating whether to return model fits for the
-outcome regression, propensity score, and reduced-dimension regressions.}
+\item{returnModels}{A boolean indicating whether to return model fits for
+the outcome, propensity score, and reduced-dimension regressions.}
 
-\item{Qn}{A \code{list} of estimates of the outcome regression for each value
-in \code{a_0}. Only needed if \code{adapt_g = TRUE}.}
+\item{Qn}{A \code{list} of estimates of the outcome regression for each
+value in \code{a_0}. Only needed if \code{adapt_g = TRUE}.}
 
 \item{adapt_g}{A boolean indicating whether propensity score is adaptive
 to outcome regression.}
 
-\item{se_cv}{Should cross-validated nuisance parameter estimates be used 
-for computing standard errors? 
-Options are \code{"none"} = no cross-validation is performed; \code{"partial"} = 
-only applicable if Super Learner is used for nuisance parameter estimates; 
-\code{"full"} = full cross-validation is performed. See vignette for further 
-details. Ignored if \code{cvFolds > 1}, since then
-cross-validated nuisance parameter estimates are used by default and it is 
-assumed that you want full cross-validated standard errors.}
+\item{se_cv}{Should cross-validated nuisance parameter estimates be used for
+computing standard errors? Options are
+\itemize{
+\item \code{"none"} = no cross-validation is performed;
+\item \code{"partial"} = only applicable if Super Learner is used for nuisance
+parameter estimates;
+\item \code{"full"} = full cross-validation is performed. See vignette for
+further details. Ignored if \code{cvFolds > 1}, since cross-validated
+nuisance parameter estimates are used by default and it is assumed that
+you want full cross-validated standard errors.
+}}
 
 \item{se_cvFolds}{If cross-validated nuisance parameter estimates are used
-to compute standard errors, how many folds should be used in this computation. 
-If \code{se_cv = "partial"}, then this option sets the number of folds used
-by the \code{SuperLearner} fitting procedure.}
+to compute standard errors, how many folds should be used in this
+computation. If \code{se_cv = "partial"}, then this option sets the number
+of folds used by the \code{SuperLearner} fitting procedure.}
 }
 \description{
 Function to estimate propensity score

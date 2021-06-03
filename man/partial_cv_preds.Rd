@@ -2,13 +2,13 @@
 % Please edit documentation in R/utils.R
 \name{partial_cv_preds}
 \alias{partial_cv_preds}
-\title{Helper function to properly format partially cross-validated predictions 
+\title{Helper function to properly format partially cross-validated predictions
 from a fitted super learner.}
 \usage{
 partial_cv_preds(fit_sl, a_0, W = NULL, include = NULL, easy = FALSE)
 }
 \arguments{
-\item{fit_sl}{A fitted \code{SuperLearner} object with 
+\item{fit_sl}{A fitted \code{SuperLearner} object with
 \code{control$saveCVFitLibrary = TRUE}}
 
 \item{a_0}{Treatment level to set. If \code{NULL}, assume this function
@@ -19,12 +19,12 @@ is being used to get partially cross-validated propensity score predictions.}
 \item{include}{A boolean vector indicating which observations were actually
 used to fit the regression.}
 
-\item{easy}{A boolean indicating whether the predictions can be 
+\item{easy}{A boolean indicating whether the predictions can be
 computed the "easy" way, i.e., based just on the Z matrix from SuperLearner.
-This is possible for propensity score models when no missing data AND no 
+This is possible for propensity score models when no missing data AND no
 stratification.}
 }
 \description{
-Helper function to properly format partially cross-validated predictions 
+Helper function to properly format partially cross-validated predictions
 from a fitted super learner.
 }

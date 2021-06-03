@@ -4,22 +4,8 @@
 \alias{estimategrn}
 \title{estimategrn}
 \usage{
-estimategrn(
-  Y,
-  A,
-  W,
-  DeltaA,
-  DeltaY,
-  Qn,
-  gn,
-  SL_gr,
-  tolg,
-  glm_gr,
-  a_0,
-  reduction,
-  returnModels,
-  validRows
-)
+estimategrn(Y, A, W, DeltaA, DeltaY, Qn, gn, SL_gr, tolg, glm_gr, a_0,
+  reduction, returnModels, validRows)
 }
 \arguments{
 \item{Y}{A vector of continuous or binary outcomes.}

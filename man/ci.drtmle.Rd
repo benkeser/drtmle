@@ -18,7 +18,7 @@ the standard AIPTW (\code{"aiptw"}, recommended only for comparison to
 "drtmle"), and G-computation (\code{"gcomp"}, not recommended).}
 
 \item{level}{The nominal coverage probability of the desired confidence
-interval (should be between 0 and 1). Default computes 95\% confidence
+interval (should be between 0 and 1). Default computes 95\\% confidence
 intervals.}
 
 \item{contrast}{Specifies the parameter for which to return confidence
@@ -41,7 +41,7 @@ vignette for more information.}
 }
 \value{
 An object of class \code{"ci.drtmle"} with point estimates and
- confidence intervals of the specified level.
+confidence intervals of the specified level.
 }
 \description{
 Confidence intervals for drtmle objects

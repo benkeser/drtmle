@@ -4,22 +4,8 @@
 \alias{estimateQrn_loop}
 \title{estimateQrn_loop}
 \usage{
-estimateQrn_loop(
-  validRows,
-  Y,
-  A,
-  W,
-  DeltaA,
-  DeltaY,
-  Qn,
-  gn,
-  SL_Qr,
-  glm_Qr,
-  family,
-  a_0,
-  returnModels,
-  use_future
-)
+estimateQrn_loop(validRows, Y, A, W, DeltaA, DeltaY, Qn, gn, SL_Qr, glm_Qr,
+  family, a_0, returnModels, use_future)
 }
 \arguments{
 \item{validRows}{A \code{list} of length \code{cvFolds} containing the row
@@ -63,5 +49,5 @@ outcome regression, propensity score, and reduced-dimension regressions.}
 \item{use_future}{Should \code{future} be used in the fitting process.}
 }
 \description{
-Helper function to clean up internal code of \code{drtmle} function.
+Helper function to clean up internal code of the \code{drtmle} function.
 }

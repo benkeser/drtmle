@@ -34,7 +34,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">drtmle</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0.9000</span>
       </span>
     </div>
 
@@ -118,17 +118,21 @@
 <div id="doubly-robust-inference-for-the-average-treatment-effect" class="section level3">
 <h3 class="hasAnchor">
 <a href="#doubly-robust-inference-for-the-average-treatment-effect" class="anchor"></a>Doubly-robust inference for the average treatment effect</h3>
-<p>Suppose the data consist of a vector of baseline covariates (<code>W</code>), a multi-level treatment assignment (<code>A</code>), and a continuous or binary-valued outcome (<code>Y</code>). The function <code>drtmle</code> may be used to estimate <em>E</em><span class="math display"> * <em>E</em> * ( * <em>Y</em> *  ∣  * <em>A</em> *  =  * <em>a</em> *  &lt; <em>s</em><em>u</em><em>b</em> &gt; 0 &lt; /<em>s</em><em>u</em><em>b</em>&gt;, * <em>W</em> * )</span> for user-selected values of <em>a</em><sub>0</sub> (via option <code>a_0</code>). The resulting targeted minimum loss-based estimates are doubly robust with respect to both consistency and asymptotic normality. The function computes doubly robust covariance estimates that can be used to construct doubly robust confidence intervals for marginal means and contrasts between means. A simple example on simulated data is shown below. We refer users to <a href="https://benkeser.github.io/drtmle/articles/using_drtmle.html">the vignette</a> for more information and further examples.</p>
+<p>Suppose the data consist of a vector of baseline covariates (<code>W</code>), a multi-level treatment assignment (<code>A</code>), and a continuous or binary-valued outcome (<code>Y</code>). The function <code>drtmle</code> may be used to estimate <span class="math inline"><em>E</em>[<em>E</em>(<em>Y</em> ∣ <em>A</em> = <em>a</em><sub>0</sub>, <em>W</em>)]</span> for user-selected values of <span class="math inline"><em>a</em><sub>0</sub></span> (via option <code>a_0</code>). The resulting targeted minimum loss-based estimates are doubly robust with respect to both consistency and asymptotic normality. The function computes doubly robust covariance estimates that can be used to construct doubly robust confidence intervals for marginal means and contrasts between means. A simple example on simulated data is shown below. We refer users to <a href="https://benkeser.github.io/drtmle/articles/using_drtmle.html">the vignette</a> for more information and further examples.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># load packages</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/benkeser/drtmle">drtmle</a></span><span class="op">)</span>
 <span class="co">#&gt; drtmle: TMLE with doubly robust inference</span>
-<span class="co">#&gt; Version: 1.0.5</span>
+<span class="co">#&gt; Version: 1.1.0.9000</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ecpolley/SuperLearner">SuperLearner</a></span><span class="op">)</span>
 <span class="co">#&gt; Loading required package: nnls</span>
+<span class="co">#&gt; Loading required package: gam</span>
+<span class="co">#&gt; Loading required package: splines</span>
+<span class="co">#&gt; Loading required package: foreach</span>
+<span class="co">#&gt; Loaded gam 1.20</span>
 <span class="co">#&gt; Super Learner</span>
-<span class="co">#&gt; Version: 2.0-26</span>
-<span class="co">#&gt; Package created on 2019-10-27</span>
+<span class="co">#&gt; Version: 2.0-28</span>
+<span class="co">#&gt; Package created on 2021-05-04</span>
 
 <span class="co"># simulate simple data structure</span>
 <span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">12345</span><span class="op">)</span>
@@ -149,65 +153,17 @@
                                   <span class="co"># misspecification of propensity score</span>
                returnModels <span class="op">=</span> <span class="cn">TRUE</span> <span class="co"># for visualizing fits later</span>
               <span class="op">)</span>
-<span class="co">#&gt; Warning: Using 'local = FALSE' for a future is deprecated and will soon be</span>
-<span class="co">#&gt; defunct and produce an error.</span>
-<span class="co">#&gt; Warning: UNRELIABLE VALUE: Future ('future_lapply-1') unexpectedly generated</span>
-<span class="co">#&gt; random numbers without specifying argument 'future.seed'. There is a risk that</span>
-<span class="co">#&gt; those random numbers are not statistically sound and the overall results might</span>
-<span class="co">#&gt; be invalid. To fix this, specify 'future.seed=TRUE'. This ensures that proper,</span>
-<span class="co">#&gt; parallel-safe random numbers are produced via the L'Ecuyer-CMRG method. To</span>
-<span class="co">#&gt; disable this check, use 'future.seed=NULL', or set option 'future.rng.onMisuse'</span>
-<span class="co">#&gt; to "ignore".</span>
-<span class="co">#&gt; Warning: Using 'local = FALSE' for a future is deprecated and will soon be</span>
-<span class="co">#&gt; defunct and produce an error.</span>
-
-<span class="co">#&gt; Warning: Using 'local = FALSE' for a future is deprecated and will soon be</span>
-<span class="co">#&gt; defunct and produce an error.</span>
-<span class="co">#&gt; Warning: UNRELIABLE VALUE: Future ('future_lapply-1') unexpectedly generated</span>
-<span class="co">#&gt; random numbers without specifying argument 'future.seed'. There is a risk that</span>
-<span class="co">#&gt; those random numbers are not statistically sound and the overall results might</span>
-<span class="co">#&gt; be invalid. To fix this, specify 'future.seed=TRUE'. This ensures that proper,</span>
-<span class="co">#&gt; parallel-safe random numbers are produced via the L'Ecuyer-CMRG method. To</span>
-<span class="co">#&gt; disable this check, use 'future.seed=NULL', or set option 'future.rng.onMisuse'</span>
-<span class="co">#&gt; to "ignore".</span>
-<span class="co">#&gt; Warning: Using 'local = FALSE' for a future is deprecated and will soon be</span>
-<span class="co">#&gt; defunct and produce an error.</span>
-<span class="co">#&gt; Warning: UNRELIABLE VALUE: Future ('future_lapply-1') unexpectedly generated</span>
-<span class="co">#&gt; random numbers without specifying argument 'future.seed'. There is a risk that</span>
-<span class="co">#&gt; those random numbers are not statistically sound and the overall results might</span>
-<span class="co">#&gt; be invalid. To fix this, specify 'future.seed=TRUE'. This ensures that proper,</span>
-<span class="co">#&gt; parallel-safe random numbers are produced via the L'Ecuyer-CMRG method. To</span>
-<span class="co">#&gt; disable this check, use 'future.seed=NULL', or set option 'future.rng.onMisuse'</span>
-<span class="co">#&gt; to "ignore".</span>
-<span class="co">#&gt; Warning: Using 'local = FALSE' for a future is deprecated and will soon be</span>
-<span class="co">#&gt; defunct and produce an error.</span>
-<span class="co">#&gt; Warning: UNRELIABLE VALUE: Future ('future_lapply-1') unexpectedly generated</span>
-<span class="co">#&gt; random numbers without specifying argument 'future.seed'. There is a risk that</span>
-<span class="co">#&gt; those random numbers are not statistically sound and the overall results might</span>
-<span class="co">#&gt; be invalid. To fix this, specify 'future.seed=TRUE'. This ensures that proper,</span>
-<span class="co">#&gt; parallel-safe random numbers are produced via the L'Ecuyer-CMRG method. To</span>
-<span class="co">#&gt; disable this check, use 'future.seed=NULL', or set option 'future.rng.onMisuse'</span>
-<span class="co">#&gt; to "ignore".</span>
-<span class="co">#&gt; Warning: Using 'local = FALSE' for a future is deprecated and will soon be</span>
-<span class="co">#&gt; defunct and produce an error.</span>
-<span class="co">#&gt; Warning: UNRELIABLE VALUE: Future ('future_lapply-1') unexpectedly generated</span>
-<span class="co">#&gt; random numbers without specifying argument 'future.seed'. There is a risk that</span>
-<span class="co">#&gt; those random numbers are not statistically sound and the overall results might</span>
-<span class="co">#&gt; be invalid. To fix this, specify 'future.seed=TRUE'. This ensures that proper,</span>
-<span class="co">#&gt; parallel-safe random numbers are produced via the L'Ecuyer-CMRG method. To</span>
-<span class="co">#&gt; disable this check, use 'future.seed=NULL', or set option 'future.rng.onMisuse'</span>
-<span class="co">#&gt; to "ignore".</span>
 <span class="co"># print the output</span>
 <span class="va">fit1</span>
 <span class="co">#&gt; $est</span>
 <span class="co">#&gt;            </span>
-<span class="co">#&gt; 0 0.1729750</span>
-<span class="co">#&gt; 1 0.3620682</span>
+<span class="co">#&gt; 0 0.1752271</span>
+<span class="co">#&gt; 1 0.2866095</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $cov</span>
 <span class="co">#&gt;              0            1</span>
-<span class="co">#&gt; 0 8.823949e-04 2.366906e-05</span>
-<span class="co">#&gt; 1 2.366906e-05 7.155764e-03</span>
+<span class="co">#&gt; 0 9.039683e-04 4.591974e-05</span>
+<span class="co">#&gt; 1 4.591974e-05 8.823850e-03</span>
 
 <span class="co"># get confidence intervals for marginal means</span>
 <span class="co"># truth is E[Y(1)] = 0.29, E[Y(0)] = 0.15</span>
@@ -216,8 +172,8 @@
 <span class="va">ci_fit1</span>
 <span class="co">#&gt; $drtmle</span>
 <span class="co">#&gt;     est   cil   ciu</span>
-<span class="co">#&gt; 0 0.173 0.115 0.231</span>
-<span class="co">#&gt; 1 0.362 0.196 0.528</span>
+<span class="co">#&gt; 0 0.175 0.116 0.234</span>
+<span class="co">#&gt; 1 0.287 0.102 0.471</span>
 
 <span class="co"># get confidence intervals for ate</span>
 <span class="co"># truth is E[Y(1)] - E[Y(0)] = 0.14</span>
@@ -225,8 +181,8 @@
 <span class="co"># print the output</span>
 <span class="va">ci_ate1</span>
 <span class="co">#&gt; $drtmle</span>
-<span class="co">#&gt;                   est   cil   ciu</span>
-<span class="co">#&gt; E[Y(1)]-E[Y(0)] 0.189 0.014 0.364</span></code></pre></div>
+<span class="co">#&gt;                   est    cil   ciu</span>
+<span class="co">#&gt; E[Y(1)]-E[Y(0)] 0.111 -0.081 0.304</span></code></pre></div>
 <p>This method requires estimation of additional univariate regressions to ensure doubly robust confidence intervals and hypothesis tests. The method for estimation are input via <code>SL.Qr</code> and <code>SL.gr</code> or <code>glm.Qr</code> and <code>glm.gr</code> if parametric models are desired). These additional fits can be visualized by the <code>plot</code> method for <code>drtmle</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/layout.html">layout</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span>
@@ -241,60 +197,18 @@
 <span class="va">fit2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/adaptive_iptw.html">adaptive_iptw</a></span><span class="op">(</span>Y <span class="op">=</span> <span class="va">Y</span>, A <span class="op">=</span> <span class="va">A</span>, W <span class="op">=</span> <span class="va">W</span>, a_0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,
                       SL_g <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"SL.glm"</span>, <span class="st">"SL.mean"</span>, <span class="st">"SL.step.interaction"</span><span class="op">)</span>,
                       SL_Qr <span class="op">=</span> <span class="st">"SL.npreg"</span><span class="op">)</span>
-<span class="co">#&gt; Warning: Using 'local = FALSE' for a future is deprecated and will soon be</span>
-<span class="co">#&gt; defunct and produce an error.</span>
 <span class="co">#&gt; Loading required package: nloptr</span>
-<span class="co">#&gt; Warning: UNRELIABLE VALUE: Future ('future_lapply-1') unexpectedly generated</span>
-<span class="co">#&gt; random numbers without specifying argument 'future.seed'. There is a risk that</span>
-<span class="co">#&gt; those random numbers are not statistically sound and the overall results might</span>
-<span class="co">#&gt; be invalid. To fix this, specify 'future.seed=TRUE'. This ensures that proper,</span>
-<span class="co">#&gt; parallel-safe random numbers are produced via the L'Ecuyer-CMRG method. To</span>
-<span class="co">#&gt; disable this check, use 'future.seed=NULL', or set option 'future.rng.onMisuse'</span>
-<span class="co">#&gt; to "ignore".</span>
-
-<span class="co">#&gt; Warning: Using 'local = FALSE' for a future is deprecated and will soon be</span>
-<span class="co">#&gt; defunct and produce an error.</span>
-<span class="co">#&gt; Warning: UNRELIABLE VALUE: Future ('future_lapply-1') unexpectedly generated</span>
-<span class="co">#&gt; random numbers without specifying argument 'future.seed'. There is a risk that</span>
-<span class="co">#&gt; those random numbers are not statistically sound and the overall results might</span>
-<span class="co">#&gt; be invalid. To fix this, specify 'future.seed=TRUE'. This ensures that proper,</span>
-<span class="co">#&gt; parallel-safe random numbers are produced via the L'Ecuyer-CMRG method. To</span>
-<span class="co">#&gt; disable this check, use 'future.seed=NULL', or set option 'future.rng.onMisuse'</span>
-<span class="co">#&gt; to "ignore".</span>
-<span class="co">#&gt; Warning: Using 'local = FALSE' for a future is deprecated and will soon be</span>
-<span class="co">#&gt; defunct and produce an error.</span>
-<span class="co">#&gt; Warning: UNRELIABLE VALUE: Future ('future_lapply-1') unexpectedly generated</span>
-<span class="co">#&gt; random numbers without specifying argument 'future.seed'. There is a risk that</span>
-<span class="co">#&gt; those random numbers are not statistically sound and the overall results might</span>
-<span class="co">#&gt; be invalid. To fix this, specify 'future.seed=TRUE'. This ensures that proper,</span>
-<span class="co">#&gt; parallel-safe random numbers are produced via the L'Ecuyer-CMRG method. To</span>
-<span class="co">#&gt; disable this check, use 'future.seed=NULL', or set option 'future.rng.onMisuse'</span>
-<span class="co">#&gt; to "ignore".</span>
-<span class="co">#&gt; Warning: Using 'local = FALSE' for a future is deprecated and will soon be</span>
-<span class="co">#&gt; defunct and produce an error.</span>
-
-<span class="co">#&gt; Warning: Using 'local = FALSE' for a future is deprecated and will soon be</span>
-<span class="co">#&gt; defunct and produce an error.</span>
-<span class="co">#&gt; Warning: UNRELIABLE VALUE: Future ('future_lapply-1') unexpectedly generated</span>
-<span class="co">#&gt; random numbers without specifying argument 'future.seed'. There is a risk that</span>
-<span class="co">#&gt; those random numbers are not statistically sound and the overall results might</span>
-<span class="co">#&gt; be invalid. To fix this, specify 'future.seed=TRUE'. This ensures that proper,</span>
-<span class="co">#&gt; parallel-safe random numbers are produced via the L'Ecuyer-CMRG method. To</span>
-<span class="co">#&gt; disable this check, use 'future.seed=NULL', or set option 'future.rng.onMisuse'</span>
-<span class="co">#&gt; to "ignore".</span>
-<span class="co">#&gt; Warning: Using 'local = FALSE' for a future is deprecated and will soon be</span>
-<span class="co">#&gt; defunct and produce an error.</span>
 <span class="co"># print the output</span>
 <span class="va">fit2</span>
 <span class="co">#&gt; $est</span>
 <span class="co">#&gt;            </span>
-<span class="co">#&gt; 0 0.1752534</span>
-<span class="co">#&gt; 1 0.2415065</span>
+<span class="co">#&gt; 0 0.1734251</span>
+<span class="co">#&gt; 1 0.2438025</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $cov</span>
 <span class="co">#&gt;              0            1</span>
-<span class="co">#&gt; 0 0.0008463737 0.0000930035</span>
-<span class="co">#&gt; 1 0.0000930035 0.0201359358</span>
+<span class="co">#&gt; 0 8.607877e-04 8.982892e-05</span>
+<span class="co">#&gt; 1 8.982892e-05 2.308177e-02</span>
 
 <span class="co"># compute a confidence interval for margin means</span>
 <span class="va">ci_fit2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ci.html">ci</a></span><span class="op">(</span><span class="va">fit2</span><span class="op">)</span>
@@ -302,16 +216,16 @@
 <span class="va">ci_fit2</span>
 <span class="co">#&gt; $iptw_tmle</span>
 <span class="co">#&gt;     est    cil   ciu</span>
-<span class="co">#&gt; 0 0.175  0.118 0.232</span>
-<span class="co">#&gt; 1 0.242 -0.037 0.520</span>
+<span class="co">#&gt; 0 0.173  0.116 0.231</span>
+<span class="co">#&gt; 1 0.244 -0.054 0.542</span>
 
 <span class="co"># compute a confidence interval for the ate</span>
 <span class="va">ci_ate2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ci.html">ci</a></span><span class="op">(</span><span class="va">fit2</span>, contrast <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>
 <span class="co"># print the output</span>
 <span class="va">ci_ate2</span>
 <span class="co">#&gt; $iptw_tmle</span>
-<span class="co">#&gt;                   est    cil   ciu</span>
-<span class="co">#&gt; E[Y(1)]-E[Y(0)] 0.066 -0.216 0.349</span></code></pre></div>
+<span class="co">#&gt;                  est    cil   ciu</span>
+<span class="co">#&gt; E[Y(1)]-E[Y(0)] 0.07 -0.232 0.373</span></code></pre></div>
 <hr>
 </div>
 </div>
@@ -325,24 +239,24 @@
 <h2 class="hasAnchor">
 <a href="#citation" class="anchor"></a>Citation</h2>
 <p>After using the <code>drtmle</code> R package, please cite the following:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="sc">@</span>Manual{drtmlepackage,</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  title <span class="ot">=</span> {drtmle<span class="sc">:</span> Doubly<span class="sc">-</span>Robust Nonparametric Estimation and Inference},</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  author <span class="ot">=</span> {David Benkeser},</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  note <span class="ot">=</span> {R package version <span class="dv">1</span>.<span class="fl">0.0</span>},</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  doi <span class="ot">=</span> {<span class="fl">10.5281</span><span class="sc">/</span>zenodo<span class="fl">.844836</span>}</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="sc">@</span>article{benkeser2017improved,</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  year  <span class="ot">=</span> {<span class="dv">2017</span>},</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  author <span class="ot">=</span> {Benkeser, David C and Carone, Marco and van der Laan, Mark J</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    and Gilbert, Peter B},</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  title <span class="ot">=</span> {Doubly<span class="sc">-</span>robust nonparametric inference on the average</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    treatment effect},</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  journal <span class="ot">=</span> {Biometrika},</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  volume <span class="ot">=</span> {<span class="dv">104</span>}, number <span class="ot">=</span> {<span class="dv">4</span>},</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  pages <span class="ot">=</span> {863–<span class="dv">880</span>},</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  doi <span class="ot">=</span> {<span class="fl">10.1093</span><span class="sc">/</span>biomet<span class="sc">/</span>asx053}</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="op">@</span>Manual{drtmlepackage,</a>
+<a class="sourceLine" id="cb6-2" title="2">  title =<span class="st"> </span>{drtmle<span class="op">:</span><span class="st"> </span>Doubly<span class="op">-</span>Robust Nonparametric Estimation and Inference},</a>
+<a class="sourceLine" id="cb6-3" title="3">  author =<span class="st"> </span>{David Benkeser},</a>
+<a class="sourceLine" id="cb6-4" title="4">  note =<span class="st"> </span>{R package version <span class="dv">1</span>.<span class="fl">0.0</span>},</a>
+<a class="sourceLine" id="cb6-5" title="5">  doi =<span class="st"> </span>{<span class="fl">10.5281</span><span class="op">/</span>zenodo<span class="fl">.844836</span>}</a>
+<a class="sourceLine" id="cb6-6" title="6">}</a>
+<a class="sourceLine" id="cb6-7" title="7"></a>
+<a class="sourceLine" id="cb6-8" title="8"><span class="op">@</span>article{benkeser2017improved,</a>
+<a class="sourceLine" id="cb6-9" title="9">  year  =<span class="st"> </span>{<span class="dv">2017</span>},</a>
+<a class="sourceLine" id="cb6-10" title="10">  author =<span class="st"> </span>{Benkeser, David C and Carone, Marco and van der Laan, Mark J</a>
+<a class="sourceLine" id="cb6-11" title="11">    and Gilbert, Peter B},</a>
+<a class="sourceLine" id="cb6-12" title="12">  title =<span class="st"> </span>{Doubly<span class="op">-</span>robust nonparametric inference on the average</a>
+<a class="sourceLine" id="cb6-13" title="13">    treatment effect},</a>
+<a class="sourceLine" id="cb6-14" title="14">  journal =<span class="st"> </span>{Biometrika},</a>
+<a class="sourceLine" id="cb6-15" title="15">  volume =<span class="st"> </span>{<span class="dv">104</span>}, number =<span class="st"> </span>{<span class="dv">4</span>},</a>
+<a class="sourceLine" id="cb6-16" title="16">  pages =<span class="st"> </span>{863–<span class="dv">880</span>},</a>
+<a class="sourceLine" id="cb6-17" title="17">  doi =<span class="st"> </span>{<span class="fl">10.1093</span><span class="op">/</span>biomet<span class="op">/</span>asx053}</a>
+<a class="sourceLine" id="cb6-18" title="18">}</a></code></pre></div>
 <hr>
 </div>
 <div id="license" class="section level2">
@@ -350,27 +264,27 @@
 <a href="#license" class="anchor"></a>License</h2>
 <p>© 2016- <a href="https://www.sph.emory.edu/faculty/profile/#!dbenkes">David C. Benkeser</a></p>
 <p>The contents of this repository are distributed under the MIT license. See below for details:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>The MIT <span class="fu">License</span> (MIT)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">Copyright</span> (c) <span class="dv">2016</span><span class="sc">-</span> David C. Benkeser</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>Permission is hereby granted, free of charge, to any person obtaining a copy</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>of this software and associated documentation <span class="fu">files</span> (the <span class="st">"Software"</span>), to deal</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="cf">in</span> the Software without restriction, including without limitation the rights</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>to use, copy, modify, merge, publish, distribute, sublicense, and<span class="sc">/</span>or sell</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>copies of the Software, and to permit persons to whom the Software is</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>furnished to do so, subject to the following conditions<span class="sc">:</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>The above copyright notice and this permission notice shall be included <span class="cf">in</span> all</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>copies or substantial portions of the Software.</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>THE SOFTWARE IS PROVIDED <span class="st">"AS IS"</span>, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>SOFTWARE.</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">The MIT <span class="kw">License</span> (MIT)</a>
+<a class="sourceLine" id="cb7-2" title="2"></a>
+<a class="sourceLine" id="cb7-3" title="3"><span class="kw">Copyright</span> (c) <span class="dv">2016</span><span class="op">-</span><span class="st"> </span>David C. Benkeser</a>
+<a class="sourceLine" id="cb7-4" title="4"></a>
+<a class="sourceLine" id="cb7-5" title="5">Permission is hereby granted, free of charge, to any person obtaining a copy</a>
+<a class="sourceLine" id="cb7-6" title="6">of this software and associated documentation <span class="kw">files</span> (the <span class="st">"Software"</span>), to deal</a>
+<a class="sourceLine" id="cb7-7" title="7"><span class="cf">in</span> the Software without restriction, including without limitation the rights</a>
+<a class="sourceLine" id="cb7-8" title="8">to use, copy, modify, merge, publish, distribute, sublicense, and<span class="op">/</span>or sell</a>
+<a class="sourceLine" id="cb7-9" title="9">copies of the Software, and to permit persons to whom the Software is</a>
+<a class="sourceLine" id="cb7-10" title="10">furnished to do so, subject to the following conditions<span class="op">:</span></a>
+<a class="sourceLine" id="cb7-11" title="11"></a>
+<a class="sourceLine" id="cb7-12" title="12">The above copyright notice and this permission notice shall be included <span class="cf">in</span> all</a>
+<a class="sourceLine" id="cb7-13" title="13">copies or substantial portions of the Software.</a>
+<a class="sourceLine" id="cb7-14" title="14"></a>
+<a class="sourceLine" id="cb7-15" title="15">THE SOFTWARE IS PROVIDED <span class="st">"AS IS"</span>, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</a>
+<a class="sourceLine" id="cb7-16" title="16">IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</a>
+<a class="sourceLine" id="cb7-17" title="17">FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</a>
+<a class="sourceLine" id="cb7-18" title="18">AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</a>
+<a class="sourceLine" id="cb7-19" title="19">LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</a>
+<a class="sourceLine" id="cb7-20" title="20">OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</a>
+<a class="sourceLine" id="cb7-21" title="21">SOFTWARE.</a></code></pre></div>
 </div>
 </div>
   </div>

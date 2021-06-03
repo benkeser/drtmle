@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">drtmle</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0.9000</span>
       </span>
     </div>
 
@@ -132,24 +132,9 @@
     <p>Function to estimate initial outcome regression</p>
     </div>
 
-    <pre class="usage"><span class='fu'>estimateQ</span><span class='op'>(</span>
-  <span class='va'>Y</span>,
-  <span class='va'>A</span>,
-  <span class='va'>W</span>,
-  <span class='va'>DeltaA</span>,
-  <span class='va'>DeltaY</span>,
-  <span class='va'>SL_Q</span>,
-  <span class='va'>glm_Q</span>,
-  <span class='va'>a_0</span>,
-  <span class='va'>stratify</span>,
-  <span class='va'>family</span>,
-  verbose <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  returnModels <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  se_cv <span class='op'>=</span> <span class='st'>"none"</span>,
-  se_cvFolds <span class='op'>=</span> <span class='fl'>10</span>,
-  validRows <span class='op'>=</span> <span class='cn'>NULL</span>,
-  <span class='va'>...</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>estimateQ</span><span class='op'>(</span><span class='va'>Y</span>, <span class='va'>A</span>, <span class='va'>W</span>, <span class='va'>DeltaA</span>, <span class='va'>DeltaY</span>, <span class='va'>SL_Q</span>, <span class='va'>glm_Q</span>, <span class='va'>a_0</span>, <span class='va'>stratify</span>, <span class='va'>family</span>,
+  verbose <span class='op'>=</span> <span class='cn'>FALSE</span>, returnModels <span class='op'>=</span> <span class='cn'>FALSE</span>, se_cv <span class='op'>=</span> <span class='st'>"none"</span>,
+  se_cvFolds <span class='op'>=</span> <span class='fl'>10</span>, validRows <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -160,8 +145,8 @@
     </tr>
     <tr>
       <th>A</th>
-      <td><p>A vector of binary treatment assignment (assumed to be equal to 0 or
-1).</p></td>
+      <td><p>A vector of binary treatment assignment (assumed to be equal to
+either 0 or 1).</p></td>
     </tr>
     <tr>
       <th>W</th>
@@ -199,7 +184,7 @@ regression separately for observations with <code>A</code> equal to 0/1 (if
     </tr>
     <tr>
       <th>family</th>
-      <td><p>A character passed to <code>SuperLearner</code></p></td>
+      <td><p>A character passed to <code>SuperLearner</code>.</p></td>
     </tr>
     <tr>
       <th>verbose</th>
@@ -207,26 +192,28 @@ regression separately for observations with <code>A</code> equal to 0/1 (if
     </tr>
     <tr>
       <th>returnModels</th>
-      <td><p>A boolean indicating whether to return model fits for the
-outcome regression, propensity score, and reduced-dimension regressions.</p></td>
+      <td><p>A boolean indicating whether to return model fits for
+the outcome, propensity score, and reduced-dimension regressions.</p></td>
     </tr>
     <tr>
       <th>se_cv</th>
-      <td><p>Should cross-validated nuisance parameter estimates be used 
-for computing standard errors? 
-Options are <code>"none"</code> = no cross-validation is performed; <code>"partial"</code> = 
-only applicable if Super Learner is used for nuisance parameter estimates; 
-<code>"full"</code> = full cross-validation is performed. See vignette for further 
-details. Ignored if <code>cvFolds &gt; 1</code>, since then
-cross-validated nuisance parameter estimates are used by default and it is 
-assumed that you want full cross-validated standard errors.</p></td>
+      <td><p>Should cross-validated nuisance parameter estimates be used for
+computing standard errors? Options are</p><ul>
+<li><p><code>"none"</code> = no cross-validation is performed;</p></li>
+<li><p><code>"partial"</code> = only applicable if Super Learner is used for nuisance
+parameter estimates;</p></li>
+<li><p><code>"full"</code> = full cross-validation is performed. See vignette for
+further details. Ignored if <code>cvFolds &gt; 1</code>, since cross-validated
+nuisance parameter estimates are used by default and it is assumed that
+you want full cross-validated standard errors.</p></li>
+</ul></td>
     </tr>
     <tr>
       <th>se_cvFolds</th>
       <td><p>If cross-validated nuisance parameter estimates are used
-to compute standard errors, how many folds should be used in this computation. 
-If <code>se_cv = "partial"</code>, then this option sets the number of folds used
-by the <code>SuperLearner</code> fitting procedure.</p></td>
+to compute standard errors, how many folds should be used in this
+computation. If <code>se_cv = "partial"</code>, then this option sets the number
+of folds used by the <code>SuperLearner</code> fitting procedure.</p></td>
     </tr>
     <tr>
       <th>validRows</th>
@@ -235,7 +222,7 @@ indexes of observations to include in validation fold.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Additional arguments (not currently used)</p></td>
+      <td><p>Additional arguments (not currently used).</p></td>
     </tr>
     </table>
 

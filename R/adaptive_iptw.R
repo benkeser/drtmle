@@ -142,7 +142,8 @@ adaptive_iptw <- function(W, A, Y,
       tolg = tolg, verbose = verbose,
       returnModels = returnModels,
       SL_g = SL_g, glm_g = glm_g,
-      a_0 = a_0, stratify = stratify
+      a_0 = a_0, stratify = stratify,
+      future.seed = TRUE
     )
     # re-order predictions
     gnValid <- unlist(gnOut, recursive = FALSE, use.names = FALSE)
@@ -185,7 +186,8 @@ adaptive_iptw <- function(W, A, Y,
     DeltaA = DeltaA, DeltaY = DeltaY,
     Qn = NULL, gn = gn, glm_Qr = glm_Qr,
     family = family, SL_Qr = SL_Qr, a_0 = a_0,
-    returnModels = returnModels
+    returnModels = returnModels,
+    future.seed = TRUE
   )
 
   # re-order predictions
@@ -239,7 +241,8 @@ adaptive_iptw <- function(W, A, Y,
       Qn = NULL, gn = gnStar,
       glm_Qr = glm_Qr, family = family,
       SL_Qr = SL_Qr, a_0 = a_0,
-      returnModels = returnModels
+      returnModels = returnModels,
+      future.seed = TRUE
     )
     # re-order predictions
     QrnValid <- unlist(QrnStarOut, recursive = FALSE, use.names = FALSE)
@@ -257,7 +260,8 @@ adaptive_iptw <- function(W, A, Y,
       A = A, DeltaA = DeltaA, DeltaY = DeltaY,
       Qrn = QrnStar, gn = gnStar, a_0 = a_0
     )
-    PnDgnStar <- future.apply::future_lapply(DngoStar, mean)
+    PnDgnStar <- future.apply::future_lapply(DngoStar, mean,
+                                             future.seed = TRUE)
     if (verbose) {
       cat("Mean of IC       =", round(unlist(PnDgnStar), 10), "\n")
     }

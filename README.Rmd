@@ -125,7 +125,7 @@ doubly robust confidence intervals and hypothesis tests. The method for
 estimation are input via `SL.Qr` and `SL.gr` or `glm.Qr` and `glm.gr` if
 parametric models are desired). These additional fits can be visualized by the
 `plot` method for `drtmle`.
-```r
+```{r, eval=FALSE}
 layout(t(1:3))
 plot(fit1, ask = FALSE)
 ```

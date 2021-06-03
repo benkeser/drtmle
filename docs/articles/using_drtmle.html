@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">drtmle</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0.9000</span>
       </span>
     </div>
 
@@ -79,7 +79,7 @@
 
       
 
-      </header><script src="using_drtmle_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>
@@ -101,7 +101,7 @@ Atlanta, Georgia, 30322, U.S.A.<br><a href="mailto:benkeser@emory.edu" class="em
     
         <div class="abstract">
       <p class="abstract">Abstract</p>
-      <p>Inverse probability of treatment weighted estimators and doubly-robust estimators (including augmented inverse probability of treatment weight and targeted minimum loss-based estimators) are widely used in causal inference to estimate and draw inference about the average effect of a treatment. As an intermediate step, these estimators require estimation of key nuisance parameters, which are often regression functions. Typically, regressions are estimated using maximum likelihood and parametric models. Confidence intervals and p-values may be computed based on standard asymptotic results, such as the central limit theorem and the delta method. However, in high-dimensional settings maximum likelihood estimation often breaks down and standard procedures no longer yield correct inference. Instead, we may rely on adaptive estimators of nuisance parameters to construct flexible regression estimators. However, use of adaptive estimators poses a challenge for performing statistical inference about an estimated treatment effect. While doubly-robust estimators facilitate inference when <em>all</em> relevant regression functions are consistently estimated, the same cannot be said when at least one estimator is inconsistent. <code>drtmle</code> implements doubly-robust confidence intervals and hypothesis tests about targeted minimum loss-based estimates of the average treatment effect. The package additionally implements an inverse probability of treatment weighted estimator that yields valid inference even when the probability of treatment is estimated via adaptive methods.</p>
+      Inverse probability of treatment weighted estimators and doubly-robust estimators (including augmented inverse probability of treatment weight and targeted minimum loss-based estimators) are widely used in causal inference to estimate and draw inference about the average effect of a treatment. As an intermediate step, these estimators require estimation of key nuisance parameters, which are often regression functions. Typically, regressions are estimated using maximum likelihood and parametric models. Confidence intervals and p-values may be computed based on standard asymptotic results, such as the central limit theorem and the delta method. However, in high-dimensional settings maximum likelihood estimation often breaks down and standard procedures no longer yield correct inference. Instead, we may rely on adaptive estimators of nuisance parameters to construct flexible regression estimators. However, use of adaptive estimators poses a challenge for performing statistical inference about an estimated treatment effect. While doubly-robust estimators facilitate inference when <em>all</em> relevant regression functions are consistently estimated, the same cannot be said when at least one estimator is inconsistent. <code>drtmle</code> implements doubly-robust confidence intervals and hypothesis tests about targeted minimum loss-based estimates of the average treatment effect. The package additionally implements an inverse probability of treatment weighted estimator that yields valid inference even when the probability of treatment is estimated via adaptive methods.
     </div>
     
 <script type="text/x-mathjax-config">
@@ -110,8 +110,8 @@ Atlanta, Georgia, 30322, U.S.A.<br><a href="mailto:benkeser@emory.edu" class="em
 <h1 class="hasAnchor">
 <a href="#introduction" class="anchor"></a>Introduction </h1>
 <p>In many fields researchers are interested in assessing the population-level effect of a particular treatment on an outcome of interest. The treatment might correspond to a drug, a potentially harmful exposure exposure, or a policy intervention. Often, the treatment may not be randomized due to ethical or logistical reasons. This has sparked great interest in developing statistical methodology to estimate population-level effects from observational data. Estimation of these effects often requires accounting for putative confounding factors, that is, factors related to whether a participant receives treatment and to the participant’s outcome. In many settings, researchers measure many potential confounders, for example using administrative databases or genetic sequencing technology. Due to the curse-of-dimensionality, common statistical estimation techniques are not feasible for such high-dimensional data without restrictive modeling assumptions. When these assumptions are violated, estimates of the population-level effect of a treatment may have large bias.</p>
-<p>This has sparked an interest in using adaptive estimation techniques from the machine learning literature to control for high-dimensional confounders when estimating treatment effects. However, facilitating proper inference (e.g., confidence intervals and hypothesis tests) about estimates of effects based on adaptive estimators is challenging. In particular, standard causal inference techniques, including both G-computation (GCOMP) estimators <span class="citation">(Robins 1986)</span> and inverse probability of treatment weighted (IPTW) estimators <span class="citation">Robins, Hernan, and Brumback (2000)</span>, fail to yield valid inference for common estimators of effects. More complex proposals have been developed that <em>are capable</em> of utilizing adaptive methods to control for confounding while still yielding valid inference. These techniques include augmented inverse probability of treatment estimation (AIPTW) <span class="citation">(Robins, Rotnitzky, and Zhao 1994)</span> and targeted minimum loss-based estimation (TMLE) <span class="citation">(van der Laan and Rubin 2006)</span>. Under assumptions, these estimators have limiting normal distributions with estimable variance. The asymptotic variance estimates then serve as the basis for constructing confidence intervals and hypothesis tests.</p>
-<p>As an intermediate step, the AIPTW and TMLE estimators require estimation of two key nuisance parameters: the probability of treatment as a function of confounders (the propensity score, hereafter referred to as the <em>PS</em>) and the average outcome as a function of confounders and treatment (the outcome regression, <em>OR</em>). In addition to their desirable inferential properties, AIPTW and TMLE estimators also enjoy the property of double robustness. That is, the estimators are consistent for the population-level effect of interest if either of the PS or OR is consistently estimated. This property gives the AIPTW and TMLE estimators a natural appeal: inconsistency in the estimation of one nuisance parameter may be mitigated by the consistent estimation of the other. As such, these estimators have increased in popularity in recent years. However, recent work has shown that the double robustness property does not necessarily extend to inferential properties about these estimators when adaptive estimators of the PS and OR are used <span class="citation">Benkeser et al. (2017)</span>. Instead, valid inference requires consistent estimation of <em>both</em> the PS <em>and</em> the OR. van der Laan (2014) proposed new TMLE estimators have an asymptotic normal sampling distribution with estimable variance under consistent estimation of <em>either</em> the PS <em>or</em> the OR, paving the way for inference that is doubly-robust. Benkeser et al. (2017) proposed modifications of these estimators with similar robustness properties and illustrated their practical performance.</p>
+<p>This has sparked an interest in using adaptive estimation techniques from the machine learning literature to control for high-dimensional confounders when estimating treatment effects. However, facilitating proper inference (e.g., confidence intervals and hypothesis tests) about estimates of effects based on adaptive estimators is challenging. In particular, standard causal inference techniques, including both G-computation (GCOMP) estimators <span class="citation">(Robins 1986)</span> and inverse probability of treatment weighted (IPTW) estimators <span class="citation">(Horvitz and Thompson 1952, @robins:2000:epi)</span>, fail to yield valid inference for common estimators of effects. More complex proposals have been developed that <em>are capable</em> of utilizing adaptive methods to control for confounding while still yielding valid inference. These techniques include augmented inverse probability of treatment estimation (AIPTW) <span class="citation">(Robins, Rotnitzky, and Zhao 1994)</span> and targeted minimum loss-based estimation (TMLE) <span class="citation">(van der Laan and Rubin 2006)</span>. Under assumptions, these estimators have limiting normal distributions with estimable variance. The asymptotic variance estimates then serve as the basis for constructing confidence intervals and hypothesis tests.</p>
+<p>As an intermediate step, the AIPTW and TMLE estimators require estimation of two key nuisance parameters: the probability of treatment as a function of confounders (the propensity score, hereafter referred to as the <em>PS</em>) and the average outcome as a function of confounders and treatment (the outcome regression, <em>OR</em>). In addition to their desirable inferential properties, AIPTW and TMLE estimators also enjoy the property of double robustness. That is, the estimators are consistent for the population-level effect of interest if either of the PS or OR is consistently estimated. This property gives the AIPTW and TMLE estimators a natural appeal: inconsistency in the estimation of one nuisance parameter may be mitigated by the consistent estimation of the other. As such, these estimators have increased in popularity in recent years. However, recent work has shown that the double robustness property does not necessarily extend to inferential properties about these estimators when adaptive estimators of the PS and OR are used <span class="citation">(van der Laan 2014, @benkeser:2017:biometrika)</span>. Instead, valid inference requires consistent estimation of <em>both</em> the PS <em>and</em> the OR. van der Laan (2014) proposed new TMLE estimators have an asymptotic normal sampling distribution with estimable variance under consistent estimation of <em>either</em> the PS <em>or</em> the OR, paving the way for inference that is doubly-robust. Benkeser et al. (2017) proposed modifications of these estimators with similar robustness properties and illustrated their practical performance.</p>
 <p>The two proposed procedures that yield doubly-robust inference are quite involved, notably involving iterative estimation of additional, complex nuisance parameters. The <code>drtmle</code> package was motivated by the need for a user-friendly tool to implement these methods. The package implements the TMLE estimators of population-level effects proposed in van der Laan (2014) and Benkeser et al. (2017), as well as several extensions including cross-validated targeted minimum loss-based estimators (CVTMLE). Additionally, <code>drtmle</code> implements an IPTW estimator that overcomes shortcomings of existing IPTW implementations with respect to statistical inference. In particular, the estimator allows an adaptive estimator of the PS to be used in construction of the IPTW estimator, while yielding valid statistical inference about population-level effects. Both the TMLE and IPTW estimators implemented in the <code>drtmle</code> package are capable of estimating population-level effects for discrete-valued treatments and the package provides convenient utilities for constructing confidence intervals and hypothesis tests about contrasts of the mean outcome under different levels of treatment. This document explains some of the key concepts underlying doubly-robust inference and illustrates usage of the <code>drtmle</code> package.</p>
 </div>
 <div id="definition-and-estimators-of-the-average-treatment-effect" class="section level1">
@@ -271,13 +271,13 @@ g_{r,n,2}^*(a \mid W_i) \ \{Y_i - \bar{Q}_n^*(a,W_i)\} = 0 \ ,
 <span class="va">sl_fit</span></code></pre></div>
 <pre><code>## $est
 ##            
-## 1 0.7109271
-## 0 0.5449348
+## 1 0.7121870
+## 0 0.5368986
 ## 
 ## $cov
-##              1            0
-## 1 1.705181e-03 5.347894e-07
-## 0 5.347894e-07 3.962026e-03</code></pre>
+##               1             0
+## 1  1.718700e-03 -7.664583e-07
+## 0 -7.664583e-07  4.154017e-03</code></pre>
 <p>The <code>drtmle</code> package also allows users to pass in their own functions for estimating regression parameters via the <code>SL_</code> options. These functions must be formatted properly for compatibility with <code>drtmle</code>. The necessary formatting is identical the formatting required for writing a <code>SuperLearner</code> wrapper (see <code><a href="https://rdrr.io/pkg/SuperLearner/man/write.SL.template.html">SuperLearner::write.SL.template()</a></code>). The <code>drtmle</code> package includes <code>SL.npreg</code>, which is an example of how a user can specify a function for estimating regression parameters. This functions fits a kernel regression estimator using the <code>np</code> package <span class="citation">(Hayfield and Racine 2008)</span>. Below we show the source code for this function.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">SL.npreg</span></code></pre></div>
@@ -300,7 +300,7 @@ g_{r,n,2}^*(a \mid W_i) \ \{Y_i - \bar{Q}_n^*(a,W_i)\} = 0 \ ,
 ##     out &lt;- list(pred = pred, fit = fit)
 ##     return(out)
 ## }
-## &lt;bytecode: 0x7ff36f875968&gt;
+## &lt;bytecode: 0x56536cdcb218&gt;
 ## &lt;environment: namespace:drtmle&gt;</code></pre>
 <p>In the above code, we see that a user-specified function should have options <code>Y, X, newX, family, obsWeights, ...</code>, along with other options specific to the function. The option <code>Y</code> corresponds to the outcome of the regression and <code>X</code> to the variables onto which the outcome is regressed. The option <code>newX</code> should be of the same class and dimension as <code>X</code> and is meant to contain new values of variables at which to evaluate the regression fit. The <code>family</code> and <code>obsWeights</code> options are not strictly necessary (indeed, they are not used by <code>SL.npreg</code>), they are useful to include if one wishes to utilize the function as part of a super learner library. The <code>SL.npreg</code> function proceeds by checking whether there is sufficient variation in <code>Y</code> to even both fitting the kernel regression (as specified by option <code>rangeThresh</code>), and if so, fits a kernel regression with cross-validated bandwidth selection via the <code>npregbw</code> function. The output is then formatted in a specific way so that <code>drtmle</code> is able to retrieve the appropriate objects from the fitted regression. In particular the output should be a list with named objects <code>pred</code> and <code>fit</code>; the former including predictions made from the fitted regression on <code>newX</code>, the latter including any information that may be needed to predict new values based on the fitted object. A class is assigned to the <code>fit</code> object, so that an S3 <code>predict</code> method may later be used to predict new values based on the fitted regression object. The user must also specify this <code>predict</code> method. Use <code>drtmle:::predict.SL.npreg</code> to view the simple <code>predict</code> method for <code>SL.npreg</code>.</p>
 <p>In the code below, we demonstrate a call to <code>drtmle</code> with <code>SL.npreg</code> used to estimate each nuisance parameter. Here, we also illustrate the use of <code>stratify = TRUE</code>, which fits a separate kernel regression of <span class="math inline">\(Y\)</span> onto <span class="math inline">\(W\)</span> in observations with <span class="math inline">\(A = 1\)</span> and <span class="math inline">\(A = 0\)</span>.</p>
@@ -524,8 +524,8 @@ D^*(\bar{Q}_0, g_0, Q_{W,0})(O_i) = \frac{I(A_i = 1)}{g_0(1 \mid W_i)} \{ Y_i - 
 ## 
 ## [[2]]
 ##              [,1]         [,2]
-## [1,] 0.0028810079 0.0004472446
-## [2,] 0.0004472446 0.0233422468</code></pre>
+## [1,] 0.0020102441 0.0002597992
+## [2,] 0.0002597992 0.0052698821</code></pre>
 </div>
 <div id="partially-cross-validated-standard-errors" class="section level3">
 <h3 class="hasAnchor">
@@ -561,25 +561,25 @@ D^*(\bar{Q}_0, g_0, Q_{W,0})(O_i) = \frac{I(A_i = 1)}{g_0(1 \mid W_i)} \{ Y_i - 
 <pre><code>## [[1]]
 ## $est
 ##            
-## 1 0.7109271
-## 0 0.5449348
+## 1 0.7121870
+## 0 0.5368986
 ## 
 ## $cov
-##              1            0
-## 1 1.705181e-03 5.347894e-07
-## 0 5.347894e-07 3.962026e-03
+##               1             0
+## 1  1.718700e-03 -7.664583e-07
+## 0 -7.664583e-07  4.154017e-03
 ## 
 ## 
 ## [[2]]
 ## $est
 ##            
-## 1 0.7109271
-## 0 0.5449348
+## 1 0.7121870
+## 0 0.5368986
 ## 
 ## $cov
 ##               1             0
-## 1  1.795085e-03 -1.647025e-05
-## 0 -1.647025e-05  4.458971e-03</code></pre>
+## 1  1.813255e-03 -1.183808e-05
+## 0 -1.183808e-05  4.300791e-03</code></pre>
 </div>
 </div>
 <div id="confidence-intervals" class="section level2">
@@ -687,13 +687,13 @@ g_0(a \mid w) &amp;= Pr_0(\Delta_A = 1, \Delta_A A = a, \Delta_Y = 1 \mid W = w)
 <span class="va">glm_fit_wNAs</span></code></pre></div>
 <pre><code>## $est
 ##            
-## 1 0.7137875
-## 0 0.5454264
+## 1 0.7353583
+## 0 0.5213146
 ## 
 ## $cov
 ##               1             0
-## 1  1.817245e-03 -5.924251e-06
-## 0 -5.924251e-06  5.050631e-03</code></pre>
+## 1  1.836839e-03 -2.380141e-05
+## 0 -2.380141e-05  4.917920e-03</code></pre>
 <p>It is possible to mix generalized linear models and super learning when fitting each of the components of the PS. In the below example we use the wrapper function <code>SL.glm</code>, which fits a main terms logistic regression, to fit the regression of <span class="math inline">\(\Delta_A\)</span> on <span class="math inline">\(W\)</span>, use <code>SL.npreg</code> to fit the regression of <span class="math inline">\(A\)</span> on <span class="math inline">\(W\)</span>, and use a super learner with library <code>SL.glm</code>, <code>SL.mean</code>, and <code>SL.earth</code> to fit the regression of <span class="math inline">\(Delta_Y\)</span> on <span class="math inline">\(W\)</span> and <span class="math inline">\(A\)</span>.</p>
 <div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mixed_fit_wNAs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/drtmle.html">drtmle</a></span><span class="op">(</span>W <span class="op">=</span> <span class="va">W</span>, A <span class="op">=</span> <span class="va">A</span>, Y <span class="op">=</span> <span class="va">Y</span>, stratify <span class="op">=</span> <span class="cn">FALSE</span>,
@@ -704,13 +704,13 @@ g_0(a \mid w) &amp;= Pr_0(\Delta_A = 1, \Delta_A A = a, \Delta_Y = 1 \mid W = w)
 <span class="va">mixed_fit_wNAs</span></code></pre></div>
 <pre><code>## $est
 ##            
-## 1 0.7312500
-## 0 0.5502438
+## 1 0.7386462
+## 0 0.5187046
 ## 
 ## $cov
-##              1            0
-## 1 1.789217e-03 1.880885e-05
-## 0 1.880885e-05 4.855986e-03</code></pre>
+##               1            0
+## 1  0.0017938723 -2.77481e-05
+## 0 -0.0000277481  4.88416e-03</code></pre>
 <p>We can also fit the PS regressions externally and pass in via <code>gn</code>, though this process is slightly more complicated than when no missing data are present. The basic idea is to fit one regression for (i) the indicator of missing <span class="math inline">\(A\)</span>, (ii) <span class="math inline">\(A\)</span> itself, and (iii) the indicator of missing the outcome. The three PS’s are then multiplied together and an appropriately ordered list is constructed as before. We illustrate with the following simple example.</p>
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># first regress indicator of missing A on W</span>
@@ -762,13 +762,13 @@ g_0(a \mid w) &amp;= Pr_0(\Delta_A = 1, \Delta_A A = a, \Delta_Y = 1 \mid W = w)
 <span class="va">out_fit_ps</span></code></pre></div>
 <pre><code>## $est
 ##            
-## 1 0.7137875
-## 0 0.5454264
+## 1 0.7353583
+## 0 0.5213146
 ## 
 ## $cov
 ##               1             0
-## 1  1.817245e-03 -5.924251e-06
-## 0 -5.924251e-06  5.050631e-03</code></pre>
+## 1  1.836839e-03 -2.380141e-05
+## 0 -2.380141e-05  4.917920e-03</code></pre>
 </div>
 <div id="multi-level-treatments" class="section level2">
 <h2 class="hasAnchor">
@@ -863,15 +863,15 @@ g_0(a \mid w) &amp;= Pr_0(\Delta_A = 1, \Delta_A A = a, \Delta_Y = 1 \mid W = w)
 <span class="va">cv_sl_fit</span></code></pre></div>
 <pre><code>## $est
 ##            
-## 0 0.4230361
-## 1 0.7258898
-## 2 0.7809827
+## 0 0.4708198
+## 1 0.7383167
+## 2 0.7858091
 ## 
 ## $cov
 ##               0             1             2
-## 0  9.441001e-03 -6.663856e-05 -4.910875e-05
-## 1 -6.663856e-05  2.771472e-03  3.346181e-05
-## 2 -4.910875e-05  3.346181e-05  2.777391e-03</code></pre>
+## 0  9.582548e-03 -5.877224e-05 -6.475948e-06
+## 1 -5.877224e-05  2.220022e-03  4.768899e-05
+## 2 -6.475948e-06  4.768899e-05  2.640170e-03</code></pre>
 <p>Cross-validation may significantly increase the computation time necessary for running <code>drtmle</code>. Parallelized regression fitting is available by setting the option <code>use_future = TRUE</code>. Since, internally, all computations are carried out using futures (with the API provided by the “future” R package), setting this option amounts only to parallelizing with futures <span class="citation">(Bengtsson 2017a)</span> via <code>future.apply::lapply</code>. Selecting this option results in parallelization of the estimation of the OR, PS, and reduced-dimension regressions.</p>
 <p>If no adjustments are made prior to invoking the <code>drtmle</code> function, futures are computed sequentially. It is up to the user to specify appropriate system-specific future back-ends that may better suit their problem (e.g., using the <code>future.batchtools</code> package <span class="citation">(Bengtsson 2017b)</span>). Below we demonstrate registration using an ad-hoc cluster on the local system. The choice of back-end is flexible, and submission of the job to a wide variety of schedulers (e.g., SLURM, TORQUE, etc.) is also permitted. Interested readers are invited to consult the documentation of the <code>future.batchtools</code> package for further information.</p>
 <div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
@@ -935,96 +935,99 @@ W_i)} \ \{ I(A_i = a) - g_n(a \mid W = W_i)\} = 0 \ ,\]</span> then the IPTW est
 <a href="#session-info" class="anchor"></a>Session Info</h1>
 <div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>## R version 4.0.3 (2020-10-10)
-## Platform: x86_64-apple-darwin17.0 (64-bit)
-## Running under: macOS High Sierra 10.13.4
+<pre><code>## R version 4.1.0 (2021-05-18)
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Ubuntu 20.04.2 LTS
 ## 
 ## Matrix products: default
-## BLAS:   /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRblas.dylib
-## LAPACK: /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRlapack.dylib
+## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3
+## LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/liblapack.so.3
 ## 
 ## locale:
-## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+##  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 ## 
 ## attached base packages:
-## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## [1] splines   stats     graphics  grDevices utils     datasets  methods  
+## [8] base     
 ## 
 ## other attached packages:
-## [1] nloptr_1.2.2.2      SuperLearner_2.0-26 nnls_1.4           
-## [4] drtmle_1.1.0       
+## [1] quadprog_1.5-8      nloptr_1.2.2.2      SuperLearner_2.0-28
+## [4] gam_1.20            foreach_1.5.1       nnls_1.4           
+## [7] drtmle_1.1.0.9000  
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] np_0.60-10           Rcpp_1.0.6           bslib_0.2.4.9000    
-##  [4] compiler_4.0.3       jquerylib_0.1.3      tools_4.0.3         
-##  [7] boot_1.3-27          digest_0.6.27        lattice_0.20-41     
-## [10] jsonlite_1.7.2       evaluate_0.14        memoise_2.0.0       
-## [13] rlang_0.4.10         Matrix_1.3-2         yaml_2.2.1          
-## [16] parallel_4.0.3       SparseM_1.81         pkgdown_1.6.1       
-## [19] xfun_0.21            fastmap_1.1.0        stringr_1.4.0       
-## [22] knitr_1.31           MatrixModels_0.4-1   desc_1.2.0          
-## [25] fs_1.5.0             sass_0.3.1.9000      systemfonts_1.0.1   
-## [28] globals_0.14.0       grid_4.0.3           rprojroot_2.0.2     
-## [31] listenv_0.8.0        R6_2.5.0             textshaping_0.3.4   
-## [34] future.apply_1.7.0   parallelly_1.23.0    rmarkdown_2.7       
-## [37] conquer_1.0.2        magrittr_2.0.1       matrixStats_0.58.0  
-## [40] codetools_0.2-18     htmltools_0.5.1.9000 assertthat_0.2.1    
-## [43] future_1.21.0        cubature_2.0.4.1     quadprog_1.5-8      
-## [46] quantreg_5.85        ragg_1.1.2           stringi_1.5.3       
-## [49] cachem_1.0.4         crayon_1.4.1</code></pre>
-<div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-futurePackage" class="csl-entry">
-Bengtsson, Henrik. 2017a. <em><span class="nocase">future</span>: A Future <span>API</span> for <span>R</span></em>. https://cran.r-project.org/web/packages/future. <a href="https://github.com/HenrikBengtsson/future">https://github.com/HenrikBengtsson/future</a>.
+##  [1] np_0.60-10         Rcpp_1.0.6         compiler_4.1.0     TeachingDemos_2.12
+##  [5] iterators_1.0.13   tools_4.1.0        boot_1.3-28        digest_0.6.27     
+##  [9] lattice_0.20-44    evaluate_0.14      memoise_2.0.0      rlang_0.4.11      
+## [13] Matrix_1.3-3       yaml_2.2.1         parallel_4.1.0     SparseM_1.81      
+## [17] pkgdown_1.6.1      xfun_0.23          fastmap_1.1.0      stringr_1.4.0     
+## [21] knitr_1.33         MatrixModels_0.5-0 desc_1.3.0         fs_1.5.0          
+## [25] systemfonts_1.0.2  globals_0.14.0     grid_4.1.0         rprojroot_2.0.2   
+## [29] listenv_0.8.0      R6_2.5.0           textshaping_0.3.4  plotrix_3.8-1     
+## [33] future.apply_1.7.0 parallelly_1.25.0  rmarkdown_2.8      plotmo_3.6.0      
+## [37] Formula_1.2-4      conquer_1.0.2      magrittr_2.0.1     matrixStats_0.58.0
+## [41] codetools_0.2-18   htmltools_0.5.1.1  future_1.21.0      cubature_2.0.4.2  
+## [45] quantreg_5.85      ragg_1.1.2         earth_5.3.0        stringi_1.6.2     
+## [49] cachem_1.0.5       crayon_1.4.1</code></pre>
+<div id="refs" class="references">
+<div id="ref-futurePackage">
+<p>Bengtsson, Henrik. 2017a. <em>future: A Future API for R</em>. https://cran.r-project.org/web/packages/future. <a href="https://github.com/HenrikBengtsson/future">https://github.com/HenrikBengtsson/future</a>.</p>
 </div>
-<div id="ref-futurebatchtoolsPackage" class="csl-entry">
-———. 2017b. <em><span class="nocase">future.batchtools</span>: A Future <span>API</span> for Parallel and Distributed Processing Using <span>“Batchtools”</span></em>. https://cran.r-project.org/web/packages/future.batchtools. <a href="https://github.com/HenrikBengtsson/future.batchtools">https://github.com/HenrikBengtsson/future.batchtools</a>.
+<div id="ref-futurebatchtoolsPackage">
+<p>———. 2017b. <em>future.batchtools: A Future API for Parallel and Distributed Processing Using “Batchtools”</em>. https://cran.r-project.org/web/packages/future.batchtools. <a href="https://github.com/HenrikBengtsson/future.batchtools">https://github.com/HenrikBengtsson/future.batchtools</a>.</p>
 </div>
-<div id="ref-benkeser:2017:biometrika" class="csl-entry">
-Benkeser, D, M Carone, M van der Laan, and P Gilbert. 2017. <span>“Doubly-Robust Nonparametric Inference on the Average Treatment Effect.”</span> <em>Biometrika</em>.
+<div id="ref-benkeser:2017:biometrika">
+<p>Benkeser, D, M Carone, M van der Laan, and P Gilbert. 2017. “Doubly-Robust Nonparametric Inference on the Average Treatment Effect.” <em>Biometrika</em>.</p>
 </div>
-<div id="ref-npPackage" class="csl-entry">
-Hayfield, Tristen, and Jeffrey Racine. 2008. <span>“Nonparametric Econometrics: The Np Package.”</span> <em>Journal of Statistical Software</em> 27 (5). <a href="https://www.jstatsoft.org/v27/i05/">https://www.jstatsoft.org/v27/i05/</a>.
+<div id="ref-npPackage">
+<p>Hayfield, Tristen, and Jeffrey Racine. 2008. “Nonparametric Econometrics: The Np Package.” <em>Journal of Statistical Software</em> 27 (5). <a href="https://www.jstatsoft.org/v27/i05/">https://www.jstatsoft.org/v27/i05/</a>.</p>
 </div>
-<div id="ref-horvitzthompson:1952:jasa" class="csl-entry">
-Horvitz, D, and D Thompson. 1952. <span>“A Generalization of Sampling Without Replacement from a Finite Universe.”</span> <em>Journal of the American Statistical Association</em> 47 (260): 663–85. <a href="https://doi.org/10.1080/01621459.1952.10483446">https://doi.org/10.1080/01621459.1952.10483446</a>.
+<div id="ref-horvitzthompson:1952:jasa">
+<p>Horvitz, D, and D Thompson. 1952. “A Generalization of Sampling Without Replacement from a Finite Universe.” <em>Journal of the American Statistical Association</em> 47 (260): 663–85. <a href="https://doi.org/10.1080/01621459.1952.10483446">https://doi.org/10.1080/01621459.1952.10483446</a>.</p>
 </div>
-<div id="ref-SuperLearnerPackage" class="csl-entry">
-Polley, E, E LeDell, C Kennedy, S Lendle, and M van der Laan. 2017. <em><span>SuperLearner</span>: Super Learner Prediction</em>. <a href="https://CRAN.R-project.org/package=SuperLearner">https://CRAN.R-project.org/package=SuperLearner</a>.
+<div id="ref-SuperLearnerPackage">
+<p>Polley, E, E LeDell, C Kennedy, S Lendle, and M van der Laan. 2017. <em>SuperLearner: Super Learner Prediction</em>. <a href="https://CRAN.R-project.org/package=SuperLearner">https://CRAN.R-project.org/package=SuperLearner</a>.</p>
 </div>
-<div id="ref-porter:2011:ijb" class="csl-entry">
-Porter, K, S Gruber, van der Laan M, and J Sekhon. 2011. <span>“The Relative Performance of Targeted Maximum Likelihood Estimators.”</span> <em>International Journal of Biostatistics</em> 7 (1). <a href="https://doi.org/10.2202/1557-4679.1308">https://doi.org/10.2202/1557-4679.1308</a>.
+<div id="ref-porter:2011:ijb">
+<p>Porter, K, S Gruber, van der Laan M, and J Sekhon. 2011. “The Relative Performance of Targeted Maximum Likelihood Estimators.” <em>International Journal of Biostatistics</em> 7 (1). <a href="https://doi.org/10.2202/1557-4679.1308">https://doi.org/10.2202/1557-4679.1308</a>.</p>
 </div>
-<div id="ref-robins:1986:mathmod" class="csl-entry">
-Robins, J. 1986. <span>“A New Approach to Causal Inference in Mortality Studies with a Sustained Exposure Period –- Application to Control of the Healthy Worker Survivor Effect.”</span> <em>Mathematical Modelling</em> 7 (9–12): 1393–1512. <a href="https://doi.org/10.1016/0270-0255(86)90088-6">https://doi.org/10.1016/0270-0255(86)90088-6</a>.
+<div id="ref-robins:1986:mathmod">
+<p>Robins, J. 1986. “A New Approach to Causal Inference in Mortality Studies with a Sustained Exposure Period –- Application to Control of the Healthy Worker Survivor Effect.” <em>Mathematical Modelling</em> 7 (9–12): 1393–1512. <a href="https://doi.org/10.1016/0270-0255(86)90088-6">https://doi.org/10.1016/0270-0255(86)90088-6</a>.</p>
 </div>
-<div id="ref-robins:2000:epi" class="csl-entry">
-Robins, J, M Hernan, and B Brumback. 2000. <span>“Marginal Structural Models and Causal Inference in Epidemiology.”</span> <em>Epidemiology</em> 11 (5): 550–60. <a href="https://doi.org/10.1097/00001648-200009000-00011">https://doi.org/10.1097/00001648-200009000-00011</a>.
+<div id="ref-robins:2000:epi">
+<p>Robins, J, M Hernan, and B Brumback. 2000. “Marginal Structural Models and Causal Inference in Epidemiology.” <em>Epidemiology</em> 11 (5): 550–60. <a href="https://doi.org/10.1097/00001648-200009000-00011">https://doi.org/10.1097/00001648-200009000-00011</a>.</p>
 </div>
-<div id="ref-robins:1994:jasa" class="csl-entry">
-Robins, J, A Rotnitzky, and L Zhao. 1994. <span>“Estimation of Regression Coefficients When Some Regressors Are Not Always Observed.”</span> <em>Journal of the American Statistical Association</em> 89 (427): 846–66. <a href="https://doi.org/10.1080/01621459.1994.10476818">https://doi.org/10.1080/01621459.1994.10476818</a>.
+<div id="ref-robins:1994:jasa">
+<p>Robins, J, A Rotnitzky, and L Zhao. 1994. “Estimation of Regression Coefficients When Some Regressors Are Not Always Observed.” <em>Journal of the American Statistical Association</em> 89 (427): 846–66. <a href="https://doi.org/10.1080/01621459.1994.10476818">https://doi.org/10.1080/01621459.1994.10476818</a>.</p>
 </div>
-<div id="ref-earthPackage" class="csl-entry">
-Trevor Hastie, Stephen Milborrow. Derived from mda:mars by, and Rob Tibshirani. Uses Alan Miller’s Fortran utilities with Thomas Lumley’s leaps wrapper. 2018. <em><span class="nocase">earth</span>: Multivariate Adaptive Regression Splines</em>. <a href="https://CRAN.R-project.org/package=earth">https://CRAN.R-project.org/package=earth</a>.
+<div id="ref-earthPackage">
+<p>Trevor Hastie, Stephen Milborrow. Derived from mda:mars by, and Rob Tibshirani. Uses Alan Miller’s Fortran utilities with Thomas Lumley’s leaps wrapper. 2018. <em>earth: Multivariate Adaptive Regression Splines</em>. <a href="https://CRAN.R-project.org/package=earth">https://CRAN.R-project.org/package=earth</a>.</p>
 </div>
-<div id="ref-vdvaart:2006:statdec" class="csl-entry">
-Vaart, A van der, S Dudoit, and M van der Laan. 2006. <span>“Oracle Inequalities for Multi-Fold Cross-Validation.”</span> <em>Statistics and Decisions</em> 24 (3): 351–71. <a href="https://doi.org/10.1524/stnd.2006.24.3.351">https://doi.org/10.1524/stnd.2006.24.3.351</a>.
+<div id="ref-vdvaart:2006:statdec">
+<p>Vaart, A van der, S Dudoit, and M van der Laan. 2006. “Oracle Inequalities for Multi-Fold Cross-Validation.” <em>Statistics and Decisions</em> 24 (3): 351–71. <a href="https://doi.org/10.1524/stnd.2006.24.3.351">https://doi.org/10.1524/stnd.2006.24.3.351</a>.</p>
 </div>
-<div id="ref-vdl:2014:ijb" class="csl-entry">
-van der Laan, M. 2014. <span>“Targeted Estimation of Nuisance Parameters to Obtain Valid Statistical Inference.”</span> <em>International Journal of Biostatistics</em> 10 (1): 29–57. <a href="https://doi.org/10.1515/ijb-2012-0038">https://doi.org/10.1515/ijb-2012-0038</a>.
+<div id="ref-vdl:2014:ijb">
+<p>van der Laan, M. 2014. “Targeted Estimation of Nuisance Parameters to Obtain Valid Statistical Inference.” <em>International Journal of Biostatistics</em> 10 (1): 29–57. <a href="https://doi.org/10.1515/ijb-2012-0038">https://doi.org/10.1515/ijb-2012-0038</a>.</p>
 </div>
-<div id="ref-vdl:2007:statapp" class="csl-entry">
-van der Laan, M, E Polley, and A Hubbard. 2007. <span>“Super Learner.”</span> <em>Statistical Applications in Genetics and Molecular Biology</em> 6 (1). <a href="https://doi.org/10.2202/1544-6115.1309">https://doi.org/10.2202/1544-6115.1309</a>.
+<div id="ref-vdl:2007:statapp">
+<p>van der Laan, M, E Polley, and A Hubbard. 2007. “Super Learner.” <em>Statistical Applications in Genetics and Molecular Biology</em> 6 (1). <a href="https://doi.org/10.2202/1544-6115.1309">https://doi.org/10.2202/1544-6115.1309</a>.</p>
 </div>
-<div id="ref-tlbook:2011" class="csl-entry">
-van der Laan, M, and S Rose. 2011. <em>Targeted Learning: Causal Inference for Observational and Experimental Data</em>. Springer New York. <a href="https://doi.org/10.1007/978-1-4419-9782-1">https://doi.org/10.1007/978-1-4419-9782-1</a>.
+<div id="ref-tlbook:2011">
+<p>van der Laan, M, and S Rose. 2011. <em>Targeted Learning: Causal Inference for Observational and Experimental Data</em>. Springer New York. <a href="https://doi.org/10.1007/978-1-4419-9782-1">https://doi.org/10.1007/978-1-4419-9782-1</a>.</p>
 </div>
-<div id="ref-vdlrubin:2006:ijb" class="csl-entry">
-van der Laan, M, and D Rubin. 2006. <span>“Targeted Maximum Likelihood Learning.”</span> <em>International Journal of Biostatistics</em> 2 (1). <a href="https://doi.org/10.2202/1557-4679.1043">https://doi.org/10.2202/1557-4679.1043</a>.
+<div id="ref-vdlrubin:2006:ijb">
+<p>van der Laan, M, and D Rubin. 2006. “Targeted Maximum Likelihood Learning.” <em>International Journal of Biostatistics</em> 2 (1). <a href="https://doi.org/10.2202/1557-4679.1043">https://doi.org/10.2202/1557-4679.1043</a>.</p>
 </div>
-<div id="ref-wolpert:1992:nnet" class="csl-entry">
-Wolpert, D. 1992. <span>“Stacked Generalization.”</span> <em>Neural Networks</em> 5 (2): 241–59. <a href="https://doi.org/10.1016/S0893-6080(05)80023-1">https://doi.org/10.1016/S0893-6080(05)80023-1</a>.
+<div id="ref-wolpert:1992:nnet">
+<p>Wolpert, D. 1992. “Stacked Generalization.” <em>Neural Networks</em> 5 (2): 241–59. <a href="https://doi.org/10.1016/S0893-6080(05)80023-1">https://doi.org/10.1016/S0893-6080(05)80023-1</a>.</p>
 </div>
-<div id="ref-zheng:2010:working" class="csl-entry">
-Zheng, W, and M van der Laan. 2010. <span>“Asymptotic Theory for Cross-Validated Targeted Maximum Likelihood Estimation.”</span> <em>U.C. Berkeley Division of Biostatistics Working Paper Series</em>. <a href="https://biostats.bepress.com/ucbbiostat/paper273/">https://biostats.bepress.com/ucbbiostat/paper273/</a>.
+<div id="ref-zheng:2010:working">
+<p>Zheng, W, and M van der Laan. 2010. “Asymptotic Theory for Cross-Validated Targeted Maximum Likelihood Estimation.” <em>U.C. Berkeley Division of Biostatistics Working Paper Series</em>. <a href="https://biostats.bepress.com/ucbbiostat/paper273/">https://biostats.bepress.com/ucbbiostat/paper273/</a>.</p>
 </div>
 </div>
 </div>

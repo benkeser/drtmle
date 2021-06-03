@@ -38,7 +38,7 @@ See examples.}
 }
 \value{
 An object of class \code{"ci.adaptive_iptw"} with point estimates and
- confidence intervals of the specified level.
+confidence intervals of the specified level.
 }
 \description{
 Wald tests for adaptive_iptw objects

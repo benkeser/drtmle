@@ -4,23 +4,8 @@
 \alias{estimategrn_loop}
 \title{estimategrn_loop}
 \usage{
-estimategrn_loop(
-  validRows,
-  Y,
-  A,
-  W,
-  DeltaA,
-  DeltaY,
-  tolg,
-  Qn,
-  gn,
-  glm_gr,
-  SL_gr,
-  a_0,
-  reduction,
-  returnModels,
-  use_future
-)
+estimategrn_loop(validRows, Y, A, W, DeltaA, DeltaY, tolg, Qn, gn, glm_gr,
+  SL_gr, a_0, reduction, returnModels, use_future)
 }
 \arguments{
 \item{validRows}{A \code{list} of length \code{cvFolds} containing the row
@@ -28,8 +13,8 @@ indexes of observations to include in validation fold.}
 
 \item{Y}{A vector of continuous or binary outcomes.}
 
-\item{A}{A vector of binary treatment assignment (assumed to be equal to 0 or
-1).}
+\item{A}{A vector of binary treatment assignment (assumed to be equal to
+either 0 or 1).}
 
 \item{W}{A \code{data.frame} of named covariates.}
 
