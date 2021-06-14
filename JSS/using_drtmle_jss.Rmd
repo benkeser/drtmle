@@ -722,14 +722,15 @@ that the ordering of `Qn` and `gn` is consistent with `a_0`.
 ## Standard error estimation
 
 This section contains some more advanced mathematical material and may be
-omitted by users interested only in implementation. For simplicity, we focus
-this discussion on the standard TMLE/AIPTW estimators. The ideas generalize
-immediately to the DRTMLE estimator, but the formulas are more complex.
+skipped over by users interested only in implementation. For simplicity, we focus
+this discussion on the standard TML/AIPTW estimators. The ideas generalize
+immediately to the DR-TML estimator, but the formulas are more complex in this
+latter case.
 
-Reported standard error estimates are based on an estimate the asymptotic
-variance of the estimators. This variance can be characterized by the estimators
-influence function.  For example, let $\psi_{n}(1)$ be an AIPTW estimate of
-$\psi_0(1)$. Under regularity conditions,
+Reported standard error estimates are based on an estimate of the asymptotic
+variance of the estimators. This variance can be characterized by influence
+function of the estimators. For example, let $\psi_{n}(1)$ be an AIPTW estimate
+of $\psi_0(1)$. Under regularity conditions,
 \begin{equation*}
   \psi_{n}(1) - \psi_0(1) = \frac{1}{n} \sum_{i=1}^n
     D^{\star}(\bar{Q}_0, g_0, Q_{W,0})(O_i) + o_{p}(n^{-1/2}) \ ,
@@ -741,37 +742,39 @@ where
   \int \bar{Q}_0(1, w) dQ_{W,0}(w) \ .
 \end{equation*}
 Thus, by the central limit theorem, $n^{1/2} \psi_{n}(1)$ converges in
-distribution to a Normal distribution with mean $\psi_0(1)$ and variance
+distribution to a normal distribution with mean $\psi_0(1)$ and variance
 \begin{equation*}
   \sigma^2_0 = E_0( [ D^{\star}(\bar{Q}_0, g_0, Q_{W,0})(O) -
   E_0\{D^{\star}(\bar{Q}_0, g_0, Q_{W,0})(O)\} ]^2 ) \ .
 \end{equation*}
 An estimate of $\sigma^2_0$ is naturally obtained by taking the empirical
-variance of $D_i = D^{\star}(\bar{Q}_n, g_n, Q_{W,n})(O_i)$,
+variance of $D_i = D^{\star}(\bar{Q}_n, g_n, Q_{W,n})(O_i)$, that is,
 \begin{equation*}
-  \sigma^2_n = \frac{1}{n} \sum_{i=1}^n \left\{ D_i - \frac{1}{n} \sum_{j=1}^n
+  \sigma^2_n = \frac{1}{n} \sum_{i=1}^n \left\{D_i - \frac{1}{n} \sum_{j=1}^n
   D_j \right\}^2 \ .
 \end{equation*}
-Thus, a natural estimate of the standard error of $\psi_{n}(1)$ is
-$\sigma_n / n^{1/2}$. This idea generalizes naturally to estimating the
+Thus, a natural estimate of the standard error of $\psi_{n}(1)$ is $\sigma_n /
+n^{1/2}$. Conveniently, this idea generalizes naturally to estimating the
 asymptotic covariance matrix of a vector $n^{1/2} (\psi_{n}(a) : a)$.
 
 ### Standard errors for TMLE
 
-For TMLE-based estimators, it is standard practice to construct $D_i$ above using the *targeted* 
-version of the OR (denoted by $\bar{Q}_n^*$ above). Recall that such estimates are obtained by modifying
-an initial OR estimate in such a way as to ensure a particular (set of) equation(s) is (are) solved.
-However, simulations have shown that better standard error estimates for TMLE may be achieved by instead
-using the *initial* OR estimate in the computation of standard errors, as described in the previous
-subsection. The `drtmle` function includes the `targeted_se` option to this end. 
+For TML estimators, it is standard practice to construct $D_i$ using the
+*targeted* version of the OR (denoted by $\bar{Q}_n^{\star}$ above). Recall that
+such estimates are obtained by modifying an initial OR estimate so as to ensure
+a particular (set of) equation(s) is (are) solved.  However, simulations have
+shown that better standard error estimates for TMLE may be achieved by instead
+using the *initial* OR estimate in the computation of standard errors, as
+described in the preceding subsection. To this end, The `drtmle` function
+includes the `targeted_se` option.
 
 ```{r, show_targeted_se, cache = TRUE}
-glm_fit_uni_nontargeted_se <- 
+glm_fit_uni_nontargeted_se <-
   drtmle(W = W, A = A, Y = Y, family = binomial(),
          glm_g = "W1 + W2", glm_Q = "W1 + W2*A",
-         glm_gr = "Qn", glm_Qr = "gn", stratify = FALSE, 
+         glm_gr = "Qn", glm_Qr = "gn", stratify = FALSE,
          targeted_se = FALSE)
-# compare to original call        
+# compare to original call
 list(
   glm_fit_uni$drtmle$cov, # based on targeted OR
   glm_fit_uni_nontargeted_se$drtmle$cov # untargeted OR
@@ -780,27 +783,38 @@ list(
 
 ### Cross-validated standard errors
 
-In simulations, we often find that when employing machine learning to estimate the OR and/or PS, 
-the estimated standard errors are *too small* in small to moderate-sized samples, leading to 
-under-coverage of confidence intervals and possibly too-large type I errors of hypothesis tests that
-are based on these standard error estimates. This should not be too surprising when studying the form
-of the standard error estimates. In particular, they will include a term that looks like 
-a (weighted) mean squared-error (MSE) of the OR. Because machine learning algorithms often set out 
-to minimize empirical MSE as part of their training, we often find that the empirical MSE is biased 
-too small relative to the true MSE. Thus, in order to more accurately estimate MSE of a machine learning
-algorithm, we typically rely on cross-validation. The same trick can be used here to obtain a more
-conservative standard error estimate.
+Simulation studies have revealed that, when employing machine learning to
+estimate the OR and/or PS, the estimated standard errors are often *too small*,
+in small to moderate-sized samples. Problematically, this leads directly to
+under-coverage of confidence intervals and possibly inflated Type-I error rates
+of hypothesis tests based on these standard error estimates. This should not be
+too surprising, as the phenomenon is related to the form of the standard error
+estimates. In particular, such estimates include a term that resembles a
+(weighted) mean squared error (MSE) of the OR. Since machine learning algorithms
+often set out to minimize empirical MSE as part of their training process, it
+follows that the empirical MSE often ends up biased towards zero relative to the
+true MSE. To more accurately estimate the MSE of a machine learning algorithm,
+cross-validation can be used. The same sample-splitting idea can be used to
+obtain more conservative standard error estimates.
 
-Suppose we use $V$-fold cross-validation to obtained $V$ training-sample-specific estimates of the OR,
- $\bar{Q}_{n,v}, v = 1, \dots, V$ and the PS, $g_{n,v}, v = 1, \dots, V$. For $i = 1, \dots, n$, let $\bar{Q}_{n,i}^{cv}(1)$ denote the estimate of $\bar{Q}_{0}(a, W_i)$ obtained when observation $i$ was in the validation fold. That is, $\bar{Q}_{n,i}^{cv}$ is an out-of-sample prediction of $Y_i$. We define
- $g_{n,i}^{cv}$ similarly. Using these estimates, we can define \[
- D_i^{cv} = \frac{I(A_i = 1)}{g_{n,i}^{cv}} \{ Y_i - \bar{Q}_{n,i}^{cv}(1)\} + \bar{Q}_{n,i}^{cv}(1) - \frac{1}{n} \sum_{i=1}^n \bar{Q}_{n,i}^{cv}(1) 
- \]
-and compute an estimate of $\sigma^2_0$ using \[
-  \sigma^2_{n,cv} = \frac{1}{n} \sum_{i=1}^n \left\{ D_i^{cv} - \frac{1}{n} \sum_{j=1}^n D_j^{cv} \right\}^2 \ . 
-\]
+Suppose we use $V$-fold cross-validation to obtaine $V$ training-sample-specific
+estimates of the OR, $\bar{Q}_{n,v}, v = 1, \dots, V$ and the PS, $g_{n,v},
+v = 1, \dots, V$. For $i = 1, \dots, n$, let $\bar{Q}_{n,i}^{cv}(1)$ denote the
+estimate of $\bar{Q}_{0}(a, W_i)$ obtained when observation $i$ was in the
+validation fold. That is, $\bar{Q}_{n,i}^{cv}$ is an out-of-sample prediction of
+$Y_i$. We define $g_{n,i}^{cv}$ similarly. Using these estimates, we can define
+\begin{equation*}
+ D_i^{cv} = \frac{I(A_i = 1)}{g_{n,i}^{cv}} \{ Y_i - \bar{Q}_{n,i}^{cv}(1)\} +
+ \bar{Q}_{n,i}^{cv}(1) - \frac{1}{n} \sum_{i=1}^n \bar{Q}_{n,i}^{cv}(1)
+\end{equation*}
+and compute an estimate of $\sigma^2_0$ using
+\begin{equation*}
+  \sigma^2_{n,cv} = \frac{1}{n} \sum_{i=1}^n \left\{ D_i^{cv} -
+  \frac{1}{n} \sum_{j=1}^n D_j^{cv} \right\}^2 \ .
+\end{equation*}
 
-Cross-validated standard errors can be obtained by setting `se_cv = "full"` and `se_cvFolds` to a number greater than 1. 
+In `drtmle`, cross-validated standard error estimates can be obtained by setting
+`se_cv = "full"` and `se_cvFolds` to a number greater than 1. For example,
 
 ```{r, fit_w_full_cv, warning = FALSE, cache = TRUE}
 glm_fit_uni_cv <- drtmle(W = W, A = A, Y = Y, family = binomial(),
@@ -814,43 +828,61 @@ list(glm_fit_uni$drtmle$cov, glm_fit_uni_cv$drtmle$cov)
 
 ### Partially cross-validated standard errors
 
-Obtaining fully cross-validated standard errors can be fairly time intensive when super learner is
-used to estimate the OR and PS. In `drtmle` we give an option to compute standard error estimates that
-are *partially cross-validated* and do not require any additional fitting beyond a standard super learner. 
-Here we describe briefly how these estimates are obtained and show calls to `drtmle` to obtain these estimates. 
+Obtaining fully cross-validated standard errors can be fairly time-intensive
+when super learner is used to estimate the OR and PS. In `drtmle`, we give an
+option to compute standard error estimates that are *partially cross-validated*
+and do not require any additional fitting beyond a standard super learner. Here,
+we describe briefly how these estimates are obtained and show calls to `drtmle`
+for obtaining such estimates.
 
-Suppose we have $K$ candidate regressions in our super learner library for both the OR and PS 
-(in practice, the number could be different for the OR as for the PS). Recall that a super learner
-estimate of for example $\bar{Q}_0(a, w)$ is obtained as a weighted combination of estimates 
-from each candidate regression. Let $\bar{Q}_{n,k}$ denote the estimate of $\bar{Q}_{0}$ obtained 
-by training algorithm $k$ using the full data set. The super learner estimate of $\bar{Q}_{0}(a,w)$ is \[
-  \bar{Q}_{n,SL}(a, w) = \sum_{k = 1}^K \alpha_{n,k} \bar{Q}_{n,k}(a, w) \ , 
-\]
-where $\alpha_n = (\alpha_{n,1}, \dots, \alpha_{n,K})$ is a weight vector that is selected by minimizing
-a cross-validated risk criteria. That is, each of the $K$ algorithms is trained according to a $V$-fold
-cross-validation scheme, resulting in $V + 1$ fits of each algorithm (one in each of $V$ training folds
-plus one obtained by fitting the algorithm using the full data). Let $\bar{Q}_{n,k,v}$ denote the $k$-th
-algorithm trained using the $v$-th training fold. For $i = 1,\dots,n$, let $\bar{Q}_{n,k,i}^{cv}(1)$ 
-denote the estimate of $\bar{Q}_0(1, W_i)$ implied by the fitted algorithm $\bar{Q}_{n,k,v}$, which 
-was obtained when observation $i$ was in the validation sample. That is, for observations with
-$A_i = 1$, $\bar{Q}_{n,k,i}^{cv}(1)$ is an out of sample prediction of $Y_i$ based on the
-$k$-th algorithm. Now, we can construct a *partially cross-validated* super learner prediction as follows. For $i = 1, \dots, n$ let \[
-  \bar{Q}_{n,SL,i}^{cv}(1) = \sum_{k = 1}^K \alpha_{n,k} \bar{Q}_{n,k,i}^{cv}(1)
-\]
-be the estimate obtained by ensembling the training-set-specific algorithm fits based on $\alpha_n$. 
-We can use these estimates to produce our *partially cross-validated* standard error estimate as follows. We define \[
- D_i^{pcv} = \frac{I(A_i = 1)}{g_{n,SL,i}^{cv}} \{ Y_i - \bar{Q}_{n,SL,i}^{cv}(1)\} + \bar{Q}_{n,SL,i}^{cv}(1) - \frac{1}{n} \sum_{i=1}^n \bar{Q}_{n,SL,i}^{cv}(1) 
- \]
-and compute an estimate of $\sigma^2_0$ using \[
-  \sigma^2_{n,pcv} = \frac{1}{n} \sum_{i=1}^n \left\{ D_i^{pcv} - \frac{1}{n} \sum_{j=1}^n D_j^{pcv} \right\}^2 \ . 
-\]
+Suppose we have $K$ candidate regressions in our super learner library for both
+the OR and PS (in practice, the number could be different for the OR and for the
+PS). Recall that a super learner estimate of, for example, $\bar{Q}_0(a, w)$ is
+obtained as a weighted combination of estimates from each candidate regression.
+Let $\bar{Q}_{n,k}$ denote the estimate of $\bar{Q}_{0}$ obtained by training
+algorithm $k$ using the full data set. The super learner estimate of
+$\bar{Q}_{0}(a,w)$ is
+\begin{equation*}
+  \bar{Q}_{n,SL}(a, w) = \sum_{k = 1}^K \alpha_{n,k} \bar{Q}_{n,k}(a, w) \ ,
+\end{equation*}
+where $\alpha_n = (\alpha_{n,1}, \dots, \alpha_{n,K})$ is a weight vector that
+is selected by minimizing a cross-validated risk criterion. That is, each of the
+$K$ algorithms is trained according to a $V$-fold cross-validation scheme,
+resulting in $V + 1$ fits of each algorithm (one in each of $V$ training folds,
+plus one obtained by fitting the algorithm using the full data). Let
+$\bar{Q}_{n,k,v}$ denote the $k$\textsuperscript{th} algorithm trained using the
+$v$\textsuperscript{th} training fold. For $i = 1, \dots, n$, let
+$\bar{Q}_{n,k,i}^{cv}(1)$ denote the estimate of $\bar{Q}_0(1, W_i)$ implied by
+the fitted algorithm $\bar{Q}_{n,k,v}$, which was obtained when observation $i$
+was in the validation sample. That is, for observations with $A_i = 1$,
+$\bar{Q}_{n,k,i}^{cv}(1)$ is an out-of-sample prediction of $Y_i$ based on the
+$k$\textsuperscript{th} algorithm. Now, we can construct a *partially
+cross-validated* super learner prediction as follows. For $i = 1, \dots, n$ let
+\begin{equation*}
+  \bar{Q}_{n,SL,i}^{cv}(1) = \sum_{k = 1}^K \alpha_{n,k}
+    \bar{Q}_{n,k,i}^{cv}(1)
+\end{equation*}
+be the estimate obtained by ensembling the training-set-specific algorithm fits
+based on $\alpha_n$. We can use these estimates to produce our *partially
+cross-validated* standard error estimate as follows. First, define
+\begin{equation*}
+  D_i^{pcv} = \frac{I(A_i = 1)}{g_{n,SL,i}^{cv}} \{ Y_i -
+    \bar{Q}_{n,SL,i}^{cv}(1)\} + \bar{Q}_{n,SL,i}^{cv}(1) -
+    \frac{1}{n} \sum_{i=1}^n \bar{Q}_{n,SL,i}^{cv}(1),
+\end{equation*}
+then, compute an estimate of $\sigma^2_0$ using
+\begin{equation*}
+  \sigma^2_{n,pcv} = \frac{1}{n} \sum_{i=1}^n \left\{ D_i^{pcv} -
+  \frac{1}{n} \sum_{j=1}^n D_j^{pcv} \right\}^2 \ .
+\end{equation*}
 
-Note that is not a proper cross-validated estimate, since observation $i$ is used to compute the 
-weight vector $\alpha_n$. However, such estimates can be obtained based on the output of a single 
-round of super learning, thereby providing improved standard error estimates at minimal additional
-computational cost. 
+Note that is not a properly cross-validated estimate, since observation $i$ is
+used to compute the weight vector $\alpha_n$. However, such estimates can be
+obtained based on the output of a single round of super learning, thereby
+providing improved standard error estimates at minimal additional computational
+cost.
 
-Here, we demonstrate how to obtain such estimates using `drtmle`.
+Below, we demonstrate how to obtain such estimates using `drtmle`.
 
 ```{r, demo_pcv, cache = TRUE, warning = FALSE}
 set.seed(1234)
@@ -1373,7 +1405,7 @@ paper for further discussion.
 
 ### Implementation of outcome-adaptive propensity score
 
-If the outcome-adaptive PS is desired, the user may specify this via 
+If the outcome-adaptive PS is desired, the user may specify this via
 the `adapt_g` option. In this case, the additional targeting steps needed for doubly
 robust inference are "turned off" (i.e., `guard = NULL`), since, as discussed above,
 this estimator is *not* doubly robust. Note that when the `adapt_g = TRUE` the data
@@ -1398,10 +1430,10 @@ adaptg_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
 
 # outcome adaptive propensity score fit using super learner
 adaptg_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
-                     SL_Q = c("SL.glm", "SL.mean"), 
+                     SL_Q = c("SL.glm", "SL.mean"),
                      SL_g = c("SL.glm", "SL.mean"),
                      adapt_g = TRUE)
-``` 
+```
 
 # Discussion
 
@@ -1428,6 +1460,6 @@ or `SL.earth`.
 
 Planned extensions of the `drtmle` package include extensions of longitudinal
 settings involving treatments at multiple time points and inclusion of the
-collaborative targeted maximum likelihood estimator (C--TMLE) of
+collaborative targeted maximum likelihood estimator (C-TMLE) of
 \citet{vdl:2014:ijb} that also facilitates collaborative doubly-robust
 inference.
