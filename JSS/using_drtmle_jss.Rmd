@@ -11,6 +11,9 @@ author:
     orcdi: 0000-0002-1019-8343
   - name: Nima S. Hejazi
     affiliation: University of California, Berkeley
+    address: |
+      | 2121 Berkeley Way,
+      | Berkeley, California, 94704, U.S.A.
     email: \email{nhejazi@berkeley.edu}
     orcdi: 0000-0002-7127-2789
 title:
@@ -114,23 +117,23 @@ OR, paving the way for inference that is doubly-robust.
 similar robustness properties and illustrated their practical performance.
 
 The two proposed procedures that yield doubly-robust inference are quite
-involved, notably requiring iterative estimation of additional, complex
-nuisance parameters. The `drtmle` package was motivated by the need for a
+involved, notably requiring iterative estimation of additional, complex nuisance
+parameters. The \pkg{drtmle} package was motivated by the need for a
 user-friendly tool to implement these methods. The package implements the TML
 estimators of population-level effects proposed in \citet{vdl:2014:ijb} and
 \citet{benkeser:2017:biometrika}, as well as several extensions including
-cross-validated targeted minimum loss-based estimation (CV--TMLE). Additionally,
-`drtmle` implements an IPTW estimator that overcomes shortcomings of existing
-IPTW implementations with respect to statistical inference. In particular, the
-estimator allows an adaptive estimator of the PS to be used in construction of
-the IPTW estimator, while yielding valid statistical inference about
-population-level effects. Both the TML and IPTW estimators implemented in the
-`drtmle` package are capable of estimating population-level effects for
+cross-validated targeted minimum loss-based estimation (CV-TMLE). Additionally,
+\pkg{drtmle} implements an IPTW estimator that overcomes shortcomings of
+existing IPTW implementations with respect to statistical inference. In
+particular, the estimator allows an adaptive estimator of the PS to be used in
+construction of the IPTW estimator, while yielding valid statistical inference
+about population-level effects. Both the TML and IPTW estimators implemented in
+the \pkg{drtmle} package are capable of estimating population-level effects for
 discrete-valued treatments; moreover, the package provides convenient utilities
 for constructing confidence intervals and hypothesis tests about contrasts of
 the mean outcome under different levels of treatment. This document explains
 some of the key concepts underlying doubly-robust inference and illustrates
-usage of the `drtmle` package.
+usage of the \pkg{drtmle} package.
 
 # Definition and estimators of the average treatment effect
 
@@ -365,7 +368,7 @@ inference, TMLE ought to be preferred.
 
 # Implementation of doubly-robust inference
 
-The main function of the package is the eponymous `drtmle` function. This
+The main function of the package is the eponymous `drtmle()` function. This
 function estimates the treatment-specific marginal mean for user-specified
 levels of a discrete-valued treatment and computes a doubly-robust covariance
 matrix for these estimates. The function implements either the
@@ -375,7 +378,7 @@ improved estimators of \citet{benkeser:2017:biometrika}
 combining these estimates into estimates of average treatment effects, as well
 as other contrasts, as discussed below.
 
-The main data arguments for `drtmle` are `W, A, Y`, which, as above, represent
+The main data arguments for `drtmle()` are `W, A, Y`, which, as above, represent
 the covariates, a discrete-valued treatment, and an outcome, respectively.
 Missing data are allowed in `A` and `Y`, as discussed below. Beyond the data
 arguments, it is necessary to specify how to estimate each of the OR, PS, R-OR,
@@ -383,24 +386,24 @@ and R-PS (or R-PS1, R-PS2). The package provides flexibility in how these
 regression parameters may be estimated. Once the user has specified the data
 arguments and how to estimate each regression parameter, the function proceeds
 as follows:
-  1. estimate the OR via the internal `estimateQ` function;
-  2. estimate the PS via the internal `estimateG` function;
-  3. estimate reduced-dimension regression via the internal `estimateQrn` and
-     `estimategrn` functions;
-  4. iteratively modify initial estimates of the OR and PS via the `fluctuateQ`
-      and `fluctuateG` functions until equations (5)-(7) are approximately
-      solved;
+  1. estimate the OR via the internal `estimateQ()` function;
+  2. estimate the PS via the internal `estimateG()` function;
+  3. estimate reduced-dimension regression via the internal `estimateQrn()` and
+     `estimategrn()` functions;
+  4. iteratively modify initial estimates of the OR and PS via the
+     `fluctuateQ()` and `fluctuateG()` functions until equations (5)-(7) are
+     approximately solved;
   5. compute the TML estimates and covariance estimates based on the final OR.
 We refer interested readers to \citet{benkeser:2017:biometrika} for a
 theoretical derivation of how the iterative modification of initial OR and PS is
 performed.
 
 In addition to returning doubly-robust parameter and covariance estimates, the
-`drtmle` function returns estimates of the GCOMP, AIPTW, standard TMLE, and the
+`drtmle()` function returns estimates of the GCOMP, AIPTW, standard TMLE, and the
 modified AIPTW estimator discussed in the remark above. While doubly-robust
 inference based on these estimators is not available, the estimators are
 provided for comparison. In the following subsections, we look at various
-options for making calls to `drtmle`.
+options for making calls to `drtmle()`.
 
 ## Estimating regressions
 ```{r, echo = FALSE, message = FALSE}
@@ -413,14 +416,14 @@ Y0 <- rbinom(N, 1, plogis(W$W1))
 EY1 <- mean(Y1)
 EY0 <- mean(Y0)
 ```
-While the estimators computed by `drtmle` are consistent and asymptotically
+While the estimators computed by `drtmle()` are consistent and asymptotically
 normal under inconsistent estimation of either the OR or PS, it is nevertheless
 advisable to strive for consistent estimation of *both* the OR and PS. If both
 of the regression parameters are consistently estimated, then the estimators
-computed by `drtmle` achieve the nonparametric efficiency bound, resulting in
+computed by `drtmle()` achieve the nonparametric efficiency bound, resulting in
 narrower confidence intervals and more powerful hypothesis tests. In order for
 the estimates of the OR and PS to have the greatest chance of consistency, the
-`drtmle` function facilitates estimation using adaptive estimation techniques.
+`drtmle()` function facilitates estimation using adaptive estimation techniques.
 In fact, there are three ways to estimate each of the regression parameters:
 generalized linear models, super learning
 [@vdl:2007:statapp; @SuperLearnerPackage], and a user-specified estimation
@@ -467,7 +470,7 @@ named `"Qn"` if `reduction = "univariate"`. Instead, if the estimators of
 formula assumes data with two columns, `"Qn"` and `"gn"`.
 
 The code below illustrates how generalized linear models can be used to
-estimate the regression parameters. In this call to `drtmle`, we specify
+estimate the regression parameters. In this call to `drtmle()`, we specify
 `family = binomial()` so that logistic regression is used to estimate the OR.
 We illustrate non-stratified regression for both the univariate (default) and
 bivariate reductions below.
@@ -500,27 +503,27 @@ a user-selected loss function [@dudoit2005asymptotics].  Oracle inequalities
 show that the super learner estimate performs essentially as well as the unknown
 best convex combination of the candidate estimators [@vdvaart:2006:statdec].
 Thus, the methodology may be seen as an asymptotically optimal way of performing
-estimator selection.  Practically, the super learner provides the best chance
+estimator selection. Practically, the super learner provides the best chance
 for obtaining a consistent estimator for both the OR and PS, and thereby an
 efficient estimator of the marginal means of interest.
 
 Super learning is implemented in the R package \pkg{SuperLearner}
-[@SuperLearnerPackage] and `drtmle` provides the option to utilize super
-learning for estimation of the OR, PS, and reduced-dimension regressions via
-the `SL_Q`, `SL_g`, `SL_Qr`, and `SL_gr` options. When calling `drtmle` either
-the generalized linear model options for regression modeling or the super
-learner options should be invoked. If both are called, the function will
-automatically opt to using the super learner option. The inputs to the super
-learner options are passed to the `SL.library` argument of the `SuperLearner`
-function of the `SuperLearner` package. We refer readers to the `SuperLearner`
-documentation for information on how to properly specify a super learner
-library. In the code below, we illustrate a call to `drtmle` with a relatively
-simple library. For the OR and PS, the library includes a main-terms generalized
-linear model (via the function `SL.glm` from `SuperLearner`) and an unadjusted
-generalized linear model (`SL.mean`). For the reduced-dimension regressions we
-use a super learner library with a main-terms generalized linear model
-(`SL.glm`) and adaptive regression splines (`SL.earth`, which utilizes the
-`earth` package [@earthPackage]).
+[@SuperLearnerPackage] and `drtmle()` provides the option to utilize super
+learning for estimation of the OR, PS, and reduced-dimension regressions via the
+`SL_Q`, `SL_g`, `SL_Qr`, and `SL_gr` options. When calling `drtmle()` either the
+generalized linear model options for regression modeling or the super learner
+options should be invoked. If both are called, the function will automatically
+opt to using the super learner option. The inputs to the super learner options
+are passed to the `SL.library` argument of the `SuperLearner()` function of the
+\pkg{SuperLearner} package. We refer readers to the documentation of the
+`SuperLearner()` function for information on how to properly specify a super
+learner library. In the code below, we illustrate a call to `drtmle()` with a
+relatively simple library. For the OR and PS, the library includes a main-terms
+generalized linear model (via the function `SL.glm` from \pkg{SuperLearner}) and
+an unadjusted generalized linear model (`SL.mean`). For the reduced-dimension
+regressions we use a super learner library with a main-terms generalized linear
+model (`SL.glm`) and adaptive regression splines (`SL.earth`, which utilizes the
+\pkg{earth} package [@earthPackage]).
 
 ```{r, warning = FALSE, message = FALSE, cache = TRUE}
 set.seed(1234)
@@ -533,14 +536,15 @@ sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
 sl_fit
 ```
 
-The `drtmle` package also allows users to pass in their own functions for
+The \pkg{drtmle} package also allows users to pass in their own functions for
 estimating regression parameters via the `SL_` options. These functions must be
-formatted properly for compatibility with `drtmle`. The necessary formatting is
-identical to the formatting required for writing a `SuperLearner` wrapper (see
-`SuperLearner::write.SL.template()`). The `drtmle` package includes `SL.npreg`,
-which is an example of how a user can specify a function for estimating
-regression parameters. This functions fits a kernel regression estimator using
-the `np` package [@npPackage]. Below we show the source code for this function.
+formatted properly for compatibility with `drtmle()`. The necessary formatting
+is identical to the formatting required for writing a `SuperLearner` wrapper
+(see `SuperLearner::write.SL.template()`). The \pkg{drtmle} package includes
+`SL.npreg`, which is an example of how a user can specify a function for
+estimating regression parameters. This functions fits a kernel regression
+estimator using the \pkg{np} package [@npPackage]. Below we show the source code
+for this function.
 
 ```{r}
 SL.npreg
@@ -558,17 +562,18 @@ function as part of a super learner library. The `SL.npreg` function proceeds by
 checking whether there is sufficient variation in `Y` to justify fitting the
 kernel regression (as specified by option `rangeThresh`), and if so, fits a
 kernel regression with cross-validated bandwidth selection via the `npregbw()`
-function. The output is then formatted in a specific way so that `drtmle` is
+function. The output is then formatted in a specific way so that `drtmle()` is
 able to retrieve the appropriate objects from the fitted regression. In
 particular the output should be a list with named objects `pred` and `fit`; the
 former including predictions made from the fitted regression on `newX`, the
 latter including any information that may be needed to predict new values based
 on the fitted object. A class is assigned to the `fit` object, so that an S3
-`predict` method may later be used to predict new values based on the fitted
-regression object. The user must also specify this `predict` method. Use
-`drtmle:::predict.SL.npreg` to view the simple `predict` method for `SL.npreg`.
+`predict()` method may later be used to predict new values based on the fitted
+regression object. The user must also specify this `predict()` method. Use
+`drtmle:::predict.SL.npreg()` to view the simple `predict()` method for
+`SL.npreg`.
 
-In the code below, we demonstrate a call to `drtmle` with `SL.npreg` used to
+In the code below, we demonstrate a call to `drtmle()` with `SL.npreg` used to
 estimate each nuisance parameter. Here, we also illustrate the use of `stratify
 = TRUE`, which fits a separate kernel regression of $Y$ onto $W$ in
 observations with $A = 1$ and $A = 0$.
@@ -620,22 +625,22 @@ average of two point estimates, each obtained using OR and PS estimates that are
 averaged over two super learners.
 
 Not surprisingly, averaging over multiple super learners can add considerable
-computational expense to calls to `drtmle`. The package is currently
-parallelized at the level of individual calls to `SuperLearner`. With
+computational expense to calls to `drtmle()`. The package is currently
+parallelized at the level of individual calls to `SuperLearner()`. With
 parallelization over enough cores, repeated super learning should not add too
-much to the computational burden relative to a single call to `SuperLearner`.
+much to the computational burden relative to a single call to `SuperLearner()`.
 
 ### Arbitrary user-specified regressions
 
-The `drtmle` package also allows users to pass in their own estimated OR and PS
-via the `Qn` and `gn` options, respectively.  If `Qn` is specified by the user,
-`drtmle` will ignore the nuisance parameter estimation routines specified by
-`SL_Q` and `glm_Q` -- similarly for `gn` and `SL_g`, `glm_g`. As noted in the
-package documentation, there is a specific format necessary for inputting `Qn`
-and `gn`. For `Qn`, the entries in the list should correspond to the OR
-evaluated at `A` and the observed values of `W`, with order determined by the
-input to `a_0`. For example, if `a_0 = c(0, 1)` then `Qn[[1]]` should be the OR
-at $A = 0$ and `Qn[[2]]` should be the outcome regression at $A = 1$. The
+The \pkg{drtmle} package also allows users to pass in their own estimated OR and
+PS via the `Qn` and `gn` options, respectively.  If `Qn` is specified by the
+user, `drtmle()` will ignore the nuisance parameter estimation routines
+specified by `SL_Q` and `glm_Q` -- similarly for `gn` and `SL_g`, `glm_g`. As
+noted in the package documentation, there is a specific format necessary for
+inputting `Qn` and `gn`. For `Qn`, the entries in the list should correspond to
+the OR evaluated at `A` and the observed values of `W`, with order determined by
+the input to `a_0`. For example, if `a_0 = c(0, 1)` then `Qn[[1]]` should be the
+OR at $A = 0$ and `Qn[[2]]` should be the outcome regression at $A = 1$. The
 example below illustrates this concept.
 
 ```{r, cache = TRUE, message = FALSE}
@@ -722,10 +727,10 @@ that the ordering of `Qn` and `gn` is consistent with `a_0`.
 ## Standard error estimation
 
 This section contains some more advanced mathematical material and may be
-skipped over by users interested only in implementation. For simplicity, we focus
-this discussion on the standard TML/AIPTW estimators. The ideas generalize
-immediately to the DR-TML estimator, but the formulas are more complex in this
-latter case.
+skipped over by users interested only in implementation. For simplicity, we
+focus this discussion on the standard TML and AIPTW estimators. The ideas
+generalize immediately to the DR-TML estimator, but the formulas are more
+complex in this latter case.
 
 Reported standard error estimates are based on an estimate of the asymptotic
 variance of the estimators. This variance can be characterized by influence
@@ -765,7 +770,7 @@ such estimates are obtained by modifying an initial OR estimate so as to ensure
 a particular (set of) equation(s) is (are) solved.  However, simulations have
 shown that better standard error estimates for TMLE may be achieved by instead
 using the *initial* OR estimate in the computation of standard errors, as
-described in the preceding subsection. To this end, The `drtmle` function
+described in the preceding subsection. To this end, The `drtmle()` function
 includes the `targeted_se` option.
 
 ```{r, show_targeted_se, cache = TRUE}
@@ -797,7 +802,7 @@ true MSE. To more accurately estimate the MSE of a machine learning algorithm,
 cross-validation can be used. The same sample-splitting idea can be used to
 obtain more conservative standard error estimates.
 
-Suppose we use $V$-fold cross-validation to obtaine $V$ training-sample-specific
+Suppose we use $V$-fold cross-validation to obtain $V$ training-sample-specific
 estimates of the OR, $\bar{Q}_{n,v}, v = 1, \dots, V$ and the PS, $g_{n,v},
 v = 1, \dots, V$. For $i = 1, \dots, n$, let $\bar{Q}_{n,i}^{cv}(1)$ denote the
 estimate of $\bar{Q}_{0}(a, W_i)$ obtained when observation $i$ was in the
@@ -813,8 +818,9 @@ and compute an estimate of $\sigma^2_0$ using
   \frac{1}{n} \sum_{j=1}^n D_j^{cv} \right\}^2 \ .
 \end{equation*}
 
-In `drtmle`, cross-validated standard error estimates can be obtained by setting
-`se_cv = "full"` and `se_cvFolds` to a number greater than 1. For example,
+In \pkg{drtmle}, cross-validated standard error estimates can be obtained by
+setting `se_cv = "full"` and `se_cvFolds` to a number greater than 1. For
+example,
 
 ```{r, fit_w_full_cv, warning = FALSE, cache = TRUE}
 glm_fit_uni_cv <- drtmle(W = W, A = A, Y = Y, family = binomial(),
@@ -829,11 +835,11 @@ list(glm_fit_uni$drtmle$cov, glm_fit_uni_cv$drtmle$cov)
 ### Partially cross-validated standard errors
 
 Obtaining fully cross-validated standard errors can be fairly time-intensive
-when super learner is used to estimate the OR and PS. In `drtmle`, we give an
-option to compute standard error estimates that are *partially cross-validated*
-and do not require any additional fitting beyond a standard super learner. Here,
-we describe briefly how these estimates are obtained and show calls to `drtmle`
-for obtaining such estimates.
+when super learner is used to estimate the OR and PS. In \pkg{drtmle}, we give
+an option to compute standard error estimates that are *partially
+cross-validated* and do not require any additional fitting beyond a standard
+super learner. Here, we describe briefly how these estimates are obtained and
+show calls to `drtmle()` for obtaining such estimates.
 
 Suppose we have $K$ candidate regressions in our super learner library for both
 the OR and PS (in practice, the number could be different for the OR and for the
@@ -882,7 +888,7 @@ obtained based on the output of a single round of super learning, thereby
 providing improved standard error estimates at minimal additional computational
 cost.
 
-Below, we demonstrate how to obtain such estimates using `drtmle`.
+Below, we demonstrate how to obtain such estimates using `drtmle()`.
 
 ```{r, demo_pcv, cache = TRUE, warning = FALSE}
 set.seed(1234)
@@ -904,10 +910,11 @@ list(
 
 ## Confidence intervals
 
-The `drtmle` package contains methods that compute doubly-robust confidence
+The \pkg{drtmle} package contains methods that compute doubly-robust confidence
 intervals. The `ci()` method computes confidence intervals about the estimated
-marginal means in a fitted `drtmle` object, in addition to contrasts between
-those means. By default the method gives confidence intervals about each mean.
+marginal means in a fitted object of S3 class `"drtmle"`, in addition to
+contrasts between those means. By default, the method gives confidence intervals
+about each mean.
 
 ```{r}
 ci(npreg_fit)
@@ -937,8 +944,8 @@ the delta method, an estimate of this standard error is given by
   \sigma^{\log}_n = \nabla g(\psi_n)^T \Sigma_n \nabla g(\psi_n),
 \end{equation*}
 where $\Sigma_n$ is the doubly-robust covariance matrix estimate output from
-`drtmle` and $\nabla g(\psi)$ is the gradient of $\log\{\psi(1)/\psi(0)\}$. This
-confidence interval may be obtained as follows.
+`drtmle()` and $\nabla g(\psi)$ is the gradient of $\log\{\psi(1)/\psi(0)\}$.
+This confidence interval may be obtained as follows.
 
 ```{r}
 riskRatio <- list(f = function(eff){ log(eff) },
@@ -948,7 +955,7 @@ riskRatio <- list(f = function(eff){ log(eff) },
 ci(npreg_fit, contrast = riskRatio)
 ```
 
-More generally, this method of inputting the `contrast` option to the `ci`
+More generally, this manner of inputting the `contrast` option to the `ci()`
 method can be used to compute confidence intervals of the form
 \begin{equation*}
   f^{-1}\bigl\{ f(h(\psi_n)) \pm z_{1-\alpha/2} \nabla f(h(\psi_n))^T \Sigma_n
@@ -983,7 +990,7 @@ ci(npreg_fit, contrast = logitMean)
 ## Hypothesis tests
 
 Doubly-robust Wald-style hypothesis tests may be implemented using the
-`wald_test` method. As with confidence intervals, there are three options for
+`wald_test()` method. As with confidence intervals, there are three options for
 testing. First, we may test the null hypothesis that the marginal means equal a
 fixed value (or values). Below, we test the null hypothesis that $\psi_0(1) =
 0.5$ and that $\psi_0(0) = 0.6$ by inputting a vector to the `null` option.
@@ -992,7 +999,7 @@ fixed value (or values). Below, we test the null hypothesis that $\psi_0(1) =
 wald_test(npreg_fit, null = c(0.5, 0.6))
 ```
 
-As with the `ci` method, the `wald_test` method allows users to test linear
+As with the `ci()` method, the `wald_test()` method allows users to test linear
 combinations of marginal means by inputting a vector of ones and negative ones
 in the `contrast` option. We can use this to test the null hypothesis of no
 average treatment effect or to test the null hypothesis that the average
