@@ -905,7 +905,7 @@ list(
 ## Confidence intervals
 
 The `drtmle` package contains methods that compute doubly-robust confidence
-intervals. The `ci` method computes confidence intervals about the estimated
+intervals. The `ci()` method computes confidence intervals about the estimated
 marginal means in a fitted `drtmle` object, in addition to contrasts between
 those means. By default the method gives confidence intervals about each mean.
 
@@ -915,69 +915,68 @@ ci(npreg_fit)
 
 Alternatively the `contrast` option allows users to specify a linear
 combination of marginal means, which can be used to estimate the average
-treatment effect as we show below.
+treatment effect, as we show below.
 
 ```{r}
-ci(npreg_fit, contrast = c(1,-1))
+ci(npreg_fit, contrast = c(1, -1))
 ```
 
-The `contrast` option can also be input as a list of functions in order to
+The `contrast` option also accepts as input a list of functions to be used to
 compute a confidence interval for a user-specified contrast. For example, we
 might be interested in the risk ratio $\psi_0(1) / \psi_0(0)$. When
-constructing Wald style confidence intervals for ratios, it is common to
-compute the interval on the log scale and back-transform. That is, the
-confidence interval is of the form
-$$
-\mbox{exp}\biggl[\mbox{log}\biggl\{ \frac{\psi_0(1)}{\psi_0(0)} \biggr\} \pm
-z_{1-\alpha/2} \sigma^{\text{log}}_n \biggr] \ ,
-$$
-where $\sigma^{\text{log}}_n$ is the estimated standard error on the log-scale.
-By the delta method, an estimate of this standard error is given by $$
-\sigma^{\text{log}}_n = \nabla g(\psi_n)^T \Sigma_n \nabla g(\psi_n),
-$$
+constructing Wald-style confidence intervals for ratios, it is common to
+compute the interval on the logarithmic scale and subsequently back-transform.
+That is, the confidence interval takes the form
+\begin{equation*}
+  \exp \biggl[\log \biggl\{ \frac{\psi_0(1)}{\psi_0(0)} \biggr\} \pm
+  z_{1-\alpha/2} \sigma^{\log}_n \biggr] \ ,
+\end{equation*}
+where $\sigma^{\log}_n$ is the estimated standard error on the log-scale. By
+the delta method, an estimate of this standard error is given by
+\begin{equation*}
+  \sigma^{\log}_n = \nabla g(\psi_n)^T \Sigma_n \nabla g(\psi_n),
+\end{equation*}
 where $\Sigma_n$ is the doubly-robust covariance matrix estimate output from
-`drtmle` and $\nabla g(\psi)$ is the gradient of
-$\mbox{log}\{\psi(1)/\psi(0)\}$. To obtain this confidence interval, we may use
-the following code.
+`drtmle` and $\nabla g(\psi)$ is the gradient of $\log\{\psi(1)/\psi(0)\}$. This
+confidence interval may be obtained as follows.
 
 ```{r}
 riskRatio <- list(f = function(eff){ log(eff) },
                   f_inv = function(eff){ exp(eff) },
-                  h = function(est){ est[1]/est[2] },
-                  fh_grad =  function(est){ c(1/est[1],-1/est[2]) })
+                  h = function(est){ est[1] / est[2] },
+                  fh_grad =  function(est){ c(1 / est[1], -1 / est[2]) })
 ci(npreg_fit, contrast = riskRatio)
 ```
 
-More generally this method of inputting the `contrast` option to the `ci`
+More generally, this method of inputting the `contrast` option to the `ci`
 method can be used to compute confidence intervals of the form
-$$
-f^{-1}\bigl\{ f(h(\psi_n)) \pm z_{1-\alpha/2} \nabla f(h(\psi_n))^T \Sigma_n
-\nabla f(h(\psi_n)) \bigr\} \ ,
-$$
+\begin{equation*}
+  f^{-1}\bigl\{ f(h(\psi_n)) \pm z_{1-\alpha/2} \nabla f(h(\psi_n))^T \Sigma_n
+  \nabla f(h(\psi_n)) \bigr\} \ ,
+\end{equation*}
 where $f$ (`contrast$f`) is the transformation of the confidence interval,
 $f^{-1}$ (`contrast$f_inv`) is the back-transformation of the interval, $h$
-(`contrast$h`) is the contrast of marginal means, and $\nabla f(h(\psi_n))$
+(`contrast$h`) is the contrast of the marginal means, and $\nabla f(h(\psi_n))$
 (`contrast$fh_grad`) defines the gradient of the transformed contrast at the
 estimated marginal means.
 
 We note that this method of computing confidence intervals can also be used to
 obtain a transformed confidence interval for a particular marginal mean. For
-example, in our running example $Y$ is binary. Thus, we might wish to enforce
-that our confidence interval be computed on a scale which ensures that the
-confidence limits are bounded between zero and one. To that end, we can
-consider an interval of the form construct an interval on the logit scale and
-back-transform,
-$$
-\mbox{expit}\biggl[ \mbox{log}\biggl\{ \frac{\psi_n(1)}{1 - \psi_n(1)} \biggr\}
-\pm z_{1-\alpha/2} \sigma^{\text{logit}}_n \biggr] \ .
-$$
+example, recall that $Y$ is binary in our running example. Thus, we may wish to
+enforce that our confidence interval be computed on a scale ensuring that the
+estimated confidence limits fall within the unit interval $[0, 1]$. To that end,
+we can utilize an interval of the form:
+\begin{equation*}
+  \expit \biggl[ \log\biggl\{ \frac{\psi_n(1)}{1 - \psi_n(1)} \biggr\}
+  \pm z_{1-\alpha/2} \sigma^{\text{logit}}_n \biggr] \ .
+\end{equation*}
 This confidence interval may be implemented as follows.
 
 ```{r}
 logitMean <- list(f = function(eff){ qlogis(eff) },
                   f_inv = function(eff){ plogis(eff) },
                   h = function(est){ est[1] },
-                  fh_grad = function(est){ c(1/(est[1] - est[1]^2), 0) })
+                  fh_grad = function(est){ c(1 / (est[1] - est[1]^2), 0) })
 ci(npreg_fit, contrast = logitMean)
 ```
 
@@ -997,24 +996,26 @@ As with the `ci` method, the `wald_test` method allows users to test linear
 combinations of marginal means by inputting a vector of ones and negative ones
 in the `contrast` option. We can use this to test the null hypothesis of no
 average treatment effect or to test the null hypothesis that the average
-treatment effect equals 0.05 (by specifying the `null` option)
+treatment effect equals a given reference value, e.g., $0.05$, by specifying
+the `null` option.
 
 ```{r}
 wald_test(npreg_fit, contrast = c(1, -1))
 wald_test(npreg_fit, contrast = c(1, -1), null = 0.05)
 ```
 
-The `wald_test` method also allows for user-specified contrasts to be tested
-using syntax similar to the `ci` method. The only difference syntactically is
+The `wald_test()` method also allows for user-specified contrasts to be tested
+using syntax similar to the `ci()` method. The only difference syntactically is
 that it is not strictly necessary to specify `f_inv`, as the hypothesis test is
 performed on the transformed scale. That is, we can generally test the null
 hypothesis that $f(h(\psi_0))$ equals $f_0$ (the function $f$ applied to the
-value passed to `null`) using the Wald statistic $$
-Z_n := \frac{\{f(h(\psi_n)) - f_0\}}{\nabla f(h(\psi_n))^T \Sigma_n \nabla
-f(h(\psi_n))} \ .
-$$
+value passed to `null`) using the Wald statistic
+\begin{equation*}
+  Z_n \coloneqq \frac{\{f(h(\psi_n)) - f_0\}}{\nabla f(h(\psi_n))^T \Sigma_n
+  \nabla f(h(\psi_n))} \ .
+\end{equation*}
 We can use the `riskRatio` contrast defined previously to test the null
-hypothesis that $\psi_0(1)/\psi_0(0) = 1$.
+hypothesis that $\psi_0(1) / \psi_0(0) = 1$.
 
 ```{r}
 wald_test(npreg_fit, contrast = riskRatio, null = 1)
@@ -1022,20 +1023,24 @@ wald_test(npreg_fit, contrast = riskRatio, null = 1)
 
 ## Missing data
 
-The `drtmle` function supports missing data in `A` and `Y`. Such missing data
+The `drtmle()` function supports missing data in `A` and `Y`. Such missing data
 are common in practice and, if ignored, can bias estimates of the marginal
 means of interest. The estimators previously discussed can be modified to allow
-this missingness to depend on covariates. Let $\Delta_A$ and $\Delta_Y$ be
-indicators that $A$ and $Y$ are observed, respectively. We can redefine the OR
-to be $\bar{Q}_0(a,w) := E_0(\Delta_Y Y \mid \Delta_A A = a, \Delta_A = 1,
-\Delta_Y = 1, W = w)$ and similarly redefine the PS to be \begin{align}
-g_0(a \mid w) &= Pr_0(\Delta_A = 1, \Delta_A A = a, \Delta_Y = 1 \mid W = w)
-\notag \\
-&= Pr_0(\Delta_A = 1 \mid W) Pr_0(\Delta_A A = a \mid \Delta_A = 1, W = w)
-\label{modPS} \\
-&\hspace{1.5in} Pr_0(\Delta_Y = 1 \mid \Delta_A = 1, \Delta_A A = a, W = w) \ \notag.
+such missingness processes to depend on observed covariates. Let $\Delta_A$ and
+$\Delta_Y$ be indicators that $A$ and $Y$ are observed, respectively. We can
+redefine the OR to be $\bar{Q}_0(a,w) \coloneqq E_0(\Delta_Y Y \mid \Delta_A
+A = a, \Delta_A = 1, \Delta_Y = 1, W = w)$ and similarly redefine the PS to be
+\begin{align}
+  g_0(a \mid w) &= Pr_0(\Delta_A = 1, \Delta_A A = a, \Delta_Y = 1 \mid W = w)
+  \notag \\
+  &= Pr_0(\Delta_A = 1 \mid W) Pr_0(\Delta_A A = a \mid \Delta_A = 1, W = w)
+  \label{modPS} \\
+  &\hspace{1.5in} Pr_0(\Delta_Y = 1 \mid \Delta_A = 1, \Delta_A A = a, W = w) \
+   \notag.
 \end{align}
-We introduce missing values to `A` and `Y` in our running example.
+
+To demonstrate, we artificially introduce missing values to `A` and `Y` in our
+running example.
 
 ```{r}
 DeltaA <- rbinom(n, 1, plogis(2 + W$W1))
@@ -1044,21 +1049,20 @@ A[DeltaA == 0] <- NA
 Y[DeltaY == 0] <- NA
 ```
 
-The only modification of the call to `drtmle` is in how the PS estimation is
+The only modification of the call to `drtmle()` is in how the PS estimation is
 performed. The options `glm_g` and `SL_g` are still used to fit generalized
 linear models or a super learner, respectively. However, the code allows for
 separate regression fits for each of the three components of the PS in (8). To
-perform separate generalized linear model fits for each of the three
-components, `glm_g` should be a named list with entries `"DeltaA"`, `"A"`, and
-`"DeltaY"`. Respectively these should provide a regression formula for the
-regression of $\Delta_A$ on $W$, $A$ on $W$ in observations with $\Delta_A =
-1$, and a regression of $\Delta_Y$ on $W$ and $A$ in observations with
-$\Delta_A = \Delta_Y = 1$ (if `stratify = FALSE`) or a regression of $\Delta_Y$
-on $W$ to be fit in observations with $\Delta_A = \Delta_Y = 1$ and $A = a$ for
-each $a$ specified in option `a_0` (if `stratify = TRUE`). If only a single
-formula is passed to `glm_g`, it is used for each of the three regressions. We
-illustrate a call to `drtmle` with missing data and generalized linear model
-fits below.
+perform separate generalized linear model fits for each of the three components,
+`glm_g` should be a named list with entries `"DeltaA"`, `"A"`, and `"DeltaY"`.
+Respectively, these should provide a formula expression for the regression of
+$\Delta_A$ on $W$, $A$ on $W$ in observations with $\Delta_A = 1$, and of
+$\Delta_Y$ on $W$ and $A$ in observations with $\Delta_A = \Delta_Y = 1$ (if
+`stratify = FALSE`) _or_ of $\Delta_Y$ on $W$ to be fit in observations with
+$\Delta_A = \Delta_Y = 1$ and $A = a$ for each $a$ specified in option `a_0` (if
+`stratify = TRUE`). If only a single formula is passed to `glm_g`, it is used
+for each of the three regressions. We illustrate a call to `drtmle()` with
+missing data and generalized linear model fits below.
 
 ```{r, cache = TRUE}
 glm_fit_wNAs <- drtmle(W = W, A = A, Y = Y, stratify = FALSE,
@@ -1070,10 +1074,10 @@ glm_fit_wNAs
 ```
 
 It is possible to mix generalized linear models and super learning when fitting
-each of the components of the PS. In the below example we use the wrapper
+each of the components of the PS. In the example below, we use the wrapper
 function `SL.glm`, which fits a main terms logistic regression, to fit the
-regression of $\Delta_A$ on $W$, use `SL.npreg` to fit the regression of $A$ on
-$W$, and use a super learner with library `SL.glm`, `SL.mean`, and `SL.earth` to
+regression of $\Delta_A$ on $W$; use `SL.npreg` to fit the regression of $A$ on
+$W$; and use a super learner with library `SL.glm`, `SL.mean`, and `SL.earth` to
 fit the regression of $\Delta_Y$ on $W$ and $A$.
 
 ```{r, cache = TRUE}
@@ -1086,11 +1090,11 @@ mixed_fit_wNAs
 ```
 
 We can also fit the PS regressions externally and pass in via `gn`, though this
-process is slightly more complicated than when no missing data are present. 
-The basic idea is to fit one regression for (i) the indicator of missing $A$, 
-(ii) $A$ itself, and (iii) the indicator of missing the outcome. The three PS's 
-are then multiplied together and an appropriately ordered list is constructed
-as before. We illustrate with the following simple example. 
+process is slightly more complicated than when no missing data are present. The
+basic idea is to fit one regression for (i) the indicator of missing $A$, (ii)
+$A$ itself, and (iii) the indicator of the outcome being missing. The three PS's
+are then multiplied together and an appropriately ordered list is constructed as
+before. We illustrate with the following simple example.
 
 ```{r, cache = TRUE}
 # first regress indicator of missing A on W
@@ -1100,7 +1104,7 @@ fit_DeltaA <- glm(DeltaA ~ . , data = W, family = binomial())
 ps_DeltaA <- predict(fit_DeltaA, type = "response")
 
 # now regress A on W | DeltaA = 1
-fit_A <- glm(A[DeltaA == 1] ~ . , data = W[DeltaA == 1, , drop = FALSE], 
+fit_A <- glm(A[DeltaA == 1] ~ . , data = W[DeltaA == 1, , drop = FALSE],
              family = binomial())
 
 # get estimated propensity for receiving A = 1
@@ -1108,24 +1112,24 @@ ps_A1 <- predict(fit_A, newdata = W, type = "response")
 # propensity for receiving A = 0
 ps_A0 <- 1 - ps_A1
 
-# now regress DeltaY on A + W | DeltaA = 1. Here we are pooling over 
-# values of A (i.e., this is what drtmle does if stratify = FALSE). 
+# now regress DeltaY on A + W | DeltaA = 1. Here we are pooling over
+# values of A (i.e., this is what drtmle does if stratify = FALSE).
 # We could also fit two regressions, one of DeltaY ~ W | DeltaA = 1, A = 1
 # and one of DeltaY ~ W | DeltaA = 1, A = 0 (this is what drtmle does if
-# stratify = TRUE). 
-fit_DeltaY <- glm(DeltaY[DeltaA == 1] ~ . , 
-                  data = data.frame(A = A, W)[DeltaA == 1, ], 
+# stratify = TRUE).
+fit_DeltaY <- glm(DeltaY[DeltaA == 1] ~ . ,
+                  data = data.frame(A = A, W)[DeltaA == 1, ],
                   family = binomial())
 
 # get estimated propensity for observing outcome if A = 1
-ps_DeltaY_A1 <- predict(fit_DeltaY, newdata = data.frame(A = 1, W), 
+ps_DeltaY_A1 <- predict(fit_DeltaY, newdata = data.frame(A = 1, W),
                         type = "response")
 
 # get estimated propensity for observing outcome if A = 0
-ps_DeltaY_A0 <- predict(fit_DeltaY, newdata = data.frame(A = 0, W), 
+ps_DeltaY_A0 <- predict(fit_DeltaY, newdata = data.frame(A = 0, W),
                         type = "response")
 
-# now combine all results into a single propensity score 
+# now combine all results into a single propensity score
 gn <- list(
   # propensity for DeltaA = 1, A = 1, DeltaY = 1
   ps_DeltaA * ps_A1 * ps_DeltaY_A1,
@@ -1157,13 +1161,13 @@ EY0 <- mean(Y0)
 EY2 <- mean(Y2)
 ```
 
-So far in our examples, we have only considered binary treatments. However,
+In our examples so far, we have only considered binary treatments. However,
 `drtmle` is equipped to handle treatments with an arbitrary number of discrete
 values. Suppose that $A$ assumes values in a set $\mathcal{A}$, the PS
 regression estimation is modified to ensure that
-$$
+\begin{equation*}
   \sum\limits_{a \in \mathcal{A}} g_n(a \mid w) = 1 \ \mbox{for all $w$} \ .
-$$
+\end{equation*}
 If this condition is true, we say that the estimates of the PS are compatible.
 Many regression methodologies that have been developed work well with binary
 outcomes, but have not been extended to multi-level outcomes. To ensure that
