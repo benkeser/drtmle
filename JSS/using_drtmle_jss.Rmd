@@ -57,6 +57,8 @@ bibliography: refs
 ```{r, setup, include=FALSE}
 options(prompt = 'R> ', continue = '+ ')
 knitr::opts_chunk$set(warning=FALSE, message=FALSE)
+renv::activate(here::here())
+library(nloptr)
 ```
 
 # Introduction
@@ -167,7 +169,7 @@ An estimator of $\psi_0(a)$ may be motivated directly by (1). Suppose we have
 available an estimate of the OR, $\bar{Q}_n$, and an estimate of the
 distribution function of baseline covariates, $Q_{W,n}$. An estimator of
 $\psi_0(a)$ may be obtained by plugging these into (1), $\psi_n(a) = \int
-\bar{Q}_0(a,w) dQ_{W,n}(w)$. Typically, the empirical distribution function of
+\bar{Q}_n(a,w) dQ_{W,n}(w)$. Typically, the empirical distribution function of
 covariates is used so that this estimator can be equivalently expressed
 \begin{equation*}
   \psi_{n,GCOMP}(a) = \frac{1}{n}\sum\limits_{i=1}^n \bar{Q}_n(a, W_i) \ .
@@ -279,12 +281,12 @@ and PS that simultaneously satisfy equation (4) in addition to two additional
 equations. These equations involve additional regression parameters that we
 refer to as the reduced outcome regression (R-OR) and the reduced propensity
 score (R-PS), defined respectively as
-\begin{align*}
+\begin{align}
   \bar{Q}_{r,0n}(a,w) &\coloneqq E_{0}\bigl\{Y - \bar{Q}_n(W) \mid A = a,
-  g_n(W)=g_n(w)\bigr\} \ , \ \mbox{and} \\
+  g_n(W)=g_n(w)\bigr\} \ , \ \mbox{and} \label{eqn:qbarr} \\
   g_{r,0n}(a \mid w) &\coloneqq Pr_0\left\{A = a \mid \bar{Q}_n(W)=\bar{Q}_n(w),
-  g_n(W)=g_n(w)\right\} \ .
-\end{align*}
+  g_n(W)=g_n(w)\right\} \ . \label{eqn:gr_bivariate}
+\end{align}
 In words, the R-OR is the regression of the residual from the outcome
 regression onto the estimated PS amongst observations with $A = a$, while the
 R-PS is the propensity for treatment $A = a$ given the estimated OR and PS. We
@@ -427,7 +429,7 @@ the estimates of the OR and PS to have the greatest chance of consistency, the
 In fact, there are three ways to estimate each of the regression parameters:
 generalized linear models, super learning
 [@vdl:2007:statapp; @SuperLearnerPackage], and a user-specified estimation
-technique. We demonstrate each of these approaches in turn on a simple simulated
+technique. We demonstrate each of these approaches in turn on a  simulated
 data set. The true parameter values of interest are $\psi_0(0)=$ `r round(EY0,
 2)` and $\psi_0(1)=$ `r round(EY1, 2)`.
 
@@ -456,9 +458,9 @@ case, the OR regression is fit by passing a `data.frame` that contains `W` and
 `A` into the `data` argument of `glm()`. Thus, both `colnames(W)` and `"A"` may
 appear in the formula specified in `glm_Q`. If `stratify = TRUE`, regressions
 are fit stratifying on `A` to separately estimate $\bar{Q}_0(1,W)$ and
-$\bar{Q}_0(0,W)$. In this case, the `glm_Q` option may not include `"A"`.
+$\bar{Q}_0(0,W)$. In this case, the `glm_Q` formula may not include `"A"`.
 
-To understand the variable names available for R-OR, recall that the parameter
+To understand the variable names available for R-OR, recall from (\ref{eqn:qbarr}) that the parameter
 involves a regression onto the estimated propensity score. Thus, the formula
 that is input via `glm_Qr` should assume data with a single column, `"gn"`.
 Similarly, the R-PS1 and R-PS2 that are computed for the estimators of
@@ -466,8 +468,8 @@ Similarly, the R-PS1 and R-PS2 that are computed for the estimators of
 `reduction = "univariate"`) involve regressions onto the estimated outcome
 regression. Thus, the formula `glm_gr` should assume data with a single column
 named `"Qn"` if `reduction = "univariate"`. Instead, if the estimators of
-\citet{vdl:2014:ijb} are preferred (`reduction = "bivariate"`) the `glm_gr`
-formula assumes data with two columns, `"Qn"` and `"gn"`.
+\citet{vdl:2014:ijb} are preferred (`reduction = "bivariate"`) the `glm_gr` 
+formula specifies a model for (\ref{eqn:gr_bivariate}) and assumes data with two columns, `"Qn"` and `"gn"`.
 
 The code below illustrates how generalized linear models can be used to
 estimate the regression parameters. In this call to `drtmle()`, we specify
@@ -570,7 +572,7 @@ latter including any information that may be needed to predict new values based
 on the fitted object. A class is assigned to the `fit` object, so that an S3
 `predict()` method may later be used to predict new values based on the fitted
 regression object. The user must also specify this `predict()` method. Use
-`drtmle:::predict.SL.npreg()` to view the simple `predict()` method for
+`drtmle:::predict.SL.npreg()` to view the `predict()` method for
 `SL.npreg`.
 
 In the code below, we demonstrate a call to `drtmle()` with `SL.npreg` used to
@@ -961,10 +963,10 @@ method can be used to compute confidence intervals of the form
   f^{-1}\bigl\{ f(h(\psi_n)) \pm z_{1-\alpha/2} \nabla f(h(\psi_n))^T \Sigma_n
   \nabla f(h(\psi_n)) \bigr\} \ ,
 \end{equation*}
-where $f$ (`contrast$f`) is the transformation of the confidence interval,
-$f^{-1}$ (`contrast$f_inv`) is the back-transformation of the interval, $h$
-(`contrast$h`) is the contrast of the marginal means, and $\nabla f(h(\psi_n))$
-(`contrast$fh_grad`) defines the gradient of the transformed contrast at the
+where $f$ (`contrast$f()`) is the transformation of the confidence interval,
+$f^{-1}$ (`contrast$f_inv()`) is the back-transformation of the interval, $h$
+(`contrast$h()`) is the contrast of the marginal means, and $\nabla f(h(\psi_n))$
+(`contrast$fh_grad()`) defines the gradient of the transformed contrast at the
 estimated marginal means.
 
 We note that this method of computing confidence intervals can also be used to
@@ -1013,7 +1015,7 @@ wald_test(npreg_fit, contrast = c(1, -1), null = 0.05)
 
 The `wald_test()` method also allows for user-specified contrasts to be tested
 using syntax similar to the `ci()` method. The only difference syntactically is
-that it is not strictly necessary to specify `f_inv`, as the hypothesis test is
+that it is not strictly necessary to specify `f_inv()`, as the hypothesis test is
 performed on the transformed scale. That is, we can generally test the null
 hypothesis that $f(h(\psi_0))$ equals $f_0$ (the function $f$ applied to the
 value passed to `null`) using the Wald statistic
@@ -1101,7 +1103,7 @@ process is slightly more complicated than when no missing data are present. The
 basic idea is to fit one regression for (i) the indicator of missing $A$, (ii)
 $A$ itself, and (iii) the indicator of the outcome being missing. The three PS's
 are then multiplied together and an appropriately ordered list is constructed as
-before. We illustrate with the following simple example.
+before. We illustrate with the following example.
 
 ```{r, cache = TRUE}
 # first regress indicator of missing A on W
@@ -1188,7 +1190,7 @@ the PS by generating an estimate $g_n(0 \mid w)$ of $Pr_0(A = 0 \mid W = w)$
 and $\tilde{g}_n(1 \mid w)$ of $Pr_0(A = 1 \mid A > 0, W = w)$. The latter
 estimate may be generated by regressing $I(A = 1)$ on $W$ in observations with
 $A > 0$. Since the outcome is binary, this regression may be estimated using
-any technique suitable for binary outcomes. By simple rules of conditional
+any technique suitable for binary outcomes. By rules of conditional
 probability, it holds that $g_0(1 \mid w) = Pr_0(A = 1 \mid A > 0, W = w)\{1 -
 Pr_0(A = 0 \mid W)\}$ and thus an estimate of $g_0(1 \mid w)$ can be computed
 as $g_n(1 \mid w) = \tilde{g}_n(1 \mid w) \{1 - g_n(0 \mid w)\}$. Finally, we
@@ -1208,7 +1210,7 @@ Y <- rbinom(n, 1, plogis(W$W1 + W$W2*A))
 ```
 
 The multi-level PS can still be estimated using any of the three techniques
-discussed previously. Here, we illustrate with simple generalized linear
+discussed previously. Here, we illustrate with generalized linear
 models.
 
 ```{r, cache = TRUE, message = FALSE}
@@ -1261,7 +1263,7 @@ riskRatio_1v0 <- list(f = function(eff){ log(eff) },
 ci(glm_fit_multiA, contrast = riskRatio_1v0)
 ```
 
-Just as straightforwardly, we can compute confidence intervals for the risk
+Similarly, we can compute confidence intervals for the risk
 ratio comparing the marginal mean for $A=2$ to $A=1$.
 
 ```{r, cache = TRUE}
