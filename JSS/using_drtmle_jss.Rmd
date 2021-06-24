@@ -937,7 +937,7 @@ constructing Wald-style confidence intervals for ratios, it is common to
 compute the interval on the logarithmic scale and subsequently back-transform.
 That is, the confidence interval takes the form
 \begin{equation*}
-  \exp \biggl[\log \biggl\{ \frac{\psi_0(1)}{\psi_0(0)} \biggr\} \pm
+  \exp \biggl[\log \biggl\{ \frac{\psi_n(1)}{\psi_n(0)} \biggr\} \pm
   z_{1-\alpha/2} \sigma^{\log}_n \biggr] \ ,
 \end{equation*}
 where $\sigma^{\log}_n$ is the estimated standard error on the log-scale. By
