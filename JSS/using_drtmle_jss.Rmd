@@ -45,9 +45,8 @@ abstract: >
   cannot be said when at least one nuisance estimator is inconsistent.
   \pkg{drtmle} implements doubly-robust confidence intervals and hypothesis
   tests for targeted minimum loss-based estimates of the average treatment
-  effect. The package additionally implements a targeted inverse probability of
-  treatment weighted estimator that yields valid inference even when the
-  probability of treatment is estimated via adaptive methods.
+  effect, in addition to several other recently-proposed estimators of the 
+  average treatment effect.
 header-includes:
   - \usepackage{mathtools}
 output: rticles::jss_article
@@ -78,23 +77,32 @@ techniques are not feasible for such high-dimensional data without restrictive
 modeling assumptions. When these assumptions are violated, estimates of the
 population-level effect of a treatment may have large bias.
 
-This has sparked an interest in using adaptive estimation techniques from the
+This has led to increased interest in adopting adaptive estimation techniques from the
 machine learning literature to control for high-dimensional confounders when
 estimating treatment effects. However, facilitating proper inference (i.e.,
 confidence intervals and hypothesis tests) about estimates of effects based on
-adaptive estimators is challenging. In particular, standard causal inference
+adaptive estimators is challenging. In particular, the use of standard causal inference
 techniques, including both G-computation (GCOMP) estimators
 [@robins:1986:mathmod] and inverse probability of treatment weighted (IPTW)
-estimators [@horvitzthompson:1952:jasa, @robins:2000:epi], fail to yield valid
-inference under adaptive estimates of nuisance parameters. More complex
-proposals have been developed that *are capable* of utilizing adaptive methods
-to control for confounding while still yielding valid inference. These
-techniques include augmented inverse probability of treatment weighted
-(AIPTW) estimation [@robins:1994:jasa] and targeted minimum loss-based (TML)
-estimation [@vdlrubin:2006:ijb]. Under standard assumptions, these estimators
-have limiting normal distributions with estimable variance. Estimates of the
-asymptotic variance serve as the basis for constructing confidence intervals and
-hypothesis tests.
+estimators [@horvitzthompson:1952:jasa, @robins:2000:epi] is challenging when utilizing
+adaptive estimators. In particular, with rare exception, if cross-validation is used
+to select tuning parameters for the nuisance parameters, estimates of the population-level
+effect will generally be too biased to achieve standard $n^{1/2}$-rate asymptotics. Instead,
+*undersmoothing* must be used to select tuning parameters to control the bias 
+[@undersmoothed_hal]. However, this can prove quite challenging in practice and 
+few guidelines are available. 
+
+A more natural framework for integrating adaptive methods into nuisance regression 
+estimation are doubly robust approaches, including augmented inverse probability of 
+treatment weighted (AIPTW) estimation [@robins:1994:jasa] and targeted minimum 
+loss-based (TML) estimation [@vdlrubin:2006:ijb]. The asymptotics of these estimators
+are characterized in part by the convergence rates of nuisance parameter estimates with
+respect to a proper norm. This fact makes the use of cross-validation more appealing for
+selection of tuning parameters for estimators of nuisance parameters, thereby providing 
+a more straightforward means of obtaining an estimate of the effect of interest that
+enjoys standard $n^{1/2}$ asymptotics. These asymptotic results also yield closed form
+standard error estimates, which can serve as the basis for constructing confidence 
+intervals and hypothesis tests.
 
 As an intermediate step, the AIPTW and TML estimators require estimation of
 two key nuisance parameters: the probability of treatment as a function of
@@ -106,7 +114,6 @@ estimators are consistent for the population-level effect of interest if either
 of the PS or OR is consistently estimated. This property gives the AIPTW and
 TML estimators a natural appeal: inconsistency in the estimation of one
 nuisance parameter may be mitigated by the consistent estimation of the other.
-As such, these estimators have increased in popularity in recent years.
 However, recent work has shown that the double robustness property does not
 necessarily extend to the inferential properties of these estimators when
 adaptive estimators of the PS and/or OR are used
@@ -143,8 +150,8 @@ usage of the \pkg{drtmle} package.
 
 Suppose the observed data consist of $n$ independent and identically
 distributed copies of the random variable $O = (W,A,Y) \sim P_0$. Here, $W$ is
-a vector of baseline covariates, $A \in \{0,1\}$ is a binary (for the sake of
-simplicity) treatment, $Y$ is an outcome, and $P_0$ is the true data-generating
+a vector of baseline covariates, $A \in \{0,1\}$ is a binary treatment, 
+$Y$ is an outcome, and $P_0$ is the true data-generating
 distribution. The parameters of interest are
 \begin{equation}
   \psi_0(a) = E_0\{\bar{Q}(a,W)\} = \int \bar{Q}_0(a,w) dQ_{W,0}(w) \ , \
@@ -161,7 +168,7 @@ different treatment levels. For example, the average treatment effect is often
 defined as $\psi_0 \coloneqq \psi_0(1) - \psi_0(0)$. Under additional
 assumptions, these parameters have interpretations as mean counterfactual
 outcomes under the different treatments, with contrasts between these means
-defining causal effects.
+defining causal effects. 
 
 ## G-computation estimators
 
@@ -178,7 +185,7 @@ This estimator is commonly referred to as the G-computation (GCOMP) estimator.
 Inference for GCOMP estimators based on parametric OR estimators may be
 facilitated through the nonparametric bootstrap. However, if adaptive
 approaches are used to estimate the OR, inference may not be available without
-further modification to the estimator.
+further modification to the estimator (e.g., undersmoothing as discussed above).
 
 ## Inverse probability of treatment estimators
 
@@ -216,7 +223,7 @@ consistent estimation of the PS. In practice, we may not know which of the OR
 or PS is simpler to consistently estimate and thus may not know which of the
 two estimators to prefer. Furthermore, if adaptive estimators (e.g., based on
 machine learning) are used to estimate the OR or PS, then the GCOMP and IPTW
-estimators lack a basis for statistical inference.
+estimators generally lack a basis for statistical inference.
 
 This motivates a new class of estimators that combine both the GCOMP and IPTW
 estimators. One example is the augmented IPTW (AIPTW) estimator
@@ -274,7 +281,7 @@ work provided closed-form, doubly-robust variance estimators that may be used to
 construct doubly-robust confidence intervals and hypothesis tests.
 \citet{benkeser:2017:biometrika} proposed simplifications of the
 \citet{vdl:2014:ijb} estimators and demonstrated the practical performance of
-these estimators via simulation experiments.
+these estimators via simulation.
 
 The key to the theory underlying these results is finding estimators of the OR
 and PS that simultaneously satisfy equation (4) in addition to two additional
@@ -585,8 +592,10 @@ npreg_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
                     SL_g = "SL.npreg", SL_Q = "SL.npreg",
                     SL_gr = "SL.npreg", SL_Qr = "SL.npreg",
                     stratify = TRUE)
-npreg_fit
 ```
+
+In the Appendix, we describe an additional means of using `drtmle()` with 
+OR and PS estimates that have been obtained externally.
 
 ### Reducing dependence on random seed
 
@@ -632,99 +641,6 @@ parallelized at the level of individual calls to `SuperLearner()`. With
 parallelization over enough cores, repeated super learning should not add too
 much to the computational burden relative to a single call to `SuperLearner()`.
 
-### Arbitrary user-specified regressions
-
-The \pkg{drtmle} package also allows users to pass in their own estimated OR and
-PS via the `Qn` and `gn` options, respectively.  If `Qn` is specified by the
-user, `drtmle()` will ignore the nuisance parameter estimation routines
-specified by `SL_Q` and `glm_Q` -- similarly for `gn` and `SL_g`, `glm_g`. As
-noted in the package documentation, there is a specific format necessary for
-inputting `Qn` and `gn`. For `Qn`, the entries in the list should correspond to
-the OR evaluated at `A` and the observed values of `W`, with order determined by
-the input to `a_0`. For example, if `a_0 = c(0, 1)` then `Qn[[1]]` should be the
-OR at $A = 0$ and `Qn[[2]]` should be the outcome regression at $A = 1$. The
-example below illustrates this concept.
-
-```{r, cache = TRUE, message = FALSE}
-# fit a GLM for outcome regression outside of drtmle
-out_glm_fit <- glm(Y ~ . , data = data.frame(A = A, W), family = binomial())
-
-# generate Qn list
-Qn10 <- list(
-  # first entry is predicted values setting A = 1
-  predict(out_glm_fit, newdata = data.frame(A = 1, W), type = "response"),
-  # second entry is predicted values setting A = 0
-  predict(out_glm_fit, newdata = data.frame(A = 0, W), type = "response")
-)
-
-# pass this list to drtmle to avoid internal estimation of
-# outcome regression (note propensity score and reduced-dimension
-# regressions are still estimated internally)
-out_fit1 <- drtmle(W = W, A = A, Y = Y, family = binomial(),
-                  glm_g = ".", glm_Qr = "gn", glm_gr = "Qn", Qn = Qn10,
-                  # crucial to set a_0 to match Qn's construction!
-                  a_0 = c(1,0))
-out_fit1
-
-# to be completely thorough let's re-order Qn10 and re-run
-Qn01 <- list(Qn10[[2]], Qn10[[1]])
-
-out_fit2 <- drtmle(W = W, A = A, Y = Y, family = binomial(),
-                  glm_g = ".", glm_Qr = "gn", glm_gr = "Qn",
-                  # use re-ordered Qn list
-                  Qn = Qn01,
-                  # a_0 has to be reordered to match Qn01!
-                  a_0 = c(0,1))
-# should be the same as out_fit1, but re-ordered
-out_fit2
-```
-
-Similarly, for `gn` we need to pass in properly ordered lists. For example, if
-`a_0 = c(0, 1)` then `gn[[1]]` should be the PS for receiving $A = 0$ and
-`gn[[2]]` should be the PS for receiving $A = 1$. The example below illustrates
-this concept.
-
-```{r, cache = TRUE, message = FALSE}
-# fit a GLM for propensity score outside of drtmle
-out_glm_fit <- glm(A ~ . , data = data.frame(W), family = binomial())
-
-# get P(A = 1 | W) by calling predict
-gn1W <- predict(out_glm_fit, newdata = data.frame(W), type = "response")
-
-# generate gn list
-gn10 <- list(
-  # first entry is P(A = 1 | W)
-  gn1W,
-  # second entry is P(A = 0 | W) = 1 - P(A = 1 | W)
-  1 - gn1W
-)
-
-# pass this list to drtmle to avoid internal estimation of
-# propensity score (note reduced-dimension regressions are
-# still estimated internally)
-out_fit3 <- drtmle(W = W, A = A, Y = Y, family = binomial(),
-                   glm_Qr = "gn", glm_gr = "Qn",
-                   Qn = Qn10, gn = gn10,
-                   # crucial to set a_0 to match Qn and gn's construction!
-                   a_0 = c(1,0))
-out_fit3
-
-# to be completely thorough let's re-order gn10 and re-run
-gn01 <- list(gn10[[2]], gn10[[1]])
-
-out_fit4 <- drtmle(W = W, A = A, Y = Y, family = binomial(),
-                   glm_Qr = "gn", glm_gr = "Qn",
-                   # use re-ordered Qn/gn list
-                   Qn = Qn01, gn = gn01,
-                   # a_0 has to be reordered to match Qn01!
-                   a_0 = c(0,1))
-# should be the same as out_fit3, but re-ordered
-out_fit4
-```
-
-This flexibility allows users to leverage any regression technique to externally
-obtain initial estimates of nuisance parameters. The key step is making sure
-that the ordering of `Qn` and `gn` is consistent with `a_0`.
 
 ## Standard error estimation
 
@@ -831,7 +747,10 @@ glm_fit_uni_cv <- drtmle(W = W, A = A, Y = Y, family = binomial(),
                          se_cv = "full", se_cvFolds = 2, stratify = FALSE,
                          targeted_se = FALSE) # needed for this to work
 # compare variance to previously obtained
-list(glm_fit_uni$drtmle$cov, glm_fit_uni_cv$drtmle$cov)
+list(
+  `No CV` = glm_fit_uni$drtmle$cov, 
+  `CV` = glm_fit_uni_cv$drtmle$cov
+)
 ```
 
 ### Partially cross-validated standard errors
@@ -905,8 +824,8 @@ sl_fit_pcv <- drtmle(W = W, A = A, Y = Y, family = binomial(),
 # pt estimates should be same
 # variance should be larger for pcv
 list(
-  sl_fit, # no cv
-  sl_fit_pcv # partial cv
+  `No-CV` = sl_fit$cov, # no cv
+  `Partial CV` = sl_fit_pcv$cov # partial cv
 )
 ```
 
@@ -1095,7 +1014,6 @@ mixed_fit_wNAs <- drtmle(W = W, A = A, Y = Y, stratify = FALSE,
                          DeltaY = c("SL.glm", "SL.mean", "SL.earth")),
                          glm_Q = "W1 + W2*A", glm_Qr = "gn",
                          glm_gr = "Qn", family = binomial())
-mixed_fit_wNAs
 ```
 
 We can also fit the PS regressions externally and pass in via `gn`, though this
@@ -1251,7 +1169,7 @@ effect of $A = 2$ versus $A = 0$.
 ci(glm_fit_multiA, contrast = c(-1, 0, 1))
 ```
 
-The user-specified contrasts are also available. For example, we can modify the
+User-specified contrasts are also available. For example, we can modify the
 `riskRatio` object we used previously for a two-level treatment to compute the
 risk ratio comparing $A=1$ to $A=0$ and comparing $A = 2$ to $A = 0$.
 
@@ -1276,18 +1194,14 @@ ci(glm_fit_multiA, contrast = riskRatio_2v0)
 
 ## Cross-validated regression estimates
 
-When considering adaptive estimation techniques, one runs the risk of
-overfitting the initial nuisance regressions. While the layer of
-cross-validation built into super learning attempts to guard against
-overfitting, there are no guarantees in finite samples. To definitively avoid
-such overfitting, one can use cross-validated estimates of the nuisance
+To avoid overfitting initial regressions, one can use cross-validated 
+estimates of the nuisance
 regressions. Theoretically, the use of cross-validated regression weakens the
 assumptions necessary to achieve asymptotic normality [@zheng:2010:working].
 This is true of the regular TML and AIPTW estimators, as well as of the TML
 estimator with doubly-robust inference. The `drtmle()` function implements
 cross-validated estimation of the regression parameters through the `cvFolds`
-option, as shown in the code below, where we continue on with the multi-level
-treatment example.
+option, as shown in the code below.
 
 ```{r, cache = TRUE}
 cv_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
@@ -1296,7 +1210,6 @@ cv_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
                     SL_gr = c("SL.glm", "SL.mean"),
                     SL_Qr = c("SL.glm", "SL.mean"),
                     stratify = FALSE, cvFolds = 2, a_0 = c(0, 1, 2))
-cv_sl_fit
 ```
 
 Cross-validation may significantly increase the computation time necessary for
@@ -1334,9 +1247,142 @@ pcv_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
                      cvFolds = 2, use_future = TRUE)
 ```
 
-# Additional methods included in drtmle
+# Discussion
 
-## Inference for IPTW using adaptive PS estimators
+The \pkg{drtmle} package was designed to provide a user-friendly implementation
+of the TMLE algorithm that facilitates doubly-robust inference about marginal
+means and average treatment effects. While the theory underlying doubly-robust
+inference is complex, the implementation of the methods only requires users to
+provide the data and specify how to estimate nuisance regressions. Though
+estimation of the OR and PS is familiar to those with backgrounds in causal
+inference-related estimation, the reduced-dimension regressions may appear
+strange. Indeed, it is difficult to provide intuition for these parameters and
+more difficult still to determine what scientific background knowledge might
+guide users in how to estimate these regression parameters. Therefore, we
+recommended estimating these quantities adaptively, e.g., with the super
+learner. The super learner library should contain several relatively smooth
+estimators such as `SL.mean`, `SL.glm`, and `SL.gam`. In particular, including
+`SL.mean` (an unadjusted generalized linear model) may be important due to the
+fact that, when the OR and PS are consistently estimated, the reduced-dimension
+regressions are identically equal to zero. Thus, this unadjusted regression
+estimator may do a good job estimating the reduced-dimension regressions in
+situations where the OR and PS are estimated well. In addition to relatively
+smooth estimators, we recommend additionally including several adaptive
+estimators such as `SL.npreg` or `SL.earth`.
+
+Planned extensions of the \pkg{drtmle} package include extensions to
+longitudinal settings involving treatments at multiple time points and inclusion
+of the collaborative targeted maximum likelihood estimator (C-TMLE) of
+\citet{vdl:2014:ijb} that also facilitates collaborative doubly-robust
+inference.
+
+# Appendix
+
+## Arbitrary user-specified regressions
+
+The \pkg{drtmle} package also allows users to pass in their own estimated OR and
+PS via the `Qn` and `gn` options, respectively.  If `Qn` is specified by the
+user, `drtmle()` will ignore the nuisance parameter estimation routines
+specified by `SL_Q` and `glm_Q` -- similarly for `gn` and `SL_g`, `glm_g`. As
+noted in the package documentation, there is a specific format necessary for
+inputting `Qn` and `gn`. For `Qn`, the entries in the list should correspond to
+the OR evaluated at `A` and the observed values of `W`, with order determined by
+the input to `a_0`. For example, if `a_0 = c(0, 1)` then `Qn[[1]]` should be the
+OR at $A = 0$ and `Qn[[2]]` should be the outcome regression at $A = 1$. The
+example below illustrates this concept.
+
+```{r, cache = TRUE, message = FALSE}
+# use simplified data
+set.seed(1234)
+n <- 200
+W <- data.frame(W1 = runif(n), W2 = rbinom(n, 1, 0.5))
+A <- rbinom(n, 1, plogis(W$W1 + W$W2))
+Y <- rbinom(n, 1, plogis(W$W1 + W$W2*A))
+
+# fit a GLM for outcome regression outside of drtmle
+out_glm_fit <- glm(Y ~ . , data = data.frame(A = A, W), family = binomial())
+
+# generate Qn list
+Qn10 <- list(
+  # first entry is predicted values setting A = 1
+  predict(out_glm_fit, newdata = data.frame(A = 1, W), type = "response"),
+  # second entry is predicted values setting A = 0
+  predict(out_glm_fit, newdata = data.frame(A = 0, W), type = "response")
+)
+
+# pass this list to drtmle to avoid internal estimation of
+# outcome regression (note propensity score and reduced-dimension
+# regressions are still estimated internally)
+out_fit1 <- drtmle(W = W, A = A, Y = Y, family = binomial(),
+                  glm_g = ".", glm_Qr = "gn", glm_gr = "Qn", Qn = Qn10,
+                  # crucial to set a_0 to match Qn's construction!
+                  a_0 = c(1,0))
+out_fit1
+
+# to be completely thorough let's re-order Qn10 and re-run
+Qn01 <- list(Qn10[[2]], Qn10[[1]])
+
+out_fit2 <- drtmle(W = W, A = A, Y = Y, family = binomial(),
+                  glm_g = ".", glm_Qr = "gn", glm_gr = "Qn",
+                  # use re-ordered Qn list
+                  Qn = Qn01,
+                  # a_0 has to be reordered to match Qn01!
+                  a_0 = c(0,1))
+# should be the same as out_fit1, but re-ordered
+out_fit2
+```
+
+Similarly, for `gn` we need to pass in properly ordered lists. For example, if
+`a_0 = c(0, 1)` then `gn[[1]]` should be the PS for receiving $A = 0$ and
+`gn[[2]]` should be the PS for receiving $A = 1$. The example below illustrates
+this concept.
+
+```{r, cache = TRUE, message = FALSE}
+# fit a GLM for propensity score outside of drtmle
+out_glm_fit <- glm(A ~ . , data = data.frame(W), family = binomial())
+
+# get P(A = 1 | W) by calling predict
+gn1W <- predict(out_glm_fit, newdata = data.frame(W), type = "response")
+
+# generate gn list
+gn10 <- list(
+  # first entry is P(A = 1 | W)
+  gn1W,
+  # second entry is P(A = 0 | W) = 1 - P(A = 1 | W)
+  1 - gn1W
+)
+
+# pass this list to drtmle to avoid internal estimation of
+# propensity score (note reduced-dimension regressions are
+# still estimated internally)
+out_fit3 <- drtmle(W = W, A = A, Y = Y, family = binomial(),
+                   glm_Qr = "gn", glm_gr = "Qn",
+                   Qn = Qn10, gn = gn10,
+                   # crucial to set a_0 to match Qn and gn's construction!
+                   a_0 = c(1,0))
+out_fit3
+
+# to be completely thorough let's re-order gn10 and re-run
+gn01 <- list(gn10[[2]], gn10[[1]])
+
+out_fit4 <- drtmle(W = W, A = A, Y = Y, family = binomial(),
+                   glm_Qr = "gn", glm_gr = "Qn",
+                   # use re-ordered Qn/gn list
+                   Qn = Qn01, gn = gn01,
+                   # a_0 has to be reordered to match Qn01!
+                   a_0 = c(0,1))
+# should be the same as out_fit3, but re-ordered
+out_fit4
+```
+
+This flexibility allows users to leverage any regression technique to externally
+obtain initial estimates of nuisance parameters. The key step is making sure
+that the ordering of `Qn` and `gn` is consistent with `a_0`.
+
+
+## Additional methods included in drtmle
+
+### Inference for IPTW using adaptive PS estimators
 
 Doubly-robust estimators of marginal means are appealing in their robustness and
 efficiency properties. However, researchers may prefer the IPTW estimator for
@@ -1369,18 +1415,17 @@ $g_n(a \mid w)$, can be computed as
 Both this estimator and the TMLE-based IPTW estimator above are implemented in
 \pkg{drtmle}.
 
-### Implementation of inference for adaptive IPTW
+#### Implementation of inference for adaptive IPTW
 
 The IPTW estimators based on adaptive estimation of the PS are implemented in
 the `adaptive_iptw()` function. The `adaptive_iptw()` function shares many
 options with `drtmle()`; however, as the IPTW estimator does not rely on an
-estimate of the OR, options related to the OR are omitted. We demonstrate below,
-while continuing with the multi-level treatment example.
+estimate of the OR, options related to the OR are omitted. 
 
 ```{r, cache = TRUE}
 npreg_iptw_multiA <- adaptive_iptw(W = W, A = A, Y = Y, stratify = FALSE,
                                    SL_g = "SL.npreg", SL_Qr = "SL.npreg",
-                                   family = binomial(), a_0 = c(0, 1, 2))
+                                   family = binomial(), a_0 = c(0, 1))
 npreg_iptw_multiA
 ```
 
@@ -1399,7 +1444,7 @@ cross-validated estimation of the regression parameters via the `cvFolds` and
 `parallel` options.  As with the estimators implemented by `drtmle()`,
 cross-validation allows for valid inference under weaker assumptions.
 
-## Outcome-adaptive propensity score estimation
+### Outcome-adaptive propensity score estimation
 
 We have recently proposed estimators of the average treatment effect to be used
 in settings where this effect is weakly identifiable, as evidenced by estimated
@@ -1422,7 +1467,7 @@ at $n^{-1/4}$ rate. In this sense, this estimator trades off robustness against
 achieving greater stability and efficiency. See \citet{ju2020robust} for further
 discussion.
 
-### Implementation of outcome-adaptive propensity score
+#### Implementation of outcome-adaptive propensity score
 
 If the outcome-adaptive PS is desired, the user may specify this via the
 `adapt_g` option. In this case, the additional targeting steps needed for doubly
@@ -1435,13 +1480,6 @@ and `Q1W`. This may be relevant for users writing their own \pkg{SuperLearner}
 wrapper functions or those who make use of the `glm_g` setting.
 
 ```{r, message = FALSE}
-# use simplified data
-set.seed(1234)
-n <- 200
-W <- data.frame(W1 = runif(n), W2 = rbinom(n, 1, 0.5))
-A <- rbinom(n, 1, plogis(W$W1 + W$W2))
-Y <- rbinom(n, 1, plogis(W$W1 + W$W2*A))
-
 # outcome adaptive propensity score fit using glms
 adaptg_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
                      glm_Q = ".^2", glm_g = "Q1W + Q0W",
@@ -1454,31 +1492,3 @@ adaptg_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
                      adapt_g = TRUE)
 ```
 
-# Discussion
-
-The \pkg{drtmle} package was designed to provide a user-friendly implementation
-of the TMLE algorithm that facilitates doubly-robust inference about marginal
-means and average treatment effects. While the theory underlying doubly-robust
-inference is complex, the implementation of the methods only requires users to
-provide the data and specify how to estimate nuisance regressions. Though
-estimation of the OR and PS is familiar to those with backgrounds in causal
-inference-related estimation, the reduced-dimension regressions may appear
-strange. Indeed, it is difficult to provide intuition for these parameters and
-more difficult still to determine what scientific background knowledge might
-guide users in how to estimate these regression parameters. Therefore, we
-recommended estimating these quantities adaptively, e.g., with the super
-learner. The super learner library should contain several relatively smooth
-estimators such as `SL.mean`, `SL.glm`, and `SL.gam`. In particular, including
-`SL.mean` (an unadjusted generalized linear model) may be important due to the
-fact that, when the OR and PS are consistently estimated, the reduced-dimension
-regressions are identically equal to zero. Thus, this unadjusted regression
-estimator may do a good job estimating the reduced-dimension regressions in
-situations where the OR and PS are estimated well. In addition to relatively
-smooth estimators, we recommend additionally including several adaptive
-estimators such as `SL.npreg` or `SL.earth`.
-
-Planned extensions of the \pkg{drtmle} package include extensions to
-longitudinal settings involving treatments at multiple time points and inclusion
-of the collaborative targeted maximum likelihood estimator (C-TMLE) of
-\citet{vdl:2014:ijb} that also facilitates collaborative doubly-robust
-inference.
