@@ -1,7 +1,7 @@
 # Reproducing Doubly-Robust Inference in R using `drtmle`
 
 See the rendered version of these instructions at
-https://github.com/benkeser/drtmle/blob/jss/instructions_for_use.md.
+https://github.com/benkeser/drtmle/blob/jss/JSS/instructions_for_use.md.
 
 To reproduce the submitted manuscript in its entirety, we assume the user has 
 access to a machine that includes: 
