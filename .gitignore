@@ -5,5 +5,6 @@ simulation/*
 README.html
 vignettes/*.html
 vignettes/using_drtmle_cache/*
-JSS/*
-
+JSS/using_drtmle_jss.tex
+JSS/using_drtmle_jss.pdf
+JSS/using_drtmle_jss_cache
