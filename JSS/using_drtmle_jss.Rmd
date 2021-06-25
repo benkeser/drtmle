@@ -57,7 +57,7 @@ bibliography: refs
 options(prompt = 'R> ', continue = '+ ')
 knitr::opts_chunk$set(warning=FALSE, message=FALSE)
 renv::activate(here::here())
-library(nloptr)
+library(nloptr); library(earth)
 ```
 
 # Introduction

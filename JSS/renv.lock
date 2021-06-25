@@ -9,6 +9,13 @@
     ]
   },
   "Packages": {
+    "Formula": {
+      "Package": "Formula",
+      "Version": "1.2-4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "cc8c8c4d61346cde1ca60030ff9c241f"
+    },
     "KernSmooth": {
       "Package": "KernSmooth",
       "Version": "2.23-20",
@@ -64,6 +71,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "8a1b2fdfb6c4a448a4cfa24980124ad9"
+    },
+    "TeachingDemos": {
+      "Package": "TeachingDemos",
+      "Version": "2.12",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "41e566d7eab7307a31b3dee3b203c7e0"
     },
     "base64enc": {
       "Package": "base64enc",
@@ -141,6 +155,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "23ed12a5c2f1c19fff7604d560b96887"
+    },
+    "earth": {
+      "Package": "earth",
+      "Version": "5.3.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "65afb8404e57d5e634ff1d1c82d750c0"
     },
     "evaluate": {
       "Package": "evaluate",
@@ -316,6 +337,20 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "08925887608f7086dd7522933ff43a93"
+    },
+    "plotmo": {
+      "Package": "plotmo",
+      "Version": "3.6.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "a96bcc5873e53a44cd97b5251939f792"
+    },
+    "plotrix": {
+      "Package": "plotrix",
+      "Version": "3.8-1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "cd2248636c86e6716cd7ae086536cecc"
     },
     "quadprog": {
       "Package": "quadprog",
