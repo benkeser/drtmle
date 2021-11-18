@@ -49,5 +49,5 @@ outcome regression, propensity score, and reduced-dimension regressions.}
 \item{use_future}{Should \code{future} be used in the fitting process.}
 }
 \description{
-Helper function to clean up internal code of the \code{drtmle} function.
+Helper function to clean up internal code of \code{drtmle} function.
 }

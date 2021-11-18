@@ -5,7 +5,7 @@
 \title{Helper function to properly format partially cross-validated predictions
 from a fitted super learner.}
 \usage{
-partial_cv_preds(fit_sl, a_0, W = NULL, include = NULL, easy = FALSE)
+partial_cv_preds(fit_sl, a_0, W = NULL, family, include = NULL, easy = FALSE)
 }
 \arguments{
 \item{fit_sl}{A fitted \code{SuperLearner} object with
@@ -15,6 +15,8 @@ partial_cv_preds(fit_sl, a_0, W = NULL, include = NULL, easy = FALSE)
 is being used to get partially cross-validated propensity score predictions.}
 
 \item{W}{A \code{data.frame} of named covariates.}
+
+\item{family}{Family of prediction model}
 
 \item{include}{A boolean vector indicating which observations were actually
 used to fit the regression.}

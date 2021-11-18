@@ -616,6 +616,7 @@ average_ic_list <- function(ic_list){
 #' 
 #' @param fit_sl A fitted \code{SuperLearner} object with 
 #' \code{control$saveCVFitLibrary = TRUE}
+#' @param family Family of prediction model
 #' @param a_0 Treatment level to set. If \code{NULL}, assume this function
 #' is being used to get partially cross-validated propensity score predictions.
 #' @param W A \code{data.frame} of named covariates.
@@ -625,7 +626,7 @@ average_ic_list <- function(ic_list){
 #' computed the "easy" way, i.e., based just on the Z matrix from SuperLearner.
 #' This is possible for propensity score models when no missing data AND no 
 #' stratification. 
-partial_cv_preds <- function(fit_sl, a_0, W = NULL,
+partial_cv_preds <- function(fit_sl, a_0, W = NULL, family, 
                              include = NULL, easy = FALSE){
   n_algo <- length(fit_sl$cvRisk)
   n_folds <- length(fit_sl$validRows)
