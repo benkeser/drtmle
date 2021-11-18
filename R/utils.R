@@ -652,9 +652,9 @@ partial_cv_preds <- function(fit_sl, a_0, W = NULL, family,
       for(k in seq_len(n_algo)){
         # predict under a_0
         if(!is.null(a_0)){
-          rslt[ , k] <- predict(foldv_models[[k]], newdata = data.frame(A = a_0, W)[include,][foldv_ids,])
+          rslt[ , k] <- predict(foldv_models[[k]], family = family, newdata = data.frame(A = a_0, W)[include,][foldv_ids,])
         }else{
-          rslt[ , k] <- predict(foldv_models[[k]], newdata = W[include,][foldv_ids,])
+          rslt[ , k] <- predict(foldv_models[[k]], family = family, newdata = W[include,][foldv_ids,])
         }
       }
       rslt_list[[v]] <- rslt
