@@ -234,19 +234,12 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
                                             easy = all(include))
           }
           if (a_ct != 0) { # if not the first level of treatment
-            gn_A[[a_ct + 1]] <- tmp_pred * Reduce(
-              "*",
-              lapply(gn_A[1:a_ct], function(x) {
-                1 - x
-              })
-            )
+            gn_A[[a_ct + 1]] <- tmp_pred * (1 - Reduce(
+              "+", gn_A[1:a_ct]
+              ))
             if(partial_cv){
-              gn_A_se[[a_ct + 1]] <- tmp_pred_se * Reduce(
-                "*",
-                lapply(gn_A_se[1:a_ct], function(x) {
-                  1 - x
-                })
-              )
+              gn_A_se[[a_ct + 1]] <- tmp_pred_se * (1 - Reduce(
+                "+", gn_A_se[1:a_ct]))                
             }
           } else { # if the first level of treatment
             gn_A[[a_ct + 1]] <- tmp_pred
@@ -304,12 +297,8 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
           # get predictions
           tmp_pred <- tmp_fm$pred
           if (a_ct != 0) {
-            gn_A[[a_ct + 1]] <- tmp_pred * Reduce(
-              "*",
-              lapply(gn_A[1:a_ct], function(x) {
-                1 - x
-              })
-            )
+            gn_A[[a_ct + 1]] <- tmp_pred * (1 - Reduce(
+              "+", gn_A[1:a_ct]))              
           } else {
             gn_A[[a_ct + 1]] <- tmp_pred
           }
@@ -369,12 +358,8 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
         ), type = "response")
         # get predictions
         if (a_ct != 0) {
-          gn_A[[a_ct + 1]] <- tmp_pred * Reduce(
-            "*",
-            lapply(gn_A[1:a_ct], function(x) {
-              1 - x
-            })
-          )
+          gn_A[[a_ct + 1]] <- tmp_pred * (1 - Reduce(
+            "+", gn_A[1:a_ct]))
         } else {
           gn_A[[a_ct + 1]] <- tmp_pred
         }
