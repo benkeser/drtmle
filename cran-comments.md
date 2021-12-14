@@ -29,4 +29,4 @@ All checks reporting OK.
 Nothing to report.
 
 ## Additional Notes
-Submission of updated package, version 1.1.0. 
+Submission of updated package, version 1.1.1. 
