@@ -517,16 +517,16 @@ the OR and PS, the library includes a main-terms generalized linear model (via
 the function `SL.glm` from `SuperLearner`) and an unadjusted
 generalized linear model (`SL.mean`). For the reduced dimension regressions we
 use a super learner library with a main terms generalized linear model
-(`SL.glm`) and adaptive regression splines (`SL.earth`, which utilizes the `earth`
-package [@earthPackage]).
+(`SL.glm`) and regression splines (`SL.gam`, which utilizes the `gam`
+package [@gamPackage]).
 
 ```{r, warning = FALSE, message = FALSE, cache = TRUE}
 set.seed(1234)
 sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
                  SL_g = c("SL.glm","SL.mean"),
                  SL_Q = c("SL.glm","SL.mean"),
-                 SL_gr = c("SL.glm", "SL.earth"),
-                 SL_Qr = c("SL.glm", "SL.earth"),
+                 SL_gr = c("SL.glm", "SL.gam"),
+                 SL_Qr = c("SL.glm", "SL.gam"),
                  stratify = FALSE)
 sl_fit
 ```
@@ -863,8 +863,8 @@ set.seed(1234)
 sl_fit_pcv <- drtmle(W = W, A = A, Y = Y, family = binomial(),
                      SL_g = c("SL.glm","SL.mean"),
                      SL_Q = c("SL.glm","SL.mean"),
-                     SL_gr = c("SL.glm", "SL.earth"),
-                     SL_Qr = c("SL.glm", "SL.earth"),
+                     SL_gr = c("SL.glm", "SL.gam"),
+                     SL_Qr = c("SL.glm", "SL.gam"),
                      stratify = FALSE,
                      se_cv = "partial")
 # compare estimates
@@ -1047,13 +1047,13 @@ It is possible to mix generalized linear models and super learning when fitting
 each of the components of the PS. In the below example we use the wrapper
 function `SL.glm`, which fits a main terms logistic regression, to fit the
 regression of $\Delta_A$ on $W$, use `SL.npreg` to fit the regression of $A$ on
-$W$, and use a super learner with library `SL.glm`, `SL.mean`, and `SL.earth` to
+$W$, and use a super learner with library `SL.glm`, `SL.mean`, and `SL.gam` to
 fit the regression of $Delta_Y$ on $W$ and $A$.
 
 ```{r, cache = TRUE}
 mixed_fit_wNAs <- drtmle(W = W, A = A, Y = Y, stratify = FALSE,
                          SL_g = list(DeltaA = "SL.glm", A = "SL.npreg",
-                         DeltaY = c("SL.glm", "SL.mean", "SL.earth")),
+                         DeltaY = c("SL.glm", "SL.mean", "SL.gam")),
                          glm_Q = "W1 + W2*A", glm_Qr = "gn",
                          glm_gr = "Qn", family = binomial())
 mixed_fit_wNAs
@@ -1251,8 +1251,8 @@ continue with the multi-level treatment example.
 
 ```{r, cache = TRUE}
 cv_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
-                    SL_g = c("SL.glm", "SL.glm.interaction", "SL.earth"),
-                    SL_Q = c("SL.glm", "SL.glm.interaction", "SL.earth"),
+                    SL_g = c("SL.glm", "SL.glm.interaction", "SL.gam"),
+                    SL_Q = c("SL.glm", "SL.glm.interaction", "SL.gam"),
                     SL_gr = c("SL.glm", "SL.mean"),
                     SL_Qr = c("SL.glm", "SL.mean"),
                     stratify = FALSE, cvFolds = 2, a_0 = c(0, 1, 2))
@@ -1285,10 +1285,10 @@ further information.
 # plan(cluster, workers = cl)
 # clusterEvalQ(cl, library("SuperLearner"))
 # pcv_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
-#                      SL_g = c("SL.glm", "SL.glm.interaction","SL.earth"),
-#                      SL_Q = c("SL.glm", "SL.glm.interaction","SL.earth"),
-#                      SL_gr = c("SL.glm", "SL.earth", "SL.mean"),
-#                      SL_Qr = c("SL.glm", "SL.earth", "SL.mean"),
+#                      SL_g = c("SL.glm", "SL.glm.interaction","SL.gam"),
+#                      SL_Q = c("SL.glm", "SL.glm.interaction","SL.gam"),
+#                      SL_gr = c("SL.glm", "SL.gam", "SL.mean"),
+#                      SL_Qr = c("SL.glm", "SL.gam", "SL.mean"),
 #                      stratify = FALSE, a_0 = c(0,1,2),
 #                      cvFolds = 2, use_future = TRUE)
 ```
@@ -1374,7 +1374,7 @@ identically equal to zero. Thus, this unadjusted regression estimator may do a
 good job estimating the reduced-dimension regressions in situations where the
 OR and PS are estimated well. In addition to relatively smooth estimators, we
 recommend additionally including several adaptive estimators such as `SL.npreg`
-or `SL.earth`.
+or `SL.gam`.
 
 Planned extensions of the `drtmle` package include extensions of longitudinal
 settings involving treatments at multiple time points and inclusion of the

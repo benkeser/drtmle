@@ -16,20 +16,19 @@ Depends:
     R (>= 3.5.0)
 Imports:
     SuperLearner,
-    np,
-    future.apply
+    np
 Suggests:
     testthat,
     knitr,
     rmarkdown,
     gam,
-    earth,
     quadprog,
     nloptr,
     parallel,
     foreach,
     stringi,
-    future.batchtools
+    future.batchtools,
+    future.apply
 License: MIT + file LICENSE
 URL: https://github.com/benkeser/drtmle
 BugReports: https://github.com/benkeser/drtmle/issues
