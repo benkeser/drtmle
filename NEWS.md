@@ -6,6 +6,7 @@
 * Minor changes
 	* fixed small bugs that caused errors predicting from some super learner
 	wrapper functions.
+	* removed `earth` dependency to fix build errors
 
 # drtmle 1.1.0
 
