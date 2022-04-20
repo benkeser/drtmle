@@ -87,7 +87,7 @@ ci <- function(...) {
 #' }
 ci.drtmle <- function(object, est = c("drtmle"), level = 0.95,
                       contrast = NULL, ...) {
-  if (class(object) != "drtmle") {
+  if (!inherits(object, "drtmle")) {
     stop("ci only works with drtmle objects")
   }
   out <- vector(mode = "list", length = length(est))
@@ -249,7 +249,7 @@ ci.adaptive_iptw <- function(object, est = c("iptw_tmle"), level = 0.95,
   if (any(est == "iptw")) {
     stop("Theory does not support inference for naive IPTW with super learner.")
   }
-  if (class(object) != "adaptive_iptw") {
+  if (!inherits(object, "adaptive_iptw")) {
     stop("ci only works with adaptive_iptw objects")
   }
   out <- vector(mode = "list", length = length(est))

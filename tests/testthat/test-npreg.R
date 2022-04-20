@@ -15,7 +15,7 @@ test_that("SL.npreg works as expected", {
   )
   expect_true(is.numeric(fit$pred))
   expect_true(all(!is.na(fit$pred)))
-  expect_true(class(fit$fit) == "SL.npreg")
+  expect_true(inherits(fit$fit, "SL.npreg"))
   # test predict function
   newX <- data.frame(X1 = seq(-1, 1, length = 10))
   pred <- predict(fit$fit, newdata = newX)

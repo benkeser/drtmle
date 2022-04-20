@@ -23,7 +23,7 @@ test_that("wald_test.drtmle works as expected", {
   # get test for each mean for only drtmle
   tmp <- wald_test(fit1)
   # correct class
-  expect_true(class(tmp) == "wald_test.drtmle")
+  expect_true(inherits(tmp,  "wald_test.drtmle"))
   # no NAs
   expect_true(sum(is.na(unlist(tmp))) == 0)
 
@@ -31,7 +31,7 @@ test_that("wald_test.drtmle works as expected", {
   tmp <- wald_test(fit1, est = c("drtmle", "tmle", "aiptw", "aiptw_c", "gcomp"))
 
   # correct class
-  expect_true(class(tmp) == "wald_test.drtmle")
+  expect_true(inherits(tmp, "wald_test.drtmle"))
   # no NAs
   expect_true(sum(is.na(unlist(tmp))) == 0)
   expect_true(length(tmp) == 5)
@@ -42,7 +42,7 @@ test_that("wald_test.drtmle works as expected", {
   # get test for ATE
   tmp <- wald_test(fit1, contrast = c(1, -1))
   # correct class
-  expect_true(class(tmp) == "wald_test.drtmle")
+  expect_true(inherits(tmp, "wald_test.drtmle"))
   # correct row name
   expect_true(row.names(tmp$drtmle) == "H0:E[Y(1)]-E[Y(0)]=0")
   # no NAs
@@ -69,7 +69,7 @@ test_that("wald_test.drtmle works as expected", {
     }
   )
   tmp <- wald_test(fit1, contrast = myContrast, null = 1)
-  expect_true(class(tmp) == "wald_test.drtmle")
+  expect_true(inherits(tmp, "wald_test.drtmle"))
   expect_true(row.names(tmp$drtmle) == "H0: user contrast = 1")
   # no NAs
   expect_true(sum(is.na(unlist(tmp))) == 0)
@@ -93,7 +93,7 @@ test_that("wald_test.adaptive_iptw works as expected", {
   # get test for each mean for only drtmle
   tmp <- wald_test(fit1)
   # correct class
-  expect_true(class(tmp) == "wald_test.adaptive_iptw")
+  expect_true(inherits(tmp, "wald_test.adaptive_iptw"))
   # no NAs
   expect_true(sum(is.na(unlist(tmp))) == 0)
 
@@ -101,7 +101,7 @@ test_that("wald_test.adaptive_iptw works as expected", {
   tmp <- wald_test(fit1, est = c("iptw_tmle", "iptw_os"))
 
   # correct class
-  expect_true(class(tmp) == "wald_test.adaptive_iptw")
+  expect_true(inherits(tmp, "wald_test.adaptive_iptw"))
   # no NAs
   expect_true(sum(is.na(unlist(tmp))) == 0)
   expect_true(length(tmp) == 2)
@@ -112,7 +112,7 @@ test_that("wald_test.adaptive_iptw works as expected", {
   # get test for ATE
   tmp <- wald_test(fit1, contrast = c(1, -1))
   # correct class
-  expect_true(class(tmp) == "wald_test.adaptive_iptw")
+  expect_true(inherits(tmp, "wald_test.adaptive_iptw"))
   # correct row name
   expect_true(row.names(tmp$iptw_tmle) == "H0:E[Y(1)]-E[Y(0)]=0")
   # no NAs
@@ -139,7 +139,7 @@ test_that("wald_test.adaptive_iptw works as expected", {
     }
   )
   tmp <- wald_test(fit1, contrast = myContrast, null = 1)
-  expect_true(class(tmp) == "wald_test.adaptive_iptw")
+  expect_true(inherits(tmp, "wald_test.adaptive_iptw"))
   expect_true(row.names(tmp$iptw_tmle) == "H0: user contrast = 1")
   # no NAs
   expect_true(sum(is.na(unlist(tmp))) == 0)

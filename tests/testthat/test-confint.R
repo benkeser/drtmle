@@ -23,7 +23,7 @@ test_that("ci.drtmle works as expected", {
   # get confidence intervals for each mean for only drtmle
   tmp <- ci(fit1)
   # correct class
-  expect_true(class(tmp) == "ci.drtmle")
+  expect_true(inherits(tmp, "ci.drtmle"))
   # no NAs
   expect_true(sum(is.na(unlist(tmp))) == 0)
 
@@ -31,7 +31,7 @@ test_that("ci.drtmle works as expected", {
   tmp <- ci(fit1, est = c("drtmle", "tmle", "aiptw", "aiptw_c", "gcomp"))
 
   # correct class
-  expect_true(class(tmp) == "ci.drtmle")
+  expect_true(inherits(tmp, "ci.drtmle"))
   # no NAs
   expect_true(sum(is.na(unlist(tmp))) == 0)
   expect_true(length(tmp) == 5)
@@ -42,7 +42,7 @@ test_that("ci.drtmle works as expected", {
   # get confidence intervals for ATE
   tmp <- ci(fit1, contrast = c(1, -1))
   # correct class
-  expect_true(class(tmp) == "ci.drtmle")
+  expect_true(inherits(tmp, "ci.drtmle"))
   # correct row name
   expect_true(row.names(tmp$drtmle) == "E[Y(1)]-E[Y(0)]")
   # no NAs
@@ -69,7 +69,7 @@ test_that("ci.drtmle works as expected", {
     }
   )
   tmp <- ci(fit1, contrast = myContrast)
-  expect_true(class(tmp) == "ci.drtmle")
+  expect_true(inherits(tmp, "ci.drtmle"))
   expect_true(row.names(tmp$drtmle) == "user contrast")
   # no NAs
   expect_true(sum(is.na(unlist(tmp))) == 0)
@@ -95,7 +95,7 @@ test_that("ci.adaptive_iptw works as expected", {
   # get confidence intervals for each
   tmp <- ci(fit1)
   # correct class
-  expect_true(class(tmp) == "ci.adaptive_iptw")
+  expect_true(inherits(tmp, "ci.adaptive_iptw"))
   # no NAs
   expect_true(sum(is.na(unlist(tmp))) == 0)
 
@@ -103,7 +103,7 @@ test_that("ci.adaptive_iptw works as expected", {
   tmp <- ci(fit1, est = c("iptw_tmle", "iptw_os"))
 
   # correct class
-  expect_true(class(tmp) == "ci.adaptive_iptw")
+  expect_true(inherits(tmp, "ci.adaptive_iptw"))
   # no NAs
   expect_true(sum(is.na(unlist(tmp))) == 0)
   expect_true(length(tmp) == 2)
@@ -114,7 +114,7 @@ test_that("ci.adaptive_iptw works as expected", {
   # get confidence intervals for ATE
   tmp <- ci(fit1, contrast = c(1, -1))
   # correct class
-  expect_true(class(tmp) == "ci.adaptive_iptw")
+  expect_true(inherits(tmp,  "ci.adaptive_iptw"))
   # correct row name
   expect_true(row.names(tmp$iptw_tmle) == "E[Y(1)]-E[Y(0)]")
   # no NAs
@@ -141,7 +141,7 @@ test_that("ci.adaptive_iptw works as expected", {
     }
   )
   tmp <- ci(fit1, contrast = myContrast)
-  expect_true(class(tmp) == "ci.adaptive_iptw")
+  expect_true(inherits(tmp, "ci.adaptive_iptw"))
   expect_true(row.names(tmp$iptw_tmle) == "user contrast")
   # no NAs
   expect_true(sum(is.na(unlist(tmp))) == 0)

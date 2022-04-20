@@ -24,5 +24,5 @@ test_that("adaptive_iptw works as expected with cv", {
   expect_true(all(!is.na(fit1$iptw_os$est)))
   expect_true(all(!is.na(fit1$iptw_os$cov)))
   expect_true(all(!is.na(fit1$iptw$est)))
-  expect_true(class(fit1) == "adaptive_iptw")
+  expect_true(inherits(fit1, "adaptive_iptw"))
 })
