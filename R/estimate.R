@@ -134,7 +134,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
         # get partially cross-validated estimates
         if(partial_cv){
           gn_DeltaA_se <- partial_cv_preds(a_0 = NULL, fit_sl = fm_DeltaA,
-                                           family = family,
+                                           family = stats::binomial(),
                                            easy = TRUE)
         }
       } else if (!is.list(SL_g$DeltaA) & length(SL_g$DeltaA) == 1) {
@@ -192,7 +192,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
         if(partial_cv){
           gn_A_se <- vector(mode = "list", length = 2)        
           gn_A_se[[1]] <- partial_cv_preds(fit_sl = fm_A[[1]], a_0 = NULL,
-                                           family = family,
+                                           family = stats::binomial(),
                                            W = validW, include = trainDeltaA == 1,
                                            easy = all(trainDeltaA == 1))
           gn_A_se[[2]] <- 1 - gn_A_se[[1]]
@@ -229,7 +229,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
           tmp_pred <- tmp_fm$SL.pred
           if(partial_cv){
             tmp_pred_se <- partial_cv_preds(fit_sl = tmp_fm, a_0 = NULL,
-                                            family = family,
+                                            family = stats::binomial(),
                                             W = validW, include = include,
                                             easy = all(include))
           }
@@ -418,7 +418,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
             gn_DeltaY[[a_ct]] <- fm_DeltaY[[a_ct]]$SL.predict
             if(partial_cv){
               gn_DeltaY_se[[a_ct]] <- partial_cv_preds(fit_sl = fm_DeltaY[[a_ct]],
-                                                       family = family,
+                                                       family = stats::binomial(),
                                                        a_0 = NULL, include = include & include2, 
                                                        W = validW, easy = all(include & include2))
             }
@@ -450,7 +450,7 @@ estimateG <- function(A, W, DeltaY, DeltaA, SL_g, glm_g, a_0, tolg,
             )$pred
             if(partial_cv){
               gn_DeltaY_se[[a_ct]] <- partial_cv_preds(fit_sl = fm_DeltaY[[1]],
-                                                       family = family,
+                                                       family = stats::binomial(),
                                                        a_0 = a, W = validW,
                                                        include = include, 
                                                        easy = all(include))
