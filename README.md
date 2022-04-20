@@ -23,7 +23,7 @@ license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://openso
 **Author:** [David
 Benkeser](https://www.sph.emory.edu/faculty/profile/#!dbenkes)
 
------
+------------------------------------------------------------------------
 
 ## Description
 
@@ -42,7 +42,7 @@ estimator of the average treatment effect when the propensity score is
 estimated via super learning, as discussed in [van der Laan
 (2014)](https://www.degruyter.com/downloadpdf/j/ijb.2014.10.issue-1/ijb-2012-0038/ijb-2012-0038.pdf).
 
------
+------------------------------------------------------------------------
 
 ## Installation
 
@@ -60,7 +60,7 @@ A developmental release may be installed from GitHub via
 devtools::install_github("benkeser/drtmle")
 ```
 
------
+------------------------------------------------------------------------
 
 ## Usage
 
@@ -69,13 +69,13 @@ devtools::install_github("benkeser/drtmle")
 Suppose the data consist of a vector of baseline covariates (`W`), a
 multi-level treatment assignment (`A`), and a continuous or
 binary-valued outcome (`Y`). The function `drtmle` may be used to
-estimate \(E[E(Y \mid A = a_0, W)]\) for user-selected values of \(a_0\)
-(via option `a_0`). The resulting targeted minimum loss-based estimates
-are doubly robust with respect to both consistency and asymptotic
-normality. The function computes doubly robust covariance estimates that
-can be used to construct doubly robust confidence intervals for marginal
-means and contrasts between means. A simple example on simulated data is
-shown below. We refer users to [the
+estimate *E*\[*E*(*Y*∣*A*=*a*<sub>0</sub>,*W*)\] for user-selected
+values of *a*<sub>0</sub> (via option `a_0`). The resulting targeted
+minimum loss-based estimates are doubly robust with respect to both
+consistency and asymptotic normality. The function computes doubly
+robust covariance estimates that can be used to construct doubly robust
+confidence intervals for marginal means and contrasts between means. A
+simple example on simulated data is shown below. We refer users to [the
 vignette](https://benkeser.github.io/drtmle/articles/using_drtmle.html)
 for more information and further examples.
 
@@ -83,7 +83,7 @@ for more information and further examples.
 # load packages
 library(drtmle)
 #> drtmle: TMLE with doubly robust inference
-#> Version: 1.1.0.9000
+#> Version: 1.1.0
 library(SuperLearner)
 #> Loading required package: nnls
 #> Loading required package: gam
@@ -169,17 +169,45 @@ fit2 <- adaptive_iptw(Y = Y, A = A, W = W, a_0 = c(0, 1),
                       SL_g = c("SL.glm", "SL.mean", "SL.step.interaction"),
                       SL_Qr = "SL.npreg")
 #> Loading required package: nloptr
+#> Warning: UNRELIABLE VALUE: One of the 'future.apply' iterations
+#> ('future_lapply-1') unexpectedly generated random numbers without declaring so.
+#> There is a risk that those random numbers are not statistically sound and the
+#> overall results might be invalid. To fix this, specify 'future.seed=TRUE'. This
+#> ensures that proper, parallel-safe random numbers are produced via the L'Ecuyer-
+#> CMRG method. To disable this check, use 'future.seed = NULL', or set option
+#> 'future.rng.onMisuse' to "ignore".
+#> Warning: UNRELIABLE VALUE: One of the 'future.apply' iterations
+#> ('future_lapply-1') unexpectedly generated random numbers without declaring so.
+#> There is a risk that those random numbers are not statistically sound and the
+#> overall results might be invalid. To fix this, specify 'future.seed=TRUE'. This
+#> ensures that proper, parallel-safe random numbers are produced via the L'Ecuyer-
+#> CMRG method. To disable this check, use 'future.seed = NULL', or set option
+#> 'future.rng.onMisuse' to "ignore".
+#> Warning: UNRELIABLE VALUE: One of the 'future.apply' iterations
+#> ('future_lapply-1') unexpectedly generated random numbers without declaring so.
+#> There is a risk that those random numbers are not statistically sound and the
+#> overall results might be invalid. To fix this, specify 'future.seed=TRUE'. This
+#> ensures that proper, parallel-safe random numbers are produced via the L'Ecuyer-
+#> CMRG method. To disable this check, use 'future.seed = NULL', or set option
+#> 'future.rng.onMisuse' to "ignore".
+#> Warning: UNRELIABLE VALUE: One of the 'future.apply' iterations
+#> ('future_lapply-1') unexpectedly generated random numbers without declaring so.
+#> There is a risk that those random numbers are not statistically sound and the
+#> overall results might be invalid. To fix this, specify 'future.seed=TRUE'. This
+#> ensures that proper, parallel-safe random numbers are produced via the L'Ecuyer-
+#> CMRG method. To disable this check, use 'future.seed = NULL', or set option
+#> 'future.rng.onMisuse' to "ignore".
 # print the output
 fit2
 #> $est
 #>            
-#> 0 0.1734251
-#> 1 0.2438025
+#> 0 0.1740064
+#> 1 0.2424139
 #> 
 #> $cov
 #>              0            1
-#> 0 8.607877e-04 8.982892e-05
-#> 1 8.982892e-05 2.308177e-02
+#> 0 8.554246e-04 8.969435e-05
+#> 1 8.969435e-05 2.235191e-02
 
 # compute a confidence interval for margin means
 ci_fit2 <- ci(fit2)
@@ -187,26 +215,26 @@ ci_fit2 <- ci(fit2)
 ci_fit2
 #> $iptw_tmle
 #>     est    cil   ciu
-#> 0 0.173  0.116 0.231
-#> 1 0.244 -0.054 0.542
+#> 0 0.174  0.117 0.231
+#> 1 0.242 -0.051 0.535
 
 # compute a confidence interval for the ate
 ci_ate2 <- ci(fit2, contrast = c(-1, 1))
 # print the output
 ci_ate2
 #> $iptw_tmle
-#>                  est    cil   ciu
-#> E[Y(1)]-E[Y(0)] 0.07 -0.232 0.373
+#>                   est    cil   ciu
+#> E[Y(1)]-E[Y(0)] 0.068 -0.229 0.366
 ```
 
------
+------------------------------------------------------------------------
 
 ## Issues
 
 If you encounter any bugs or have any specific feature requests, please
 [file an issue](https://github.com/benkeser/drtmle/issues).
 
------
+------------------------------------------------------------------------
 
 ## Citation
 
@@ -218,7 +246,7 @@ After using the `drtmle` R package, please cite the following:
       note = {R package version 1.0.0},
       doi = {10.5281/zenodo.844836}
     }
-    
+
     @article{benkeser2017improved,
       year  = {2017},
       author = {Benkeser, David C and Carone, Marco and van der Laan, Mark J
@@ -231,7 +259,7 @@ After using the `drtmle` R package, please cite the following:
       doi = {10.1093/biomet/asx053}
     }
 
------
+------------------------------------------------------------------------
 
 ## License
 
@@ -242,19 +270,19 @@ The contents of this repository are distributed under the MIT license.
 See below for details:
 
     The MIT License (MIT)
-    
+
     Copyright (c) 2016- David C. Benkeser
-    
+
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
     in the Software without restriction, including without limitation the rights
     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
     copies of the Software, and to permit persons to whom the Software is
     furnished to do so, subject to the following conditions:
-    
+
     The above copyright notice and this permission notice shall be included in all
     copies or substantial portions of the Software.
-    
+
     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE

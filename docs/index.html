@@ -22,6 +22,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -34,18 +36,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">drtmle</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
@@ -67,7 +63,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/benkeser/drtmle/">
+  <a href="https://github.com/benkeser/drtmle/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -84,47 +80,47 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="rdrtmle" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#rdrtmle" class="anchor"></a>R/<code>drtmle</code>
+<div class="section level1">
+<div class="page-header"><h1 id="rdrtmle">R/<code>drtmle</code>
+<a class="anchor" aria-label="anchor" href="#rdrtmle"></a>
 </h1></div>
 
 <blockquote>
 <p>Nonparametric estimators of the average treatment effect with doubly-robust confidence intervals and hypothesis tests</p>
 </blockquote>
-<p><strong>Author:</strong> <a href="https://www.sph.emory.edu/faculty/profile/#!dbenkes">David Benkeser</a></p>
+<p><strong>Author:</strong> <a href="https://www.sph.emory.edu/faculty/profile/#!dbenkes" class="external-link">David Benkeser</a></p>
 <hr>
-<div id="description" class="section level2">
-<h2 class="hasAnchor">
-<a href="#description" class="anchor"></a>Description</h2>
-<p><code>drtmle</code> is an R package that computes marginal means of an outcome under fixed levels of a treatment. The package computes targeted minimum loss-based (TMLE) estimators that are doubly robust, not only with respect to consistency, but also with respect to asymptotic normality, as discussed in <a href="https://academic.oup.com/biomet/article-abstract/104/4/863/4554445">Benkeser, et al. (2017)</a>. This property facilitates construction of doubly-robust confidence intervals and hypothesis tests.</p>
-<p>The package additionally includes methods for computing valid confidence intervals for an inverse probability of treatment weighted (IPTW) estimator of the average treatment effect when the propensity score is estimated via super learning, as discussed in <a href="https://www.degruyter.com/downloadpdf/j/ijb.2014.10.issue-1/ijb-2012-0038/ijb-2012-0038.pdf">van der Laan (2014)</a>.</p>
+<div class="section level2">
+<h2 id="description">Description<a class="anchor" aria-label="anchor" href="#description"></a>
+</h2>
+<p><code>drtmle</code> is an R package that computes marginal means of an outcome under fixed levels of a treatment. The package computes targeted minimum loss-based (TMLE) estimators that are doubly robust, not only with respect to consistency, but also with respect to asymptotic normality, as discussed in <a href="https://academic.oup.com/biomet/article-abstract/104/4/863/4554445" class="external-link">Benkeser, et al. (2017)</a>. This property facilitates construction of doubly-robust confidence intervals and hypothesis tests.</p>
+<p>The package additionally includes methods for computing valid confidence intervals for an inverse probability of treatment weighted (IPTW) estimator of the average treatment effect when the propensity score is estimated via super learning, as discussed in <a href="https://www.degruyter.com/downloadpdf/j/ijb.2014.10.issue-1/ijb-2012-0038/ijb-2012-0038.pdf" class="external-link">van der Laan (2014)</a>.</p>
 <hr>
 </div>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
-<p>Install the current stable release from <a href="https://cran.r-project.org/">CRAN</a> via</p>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<p>Install the current stable release from <a href="https://cran.r-project.org/" class="external-link">CRAN</a> via</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"drtmle"</span><span class="op">)</span></code></pre></div>
-<p>A developmental release may be installed from GitHub via <a href="https://www.rstudio.com/products/rpackages/devtools/"><code>devtools</code></a> with:</p>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"drtmle"</span><span class="op">)</span></code></pre></div>
+<p>A developmental release may be installed from GitHub via <a href="https://www.rstudio.com/products/rpackages/devtools/" class="external-link"><code>devtools</code></a> with:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span><span class="op">(</span><span class="st">"benkeser/drtmle"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"benkeser/drtmle"</span><span class="op">)</span></code></pre></div>
 <hr>
 </div>
-<div id="usage" class="section level2">
-<h2 class="hasAnchor">
-<a href="#usage" class="anchor"></a>Usage</h2>
-<div id="doubly-robust-inference-for-the-average-treatment-effect" class="section level3">
-<h3 class="hasAnchor">
-<a href="#doubly-robust-inference-for-the-average-treatment-effect" class="anchor"></a>Doubly-robust inference for the average treatment effect</h3>
-<p>Suppose the data consist of a vector of baseline covariates (<code>W</code>), a multi-level treatment assignment (<code>A</code>), and a continuous or binary-valued outcome (<code>Y</code>). The function <code>drtmle</code> may be used to estimate <span class="math inline"><em>E</em>[<em>E</em>(<em>Y</em> ∣ <em>A</em> = <em>a</em><sub>0</sub>, <em>W</em>)]</span> for user-selected values of <span class="math inline"><em>a</em><sub>0</sub></span> (via option <code>a_0</code>). The resulting targeted minimum loss-based estimates are doubly robust with respect to both consistency and asymptotic normality. The function computes doubly robust covariance estimates that can be used to construct doubly robust confidence intervals for marginal means and contrasts between means. A simple example on simulated data is shown below. We refer users to <a href="https://benkeser.github.io/drtmle/articles/using_drtmle.html">the vignette</a> for more information and further examples.</p>
+<div class="section level2">
+<h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
+</h2>
+<div class="section level3">
+<h3 id="doubly-robust-inference-for-the-average-treatment-effect">Doubly-robust inference for the average treatment effect<a class="anchor" aria-label="anchor" href="#doubly-robust-inference-for-the-average-treatment-effect"></a>
+</h3>
+<p>Suppose the data consist of a vector of baseline covariates (<code>W</code>), a multi-level treatment assignment (<code>A</code>), and a continuous or binary-valued outcome (<code>Y</code>). The function <code>drtmle</code> may be used to estimate <em>E</em>[<em>E</em>(<em>Y</em>∣<em>A</em>=<em>a</em><sub>0</sub>,<em>W</em>)] for user-selected values of <em>a</em><sub>0</sub> (via option <code>a_0</code>). The resulting targeted minimum loss-based estimates are doubly robust with respect to both consistency and asymptotic normality. The function computes doubly robust covariance estimates that can be used to construct doubly robust confidence intervals for marginal means and contrasts between means. A simple example on simulated data is shown below. We refer users to <a href="https://benkeser.github.io/drtmle/articles/using_drtmle.html" class="external-link">the vignette</a> for more information and further examples.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># load packages</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/benkeser/drtmle">drtmle</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/benkeser/drtmle" class="external-link">drtmle</a></span><span class="op">)</span>
 <span class="co">#&gt; drtmle: TMLE with doubly robust inference</span>
-<span class="co">#&gt; Version: 1.1.0.9000</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ecpolley/SuperLearner">SuperLearner</a></span><span class="op">)</span>
+<span class="co">#&gt; Version: 1.1.0</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ecpolley/SuperLearner" class="external-link">SuperLearner</a></span><span class="op">)</span>
 <span class="co">#&gt; Loading required package: nnls</span>
 <span class="co">#&gt; Loading required package: gam</span>
 <span class="co">#&gt; Loading required package: splines</span>
@@ -135,16 +131,16 @@
 <span class="co">#&gt; Package created on 2021-05-04</span>
 
 <span class="co"># simulate simple data structure</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">12345</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">12345</span><span class="op">)</span>
 <span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">200</span>
-<span class="va">W</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>W1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="va">n</span>,<span class="op">-</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span>, W2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span><span class="op">(</span><span class="va">n</span>,<span class="fl">1</span>,<span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>
-<span class="va">A</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span><span class="op">(</span><span class="va">n</span>, <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html">plogis</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span> <span class="op">+</span> <span class="va">W</span><span class="op">$</span><span class="va">W1</span> <span class="op">-</span> <span class="fl">2</span><span class="op">*</span><span class="va">W</span><span class="op">$</span><span class="va">W1</span><span class="op">*</span><span class="va">W</span><span class="op">$</span><span class="va">W2</span><span class="op">)</span><span class="op">)</span>
-<span class="va">Y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span><span class="op">(</span><span class="va">n</span>, <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html">plogis</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span> <span class="op">+</span> <span class="va">W</span><span class="op">$</span><span class="va">W1</span> <span class="op">-</span> <span class="fl">2</span><span class="op">*</span><span class="va">W</span><span class="op">$</span><span class="va">W1</span><span class="op">*</span><span class="va">W</span><span class="op">$</span><span class="va">W2</span> <span class="op">+</span> <span class="va">A</span><span class="op">)</span><span class="op">)</span>
+<span class="va">W</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>W1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">n</span>,<span class="op">-</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span>, W2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="va">n</span>,<span class="fl">1</span>,<span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>
+<span class="va">A</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="va">n</span>, <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">plogis</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span> <span class="op">+</span> <span class="va">W</span><span class="op">$</span><span class="va">W1</span> <span class="op">-</span> <span class="fl">2</span><span class="op">*</span><span class="va">W</span><span class="op">$</span><span class="va">W1</span><span class="op">*</span><span class="va">W</span><span class="op">$</span><span class="va">W2</span><span class="op">)</span><span class="op">)</span>
+<span class="va">Y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="va">n</span>, <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">plogis</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span> <span class="op">+</span> <span class="va">W</span><span class="op">$</span><span class="va">W1</span> <span class="op">-</span> <span class="fl">2</span><span class="op">*</span><span class="va">W</span><span class="op">$</span><span class="va">W1</span><span class="op">*</span><span class="va">W</span><span class="op">$</span><span class="va">W2</span> <span class="op">+</span> <span class="va">A</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># estimate the covariate-adjusted marginal mean for A = 1 and A = 0</span>
 <span class="co"># here, we do not properly estimate the propensity score</span>
 <span class="va">fit1</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/drtmle.html">drtmle</a></span><span class="op">(</span>W <span class="op">=</span> <span class="va">W</span>, A <span class="op">=</span> <span class="va">A</span>, Y <span class="op">=</span> <span class="va">Y</span>, <span class="co"># input data</span>
-               a_0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, <span class="co"># return estimates for A = 0 and A = 1</span>
+               a_0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, <span class="co"># return estimates for A = 0 and A = 1</span>
                SL_Q <span class="op">=</span> <span class="st">"SL.npreg"</span>, <span class="co"># use kernel regression for E(Y | A = a, W)</span>
                glm_g <span class="op">=</span> <span class="st">"W1 + W2"</span>, <span class="co"># use misspecified main terms glm for E(A | W)</span>
                SL_Qr <span class="op">=</span> <span class="st">"SL.npreg"</span>, <span class="co"># use kernel regression to guard against</span>
@@ -177,7 +173,7 @@
 
 <span class="co"># get confidence intervals for ate</span>
 <span class="co"># truth is E[Y(1)] - E[Y(0)] = 0.14</span>
-<span class="va">ci_ate1</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ci.html">ci</a></span><span class="op">(</span><span class="va">fit1</span>, contrast <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>
+<span class="va">ci_ate1</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ci.html">ci</a></span><span class="op">(</span><span class="va">fit1</span>, contrast <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>
 <span class="co"># print the output</span>
 <span class="va">ci_ate1</span>
 <span class="co">#&gt; $drtmle</span>
@@ -185,30 +181,58 @@
 <span class="co">#&gt; E[Y(1)]-E[Y(0)] 0.111 -0.081 0.304</span></code></pre></div>
 <p>This method requires estimation of additional univariate regressions to ensure doubly robust confidence intervals and hypothesis tests. The method for estimation are input via <code>SL.Qr</code> and <code>SL.gr</code> or <code>glm.Qr</code> and <code>glm.gr</code> if parametric models are desired). These additional fits can be visualized by the <code>plot</code> method for <code>drtmle</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/layout.html">layout</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">fit1</span>, ask <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/layout.html" class="external-link">layout</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit1</span>, ask <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="inference-for-super-learner-based-iptw" class="section level3">
-<h3 class="hasAnchor">
-<a href="#inference-for-super-learner-based-iptw" class="anchor"></a>Inference for super learner-based IPTW</h3>
+<div class="section level3">
+<h3 id="inference-for-super-learner-based-iptw">Inference for super learner-based IPTW<a class="anchor" aria-label="anchor" href="#inference-for-super-learner-based-iptw"></a>
+</h3>
 <p>The package additionally includes a function for computing valid confidence intervals about an inverse probability of treatment weight (IPTW) estimator when super learning is used to estimate the propensity score.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># fit iptw</span>
-<span class="va">fit2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/adaptive_iptw.html">adaptive_iptw</a></span><span class="op">(</span>Y <span class="op">=</span> <span class="va">Y</span>, A <span class="op">=</span> <span class="va">A</span>, W <span class="op">=</span> <span class="va">W</span>, a_0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,
-                      SL_g <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"SL.glm"</span>, <span class="st">"SL.mean"</span>, <span class="st">"SL.step.interaction"</span><span class="op">)</span>,
+<span class="va">fit2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/adaptive_iptw.html">adaptive_iptw</a></span><span class="op">(</span>Y <span class="op">=</span> <span class="va">Y</span>, A <span class="op">=</span> <span class="va">A</span>, W <span class="op">=</span> <span class="va">W</span>, a_0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,
+                      SL_g <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SL.glm"</span>, <span class="st">"SL.mean"</span>, <span class="st">"SL.step.interaction"</span><span class="op">)</span>,
                       SL_Qr <span class="op">=</span> <span class="st">"SL.npreg"</span><span class="op">)</span>
 <span class="co">#&gt; Loading required package: nloptr</span>
+<span class="co">#&gt; Warning: UNRELIABLE VALUE: One of the 'future.apply' iterations</span>
+<span class="co">#&gt; ('future_lapply-1') unexpectedly generated random numbers without declaring so.</span>
+<span class="co">#&gt; There is a risk that those random numbers are not statistically sound and the</span>
+<span class="co">#&gt; overall results might be invalid. To fix this, specify 'future.seed=TRUE'. This</span>
+<span class="co">#&gt; ensures that proper, parallel-safe random numbers are produced via the L'Ecuyer-</span>
+<span class="co">#&gt; CMRG method. To disable this check, use 'future.seed = NULL', or set option</span>
+<span class="co">#&gt; 'future.rng.onMisuse' to "ignore".</span>
+<span class="co">#&gt; Warning: UNRELIABLE VALUE: One of the 'future.apply' iterations</span>
+<span class="co">#&gt; ('future_lapply-1') unexpectedly generated random numbers without declaring so.</span>
+<span class="co">#&gt; There is a risk that those random numbers are not statistically sound and the</span>
+<span class="co">#&gt; overall results might be invalid. To fix this, specify 'future.seed=TRUE'. This</span>
+<span class="co">#&gt; ensures that proper, parallel-safe random numbers are produced via the L'Ecuyer-</span>
+<span class="co">#&gt; CMRG method. To disable this check, use 'future.seed = NULL', or set option</span>
+<span class="co">#&gt; 'future.rng.onMisuse' to "ignore".</span>
+<span class="co">#&gt; Warning: UNRELIABLE VALUE: One of the 'future.apply' iterations</span>
+<span class="co">#&gt; ('future_lapply-1') unexpectedly generated random numbers without declaring so.</span>
+<span class="co">#&gt; There is a risk that those random numbers are not statistically sound and the</span>
+<span class="co">#&gt; overall results might be invalid. To fix this, specify 'future.seed=TRUE'. This</span>
+<span class="co">#&gt; ensures that proper, parallel-safe random numbers are produced via the L'Ecuyer-</span>
+<span class="co">#&gt; CMRG method. To disable this check, use 'future.seed = NULL', or set option</span>
+<span class="co">#&gt; 'future.rng.onMisuse' to "ignore".</span>
+<span class="co">#&gt; Warning: UNRELIABLE VALUE: One of the 'future.apply' iterations</span>
+<span class="co">#&gt; ('future_lapply-1') unexpectedly generated random numbers without declaring so.</span>
+<span class="co">#&gt; There is a risk that those random numbers are not statistically sound and the</span>
+<span class="co">#&gt; overall results might be invalid. To fix this, specify 'future.seed=TRUE'. This</span>
+<span class="co">#&gt; ensures that proper, parallel-safe random numbers are produced via the L'Ecuyer-</span>
+<span class="co">#&gt; CMRG method. To disable this check, use 'future.seed = NULL', or set option</span>
+<span class="co">#&gt; 'future.rng.onMisuse' to "ignore".</span>
 <span class="co"># print the output</span>
 <span class="va">fit2</span>
 <span class="co">#&gt; $est</span>
 <span class="co">#&gt;            </span>
-<span class="co">#&gt; 0 0.1734251</span>
-<span class="co">#&gt; 1 0.2438025</span>
+<span class="co">#&gt; 0 0.1740064</span>
+<span class="co">#&gt; 1 0.2424139</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $cov</span>
 <span class="co">#&gt;              0            1</span>
-<span class="co">#&gt; 0 8.607877e-04 8.982892e-05</span>
-<span class="co">#&gt; 1 8.982892e-05 2.308177e-02</span>
+<span class="co">#&gt; 0 8.554246e-04 8.969435e-05</span>
+<span class="co">#&gt; 1 8.969435e-05 2.235191e-02</span>
 
 <span class="co"># compute a confidence interval for margin means</span>
 <span class="va">ci_fit2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ci.html">ci</a></span><span class="op">(</span><span class="va">fit2</span><span class="op">)</span>
@@ -216,136 +240,146 @@
 <span class="va">ci_fit2</span>
 <span class="co">#&gt; $iptw_tmle</span>
 <span class="co">#&gt;     est    cil   ciu</span>
-<span class="co">#&gt; 0 0.173  0.116 0.231</span>
-<span class="co">#&gt; 1 0.244 -0.054 0.542</span>
+<span class="co">#&gt; 0 0.174  0.117 0.231</span>
+<span class="co">#&gt; 1 0.242 -0.051 0.535</span>
 
 <span class="co"># compute a confidence interval for the ate</span>
-<span class="va">ci_ate2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ci.html">ci</a></span><span class="op">(</span><span class="va">fit2</span>, contrast <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>
+<span class="va">ci_ate2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ci.html">ci</a></span><span class="op">(</span><span class="va">fit2</span>, contrast <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>
 <span class="co"># print the output</span>
 <span class="va">ci_ate2</span>
 <span class="co">#&gt; $iptw_tmle</span>
-<span class="co">#&gt;                  est    cil   ciu</span>
-<span class="co">#&gt; E[Y(1)]-E[Y(0)] 0.07 -0.232 0.373</span></code></pre></div>
+<span class="co">#&gt;                   est    cil   ciu</span>
+<span class="co">#&gt; E[Y(1)]-E[Y(0)] 0.068 -0.229 0.366</span></code></pre></div>
 <hr>
 </div>
 </div>
-<div id="issues" class="section level2">
-<h2 class="hasAnchor">
-<a href="#issues" class="anchor"></a>Issues</h2>
-<p>If you encounter any bugs or have any specific feature requests, please <a href="https://github.com/benkeser/drtmle/issues">file an issue</a>.</p>
+<div class="section level2">
+<h2 id="issues">Issues<a class="anchor" aria-label="anchor" href="#issues"></a>
+</h2>
+<p>If you encounter any bugs or have any specific feature requests, please <a href="https://github.com/benkeser/drtmle/issues" class="external-link">file an issue</a>.</p>
 <hr>
 </div>
-<div id="citation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#citation" class="anchor"></a>Citation</h2>
+<div class="section level2">
+<h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
+</h2>
 <p>After using the <code>drtmle</code> R package, please cite the following:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="op">@</span>Manual{drtmlepackage,</a>
-<a class="sourceLine" id="cb6-2" title="2">  title =<span class="st"> </span>{drtmle<span class="op">:</span><span class="st"> </span>Doubly<span class="op">-</span>Robust Nonparametric Estimation and Inference},</a>
-<a class="sourceLine" id="cb6-3" title="3">  author =<span class="st"> </span>{David Benkeser},</a>
-<a class="sourceLine" id="cb6-4" title="4">  note =<span class="st"> </span>{R package version <span class="dv">1</span>.<span class="fl">0.0</span>},</a>
-<a class="sourceLine" id="cb6-5" title="5">  doi =<span class="st"> </span>{<span class="fl">10.5281</span><span class="op">/</span>zenodo<span class="fl">.844836</span>}</a>
-<a class="sourceLine" id="cb6-6" title="6">}</a>
-<a class="sourceLine" id="cb6-7" title="7"></a>
-<a class="sourceLine" id="cb6-8" title="8"><span class="op">@</span>article{benkeser2017improved,</a>
-<a class="sourceLine" id="cb6-9" title="9">  year  =<span class="st"> </span>{<span class="dv">2017</span>},</a>
-<a class="sourceLine" id="cb6-10" title="10">  author =<span class="st"> </span>{Benkeser, David C and Carone, Marco and van der Laan, Mark J</a>
-<a class="sourceLine" id="cb6-11" title="11">    and Gilbert, Peter B},</a>
-<a class="sourceLine" id="cb6-12" title="12">  title =<span class="st"> </span>{Doubly<span class="op">-</span>robust nonparametric inference on the average</a>
-<a class="sourceLine" id="cb6-13" title="13">    treatment effect},</a>
-<a class="sourceLine" id="cb6-14" title="14">  journal =<span class="st"> </span>{Biometrika},</a>
-<a class="sourceLine" id="cb6-15" title="15">  volume =<span class="st"> </span>{<span class="dv">104</span>}, number =<span class="st"> </span>{<span class="dv">4</span>},</a>
-<a class="sourceLine" id="cb6-16" title="16">  pages =<span class="st"> </span>{863–<span class="dv">880</span>},</a>
-<a class="sourceLine" id="cb6-17" title="17">  doi =<span class="st"> </span>{<span class="fl">10.1093</span><span class="op">/</span>biomet<span class="op">/</span>asx053}</a>
-<a class="sourceLine" id="cb6-18" title="18">}</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="sc">@</span>Manual{drtmlepackage,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  title <span class="ot">=</span> {drtmle<span class="sc">:</span> Doubly<span class="sc">-</span>Robust Nonparametric Estimation and Inference},</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  author <span class="ot">=</span> {David Benkeser},</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  note <span class="ot">=</span> {R package version <span class="dv">1</span>.<span class="fl">0.0</span>},</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  doi <span class="ot">=</span> {<span class="fl">10.5281</span><span class="sc">/</span>zenodo<span class="fl">.844836</span>}</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="sc">@</span>article{benkeser2017improved,</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  year  <span class="ot">=</span> {<span class="dv">2017</span>},</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  author <span class="ot">=</span> {Benkeser, David C and Carone, Marco and van der Laan, Mark J</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    and Gilbert, Peter B},</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  title <span class="ot">=</span> {Doubly<span class="sc">-</span>robust nonparametric inference on the average</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    treatment effect},</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  journal <span class="ot">=</span> {Biometrika},</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  volume <span class="ot">=</span> {<span class="dv">104</span>}, number <span class="ot">=</span> {<span class="dv">4</span>},</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  pages <span class="ot">=</span> {863–<span class="dv">880</span>},</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  doi <span class="ot">=</span> {<span class="fl">10.1093</span><span class="sc">/</span>biomet<span class="sc">/</span>asx053}</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <hr>
 </div>
-<div id="license" class="section level2">
-<h2 class="hasAnchor">
-<a href="#license" class="anchor"></a>License</h2>
-<p>© 2016- <a href="https://www.sph.emory.edu/faculty/profile/#!dbenkes">David C. Benkeser</a></p>
+<div class="section level2">
+<h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
+</h2>
+<p>© 2016- <a href="https://www.sph.emory.edu/faculty/profile/#!dbenkes" class="external-link">David C. Benkeser</a></p>
 <p>The contents of this repository are distributed under the MIT license. See below for details:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">The MIT <span class="kw">License</span> (MIT)</a>
-<a class="sourceLine" id="cb7-2" title="2"></a>
-<a class="sourceLine" id="cb7-3" title="3"><span class="kw">Copyright</span> (c) <span class="dv">2016</span><span class="op">-</span><span class="st"> </span>David C. Benkeser</a>
-<a class="sourceLine" id="cb7-4" title="4"></a>
-<a class="sourceLine" id="cb7-5" title="5">Permission is hereby granted, free of charge, to any person obtaining a copy</a>
-<a class="sourceLine" id="cb7-6" title="6">of this software and associated documentation <span class="kw">files</span> (the <span class="st">"Software"</span>), to deal</a>
-<a class="sourceLine" id="cb7-7" title="7"><span class="cf">in</span> the Software without restriction, including without limitation the rights</a>
-<a class="sourceLine" id="cb7-8" title="8">to use, copy, modify, merge, publish, distribute, sublicense, and<span class="op">/</span>or sell</a>
-<a class="sourceLine" id="cb7-9" title="9">copies of the Software, and to permit persons to whom the Software is</a>
-<a class="sourceLine" id="cb7-10" title="10">furnished to do so, subject to the following conditions<span class="op">:</span></a>
-<a class="sourceLine" id="cb7-11" title="11"></a>
-<a class="sourceLine" id="cb7-12" title="12">The above copyright notice and this permission notice shall be included <span class="cf">in</span> all</a>
-<a class="sourceLine" id="cb7-13" title="13">copies or substantial portions of the Software.</a>
-<a class="sourceLine" id="cb7-14" title="14"></a>
-<a class="sourceLine" id="cb7-15" title="15">THE SOFTWARE IS PROVIDED <span class="st">"AS IS"</span>, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</a>
-<a class="sourceLine" id="cb7-16" title="16">IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</a>
-<a class="sourceLine" id="cb7-17" title="17">FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</a>
-<a class="sourceLine" id="cb7-18" title="18">AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</a>
-<a class="sourceLine" id="cb7-19" title="19">LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</a>
-<a class="sourceLine" id="cb7-20" title="20">OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</a>
-<a class="sourceLine" id="cb7-21" title="21">SOFTWARE.</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>The MIT <span class="fu">License</span> (MIT)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">Copyright</span> (c) <span class="dv">2016</span><span class="sc">-</span> David C. Benkeser</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>of this software and associated documentation <span class="fu">files</span> (the <span class="st">"Software"</span>), to deal</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="cf">in</span> the Software without restriction, including without limitation the rights</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>to use, copy, modify, merge, publish, distribute, sublicense, and<span class="sc">/</span>or sell</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>copies of the Software, and to permit persons to whom the Software is</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>furnished to do so, subject to the following conditions<span class="sc">:</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>The above copyright notice and this permission notice shall be included <span class="cf">in</span> all</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>copies or substantial portions of the Software.</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>THE SOFTWARE IS PROVIDED <span class="st">"AS IS"</span>, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>SOFTWARE.</span></code></pre></div>
 </div>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=drtmle">https://​cloud.r-project.org/​package=drtmle</a>
-</li>
-<li>Browse source code at <br><a href="https://github.com/benkeser/drtmle/">https://​github.com/​benkeser/​drtmle/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/benkeser/drtmle/issues">https://​github.com/​benkeser/​drtmle/​issues</a>
-</li>
+<li><a href="https://cloud.r-project.org/package=drtmle" class="external-link">View on CRAN</a></li>
+<li><a href="https://github.com/benkeser/drtmle/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/benkeser/drtmle/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li>
-<a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a>
+<a href="https://opensource.org/licenses/mit-license.php" class="external-link">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a>
 </li>
 </ul>
 </div>
+
 <div class="community">
-<h2>Community</h2>
+<h2 data-toc-skip>Community</h2>
 <ul class="list-unstyled">
 <li><a href="CONTRIBUTING.html">Contributing guide</a></li>
 </ul>
 </div>
-<div class="developers">
-<h2>Developers</h2>
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
-<li>David Benkeser <br><small class="roles"> Author, maintainer, copyright holder </small> <a href="https://orcid.org/0000-0002-1019-8343" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
-<li><a href="authors.html">All authors...</a></li>
+<li><a href="authors.html#citation">Citing drtmle</a></li>
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="developers">
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li><a href="https://travis-ci.org/benkeser/drtmle"><img src="https://travis-ci.org/benkeser/drtmle.svg?branch=master" alt="Travis-CI Build Status"></a></li>
-<li><a href="https://ci.appveyor.com/project/benkeser/drtmle"><img src="https://ci.appveyor.com/api/projects/status/github/benkeser/drtmle?branch=master&amp;svg=true" alt="AppVeyor Build Status"></a></li>
-<li><a href="https://codecov.io/github/benkeser/drtmle?branch=master"><img src="https://img.shields.io/codecov/c/github/benkeser/drtmle/master.svg" alt="Coverage Status"></a></li>
-<li><a href="http://www.r-pkg.org/pkg/drtmle"><img src="http://www.r-pkg.org/badges/version/drtmle" alt="CRAN"></a></li>
-<li><a href="https://CRAN.R-project.org/package=drtmle"><img src="https://cranlogs.r-pkg.org/badges/drtmle" alt="CRAN downloads"></a></li>
-<li><a href="http://www.repostatus.org/#active"><img src="http://www.repostatus.org/badges/latest/active.svg" alt="Project Status: Active - The project has reached a stable, usable state and is being actively developed."></a></li>
-<li><a href="http://opensource.org/licenses/MIT"><img src="http://img.shields.io/badge/license-MIT-brightgreen.svg" alt="MIT license"></a></li>
-<li><a href="https://zenodo.org/badge/latestdoi/75324341"><img src="https://zenodo.org/badge/75324341.svg" alt="DOI"></a></li>
+<li>David Benkeser <br><small class="roles"> Author, maintainer, copyright holder </small> <a href="https://orcid.org/0000-0002-1019-8343" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li><a href="authors.html">More about authors...</a></li>
 </ul>
 </div>
+
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://travis-ci.org/benkeser/drtmle" class="external-link"><img src="https://travis-ci.org/benkeser/drtmle.svg?branch=master" alt="Travis-CI Build Status"></a></li>
+<li><a href="https://ci.appveyor.com/project/benkeser/drtmle" class="external-link"><img src="https://ci.appveyor.com/api/projects/status/github/benkeser/drtmle?branch=master&amp;svg=true" alt="AppVeyor Build Status"></a></li>
+<li><a href="https://codecov.io/github/benkeser/drtmle?branch=master" class="external-link"><img src="https://img.shields.io/codecov/c/github/benkeser/drtmle/master.svg" alt="Coverage Status"></a></li>
+<li><a href="http://www.r-pkg.org/pkg/drtmle" class="external-link"><img src="http://www.r-pkg.org/badges/version/drtmle" alt="CRAN"></a></li>
+<li><a href="https://CRAN.R-project.org/package=drtmle" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/drtmle" alt="CRAN downloads"></a></li>
+<li><a href="http://www.repostatus.org/#active" class="external-link"><img src="http://www.repostatus.org/badges/latest/active.svg" alt="Project Status: Active - The project has reached a stable, usable state and is being actively developed."></a></li>
+<li><a href="http://opensource.org/licenses/MIT" class="external-link"><img src="http://img.shields.io/badge/license-MIT-brightgreen.svg" alt="MIT license"></a></li>
+<li><a href="https://zenodo.org/badge/latestdoi/75324341" class="external-link"><img src="https://zenodo.org/badge/75324341.svg" alt="DOI"></a></li>
+</ul>
 </div>
+
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by David Benkeser.</p>
+  <p></p>
+<p>Developed by David Benkeser.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer>
@@ -353,6 +387,8 @@
 
   
 
+
+  
 
   </body>
 </html>
