@@ -1,12 +1,10 @@
 .Rproj.user
 .Rhistory
 .RData
-simulation/*
 README.html
 vignettes/*.html
 vignettes/using_drtmle_cache/*
-JSS/*
 .Rapp.history
-JSS/using_drtmle_jss.tex
-JSS/using_drtmle_jss.pdf
-JSS/using_drtmle_jss_cache
+paper/using_drtmle_obstudies.tex
+paper/using_drtmle_obstudies.pdf
+paper/using_drtmle_obstudies_cache

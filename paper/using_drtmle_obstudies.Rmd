@@ -1,30 +1,32 @@
 ---
-documentclass: jss
-author:
-  - name: David Benkeser
-    affiliation: Emory University
-    address: |
-      | 1518 Clifton Road, NE
-      | Mailstop: 002-3AA
-      | Atlanta, Georgia, 30322, U.S.A.
-    email: \email{benkeser@emory.edu}
-    orcdi: 0000-0002-1019-8343
-  - name: Nima S. Hejazi
-    affiliation: University of California, Berkeley
-    address: |
-      | 2121 Berkeley Way,
-      | Berkeley, California, 94704, U.S.A.
-    email: \email{nhejazi@berkeley.edu}
-    orcdi: 0000-0002-7127-2789
-title:
-  formatted: "Doubly-Robust Inference in R using \\pkg{drtmle}"
-  plain: "Doubly-Robust Inference in R using drtmle"
-  short: "\\pkg{drtmle}: Doubly-robust Inference"
-keywords:
-  formatted: [causal inference, machine learning, treatment effects, targeted minimum loss estimation]
-  plain: [causal inference, machine learning, treatment effects, targeted minimum loss estimation]
-preamble: >
-  \usepackage{amsmath}
+documentclass: article
+classoption: [twoside,11pt]
+author: David Benkeser and Nima S. Hejazi
+title: "Doubly-Robust Inference in R using \\texttt{drtmle}"
+keywords: [causal inference, machine learning, treatment effects, targeted minimum loss estimation]
+output:
+  latex_document:
+    extra_dependencies:
+      obs_study_style: null
+      amsmath: null
+      mathtools: null
+      fancyvrb: null
+      inputenc: ["utf8"]
+bibliography: refs.bib
+header-includes: >
+  \providecommand{\tightlist}{%
+    \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+  \newcommand{\dataset}{{\cal D}}
+  \newcommand{\fracpartial}[2]{\frac{\partial #1}{\partial  #2}}
+  \DefineVerbatimEnvironment{Sinput}{Verbatim}{fontshape=sl}
+  \DefineVerbatimEnvironment{Soutput}{Verbatim}{}
+  \DefineVerbatimEnvironment{Scode}{Verbatim}{fontshape=sl}
+  \newenvironment{Schunk}{}{}
+  \DefineVerbatimEnvironment{Code}{Verbatim}{}
+  \DefineVerbatimEnvironment{CodeInput}{Verbatim}{fontshape=sl}
+  \DefineVerbatimEnvironment{CodeOutput}{Verbatim}{}
+  \newenvironment{CodeChunk}{}{}
+  \setkeys{Gin}{width=0.8\textwidth}
 abstract: >
   Inverse probability of treatment weighted estimators and doubly-robust
   estimators (including augmented inverse probability of treatment weight and
@@ -43,14 +45,10 @@ abstract: >
   treatment effect. While doubly-robust estimators facilitate inference when
   *all* relevant regression functions are consistently estimated, the same
   cannot be said when at least one nuisance estimator is inconsistent.
-  \pkg{drtmle} implements doubly-robust confidence intervals and hypothesis
+  \texttt{drtmle} implements doubly-robust confidence intervals and hypothesis
   tests for targeted minimum loss-based estimates of the average treatment
-  effect, in addition to several other recently-proposed estimators of the 
+  effect, in addition to several other recently-proposed estimators of the
   average treatment effect.
-header-includes:
-  - \usepackage{mathtools}
-output: rticles::jss_article
-bibliography: refs
 ---
 
 ```{r, setup, include=FALSE}
@@ -118,31 +116,31 @@ However, recent work has shown that the double robustness property does not
 necessarily extend to the inferential properties of these estimators when
 adaptive estimators of the PS and/or OR are used
 [@vdl:2014:ijb,@benkeser:2017:biometrika]. Instead, valid inference requires
-consistent estimation of *both* the PS *and* the OR. \citet{vdl:2014:ijb}
+consistent estimation of *both* the PS *and* the OR. @vdl:2014:ijb
 proposed new TML estimators that have an asymptotic normal sampling distribution
 with estimable variance under consistent estimation of *either* the PS *or* the
 OR, paving the way for inference that is doubly-robust.
-\citet{benkeser:2017:biometrika} proposed modifications of these estimators with
+@benkeser:2017:biometrika proposed modifications of these estimators with
 similar robustness properties and illustrated their practical performance.
 
 The two proposed procedures that yield doubly-robust inference are quite
 involved, notably requiring iterative estimation of additional, complex nuisance
-parameters. The \pkg{drtmle} package was motivated by the need for a
+parameters. The \texttt{drtmle} package was motivated by the need for a
 user-friendly tool to implement these methods. The package implements the TML
-estimators of population-level effects proposed in \citet{vdl:2014:ijb} and
-\citet{benkeser:2017:biometrika}, as well as several extensions including
+estimators of population-level effects proposed in @vdl:2014:ijb and
+@benkeser:2017:biometrika, as well as several extensions including
 cross-validated targeted minimum loss-based estimation (CV-TMLE). Additionally,
-\pkg{drtmle} implements an IPTW estimator that overcomes shortcomings of
+\texttt{drtmle} implements an IPTW estimator that overcomes shortcomings of
 existing IPTW implementations with respect to statistical inference. In
 particular, the estimator allows an adaptive estimator of the PS to be used in
 construction of the IPTW estimator, while yielding valid statistical inference
 about population-level effects. Both the TML and IPTW estimators implemented in
-the \pkg{drtmle} package are capable of estimating population-level effects for
+the \texttt{drtmle} package are capable of estimating population-level effects for
 discrete-valued treatments; moreover, the package provides convenient utilities
 for constructing confidence intervals and hypothesis tests about contrasts of
 the mean outcome under different levels of treatment. This document explains
 some of the key concepts underlying doubly-robust inference and illustrates
-usage of the \pkg{drtmle} package.
+usage of the \texttt{drtmle} package.
 
 # Definition and estimators of the average treatment effect
 
@@ -263,25 +261,25 @@ regularity conditions are satisfied, will have a normal limiting distribution.
 TMLE provides a means of mapping an initial estimator of the OR into an
 estimator that satisfies (4). In addition to possessing the desirable asymptotic
 properties, TML estimators have been shown to outperform AIPTW estimators in
-finite samples [@porter:2011:ijb]. We refer readers to \citet{tlbook:2011} for
+finite samples [@porter:2011:ijb]. We refer readers to @tlbook:2011 for
 more about TMLE.
 
 # Doubly-robust inference
 
-\citet{vdl:2014:ijb} demonstrated that the double robustness property of AIPTW
+@vdl:2014:ijb demonstrated that the double robustness property of AIPTW
 and TML estimators does not extend to their normal limiting distribution if
 adaptive estimators of the OR and PS are used to construct the estimators.
 However, in settings with high-dimensional and continuous-valued covariates,
 adaptive estimation is likely necessary in order to obtain a consistent
 estimate of either the OR or PS, and thus may be necessary to obtain minimally
-biased estimates of the marginal means of interest. \citet{vdl:2014:ijb} derived
+biased estimates of the marginal means of interest. @vdl:2014:ijb derived
 modified TML estimators that are doubly-robust not only with respect to
 consistency, but also with respect to asymptotic normality. Furthermore, this
 work provided closed-form, doubly-robust variance estimators that may be used to
 construct doubly-robust confidence intervals and hypothesis tests.
-\citet{benkeser:2017:biometrika} proposed simplifications of the
-\citet{vdl:2014:ijb} estimators and demonstrated the practical performance of
-these estimators via simulation.
+@benkeser:2017:biometrika proposed simplifications of the @vdl:2014:ijb
+estimators and demonstrated the practical performance of these estimators via
+simulation.
 
 The key to the theory underlying these results is finding estimators of the OR
 and PS that simultaneously satisfy equation (4) in addition to two additional
@@ -302,8 +300,8 @@ low-dimensional regardless of the dimension of $W$ and depend on neither the
 true OR nor the true PS. Thus, these regressions may be consistently estimated
 at reasonably fast rates irrespective of the dimension of $W$ and irrespective
 of whether the OR or PS are consistently estimated. Based on these
-reduced-dimension regressions, \citet{vdl:2014:ijb} showed that if estimates of
-the OR $\bar{Q}_n^{\star}$, PS $g_n^{\star}$, R-OR $\bar{Q}_{r,n}^{\star}$, and
+reduced-dimension regressions, @{vdl:2014:ijb showed that if estimates of the
+OR $\bar{Q}_n^{\star}$, PS $g_n^{\star}$, R-OR $\bar{Q}_{r,n}^{\star}$, and
 R-PS $g_{r,n}^{\star}$ satisfied
 \begin{align}
 & \frac{1}{n} \sum\limits_{i=1}^n \frac{I(A_i = a)}{g_n^{\star}(a \mid W_i)}
@@ -322,7 +320,7 @@ distribution. The author additionally proposed a TMLE algorithm to map initial
 estimates of the OR, PS, R-OR, and R-PS into estimates that satisfy these key
 equations.
 
-\citet{benkeser:2017:biometrika} demonstrated alternative equations that can be
+@benkeser:2017:biometrika demonstrated alternative equations that can be
 satisfied to achieve this form of double-robustness. In particular, these
 authors formulated an alternative version of the R-PS,
 \begin{align*}
@@ -337,7 +335,7 @@ weighted residual from the PS on the OR,
 \end{align*}
 which we refer to as R-PS2. The key feature of R-PS1 and R-PS2 is that they are
 both univariate regressions, while R-PS is a bivariate regression.
-\citet{benkeser:2017:biometrika} suggested that this may make R-PS1 and R-PS2
+@benkeser:2017:biometrika suggested that this may make R-PS1 and R-PS2
 easier to estimate consistently than R-PS. Further, they showed that if
 estimators of the OR, PS, and R-OR satisfy equations (5)-(6), and if,
 additionally, estimators of the OR, R-PS-1 $g_{r,n,1}^{\star}$, and R-PS-2
@@ -348,7 +346,7 @@ $g_{r,n,2}^{\star}$ satisfy
 \bar{Q}_n^{\star}(a,W_i)\} = 0 \ ,
 \end{equation*}
 then the GCOMP estimator based on this $\bar{Q}_n^{\star}$ also enjoys a
-doubly-robust limiting distribution. \citet{benkeser:2017:biometrika} provided a
+doubly-robust limiting distribution. @benkeser:2017:biometrika provided a
 TMLE algorithm that produced such estimates and provided closed-form,
 doubly-robust variance estimates.
 
@@ -361,7 +359,7 @@ doubly-robust estimator by adding a term to the GCOMP estimator. This term is
 exactly the left-hand-side of the key equation (4), the key equation that is
 solved by the standard TMLE. This is no coincidence; this term is crucial in
 studying the asymptotic properties of the GCOMP, AIPTW, and TML estimators
-(for discussion, see \citet{benkeser:2017:biometrika} Section 2.2). Recall that
+(for discussion, see @benkeser:2017:biometrika Section 2.2). Recall that
 a TML estimator achieves doubly-robust consistency by satisfying equation (4),
 while the AIPTW achieves doubly-robust consistency by combining the GCOMP
 estimator with the left-hand-side of this term. Now, we have argued that a TML
@@ -369,11 +367,11 @@ estimator may achieve doubly-robust limiting behavior if it additionally
 satisfies equations (6) and (7). It is thus sensible to wonder whether an
 AIPTW-style estimator could be constructed by combining the left-hand-side of
 these two additional equations with the AIPTW estimator.
-\citet{benkeser:2017:biometrika} showed that, surprisingly, this AIPTW-style
-estimator does not achieve the same doubly-robust properties as the TML
-estimator. Thus, while AIPTW and TMLE are generally competitors for producing
-estimators doubly-robust with respect to consistency, for doubly-robust
-inference, TMLE ought to be preferred.
+@benkeser:2017:biometrika showed that, surprisingly, this AIPTW-style estimator
+does not achieve the same doubly-robust properties as the TML estimator. Thus,
+while AIPTW and TMLE are generally competitors for producing estimators
+doubly-robust with respect to consistency, for doubly-robust inference, TMLE
+ought to be preferred.
 
 # Implementation of doubly-robust inference
 
@@ -381,8 +379,8 @@ The main function of the package is the eponymous `drtmle()` function. This
 function estimates the treatment-specific marginal mean for user-specified
 levels of a discrete-valued treatment and computes a doubly-robust covariance
 matrix for these estimates. The function implements either the
-estimators of \citet{vdl:2014:ijb} (if `reduction = "bivariate"`) or the
-improved estimators of \citet{benkeser:2017:biometrika}
+estimators of @vdl:2014:ijb (if `reduction = "bivariate"`) or the
+improved estimators of @benkeser:2017:biometrika
 (`reduction = "univariate"`). The package includes utility functions for
 combining these estimates into estimates of average treatment effects, as well
 as other contrasts, as discussed below.
@@ -403,7 +401,7 @@ as follows:
      `fluctuateQ()` and `fluctuateG()` functions until equations (5)-(7) are
      approximately solved;
   5. compute the TML estimates and covariance estimates based on the final OR.
-We refer interested readers to \citet{benkeser:2017:biometrika} for a
+We refer interested readers to @benkeser:2017:biometrika for a
 theoretical derivation of how the iterative modification of initial OR and PS is
 performed.
 
@@ -467,16 +465,17 @@ appear in the formula specified in `glm_Q`. If `stratify = TRUE`, regressions
 are fit stratifying on `A` to separately estimate $\bar{Q}_0(1,W)$ and
 $\bar{Q}_0(0,W)$. In this case, the `glm_Q` formula may not include `"A"`.
 
-To understand the variable names available for R-OR, recall from (\ref{eqn:qbarr}) that the parameter
-involves a regression onto the estimated propensity score. Thus, the formula
-that is input via `glm_Qr` should assume data with a single column, `"gn"`.
-Similarly, the R-PS1 and R-PS2 that are computed for the estimators of
-\citet{benkeser:2017:biometrika} (the default estimators, computed whenever
-`reduction = "univariate"`) involve regressions onto the estimated outcome
-regression. Thus, the formula `glm_gr` should assume data with a single column
-named `"Qn"` if `reduction = "univariate"`. Instead, if the estimators of
-\citet{vdl:2014:ijb} are preferred (`reduction = "bivariate"`) the `glm_gr` 
-formula specifies a model for (\ref{eqn:gr_bivariate}) and assumes data with two columns, `"Qn"` and `"gn"`.
+To understand the variable names available for R-OR, recall from
+(\ref{eqn:qbarr}) that the parameter involves a regression onto the estimated
+propensity score. Thus, the formula that is input via `glm_Qr` should assume
+data with a single column, `"gn"`.  Similarly, the R-PS1 and R-PS2 that are
+computed for the estimators of @benkeser:2017:biometrika (the default
+estimators, computed whenever `reduction = "univariate"`) involve regressions
+onto the estimated outcome regression. Thus, the formula `glm_gr` should assume
+data with a single column named `"Qn"` if `reduction = "univariate"`. Instead,
+if the estimators of @vdl:2014:ijb are preferred (`reduction = "bivariate"`) the
+`glm_gr` formula specifies a model for (\ref{eqn:gr_bivariate}) and assumes data
+with two columns, `"Qn"` and `"gn"`.
 
 The code below illustrates how generalized linear models can be used to
 estimate the regression parameters. In this call to `drtmle()`, we specify
@@ -516,7 +515,7 @@ estimator selection. Practically, the super learner provides the best chance
 for obtaining a consistent estimator for both the OR and PS, and thereby an
 efficient estimator of the marginal means of interest.
 
-Super learning is implemented in the R package \pkg{SuperLearner}
+Super learning is implemented in the R package \texttt{SuperLearner}
 [@SuperLearnerPackage] and `drtmle()` provides the option to utilize super
 learning for estimation of the OR, PS, and reduced-dimension regressions via the
 `SL_Q`, `SL_g`, `SL_Qr`, and `SL_gr` options. When calling `drtmle()` either the
@@ -524,15 +523,15 @@ generalized linear model options for regression modeling or the super learner
 options should be invoked. If both are called, the function will automatically
 opt to using the super learner option. The inputs to the super learner options
 are passed to the `SL.library` argument of the `SuperLearner()` function of the
-\pkg{SuperLearner} package. We refer readers to the documentation of the
+\texttt{SuperLearner} package. We refer readers to the documentation of the
 `SuperLearner()` function for information on how to properly specify a super
 learner library. In the code below, we illustrate a call to `drtmle()` with a
 relatively simple library. For the OR and PS, the library includes a main-terms
-generalized linear model (via the function `SL.glm` from \pkg{SuperLearner}) and
+generalized linear model (via the function `SL.glm` from \texttt{SuperLearner}) and
 an unadjusted generalized linear model (`SL.mean`). For the reduced-dimension
 regressions we use a super learner library with a main-terms generalized linear
 model (`SL.glm`) and adaptive regression splines (`SL.earth`, which utilizes the
-\pkg{earth} package [@earthPackage]).
+\texttt{earth} package [@earthPackage]).
 
 ```{r, warning = FALSE, message = FALSE, cache = TRUE}
 set.seed(1234)
@@ -545,14 +544,14 @@ sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
 sl_fit
 ```
 
-The \pkg{drtmle} package also allows users to pass in their own functions for
+The \texttt{drtmle} package also allows users to pass in their own functions for
 estimating regression parameters via the `SL_` options. These functions must be
 formatted properly for compatibility with `drtmle()`. The necessary formatting
 is identical to the formatting required for writing a `SuperLearner` wrapper
-(see `SuperLearner::write.SL.template()`). The \pkg{drtmle} package includes
+(see `SuperLearner::write.SL.template()`). The \texttt{drtmle} package includes
 `SL.npreg`, which is an example of how a user can specify a function for
 estimating regression parameters. This functions fits a kernel regression
-estimator using the \pkg{np} package [@npPackage]. Below we show the source code
+estimator using the \texttt{np} package [@npPackage]. Below we show the source code
 for this function.
 
 ```{r}
@@ -736,7 +735,7 @@ and compute an estimate of $\sigma^2_0$ using
   \frac{1}{n} \sum_{j=1}^n D_j^{cv} \right\}^2 \ .
 \end{equation*}
 
-In \pkg{drtmle}, cross-validated standard error estimates can be obtained by
+In \texttt{drtmle}, cross-validated standard error estimates can be obtained by
 setting `se_cv = "full"` and `se_cvFolds` to a number greater than 1. For
 example,
 
@@ -756,7 +755,7 @@ list(
 ### Partially cross-validated standard errors
 
 Obtaining fully cross-validated standard errors can be fairly time-intensive
-when super learner is used to estimate the OR and PS. In \pkg{drtmle}, we give
+when super learner is used to estimate the OR and PS. In \texttt{drtmle}, we give
 an option to compute standard error estimates that are *partially
 cross-validated* and do not require any additional fitting beyond a standard
 super learner. Here, we describe briefly how these estimates are obtained and
@@ -831,7 +830,7 @@ list(
 
 ## Confidence intervals
 
-The \pkg{drtmle} package contains methods that compute doubly-robust confidence
+The \texttt{drtmle} package contains methods that compute doubly-robust confidence
 intervals. The `ci()` method computes confidence intervals about the estimated
 marginal means in a fitted object of S3 class `"drtmle"`, in addition to
 contrasts between those means. By default, the method gives confidence intervals
@@ -1089,7 +1088,7 @@ EY2 <- mean(Y2)
 ```
 
 In our examples so far, we have only considered binary treatments. However,
-\pkg{drtmle} is fully equipped to handle treatments with an arbitrary number of
+\texttt{drtmle} is fully equipped to handle treatments with an arbitrary number of
 discrete values as well. Suppose that $A$ assumes values in a set $\mathcal{A}$
 of limited cardinality, the PS regression estimation is modified to ensure that
 \begin{equation*}
@@ -1098,7 +1097,7 @@ of limited cardinality, the PS regression estimation is modified to ensure that
 If this condition is true, we say that the estimates of the PS are compatible.
 Many regression methodologies that have been developed work well with binary
 outcomes, but have not been extended to multi-level outcomes. To ensure that
-users of \pkg{drtmle} have access to the large number of binary regression
+users of \texttt{drtmle} have access to the large number of binary regression
 techniques when estimating the PS, we have taken an alternative approach to
 estimation of the propensity for each level of the treatment. Specifically,
 rather than fitting a single multinomial-type regression, we fit a series of
@@ -1215,22 +1214,22 @@ cv_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
 Cross-validation may significantly increase the computation time necessary for
 running `drtmle()`. Parallelized nuisance regression fitting is available by
 setting the option `use_future = TRUE`. Since, internally, all computations are
-carried out using futures (with the API provided by the \pkg{future} R package),
+carried out using futures (with the API provided by the \texttt{future} R package),
 setting this option amounts only to parallelizing with futures [@futurePackage]
 via `future.apply::lapply()`; when `use_future = FALSE`, base `lapply()` is
 simply used instead.  Together, setting these options results in parallelization
 of the estimation of the OR, PS, and reduced-dimension regressions.
 
 If no adjustments are made prior to invoking the `drtmle()` function, futures
-are computed sequentially, as per the defaults of the \pkg{future} package. It
+are computed sequentially, as per the defaults of the \texttt{future} package. It
 is left to the user to specify appropriate system-specific future backends that
-may better suit their problem (e.g., using the \pkg{future.batchtools} package
+may better suit their problem (e.g., using the \texttt{future.batchtools} package
 [@futurebatchtoolsPackage] or even simply setting a parallelized
 `future::plan()`). Below, we demonstrate registration using an ad-hoc cluster on
 the local system. The choice of backend is flexible, and submission of the job
 to a wide variety of schedulers (e.g., SLURM, TORQUE) is also permitted.
 Interested readers are invited to consult the documentation of the
-\pkg{future.batchtools} package for further information.
+\texttt{future.batchtools} package for further information.
 
 ```{r, message = FALSE, eval = FALSE}
 library(future.batchtools)
@@ -1249,7 +1248,7 @@ pcv_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
 
 # Discussion
 
-The \pkg{drtmle} package was designed to provide a user-friendly implementation
+The \texttt{drtmle} package was designed to provide a user-friendly implementation
 of the TMLE algorithm that facilitates doubly-robust inference about marginal
 means and average treatment effects. While the theory underlying doubly-robust
 inference is complex, the implementation of the methods only requires users to
@@ -1270,17 +1269,16 @@ situations where the OR and PS are estimated well. In addition to relatively
 smooth estimators, we recommend additionally including several adaptive
 estimators such as `SL.npreg` or `SL.earth`.
 
-Planned extensions of the \pkg{drtmle} package include extensions to
+Planned extensions of the \texttt{drtmle} package include extensions to
 longitudinal settings involving treatments at multiple time points and inclusion
 of the collaborative targeted maximum likelihood estimator (C-TMLE) of
-\citet{vdl:2014:ijb} that also facilitates collaborative doubly-robust
-inference.
+@vdl:2014:ijb that also facilitates collaborative doubly-robust inference.
 
 # Appendix
 
 ## Arbitrary user-specified regressions
 
-The \pkg{drtmle} package also allows users to pass in their own estimated OR and
+The \texttt{drtmle} package also allows users to pass in their own estimated OR and
 PS via the `Qn` and `gn` options, respectively.  If `Qn` is specified by the
 user, `drtmle()` will ignore the nuisance parameter estimation routines
 specified by `SL_Q` and `glm_Q` -- similarly for `gn` and `SL_g`, `glm_g`. As
@@ -1388,7 +1386,7 @@ Doubly-robust estimators of marginal means are appealing in their robustness and
 efficiency properties. However, researchers may prefer the IPTW estimator for
 its intuitive derivation and implementation. Heretofore, inference for IPTW
 estimators precluded the use of adaptive estimators of the PS. However,
-\citet{vdl:2014:ijb} proposed modified IPTW estimators that allow for adaptive
+@vdl:2014:ijb proposed modified IPTW estimators that allow for adaptive
 PS estimation. Similarly as above, this estimator is based on an additional
 regression parameter, $\tilde{Q}_{r,0n}(a,w) \coloneqq E_0\{Y \mid A = a, g_n(W)
 = g_n(w)\}$, that is, the regression of the outcome $Y$ on the estimated
@@ -1400,7 +1398,7 @@ satisfied that
     W_i)} \ \{ I(A_i = a) - g_n(a \mid W = W_i)\} = 0 \ ,
 \end{equation*}
 then the IPTW estimator based on $g_n^{\star}$ would have an asymptotic normal
-distribution with estimable variance. In fact, \citet{vdl:2014:ijb} proposed a
+distribution with estimable variance. In fact, @vdl:2014:ijb proposed a
 TMLE algorithm that mapped an initial PS estimate into an estimate that
 satisfies this key equation and variance estimators that can be used to generate
 Wald-style confidence intervals and hypothesis tests.
@@ -1413,7 +1411,7 @@ $g_n(a \mid w)$, can be computed as
   \mid W = W_i)\} \ .
 \end{equation*}
 Both this estimator and the TMLE-based IPTW estimator above are implemented in
-\pkg{drtmle}.
+\texttt{drtmle}.
 
 #### Implementation of inference for adaptive IPTW
 
@@ -1433,8 +1431,8 @@ The `"adaptive_iptw"` S3 class contains identical methods for computing
 confidence intervals and Wald-style tests as the `"drtmle"` class, thus readers
 are referred back to the section on confidence intervals and hypothesis tests
 for reminders on the various options for these procedures. By default, these
-methods are implemented for the `iptw_tmle()` estimator of \citet{vdl:2014:ijb}.
-We conjecture that this estimator will have improved finite-sample behavior
+methods are implemented for the `iptw_tmle()` estimator of @vdl:2014:ijb.  We
+conjecture that this estimator will have improved finite-sample behavior
 relative to `iptw_os()` (the alternative estimator described above), though
 further study in numerical experiments is warranted.
 
@@ -1464,7 +1462,7 @@ this approach also delivers more stable behavior in settings where estimated
 propensity scores become very small. However, the estimator is not doubly robust
 -- the asymptotics rely on the outcome regression being consistently estimated
 at $n^{-1/4}$ rate. In this sense, this estimator trades off robustness against
-achieving greater stability and efficiency. See \citet{ju2020robust} for further
+achieving greater stability and efficiency. See @ju2020robust for further
 discussion.
 
 #### Implementation of outcome-adaptive propensity score
@@ -1476,7 +1474,7 @@ above, this estimator is *not* doubly robust. Note that when `adapt_g = TRUE`,
 the data used for PS estimation will be a `data.frame` with column names `QaW`
 where `a` takes all the values specified in `a_0`. For example if `a_0 =
 c(0,1)`, then the PS estimation data frame will have two columns called `Q0W`
-and `Q1W`. This may be relevant for users writing their own \pkg{SuperLearner}
+and `Q1W`. This may be relevant for users writing their own \texttt{SuperLearner}
 wrapper functions or those who make use of the `glm_g` setting.
 
 ```{r, message = FALSE}
