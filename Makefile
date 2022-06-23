@@ -40,3 +40,11 @@ buildfast:
 
 style:
 	Rscript -e "styler::style_pkg()"
+
+jss_environment: 
+	cd JSS && Rscript -e "renv::restore()"
+
+jss:
+	cd JSS && Rscript -e "rmarkdown::render('using_drtmle_jss.Rmd')"
+
+.PHONY: jss
