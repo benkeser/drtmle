@@ -1,0 +1,88 @@
+\documentclass[twoside,11pt]{article}
+
+% Any additional packages needed should be included after obs_study_style.
+% Note that obs_study_style.sty includes epsfig, amssymb, natbib and graphicx,
+% and defines many common macros, such as 'proof' and 'example'.
+%
+% It also sets the bibliographystyle to plainnat; for more information on
+% natbib citation styles, see the natbib documentation, a copy of which
+
+\usepackage[utf8]{inputenc}
+\usepackage{mathtools}
+\usepackage{amsmath}
+\usepackage{fancyvrb}
+\usepackage{obs_study_style}
+
+% Definitions of handy macros can go here
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\newcommand{\dataset}{{\cal D}}
+\newcommand{\fracpartial}[2]{\frac{\partial #1}{\partial  #2}}
+\DefineVerbatimEnvironment{Sinput}{Verbatim}{fontshape=sl}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}{}
+\DefineVerbatimEnvironment{Scode}{Verbatim}{fontshape=sl}
+\newenvironment{Schunk}{}{}
+\DefineVerbatimEnvironment{Code}{Verbatim}{}
+\DefineVerbatimEnvironment{CodeInput}{Verbatim}{fontshape=sl}
+\DefineVerbatimEnvironment{CodeOutput}{Verbatim}{}
+\newenvironment{CodeChunk}{}{}
+\setkeys{Gin}{width=0.8\textwidth}
+
+% For papers submitted for review, just fill in author names
+% For accepted papers, heading arguments are {volume}{year}{pages}{submitted}{published}{author-full-names}
+\heading{}{}{}{}{}{David Benkeser and Nima S.~Hejazi}
+
+% Short headings should be running head and authors last names
+
+\ShortHeadings{\texttt{drtmle}: Doubly-robust Inference}{Benkeser and Hejazi}
+\firstpageno{1}
+
+\begin{document}
+
+\title{Doubly-Robust Inference in R using \texttt{drtmle}}
+
+\author{
+  \name David Benkeser \email benkeser@emory.edu \\
+  \addr Department of Biostatistics \& Bioinformatics\\
+  Rollins School of Public Health\\
+  Emory University\\
+  1518 Clifton Road, N.E., Atlanta, GA 30322
+  \AND
+  \name Nima S.~Hejazi \email nhejazi@hsph.harvard.edu \\
+  \addr Department of Biostatistics\\
+  T.H.~Chan School of Public Health\\
+  Harvard University \\
+  677 Huntington Avenue, Boston, MA 02115
+}
+
+\maketitle
+
+\begin{abstract}
+  Inverse probability of treatment weighted estimators and doubly-robust
+  estimators (including augmented inverse probability of treatment weight and
+  targeted minimum loss-based estimators) are widely used in causal inference to
+  estimate and draw inference about the average effect of a treatment. As an
+  intermediate step, these estimators require estimation of key nuisance
+  parameters, which are often regression functions. Typically, regressions are
+  estimated using maximum likelihood and parametric models. Confidence intervals
+  and p-values may be computed based on standard asymptotic results, such as the
+  central limit theorem, the delta method, and the nonparametric bootstrap.
+  However, in high-dimensional settings maximum likelihood estimation often
+  breaks down and standard procedures no longer yield correct inference.
+  Instead, we may rely on adaptive estimators of nuisance parameters to
+  construct flexible regression estimators. However, use of adaptive estimators
+  poses a challenge for performing statistical inference about an estimated
+  treatment effect. While doubly-robust estimators facilitate inference when
+  *all* relevant regression functions are consistently estimated, the same
+  cannot be said when at least one nuisance estimator is inconsistent.
+  \texttt{drtmle} implements doubly-robust confidence intervals and hypothesis
+  tests for targeted minimum loss-based estimates of the average treatment
+  effect, in addition to several other recently-proposed estimators of the
+  average treatment effect.
+\end{abstract}
+
+\begin{keywords}
+  causal inference, machine learning, treatment effects, targeted minimum
+  loss estimation
+\end{keywords}
+
