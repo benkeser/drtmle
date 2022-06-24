@@ -6,16 +6,18 @@
 %
 % It also sets the bibliographystyle to plainnat; for more information on
 % natbib citation styles, see the natbib documentation, a copy of which
-
+\usepackage{obs_study_style}
 \usepackage[utf8]{inputenc}
 \usepackage{mathtools}
 \usepackage{amsmath}
 \usepackage{fancyvrb}
-\usepackage{obs_study_style}
+\usepackage[pdfstartview=FitH]{hyperref}
+\usepackage{bookmark}
 
 % Definitions of handy macros can go here
 \providecommand{\tightlist}{%
-  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}
+}
 \newcommand{\dataset}{{\cal D}}
 \newcommand{\fracpartial}[2]{\frac{\partial #1}{\partial  #2}}
 \DefineVerbatimEnvironment{Sinput}{Verbatim}{fontshape=sl}
@@ -42,17 +44,19 @@
 \title{Doubly-Robust Inference in R using \texttt{drtmle}}
 
 \author{
-  \name David Benkeser \email benkeser@emory.edu \\
+  \name David Benkeser \email benkeser@emory.edu\\
   \addr Department of Biostatistics \& Bioinformatics\\
   Rollins School of Public Health\\
   Emory University\\
-  1518 Clifton Road, N.E., Atlanta, GA 30322
+  1518 Clifton Road, N.E.,\\
+  Atlanta, GA 30322
   \AND
-  \name Nima S.~Hejazi \email nhejazi@hsph.harvard.edu \\
+  \name Nima S.~Hejazi \email nhejazi@hsph.harvard.edu\\
   \addr Department of Biostatistics\\
   T.H.~Chan School of Public Health\\
-  Harvard University \\
-  677 Huntington Avenue, Boston, MA 02115
+  Harvard University\\
+  677 Huntington Avenue,\\
+  Boston, MA 02115
 }
 
 \maketitle
@@ -85,4 +89,3 @@
   causal inference, machine learning, treatment effects, targeted minimum
   loss estimation
 \end{keywords}
-

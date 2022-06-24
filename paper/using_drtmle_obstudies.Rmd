@@ -1,6 +1,6 @@
 ---
 output:
-  bookdown::pdf_document2:
+  latex_fragment:
     includes:
       in_header: preamble.tex
 bibliography: refs.bib
@@ -30,53 +30,55 @@ techniques are not feasible for such high-dimensional data without restrictive
 modeling assumptions. When these assumptions are violated, estimates of the
 population-level effect of a treatment may have large bias.
 
-This has led to increased interest in adopting adaptive estimation techniques from the
-machine learning literature to control for high-dimensional confounders when
-estimating treatment effects. However, facilitating proper inference (i.e.,
+This has led to increased interest in adopting adaptive estimation techniques
+from the machine learning literature to control for high-dimensional confounders
+when estimating treatment effects. However, facilitating proper inference (i.e.,
 confidence intervals and hypothesis tests) about estimates of effects based on
-adaptive estimators is challenging. In particular, the use of standard causal inference
-techniques, including both G-computation (GCOMP) estimators
+adaptive estimators is challenging. In particular, the use of standard causal
+inference techniques, including both G-computation (GCOMP) estimators
 [@robins:1986:mathmod] and inverse probability of treatment weighted (IPTW)
-estimators [@horvitzthompson:1952:jasa, @robins:2000:epi] is challenging when utilizing
-adaptive estimators. In particular, with rare exception, if cross-validation is used
-to select tuning parameters for the nuisance parameters, estimates of the population-level
-effect will generally be too biased to achieve standard $n^{1/2}$-rate asymptotics. Instead,
-*undersmoothing* must be used to select tuning parameters to control the bias 
-[@undersmoothed_hal]. However, this can prove quite challenging in practice and 
-few guidelines are available. 
+estimators [@horvitzthompson:1952:jasa, @robins:2000:epi] is challenging when
+utilizing adaptive estimators. In particular, with rare exception, if
+cross-validation is used to select tuning parameters for the nuisance
+parameters, estimates of the population-level effect will generally be too
+biased to achieve standard $n^{1/2}$-rate asymptotics. Instead, *undersmoothing*
+must be used to select tuning parameters to control the bias
+[@undersmoothed_hal]. However, this can prove quite challenging in practice and
+few guidelines are available.
 
-A more natural framework for integrating adaptive methods into nuisance regression 
-estimation are doubly robust approaches, including augmented inverse probability of 
-treatment weighted (AIPTW) estimation [@robins:1994:jasa] and targeted minimum 
-loss-based (TML) estimation [@vdlrubin:2006:ijb]. The asymptotics of these estimators
-are characterized in part by the convergence rates of nuisance parameter estimates with
-respect to a proper norm. This fact makes the use of cross-validation more appealing for
-selection of tuning parameters for estimators of nuisance parameters, thereby providing 
-a more straightforward means of obtaining an estimate of the effect of interest that
-enjoys standard $n^{1/2}$ asymptotics. These asymptotic results also yield closed form
-standard error estimates, which can serve as the basis for constructing confidence 
-intervals and hypothesis tests.
+A more natural framework for integrating adaptive methods into nuisance
+regression estimation are doubly robust approaches, including augmented inverse
+probability of treatment weighted (AIPTW) estimation [@robins:1994:jasa] and
+targeted minimum loss-based (TML) estimation [@vdlrubin:2006:ijb]. The
+asymptotics of these estimators are characterized in part by the convergence
+rates of nuisance parameter estimates with respect to a proper norm. This fact
+makes the use of cross-validation more appealing for selection of tuning
+parameters for estimators of nuisance parameters, thereby providing a more
+straightforward means of obtaining an estimate of the effect of interest that
+enjoys standard $n^{1/2}$ asymptotics. These asymptotic results also yield
+closed form standard error estimates, which can serve as the basis for
+constructing confidence intervals and hypothesis tests.
 
-As an intermediate step, the AIPTW and TML estimators require estimation of
-two key nuisance parameters: the probability of treatment as a function of
+As an intermediate step, the AIPTW and TML estimators require estimation of two
+key nuisance parameters: the probability of treatment as a function of
 confounders (the propensity score, hereafter referred to as the *PS*) and the
 average outcome as a function of confounders and treatment (the outcome
 regression, *OR*). In addition to their desirable inferential properties, AIPTW
 and TML estimators also enjoy a *double robustness* property. That is, the
 estimators are consistent for the population-level effect of interest if either
-of the PS or OR is consistently estimated. This property gives the AIPTW and
-TML estimators a natural appeal: inconsistency in the estimation of one
-nuisance parameter may be mitigated by the consistent estimation of the other.
-However, recent work has shown that the double robustness property does not
-necessarily extend to the inferential properties of these estimators when
-adaptive estimators of the PS and/or OR are used
-[@vdl:2014:ijb,@benkeser:2017:biometrika]. Instead, valid inference requires
-consistent estimation of *both* the PS *and* the OR. @vdl:2014:ijb
-proposed new TML estimators that have an asymptotic normal sampling distribution
-with estimable variance under consistent estimation of *either* the PS *or* the
-OR, paving the way for inference that is doubly-robust.
-@benkeser:2017:biometrika proposed modifications of these estimators with
-similar robustness properties and illustrated their practical performance.
+of the PS or OR is consistently estimated. This property gives the AIPTW and TML
+estimators a natural appeal: inconsistency in the estimation of one nuisance
+parameter may be mitigated by the consistent estimation of the other. However,
+recent work has shown that the double robustness property does not necessarily
+extend to the inferential properties of these estimators when adaptive
+estimators of the PS and/or OR are used
+[@vdl:2014:ijb, @benkeser:2017:biometrika]. Instead, valid inference requires
+consistent estimation of *both* the PS *and* the OR. @vdl:2014:ijb proposed new
+TML estimators that have an asymptotic normal sampling distribution with
+estimable variance under consistent estimation of *either* the PS *or* the OR,
+paving the way for inference that is doubly-robust. @benkeser:2017:biometrika
+proposed modifications of these estimators with similar robustness properties
+and illustrated their practical performance.
 
 The two proposed procedures that yield doubly-robust inference are quite
 involved, notably requiring iterative estimation of additional, complex nuisance
@@ -101,11 +103,11 @@ usage of the \texttt{drtmle} package.
 
 ## Parameters of interest
 
-Suppose the observed data consist of $n$ independent and identically
-distributed copies of the random variable $O = (W,A,Y) \sim P_0$. Here, $W$ is
-a vector of baseline covariates, $A \in \{0,1\}$ is a binary treatment, 
-$Y$ is an outcome, and $P_0$ is the true data-generating
-distribution. The parameters of interest are
+Suppose the observed data consist of $n$ independent and identically distributed
+copies of the random variable $O = (W,A,Y) \sim P_0$. Here, $W$ is a vector of
+baseline covariates, $A \in \{0,1\}$ is a binary treatment, $Y$ is an outcome,
+and $P_0$ is the true data-generating distribution. The parameters of interest
+are
 \begin{equation}
   \psi_0(a) = E_0\{\bar{Q}(a,W)\} = \int \bar{Q}_0(a,w) dQ_{W,0}(w) \ , \
   \mbox{for} \ a = 0,1 \ ,
