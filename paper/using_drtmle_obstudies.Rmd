@@ -2,29 +2,30 @@
 output:
   bookdown::pdf_document2:
     template: obs_study_skeleton.tex
+    latex_engine: xelatex
 bibliography: refs.bib
 abs_text: |
-  Inverse probability of treatment weighted estimators and doubly-robust
+  Inverse probability of treatment weighted estimators and doubly robust
   estimators (including augmented inverse probability of treatment weight and
-  targeted minimum loss-based estimators) are widely used in causal inference
-  to estimate and draw inference about the average effect of a treatment. As an
+  targeted minimum loss estimators) are widely used in causal inference to
+  estimate and draw inference about the average effect of a treatment. As an
   intermediate step, these estimators require estimation of key nuisance
   parameters, which are often regression functions. Typically, regressions are
-  estimated using maximum likelihood and parametric models. Confidence
-  intervals and p-values may be computed based on standard asymptotic results,
-  such as the central limit theorem, the delta method, and the nonparametric
-  bootstrap. However, in high-dimensional settings maximum likelihood estimation
-  often breaks down and standard procedures no longer yield correct inference.
+  estimated using maximum likelihood and parametric models. Confidence intervals
+  and p-values may be computed based on standard asymptotic results, such as the
+  central limit theorem, the delta method, and the nonparametric bootstrap.
+  However, in high-dimensional settings, maximum likelihood estimation often
+  breaks down and standard procedures no longer yield correct inference.
   Instead, we may rely on adaptive estimators of nuisance parameters to
   construct flexible regression estimators. However, use of adaptive estimators
   poses a challenge for performing statistical inference about an estimated
-  treatment effect. While doubly-robust estimators facilitate inference when
+  treatment effect. While doubly robust estimators facilitate inference when
   *all* relevant regression functions are consistently estimated, the same
   cannot be said when at least one nuisance estimator is inconsistent.
-  \texttt{drtmle} implements doubly-robust confidence intervals and hypothesis
-  tests for targeted minimum loss-based estimates of the average treatment
-  effect, in addition to several other recently-proposed estimators of the
-  average treatment effect.
+  \texttt{drtmle} implements doubly robust confidence intervals and hypothesis
+  tests for targeted minimum loss estimates of the average treatment effect, in
+  addition to several other recently proposed estimators of the average
+  treatment effect.
 abs_keywords: |
   causal inference, machine learning, semiparametric estimation, treatment
   effects, multiple robustness, targeted minimum loss estimation
@@ -45,42 +46,44 @@ correspond to a drug, a potentially harmful exposure, or a policy intervention.
 Often, the treatment cannot be randomized due to ethical or logistical reasons.
 This has sparked great interest in developing statistical methodology to
 estimate population-level effects from observational data. Estimation of these
-effects often requires accounting for putative confounding factors, that is,
+effects often requires accounting for putative confounding factors -- that is,
 factors related to whether a participant receives treatment and to the
 participant's outcome. In many settings, researchers measure many potential
 confounders, for example using administrative databases or genetic sequencing
 technology. Due to the curse of dimensionality, common statistical estimation
 techniques are not feasible for such high-dimensional data without restrictive
 modeling assumptions. When these assumptions are violated, estimates of the
-population-level effect of a treatment may have large bias.
+population-level effect of a treatment can suffer from a large degree of bias.
 
 This has led to increased interest in adopting adaptive estimation techniques
 from the machine learning literature to control for high-dimensional confounders
-when estimating treatment effects. However, facilitating proper inference (i.e.,
+when estimating treatment effects. However, facilitating proper statistical
+inference (i.e.,
 confidence intervals and hypothesis tests) about estimates of effects based on
 adaptive estimators is challenging. In particular, the use of standard causal
-inference techniques, including both G-computation (GCOMP) estimators
+inference techniques, including both G-computation estimators
 [@robins:1986:mathmod] and inverse probability of treatment weighted (IPTW)
 estimators [@horvitzthompson:1952:jasa; @robins:2000:epi] is challenging when
-utilizing adaptive estimators. In particular, with rare exception, if
+utilizing adaptive estimators. In particular, with rare exceptions, if
 cross-validation is used to select tuning parameters for the nuisance
-parameters, estimates of the population-level effect will generally be too
-biased to achieve standard $n^{1/2}$-rate asymptotics. Instead, *undersmoothing*
-must be used to select tuning parameters to control the bias
-[@undersmoothed_hal]. However, this can prove quite challenging in practice and
-few guidelines are available.
+parameters, estimates of the population-level effect will be too biased to
+achieve standard $n^{1/2}$-rate asymptotics. Instead, *undersmoothing* must be
+used to select tuning parameters to control the bias [@undersmoothed_hal;
+@ertefaie2022nonparametric; @hejazi2022efficient]. However, this can prove quite
+challenging in practice, and few guidelines are available.
 
 A more natural framework for integrating adaptive methods into nuisance
 regression estimation are doubly robust approaches, including augmented inverse
 probability of treatment weighted (AIPTW) estimation [@robins:1994:jasa] and
-targeted minimum loss-based (TML) estimation [@vdlrubin:2006:ijb]. The
+targeted minimum loss (TML) estimation [@vdlrubin:2006:ijb]. The
 asymptotics of these estimators are characterized in part by the convergence
 rates of nuisance parameter estimates with respect to a proper norm. This fact
 makes the use of cross-validation more appealing for selection of tuning
 parameters for estimators of nuisance parameters, thereby providing a more
 straightforward means of obtaining an estimate of the effect of interest that
-enjoys standard $n^{1/2}$ asymptotics. These asymptotic results also yield
-closed form standard error estimates, which can serve as the basis for
+enjoys standard $n^{1/2}$ asymptotics. Based on the efficient influence
+function, a key quantity in semiparametric theory, these asymptotic results also
+yield closed-form standard error estimates, which can serve as the basis for
 constructing confidence intervals and hypothesis tests.
 
 As an intermediate step, the AIPTW and TML estimators require estimation of two
@@ -91,37 +94,60 @@ regression, *OR*). In addition to their desirable inferential properties, AIPTW
 and TML estimators also enjoy a *double robustness* property. That is, the
 estimators are consistent for the population-level effect of interest if either
 of the PS or OR is consistently estimated. This property gives the AIPTW and TML
-estimators a natural appeal: inconsistency in the estimation of one nuisance
+estimators a natural appeal: Inconsistency in the estimation of one nuisance
 parameter may be mitigated by the consistent estimation of the other. However,
-recent work has shown that the double robustness property does not necessarily
-extend to the inferential properties of these estimators when adaptive
-estimators of the PS and/or OR are used
-[@vdl:2014:ijb; @benkeser:2017:biometrika]. Instead, valid inference requires
-consistent estimation of *both* the PS *and* the OR. @vdl:2014:ijb proposed new
-TML estimators that have an asymptotic normal sampling distribution with
-estimable variance under consistent estimation of *either* the PS *or* the OR,
-paving the way for inference that is doubly-robust. @benkeser:2017:biometrika
-proposed modifications of these estimators with similar robustness properties
-and illustrated their practical performance.
+recent work has shown that the double robustness property does not extend to the
+inferential properties of these estimators when adaptive estimators of the PS
+and/or OR are used [@vdl:2014:ijb; @benkeser:2017:biometrika]. Instead, valid
+inference requires consistent estimation of *both* the PS *and* the OR.
+@vdl:2014:ijb proposed new TML estimators that asymptotically attain a normal
+sampling distribution with estimable variance under consistent estimation of
+*either* the PS *or* the OR, paving the way for inference that is doubly-robust.
+@benkeser:2017:biometrika proposed modifications of these estimators with
+similar robustness properties and illustrated their practical performance.
 
 The two proposed procedures that yield doubly-robust inference are quite
 involved, notably requiring iterative estimation of additional, complex nuisance
-parameters. The \texttt{drtmle} package was motivated by the need for a
-user-friendly tool to implement these methods. The package implements the TML
+parameters. The \texttt{drtmle} package was motivated by the need for a open
+source tool to implement these methods. The package implements the TML
 estimators of population-level effects proposed in @vdl:2014:ijb and
 @benkeser:2017:biometrika, as well as several extensions including
-cross-validated targeted minimum loss-based estimation (CV-TMLE). Additionally,
+cross-validated targeted minimum loss estimation (CV-TMLE). Additionally,
 \texttt{drtmle} implements an IPTW estimator that overcomes shortcomings of
 existing IPTW implementations with respect to statistical inference. In
 particular, the estimator allows an adaptive estimator of the PS to be used in
 construction of the IPTW estimator, while yielding valid statistical inference
 about population-level effects. Both the TML and IPTW estimators implemented in
-the \texttt{drtmle} package are capable of estimating population-level effects for
-discrete-valued treatments; moreover, the package provides convenient utilities
-for constructing confidence intervals and hypothesis tests about contrasts of
-the mean outcome under different levels of treatment. This document explains
-some of the key concepts underlying doubly-robust inference and illustrates
-usage of the \texttt{drtmle} package.
+the \texttt{drtmle} package are capable of estimating population-level effects
+for discrete-valued treatments; moreover, the package provides convenient
+utilities for constructing confidence intervals and hypothesis tests about
+contrasts of the mean outcome under different levels of treatment. This
+manuscript explains some of the key concepts underlying doubly robust inference
+and illustrates usage of the \texttt{drtmle} package for the \texttt{R}
+language and environment for statistical computing [@R].
+
+In tandem with growing interest in and usage of doubly robust estimation
+approaches, open source software tools implementing these methods have
+proliferated. Notably extant software packages include the \texttt{tmle}
+\texttt{R} package [@gruber2012tmle], which implements TML estimators of the
+effects of static single time point interventions; the \texttt{ltmle} \texttt{R}
+package [@lendle2017ltmle], which implements TML estimators of the effects of
+multiple time point interventions, subject to time-dependent confounding and
+censoring, as well as estimators of the parameters of a longitudinal working
+marginal structural model; the \texttt{tmle3} \texttt{R} package
+[@coyle2021tmle3-rpkg], which serves as a generalizable engine for implementing
+TML estimators within the \texttt{tlverse} ecosystem [@vdl2022targeted],
+designed to provide a common and extensible framework for TML estimation of the
+effects of static, dynamic, and stochastic single time point interventions; and
+the \texttt{doubleml} \texttt{R} and \texttt{Python} packages
+[@bach2021doublemlR; @bach2022doublemlPy], which implement estimators of causal
+effects within the double machine learning framework [@chernozhukov2017double;
+@chernozhukov2018double], reyling upon Neymon orthogonality and sample-splitting
+for robustness. From among this non-exhaustive list, \texttt{drtmle} stands out
+as, to our knowledge, the only implementation of statistical procedures designed
+to attain doubly robust inference [@benkeser:2017:biometrika], uniquely
+positioning \texttt{drtmle} as a robust tool for the estimation of treatment
+effects in observational data settings.
 
 # Definition and estimators of the average treatment effect
 
@@ -147,19 +173,21 @@ different treatment levels. For example, the average treatment effect is often
 defined as $\psi_0 \coloneqq \psi_0(1) - \psi_0(0)$. Under additional
 assumptions, these parameters have interpretations as mean counterfactual
 outcomes under the different treatments, with contrasts between these means
-defining causal effects. 
+defining causal effects.
 
 ## G-computation estimators
 
-An estimator of $\psi_0(a)$ may be motivated directly by (1). Suppose we have
-available an estimate of the OR, $\bar{Q}_n$, and an estimate of the
-distribution function of baseline covariates, $Q_{W,n}$. An estimator of
-$\psi_0(a)$ may be obtained by plugging these into (1), $\psi_n(a) = \int
-\bar{Q}_n(a,w) dQ_{W,n}(w)$. Typically, the empirical distribution function of
-covariates is used so that this estimator can be equivalently expressed
-\begin{equation*}
+An estimator of $\psi_0(a)$ may be motivated directly by (\ref{parameterDef}).
+Suppose we have available an estimate of the OR, $\bar{Q}_n$, and an estimate of
+the distribution function of baseline covariates, $Q_{W,n}$. An estimator of
+$\psi_0(a)$ may be obtained by plugging these into (\ref{parameterDef}),
+$\psi_n(a) = \int \bar{Q}_n(a,w) dQ_{W,n}(w)$. Typically, the empirical
+distribution function of covariates is used so that this estimator can be
+equivalently expressed
+\begin{equation}
   \psi_{n,GCOMP}(a) = \frac{1}{n}\sum\limits_{i=1}^n \bar{Q}_n(a, W_i) \ .
-\end{equation*}
+  \label{eqn:gcomp}
+\end{equation}
 This estimator is commonly referred to as the G-computation (GCOMP) estimator.
 Inference for GCOMP estimators based on parametric OR estimators may be
 facilitated through the nonparametric bootstrap. However, if adaptive
@@ -169,7 +197,7 @@ further modification to the estimator (e.g., undersmoothing as discussed above).
 ## Inverse probability of treatment estimators
 
 An alternative estimator of the treatment-specific population-level mean may be
-obtained by noting that (1) can be equivalently written as
+obtained by noting that (\ref{eqn:gcomp}) can be equivalently written as
 \begin{align}
   E_0\{\bar{Q}(a,W)\} &= E_0\{E_0(Y \mid A = a, W)\} \notag \\
           &= E_0\biggl\{\frac{I(A=a)}{Pr_0(A = a \mid W)} E_0(Y \mid A = a,
@@ -180,20 +208,24 @@ obtained by noting that (1) can be equivalently written as
           \label{iptwID}
 \end{align}
 We use $g_0(a \mid W) \coloneqq Pr_0(A = a \mid W)$ to denote the propensity
-score. Suppose we had available $g_n$, an estimate of the PS. Equation (2)
-motivates the estimator
+score. Suppose we had available $g_n$, an estimate of the PS. Equation
+(\ref{eqn:iptwID}) motivates the estimator
 \begin{equation*}
   \psi_{n,IPTW}(a) \coloneqq \frac{1}{n}\sum\limits_{i=1}^n
     \frac{I(A_i = a)}{g_n(a \mid W_i)} Y_i \ ,
 \end{equation*}
 which is referred to as the inverse probability of treatment weighted (IPTW)
 estimator. Like GCOMP estimators, inference for IPTW estimators based on
-parametric PS estimators may be facilitated through the nonparametric bootstrap.
-If adaptive approaches are used to estimate the PS, inference may not be
-available without further modification of the propensity score estimator, as we
-discuss below.
+parametric PS estimators may be facilitated through the nonparametric bootstrap;
+however, unlike their GCOMP counterparts, IPTW estimators, being Z-estimators,
+are constructed as solutions to an IPTW estimating equation, the empirical
+variance of which may be used for standard error estimation. If adaptive
+approaches are used to estimate the PS, inference may not be available without
+further modification of the propensity score estimator, whether via targeting,
+as we discuss below, or undersmoothing, as explored by
+@ertefaie2022nonparametric and @hejazi2022efficient.
 
-## Doubly-robust estimators
+## Doubly robust estimators
 
 The GCOMP and IPTW estimators suffer from two important shortcomings. The first
 is a lack of robustness. That is, validity of GCOMP estimators relies on
@@ -202,7 +234,7 @@ consistent estimation of the PS. In practice, we may not know which of the OR
 or PS is simpler to consistently estimate and thus may not know which of the
 two estimators to prefer. Furthermore, if adaptive estimators (e.g., based on
 machine learning) are used to estimate the OR or PS, then the GCOMP and IPTW
-estimators generally lack a basis for statistical inference.
+estimators generally lack a valid basis for asymptotic statistical inference.
 
 This motivates a new class of estimators that combine both the GCOMP and IPTW
 estimators. One example is the augmented IPTW (AIPTW) estimator
@@ -217,18 +249,18 @@ estimator can be viewed as adding an augmentation to the GCOMP estimator
 \frac{I(A_i = a)}{g_n(a \mid W_i)} \{Y_i - \bar{Q}_n(a,W_i)\} \ .
 \end{equation}
 The AIPTW estimator overcomes the two limitations of the GCOMP and IPTW
-estimators. The estimator exhibits double-robustness in that it is consistent
+estimators. The estimator exhibits _double robustness_ in that it is consistent
 for $\psi_0(a)$ if either $\bar{Q}_n$ is consistent for the true OR *or* $g_n$
 is consistent for the true PS. Furthermore, if both the OR and PS are
 consistently estimated and regularity conditions hold, one can establish a
-limiting normal distribution for the AIPTW estimator. Simple estimators of the
+normal limiting distribution for the AIPTW estimator. Simple estimators of the
 variance of this limiting distribution can be derived that may be used to
 construct Wald-style confidence intervals and hypothesis tests.
 
 A more recent proposal to improve robustness and inferential properties of the
-GCOMP and IPTW estimators utilizes targeted minimum loss-based estimation
-(TMLE). TMLE is a general methodology that may be used to modify an estimator
-of a regression function in a manner that ensures that the modified estimator
+GCOMP and IPTW estimators utilizes targeted minimum loss estimation (or TMLE).
+TMLE is a general methodology that may be used to modify an estimator of a
+regression function in a manner that ensures that the modified estimator
 satisfies user-selected equations. In the present problem, one can show that if
 an estimator of the OR $\bar{Q}_n^{\star}$ satisfies
 \begin{equation}\label{meanEIFZero}
@@ -237,15 +269,16 @@ an estimator of the OR $\bar{Q}_n^{\star}$ satisfies
 \end{equation}
 then the GCOMP estimator based on $\bar{Q}_n^{\star}$ will have the same
 asymptotic properties as the AIPTW estimator. That is, the estimator will be
-doubly-robust and, provided both the OR and PS are consistently estimated and
+doubly robust and, provided both the OR and PS are consistently estimated and
 regularity conditions are satisfied, will have a normal limiting distribution.
 TMLE provides a means of mapping an initial estimator of the OR into an
-estimator that satisfies (4). In addition to possessing the desirable asymptotic
-properties, TML estimators have been shown to outperform AIPTW estimators in
-finite samples [@porter:2011:ijb]. We refer readers to @tlbook:2011 for
-more about TMLE.
+estimator that satisfies (\ref{oneStepEst}). In addition to possessing the
+desirable asymptotic properties, TML estimators have been shown to outperform
+AIPTW estimators in finite samples [@porter:2011:ijb]. We refer readers to
+@tlbook:2011 and @vdl2022targeted for further details about on the TMLE
+methodology.
 
-# Doubly-robust inference
+# Doubly robust inference
 
 @vdl:2014:ijb demonstrated that the double robustness property of AIPTW
 and TML estimators does not extend to their normal limiting distribution if
@@ -254,19 +287,19 @@ However, in settings with high-dimensional and continuous-valued covariates,
 adaptive estimation is likely necessary in order to obtain a consistent
 estimate of either the OR or PS, and thus may be necessary to obtain minimally
 biased estimates of the marginal means of interest. @vdl:2014:ijb derived
-modified TML estimators that are doubly-robust not only with respect to
+modified TML estimators that are doubly robust not only with respect to
 consistency, but also with respect to asymptotic normality. Furthermore, this
-work provided closed-form, doubly-robust variance estimators that may be used to
-construct doubly-robust confidence intervals and hypothesis tests.
+work provided closed-form, doubly robust variance estimators that may be used to
+construct doubly robust confidence intervals and hypothesis tests.
 @benkeser:2017:biometrika proposed simplifications of the @vdl:2014:ijb
 estimators and demonstrated the practical performance of these estimators via
-simulation.
+simulation experiments.
 
 The key to the theory underlying these results is finding estimators of the OR
-and PS that simultaneously satisfy equation (4) in addition to two additional
-equations. These equations involve additional regression parameters that we
-refer to as the reduced outcome regression (R-OR) and the reduced propensity
-score (R-PS), defined respectively as
+and PS that simultaneously satisfy equation (\ref{oneStepEst}) in addition to
+two additional equations. These equations involve additional regression
+parameters that we refer to as the reduced outcome regression (R-OR) and the
+reduced propensity score (R-PS), defined respectively as
 \begin{align}
   \bar{Q}_{r,0n}(a,w) &\coloneqq E_{0}\bigl\{Y - \bar{Q}_n(W) \mid A = a,
   g_n(W)=g_n(w)\bigr\} \ , \ \mbox{and} \label{eqn:qbarr} \\
@@ -295,8 +328,8 @@ R-PS $g_{r,n}^{\star}$ satisfied
 {g_n^{\star}(a \mid W_i)} \biggr\} \{Y_i - \bar{Q}_n^{\star}(a, W_i) \} = 0 \ ,
 \label{tmleQsolve}
 \end{align}
-then the GCOMP estimator based on $\bar{Q}_n^{\star}$ would be doubly-robust not
-only with respect to consistency, but also with respect to its limiting
+then the GCOMP estimator based on $\bar{Q}_n^{\star}$ would be doubly robust
+not only with respect to consistency, but also with respect to its limiting
 distribution. The author additionally proposed a TMLE algorithm to map initial
 estimates of the OR, PS, R-OR, and R-PS into estimates that satisfy these key
 equations.
@@ -413,11 +446,11 @@ narrower confidence intervals and more powerful hypothesis tests. In order for
 the estimates of the OR and PS to have the greatest chance of consistency, the
 `drtmle()` function facilitates estimation using adaptive estimation techniques.
 In fact, there are three ways to estimate each of the regression parameters:
-generalized linear models, super learning
-[@vdl:2007:statapp; @SuperLearnerPackage], and a user-specified estimation
-technique. We demonstrate each of these approaches in turn on a  simulated
-data set. The true parameter values of interest are $\psi_0(0)=$ `r round(EY0,
-2)` and $\psi_0(1)=$ `r round(EY1, 2)`.
+generalized linear models, super learning [@vdl:2007:statapp;
+@SuperLearnerPackage], and a user-specified estimation technique. We demonstrate
+each of these approaches in turn on a  simulated data set. The true parameter
+values of interest are $\psi_0(0)=$ `r round(EY0, 2)` and $\psi_0(1)=$ `r
+round(EY1, 2)`.
 
 ```{r}
 set.seed(1234)
@@ -1175,14 +1208,13 @@ ci(glm_fit_multiA, contrast = riskRatio_2v0)
 
 ## Cross-validated regression estimates
 
-To avoid overfitting initial regressions, one can use cross-validated 
-estimates of the nuisance
-regressions. Theoretically, the use of cross-validated regression weakens the
-assumptions necessary to achieve asymptotic normality [@zheng:2010:working].
-This is true of the regular TML and AIPTW estimators, as well as of the TML
-estimator with doubly-robust inference. The `drtmle()` function implements
-cross-validated estimation of the regression parameters through the `cvFolds`
-option, as shown in the code below.
+To avoid overfitting initial regressions, one can use cross-validated estimates
+of the nuisance regressions. Theoretically, the use of cross-validated
+regression weakens the assumptions necessary to achieve asymptotic normality
+[@zheng:2010:working]. This is true of the regular TML and AIPTW estimators, as
+well as of the TML estimator with doubly-robust inference. The `drtmle()`
+function implements cross-validated estimation of the regression parameters
+through the `cvFolds` option, as shown in the code below.
 
 ```{r, cache = TRUE}
 cv_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
@@ -1400,7 +1432,7 @@ Both this estimator and the TMLE-based IPTW estimator above are implemented in
 The IPTW estimators based on adaptive estimation of the PS are implemented in
 the `adaptive_iptw()` function. The `adaptive_iptw()` function shares many
 options with `drtmle()`; however, as the IPTW estimator does not rely on an
-estimate of the OR, options related to the OR are omitted. 
+estimate of the OR, options related to the OR are omitted.
 
 ```{r, cache = TRUE}
 npreg_iptw_multiA <- adaptive_iptw(W = W, A = A, Y = Y, stratify = FALSE,
@@ -1471,6 +1503,11 @@ adaptg_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
                      SL_g = c("SL.glm", "SL.mean"),
                      adapt_g = TRUE)
 ```
+
+# Acknowledgements
+
+NSH is grateful for the support of the National Science Foundation (award no.
+DMS 2102840).
 
 # References
 
