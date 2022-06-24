@@ -1,9 +1,33 @@
 ---
 output:
-  latex_fragment:
-    includes:
-      in_header: preamble.tex
+  bookdown::pdf_document2:
+    template: obs_study_skeleton.tex
 bibliography: refs.bib
+abs_text: |
+  Inverse probability of treatment weighted estimators and doubly-robust
+  estimators (including augmented inverse probability of treatment weight and
+  targeted minimum loss-based estimators) are widely used in causal inference
+  to estimate and draw inference about the average effect of a treatment. As an
+  intermediate step, these estimators require estimation of key nuisance
+  parameters, which are often regression functions. Typically, regressions are
+  estimated using maximum likelihood and parametric models. Confidence
+  intervals and p-values may be computed based on standard asymptotic results,
+  such as the central limit theorem, the delta method, and the nonparametric
+  bootstrap. However, in high-dimensional settings maximum likelihood estimation
+  often breaks down and standard procedures no longer yield correct inference.
+  Instead, we may rely on adaptive estimators of nuisance parameters to
+  construct flexible regression estimators. However, use of adaptive estimators
+  poses a challenge for performing statistical inference about an estimated
+  treatment effect. While doubly-robust estimators facilitate inference when
+  *all* relevant regression functions are consistently estimated, the same
+  cannot be said when at least one nuisance estimator is inconsistent.
+  \texttt{drtmle} implements doubly-robust confidence intervals and hypothesis
+  tests for targeted minimum loss-based estimates of the average treatment
+  effect, in addition to several other recently-proposed estimators of the
+  average treatment effect.
+abs_keywords: |
+  causal inference, machine learning, semiparametric estimation, treatment
+  effects, multiple robustness, targeted minimum loss estimation
 ---
 
 ```{r, setup, include=FALSE}
@@ -37,7 +61,7 @@ confidence intervals and hypothesis tests) about estimates of effects based on
 adaptive estimators is challenging. In particular, the use of standard causal
 inference techniques, including both G-computation (GCOMP) estimators
 [@robins:1986:mathmod] and inverse probability of treatment weighted (IPTW)
-estimators [@horvitzthompson:1952:jasa, @robins:2000:epi] is challenging when
+estimators [@horvitzthompson:1952:jasa; @robins:2000:epi] is challenging when
 utilizing adaptive estimators. In particular, with rare exception, if
 cross-validation is used to select tuning parameters for the nuisance
 parameters, estimates of the population-level effect will generally be too
@@ -72,7 +96,7 @@ parameter may be mitigated by the consistent estimation of the other. However,
 recent work has shown that the double robustness property does not necessarily
 extend to the inferential properties of these estimators when adaptive
 estimators of the PS and/or OR are used
-[@vdl:2014:ijb, @benkeser:2017:biometrika]. Instead, valid inference requires
+[@vdl:2014:ijb; @benkeser:2017:biometrika]. Instead, valid inference requires
 consistent estimation of *both* the PS *and* the OR. @vdl:2014:ijb proposed new
 TML estimators that have an asymptotic normal sampling distribution with
 estimable variance under consistent estimation of *either* the PS *or* the OR,
@@ -460,11 +484,11 @@ library(SuperLearner)
 ```
 Super learning is a loss-based ensemble machine learning technique
 [@vdl:2007:statapp] that generalizes stacking and stacked regression
-\citep{wolpert:1992:nnet,breiman:1996:ml}. The user specifies many potential
+[@wolpert:1992:nnet; @breiman:1996:ml]. The user specifies many potential
 candidate regression estimators, referred to as a *library* of candidate
 estimators, and the super learner algorithm estimates the convex combination of
 regression estimators that minimizes the $V$-fold cross-validated risk based on
-a user-selected loss function [@dudoit2005asymptotics].  Oracle inequalities
+a user-selected loss function [@dudoit2005asymptotics]. Oracle inequalities
 show that the super learner estimate performs essentially as well as the unknown
 best convex combination of the candidate estimators [@vdvaart:2006:statdec].
 Thus, the methodology may be seen as an asymptotically optimal way of performing
@@ -550,7 +574,7 @@ npreg_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
                     stratify = TRUE)
 ```
 
-In the Appendix, we describe an additional means of using `drtmle()` with 
+In the Appendix, we describe an additional means of using `drtmle()` with
 OR and PS estimates that have been obtained externally.
 
 ### Reducing dependence on random seed
@@ -704,7 +728,7 @@ glm_fit_uni_cv <- drtmle(W = W, A = A, Y = Y, family = binomial(),
                          targeted_se = FALSE) # needed for this to work
 # compare variance to previously obtained
 list(
-  `No CV` = glm_fit_uni$drtmle$cov, 
+  `No CV` = glm_fit_uni$drtmle$cov,
   `CV` = glm_fit_uni_cv$drtmle$cov
 )
 ```
@@ -1045,9 +1069,10 @@ EY2 <- mean(Y2)
 ```
 
 In our examples so far, we have only considered binary treatments. However,
-\texttt{drtmle} is fully equipped to handle treatments with an arbitrary number of
-discrete values as well. Suppose that $A$ assumes values in a set $\mathcal{A}$
-of limited cardinality, the PS regression estimation is modified to ensure that
+\texttt{drtmle} is fully equipped to handle treatments with an arbitrary number
+of discrete values as well. Suppose that $A$ assumes values in a set
+$\mathcal{A}$ of limited cardinality, the PS regression estimation is modified
+to ensure that
 \begin{equation*}
   \sum\limits_{a \in \mathcal{A}} g_n(a \mid w) = 1 \ \mbox{for all $w$} \ .
 \end{equation*}
@@ -1447,5 +1472,5 @@ adaptg_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
                      adapt_g = TRUE)
 ```
 
-## References
+# References
 
