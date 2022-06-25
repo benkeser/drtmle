@@ -185,8 +185,8 @@ $\psi_n(a) = \int \bar{Q}_n(a,w) dQ_{W,n}(w)$. Typically, the empirical
 distribution function of covariates is used so that this estimator can be
 equivalently expressed
 \begin{equation}
-  \psi_{n,GCOMP}(a) = \frac{1}{n}\sum\limits_{i=1}^n \bar{Q}_n(a, W_i) \ .
-  \label{eqn:gcomp}
+  \psi_{n,\text{GCOMP}}(a) = \frac{1}{n}\sum\limits_{i=1}^n \bar{Q}_n(a, W_i)
+  \ . \label{eqn:gcomp}
 \end{equation}
 This estimator is commonly referred to as the G-computation (GCOMP) estimator.
 Inference for GCOMP estimators based on parametric OR estimators may be
@@ -205,13 +205,13 @@ obtained by noting that (\ref{eqn:gcomp}) can be equivalently written as
           &= E_0\biggl\{\frac{I(A=a)}{Pr_0(A = a \mid W)} E_0(Y \mid A,
           W)\biggr\} \notag  \\
           &= E_0\biggl\{\frac{I(A=a)}{Pr_0(A = a \mid W)} Y \biggr\} \ .
-          \label{iptwID}
+  \label{iptwID}
 \end{align}
 We use $g_0(a \mid W) \coloneqq Pr_0(A = a \mid W)$ to denote the propensity
 score. Suppose we had available $g_n$, an estimate of the PS. Equation
-(\ref{eqn:iptwID}) motivates the estimator
+(\ref{iptwID}) motivates the estimator
 \begin{equation*}
-  \psi_{n,IPTW}(a) \coloneqq \frac{1}{n}\sum\limits_{i=1}^n
+  \psi_{n,\text{IPTW}}(a) \coloneqq \frac{1}{n}\sum\limits_{i=1}^n
     \frac{I(A_i = a)}{g_n(a \mid W_i)} Y_i \ ,
 \end{equation*}
 which is referred to as the inverse probability of treatment weighted (IPTW)
@@ -219,7 +219,7 @@ estimator. Like GCOMP estimators, inference for IPTW estimators based on
 parametric PS estimators may be facilitated through the nonparametric bootstrap;
 however, unlike their GCOMP counterparts, IPTW estimators, being Z-estimators,
 are constructed as solutions to an IPTW estimating equation, the empirical
-variance of which may be used for standard error estimation. If adaptive
+variance of which may also be used for standard error estimation. If adaptive
 approaches are used to estimate the PS, inference may not be available without
 further modification of the propensity score estimator, whether via targeting,
 as we discuss below, or undersmoothing, as explored by
@@ -239,13 +239,14 @@ estimators generally lack a valid basis for asymptotic statistical inference.
 This motivates a new class of estimators that combine both the GCOMP and IPTW
 estimators. One example is the augmented IPTW (AIPTW) estimator
 \begin{equation*}
-\psi_{n,AIPTW}(a) = \psi_{n,IPTW}(a) + \frac{1}{n} \sum\limits_{i=1}^n \biggl\{
-1 - \frac{I(A_i = a)}{g_n(a \mid W_i)} \biggr\} \  \bar{Q}_n(a, W_i) \ ,
+\psi_{n,\text{AIPTW}}(a) = \psi_{n,\text{IPTW}}(a) + \frac{1}{n} \sum_{i=1}^n
+  \biggl\{1 - \frac{I(A_i = a)}{g_n(a \mid W_i)} \biggr\} \ \bar{Q}_n(a, W_i)
+  \ ,
 \end{equation*}
 which adds an augmentation term to the IPTW estimator. Equivalently, the
 estimator can be viewed as adding an augmentation to the GCOMP estimator
 \begin{equation} \label{oneStepEst}
-\psi_{n,AIPTW}(a) = \psi_{n,GCOMP}(a) + \frac{1}{n} \sum\limits_{i=1}^n
+\psi_{n,\text{AIPTW}}(a) = \psi_{n,\text{GCOMP}}(a) + \frac{1}{n} \sum_{i=1}^n
 \frac{I(A_i = a)}{g_n(a \mid W_i)} \{Y_i - \bar{Q}_n(a,W_i)\} \ .
 \end{equation}
 The AIPTW estimator overcomes the two limitations of the GCOMP and IPTW
