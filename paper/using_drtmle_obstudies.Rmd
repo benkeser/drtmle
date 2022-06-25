@@ -58,10 +58,9 @@ population-level effect of a treatment can suffer from a large degree of bias.
 This has led to increased interest in adopting adaptive estimation techniques
 from the machine learning literature to control for high-dimensional confounders
 when estimating treatment effects. However, facilitating proper statistical
-inference (i.e.,
-confidence intervals and hypothesis tests) about estimates of effects based on
-adaptive estimators is challenging. In particular, the use of standard causal
-inference techniques, including both G-computation estimators
+inference (i.e., confidence intervals and hypothesis tests) about estimates of
+effects based on adaptive estimators is challenging. In particular, the use of
+standard causal inference techniques, including both G-computation estimators
 [@robins:1986:mathmod] and inverse probability of treatment weighted (IPTW)
 estimators [@horvitzthompson:1952:jasa; @robins:2000:epi] is challenging when
 utilizing adaptive estimators. In particular, with rare exceptions, if
@@ -159,11 +158,11 @@ baseline covariates, $A \in \{0,1\}$ is a binary treatment, $Y$ is an outcome,
 and $P_0$ is the true data-generating distribution. The parameters of interest
 are
 \begin{equation}
-  \psi_0(a) = E_0\{\bar{Q}(a,W)\} = \int \bar{Q}_0(a,w) dQ_{W,0}(w) \ , \
-  \mbox{for} \ a = 0,1 \ ,
+  \psi_0(a) = E_0\{\overline{Q}(a,W)\} = \int \overline{Q}_0(a,w) dQ_{W,0}(w)
+  \ , \ \mbox{for} \ a = 0,1 \ ,
   \label{parameterDef}
 \end{equation}
-where $\bar{Q}_0(a,w)=E_0 \left(Y \mid A=a, W=w\right)$ is the so-called
+where $\overline{Q}_0(a,w)=E_0 \left(Y \mid A=a, W=w\right)$ is the so-called
 outcome regression and $Q_{W,0}(w)=Pr_0\left(W\leq w\right)$ is the distribution
 function of the covariates. The value $\psi_0(a)$ represents the marginal
 (i.e., population-level) treatment-specific average outcome, hereafter referred
@@ -178,15 +177,16 @@ defining causal effects.
 ## G-computation estimators
 
 An estimator of $\psi_0(a)$ may be motivated directly by (\ref{parameterDef}).
-Suppose we have available an estimate of the OR, $\bar{Q}_n$, and an estimate of
+Suppose we have available an estimate of the OR, $\overline{Q}_n$, and an estimate of
 the distribution function of baseline covariates, $Q_{W,n}$. An estimator of
 $\psi_0(a)$ may be obtained by plugging these into (\ref{parameterDef}),
-$\psi_n(a) = \int \bar{Q}_n(a,w) dQ_{W,n}(w)$. Typically, the empirical
+$\psi_n(a) = \int \overline{Q}_n(a,w) dQ_{W,n}(w)$. Typically, the empirical
 distribution function of covariates is used so that this estimator can be
 equivalently expressed
 \begin{equation}
-  \psi_{n,\text{GCOMP}}(a) = \frac{1}{n}\sum\limits_{i=1}^n \bar{Q}_n(a, W_i)
-  \ . \label{eqn:gcomp}
+  \psi_{n,\text{GCOMP}}(a) = \frac{1}{n}\sum\limits_{i=1}^n
+  \overline{Q}_n(a, W_i) \ .
+  \label{eqn:gcomp}
 \end{equation}
 This estimator is commonly referred to as the G-computation (GCOMP) estimator.
 Inference for GCOMP estimators based on parametric OR estimators may be
@@ -199,7 +199,7 @@ further modification to the estimator (e.g., undersmoothing as discussed above).
 An alternative estimator of the treatment-specific population-level mean may be
 obtained by noting that (\ref{eqn:gcomp}) can be equivalently written as
 \begin{align}
-  E_0\{\bar{Q}(a,W)\} &= E_0\{E_0(Y \mid A = a, W)\} \notag \\
+  E_0\{\overline{Q}(a,W)\} &= E_0\{E_0(Y \mid A = a, W)\} \notag \\
           &= E_0\biggl\{\frac{I(A=a)}{Pr_0(A = a \mid W)} E_0(Y \mid A = a,
           W)\biggr\} \notag  \\
           &= E_0\biggl\{\frac{I(A=a)}{Pr_0(A = a \mid W)} E_0(Y \mid A,
@@ -228,7 +228,7 @@ as we discuss below, or undersmoothing, as explored by
 ## Doubly robust estimators
 
 The GCOMP and IPTW estimators suffer from two important shortcomings. The first
-is a lack of robustness. That is, validity of GCOMP estimators relies on
+is a lack of robustness -- that is, validity of GCOMP estimators relies on
 consistent estimation of the OR, while validity of the IPTW relies on
 consistent estimation of the PS. In practice, we may not know which of the OR
 or PS is simpler to consistently estimate and thus may not know which of the
@@ -237,38 +237,39 @@ machine learning) are used to estimate the OR or PS, then the GCOMP and IPTW
 estimators generally lack a valid basis for asymptotic statistical inference.
 
 This motivates a new class of estimators that combine both the GCOMP and IPTW
-estimators. One example is the augmented IPTW (AIPTW) estimator
+estimators. One prominent example is the augmented IPTW (AIPTW) estimator
 \begin{equation*}
-\psi_{n,\text{AIPTW}}(a) = \psi_{n,\text{IPTW}}(a) + \frac{1}{n} \sum_{i=1}^n
-  \biggl\{1 - \frac{I(A_i = a)}{g_n(a \mid W_i)} \biggr\} \ \bar{Q}_n(a, W_i)
-  \ ,
+  \psi_{n,\text{AIPTW}}(a) = \psi_{n,\text{IPTW}}(a) + \frac{1}{n}
+  \sum\limits_{i=1}^n \biggl\{1 - \frac{I(A_i = a)}{g_n(a \mid W_i)} \biggr\}
+  \overline{Q}_n(a, W_i) \ ,
 \end{equation*}
 which adds an augmentation term to the IPTW estimator. Equivalently, the
 estimator can be viewed as adding an augmentation to the GCOMP estimator
 \begin{equation} \label{oneStepEst}
-\psi_{n,\text{AIPTW}}(a) = \psi_{n,\text{GCOMP}}(a) + \frac{1}{n} \sum_{i=1}^n
-\frac{I(A_i = a)}{g_n(a \mid W_i)} \{Y_i - \bar{Q}_n(a,W_i)\} \ .
+  \psi_{n,\text{AIPTW}}(a) = \psi_{n,\text{GCOMP}}(a) + \frac{1}{n}
+  \sum\limits_{i=1}^n \frac{I(A_i = a)}{g_n(a \mid W_i)} \{Y_i -
+  \overline{Q}_n(a,W_i)\} \ .
 \end{equation}
 The AIPTW estimator overcomes the two limitations of the GCOMP and IPTW
-estimators. The estimator exhibits _double robustness_ in that it is consistent
-for $\psi_0(a)$ if either $\bar{Q}_n$ is consistent for the true OR *or* $g_n$
-is consistent for the true PS. Furthermore, if both the OR and PS are
-consistently estimated and regularity conditions hold, one can establish a
-normal limiting distribution for the AIPTW estimator. Simple estimators of the
-variance of this limiting distribution can be derived that may be used to
-construct Wald-style confidence intervals and hypothesis tests.
+estimators: It exhibits _double robustness_ in that it is consistent for
+$\psi_0(a)$ if either $\overline{Q}_n$ is consistent for the true OR *or* $g_n$ is
+consistent for the true PS. Furthermore, if both the OR and PS are consistently
+estimated and regularity conditions hold, one can establish a normal limiting
+distribution for the AIPTW estimator. Closed-form estimators of the variance of
+this limiting distribution can be derived that may be used to construct
+Wald-style confidence intervals and hypothesis tests.
 
 A more recent proposal to improve robustness and inferential properties of the
 GCOMP and IPTW estimators utilizes targeted minimum loss estimation (or TMLE).
 TMLE is a general methodology that may be used to modify an estimator of a
 regression function in a manner that ensures that the modified estimator
 satisfies user-selected equations. In the present problem, one can show that if
-an estimator of the OR $\bar{Q}_n^{\star}$ satisfies
+an estimator of the OR $\overline{Q}_n^{\star}$ satisfies
 \begin{equation}\label{meanEIFZero}
   \frac{1}{n} \sum\limits_{i=1}^n \frac{I(A_i = a)}{g_n(a \mid W_i)} \{Y_i -
-  \bar{Q}_n^{\star}(a, W_i)\} = 0 \ ,
+  \overline{Q}_n^{\star}(a, W_i)\} = 0 \ ,
 \end{equation}
-then the GCOMP estimator based on $\bar{Q}_n^{\star}$ will have the same
+then the GCOMP estimator based on $\overline{Q}_n^{\star}$ will have the same
 asymptotic properties as the AIPTW estimator. That is, the estimator will be
 doubly robust and, provided both the OR and PS are consistently estimated and
 regularity conditions are satisfied, will have a normal limiting distribution.
@@ -292,7 +293,7 @@ modified TML estimators that are doubly robust not only with respect to
 consistency, but also with respect to asymptotic normality. Furthermore, this
 work provided closed-form, doubly robust variance estimators that may be used to
 construct doubly robust confidence intervals and hypothesis tests.
-@benkeser:2017:biometrika proposed simplifications of the @vdl:2014:ijb
+@benkeser:2017:biometrika proposed simplifications of @vdl:2014:ijb's
 estimators and demonstrated the practical performance of these estimators via
 simulation experiments.
 
@@ -302,10 +303,11 @@ two additional equations. These equations involve additional regression
 parameters that we refer to as the reduced outcome regression (R-OR) and the
 reduced propensity score (R-PS), defined respectively as
 \begin{align}
-  \bar{Q}_{r,0n}(a,w) &\coloneqq E_{0}\bigl\{Y - \bar{Q}_n(W) \mid A = a,
-  g_n(W)=g_n(w)\bigr\} \ , \ \mbox{and} \label{eqn:qbarr} \\
-  g_{r,0n}(a \mid w) &\coloneqq Pr_0\left\{A = a \mid \bar{Q}_n(W)=\bar{Q}_n(w),
-  g_n(W)=g_n(w)\right\} \ . \label{eqn:gr_bivariate}
+  \overline{Q}_{r,0n}(a,w) &\coloneqq E_{0}\bigl\{Y - \overline{Q}_n(W) \mid
+  A = a, g_n(W)=g_n(w)\bigr\} \ , \ \mbox{and} \label{eqn:qoverliner} \\
+  g_{r,0n}(a \mid w) &\coloneqq Pr_0\left\{A = a \mid \overline{Q}_n(W) =
+  \overline{Q}_n(w), g_n(W)=g_n(w)\right\} \ .
+  \label{eqn:gr_bivariate}
 \end{align}
 In words, the R-OR is the regression of the residual from the outcome
 regression onto the estimated PS amongst observations with $A = a$, while the
@@ -315,96 +317,97 @@ low-dimensional regardless of the dimension of $W$ and depend on neither the
 true OR nor the true PS. Thus, these regressions may be consistently estimated
 at reasonably fast rates irrespective of the dimension of $W$ and irrespective
 of whether the OR or PS are consistently estimated. Based on these
-reduced-dimension regressions, @{vdl:2014:ijb showed that if estimates of the
-OR $\bar{Q}_n^{\star}$, PS $g_n^{\star}$, R-OR $\bar{Q}_{r,n}^{\star}$, and
-R-PS $g_{r,n}^{\star}$ satisfied
+reduced-dimension regressions, @vdl:2014:ijb showed that if estimates of the
+OR $\overline{Q}_n^{\star}$, PS $g_n^{\star}$, R-OR
+$\overline{Q}_{r,n}^{\star}$, and R-PS $g_{r,n}^{\star}$ satisfied
 \begin{align}
 & \frac{1}{n} \sum\limits_{i=1}^n \frac{I(A_i = a)}{g_n^{\star}(a \mid W_i)}
-\{Y_i - \bar{Q}_n^{\star}(a,W_i)\} = 0 \ , \label{tmleEIFSolve} \\
-&\frac{1}{n} \sum\limits_{i=1}^n \frac{\bar{Q}_{r,n}(a, W_i)}{g_n(a \mid W_i)}
-\{I(A_i = a) - g_n^{\star}(a \mid W_i)\} = 0 \ , \ \mbox{and}
+\{Y_i - \overline{Q}_n^{\star}(a,W_i)\} = 0 \ , \label{tmleEIFSolve} \\
+&\frac{1}{n} \sum\limits_{i=1}^n \frac{\overline{Q}_{r,n}(a, W_i)}
+{g_n(a \mid W_i)}\{I(A_i = a) - g_n^{\star}(a \mid W_i)\} = 0 \ , \ \mbox{and}
 \label{tmleAsolve} \\ &\frac{1}{n} \sum\limits_{i=1}^n
 \frac{I(A_i = a)}{g_{r,n}^{\star}(a \mid W_i)}
 \biggl\{\frac{g_{r,n}^{\star}(a \mid W_i) - g_n^{\star}(a \mid W_i)}
-{g_n^{\star}(a \mid W_i)} \biggr\} \{Y_i - \bar{Q}_n^{\star}(a, W_i) \} = 0 \ ,
+{g_n^{\star}(a \mid W_i)} \biggr\} \{Y_i - \overline{Q}_n^{\star}(a, W_i) \}
+= 0 \ ,
 \label{tmleQsolve}
 \end{align}
-then the GCOMP estimator based on $\bar{Q}_n^{\star}$ would be doubly robust
-not only with respect to consistency, but also with respect to its limiting
-distribution. The author additionally proposed a TMLE algorithm to map initial
-estimates of the OR, PS, R-OR, and R-PS into estimates that satisfy these key
-equations.
+then the GCOMP estimator based on $\overline{Q}_n^{\star}$ would be doubly
+robust not only with respect to consistency, but also with respect to its
+limiting distribution. The author additionally proposed a TMLE algorithm to map
+initial estimates of the OR, PS, R-OR, and R-PS into estimates that satisfy
+these key equations.
 
 @benkeser:2017:biometrika demonstrated alternative equations that can be
 satisfied to achieve this form of double-robustness. In particular, these
 authors formulated an alternative version of the R-PS,
 \begin{align*}
-  g_{r,0,1}(a \mid w) \coloneqq Pr_0\{A = a \mid \bar{Q}_n(W) =
-  \bar{Q}_n(w) \} \ ,
+  g_{r,0,1}(a \mid w) \coloneqq Pr_0\{A = a \mid \overline{Q}_n(W) =
+  \overline{Q}_n(w) \} \ ,
 \end{align*}
 which we refer to as R-PS1. They also introduced an additional regression of a
 weighted residual from the PS on the OR,
 \begin{align*}
   g_{r,0,2}(a \mid w) \coloneqq E_0\biggl\{\frac{I(A = a) - g_n(a \mid W)}
-  {g_n(a \mid W)} \ \bigg\vert \ \bar{Q}_n(W) = \bar{Q}_n(w) \biggr\} \ ,
+  {g_n(a \mid W)} \ \bigg\vert \ \overline{Q}_n(W) = \overline{Q}_n(w) \biggr\} \ ,
 \end{align*}
 which we refer to as R-PS2. The key feature of R-PS1 and R-PS2 is that they are
 both univariate regressions, while R-PS is a bivariate regression.
 @benkeser:2017:biometrika suggested that this may make R-PS1 and R-PS2
 easier to estimate consistently than R-PS. Further, they showed that if
-estimators of the OR, PS, and R-OR satisfy equations (5)-(6), and if,
-additionally, estimators of the OR, R-PS-1 $g_{r,n,1}^{\star}$, and R-PS-2
-$g_{r,n,2}^{\star}$ satisfy
+estimators of the OR, PS, and R-OR satisfy equations
+(\ref{meanEIFZero})--(\ref{eqn:qoverliner}), and if, additionally, estimators of
+the OR, R-PS-1 $g_{r,n,1}^{\star}$, and R-PS-2 $g_{r,n,2}^{\star}$ satisfy
 \begin{equation*}
 \frac{1}{n} \sum\limits_{i=1}^n \frac{I(A_i = a)}{g_{r,n,1}^{\star}
 (a \mid W_i)} g_{r,n,2}^{\star}(a \mid W_i) \ \{Y_i -
-\bar{Q}_n^{\star}(a,W_i)\} = 0 \ ,
+\overline{Q}_n^{\star}(a,W_i)\} = 0 \ ,
 \end{equation*}
-then the GCOMP estimator based on this $\bar{Q}_n^{\star}$ also enjoys a
-doubly-robust limiting distribution. @benkeser:2017:biometrika provided a
+then the GCOMP estimator based on this $\overline{Q}_n^{\star}$ also enjoys a
+doubly robust limiting distribution. @benkeser:2017:biometrika provided a
 TMLE algorithm that produced such estimates and provided closed-form,
-doubly-robust variance estimates.
+doubly robust variance estimates.
 
 \textbf{Remark: } In the previous section, we introduced AIPTW and TMLE as two
-methods for constructing doubly-robust (with respect to consistency) estimators
+methods for constructing doubly robust (with respect to consistency) estimators
 of our parameter of interest. Theoretically, these two frameworks are closely
 related and, practically, the two estimators are generally seen as competitors
-for estimating marginal means. In equation (3), we were able to generate a
-doubly-robust estimator by adding a term to the GCOMP estimator. This term is
-exactly the left-hand-side of the key equation (4), the key equation that is
-solved by the standard TMLE. This is no coincidence; this term is crucial in
-studying the asymptotic properties of the GCOMP, AIPTW, and TML estimators
-(for discussion, see @benkeser:2017:biometrika Section 2.2). Recall that
-a TML estimator achieves doubly-robust consistency by satisfying equation (4),
-while the AIPTW achieves doubly-robust consistency by combining the GCOMP
-estimator with the left-hand-side of this term. Now, we have argued that a TML
-estimator may achieve doubly-robust limiting behavior if it additionally
-satisfies equations (6) and (7). It is thus sensible to wonder whether an
-AIPTW-style estimator could be constructed by combining the left-hand-side of
-these two additional equations with the AIPTW estimator.
-@benkeser:2017:biometrika showed that, surprisingly, this AIPTW-style estimator
-does not achieve the same doubly-robust properties as the TML estimator. Thus,
-while AIPTW and TMLE are generally competitors for producing estimators
-doubly-robust with respect to consistency, for doubly-robust inference, TMLE
-ought to be preferred.
+for estimating marginal means. In equation (\ref{oneStepEst}), we were able to
+generate a doubly robust estimator by adding a term to the GCOMP estimator. This
+term is exactly the left-hand side of the key equation (\ref{meanEIFZero}), the
+key equation
+that is solved by the standard TMLE. This is no coincidence -- this term is
+crucial in studying the asymptotic properties of the GCOMP, AIPTW, and TML
+estimators (for discussion, see @benkeser:2017:biometrika, Section 2.2). Recall
+that a TML estimator achieves doubly-robust consistency by satisfying equation
+(\ref{meanEIFZero}), while the AIPTW achieves doubly robust consistency by
+combining the GCOMP estimator with the left-hand side of this term. Now, we have
+argued that a TML estimator may achieve doubly robust limiting behavior if it
+additionally satisfies equations (\ref{eqn:qoverliner}) and
+(\ref{eqn:gr_bivariate}). It is thus sensible to wonder whether an AIPTW-style
+estimator could be constructed by combining the left-hand side of these two
+additional equations with the AIPTW estimator. @benkeser:2017:biometrika showed
+that, surprisingly, this AIPTW-style estimator does not achieve the same
+doubly robust properties as the TML estimator. Thus, while AIPTW and TMLE are
+generally competitors for producing estimators doubly robust with respect to
+consistency, for doubly robust inference, TML estimators are preferable.
 
-# Implementation of doubly-robust inference
+# Implementation of doubly robust inference
 
-The main function of the package is the eponymous `drtmle()` function. This
-function estimates the treatment-specific marginal mean for user-specified
-levels of a discrete-valued treatment and computes a doubly-robust covariance
-matrix for these estimates. The function implements either the
-estimators of @vdl:2014:ijb (if `reduction = "bivariate"`) or the
-improved estimators of @benkeser:2017:biometrika
-(`reduction = "univariate"`). The package includes utility functions for
-combining these estimates into estimates of average treatment effects, as well
-as other contrasts, as discussed below.
+The main workhorse of the \texttt{drtmle} package is the eponymous `drtmle()`
+function. This function estimates the treatment-specific marginal mean for
+user-specified levels of a discrete-valued treatment and computes a doubly
+robust covariance matrix for these estimates. The function implements either the
+estimators of @vdl:2014:ijb (if `reduction = "bivariate"`) or the improved
+estimators of @benkeser:2017:biometrika (if `reduction = "univariate"`). The
+package includes utility functions for combining these estimates into estimates
+of average treatment effects, as well as other contrasts, as discussed below.
 
 The main data arguments for `drtmle()` are `W, A, Y`, which, as above, represent
 the covariates, a discrete-valued treatment, and an outcome, respectively.
 Missing data are allowed in `A` and `Y`, as discussed below. Beyond the data
 arguments, it is necessary to specify how to estimate each of the OR, PS, R-OR,
-and R-PS (or R-PS1, R-PS2). The package provides flexibility in how these
+and R-PS (or R-PS1 and R-PS2). The package provides flexibility in how these
 regression parameters may be estimated. Once the user has specified the data
 arguments and how to estimate each regression parameter, the function proceeds
 as follows:
@@ -413,19 +416,18 @@ as follows:
   3. estimate reduced-dimension regression via the internal `estimateQrn()` and
      `estimategrn()` functions;
   4. iteratively modify initial estimates of the OR and PS via the
-     `fluctuateQ()` and `fluctuateG()` functions until equations (5)-(7) are
-     approximately solved;
+     `fluctuateQ()` and `fluctuateG()` functions until equations
+     (\ref{meanEIFZero})--(\ref{eqn:gr_bivariate}) are approximately solved;
   5. compute the TML estimates and covariance estimates based on the final OR.
-We refer interested readers to @benkeser:2017:biometrika for a
-theoretical derivation of how the iterative modification of initial OR and PS is
-performed.
+We refer interested readers to @benkeser:2017:biometrika for a theoretical
+derivation of how the iterative modification of initial OR and PS is performed.
 
-In addition to returning doubly-robust parameter and covariance estimates, the
+In addition to returning doubly robust parameter and covariance estimates, the
 `drtmle()` function returns estimates of the GCOMP, AIPTW, standard TMLE, and the
-modified AIPTW estimator discussed in the remark above. While doubly-robust
+modified AIPTW estimator discussed in the remark above. While doubly robust
 inference based on these estimators is not available, the estimators are
-provided for comparison. In the following subsections, we look at various
-options for making calls to `drtmle()`.
+provided for comparison. In the following subsections, we demonstrate the use
+of these methods by examining various options for making calls to `drtmle()`.
 
 ## Estimating regressions
 ```{r, echo = FALSE, message = FALSE}
@@ -442,16 +444,17 @@ While the estimators computed by `drtmle()` are consistent and asymptotically
 normal under inconsistent estimation of either the OR or PS, it is nevertheless
 advisable to strive for consistent estimation of *both* the OR and PS. If both
 of the regression parameters are consistently estimated, then the estimators
-computed by `drtmle()` achieve the nonparametric efficiency bound, resulting in
+computed by `drtmle()` achieve the nonparametric efficiency bound (that is,
+the asymptotic variance of the efficient influence function), resulting in
 narrower confidence intervals and more powerful hypothesis tests. In order for
 the estimates of the OR and PS to have the greatest chance of consistency, the
 `drtmle()` function facilitates estimation using adaptive estimation techniques.
 In fact, there are three ways to estimate each of the regression parameters:
 generalized linear models, super learning [@vdl:2007:statapp;
 @SuperLearnerPackage], and a user-specified estimation technique. We demonstrate
-each of these approaches in turn on a  simulated data set. The true parameter
-values of interest are $\psi_0(0)=$ `r round(EY0, 2)` and $\psi_0(1)=$ `r
-round(EY1, 2)`.
+each of these approaches in turn on a simulated data set in which the treatment
+is not randomized. The true parameter values of interest are $\psi_0(0)=$ `r
+round(EY0, 2)` and $\psi_0(1)=$ `r round(EY1, 2)`.
 
 ```{r}
 set.seed(1234)
@@ -464,33 +467,34 @@ Y <- rbinom(n, 1, plogis(W$W1 + W$W2*A))
 ### Using generalized linear models to estimate regressions
 
 Generalized linear models are perhaps the most popular means of estimating
-regression functions. Because of this legacy, these estimators have been
+regression functions. On account of this legacy, these estimators have been
 included as an option for estimating the regression parameters. The user
-specifies the right-hand-side of a regression formula as a character in the
-`glm_g`, `glm_Q`, `glm_Qr`, and `glm_gr` options to estimate the OR, PS, R-OR,
-and R-PS. These regressions are fit by calling the `glm()` function in R [@R].
-Thus, the model specification should be able to be parsed as a valid formula,
-as required by `glm()`. For the PS formula specified by `glm_g`, `colnames(W)`
-are available to use in the formula. For the OR (`glm_Q`) available names
-of variables to be used in the formula depends on the `stratify` option.
-If `stratify = FALSE`, a single OR is fit to estimate $\bar{Q}_0(A,W)$. In this
-case, the OR regression is fit by passing a `data.frame` that contains `W` and
-`A` into the `data` argument of `glm()`. Thus, both `colnames(W)` and `"A"` may
-appear in the formula specified in `glm_Q`. If `stratify = TRUE`, regressions
-are fit stratifying on `A` to separately estimate $\bar{Q}_0(1,W)$ and
-$\bar{Q}_0(0,W)$. In this case, the `glm_Q` formula may not include `"A"`.
+specifies the right-hand side of a regression formula as a character string
+in the `glm_g`, `glm_Q`, `glm_Qr`, and `glm_gr` options to estimate the OR, PS,
+R-OR, and R-PS. These regressions are fit by calling the `glm()` function from
+\texttt{R}'s base \texttt{stats} package [@R]. Thus, the model specification
+should be able to be parsed as a valid formula object, as required by `glm()`.
+For the PS formula specified by `glm_g`, `colnames(W)` are available to use in the
+formula. For the OR (`glm_Q`) available names of variables to be used in the
+formula depends on the `stratify` option. If `stratify = FALSE`, a single OR is
+fit to estimate $\overline{Q}_0(A,W)$. In this case, the OR regression is fit by
+passing a `data.frame` that contains `W` and `A` into the `data` argument of
+`glm()`. Thus, both `colnames(W)` and `"A"` may appear in the formula specified
+in `glm_Q`. If `stratify = TRUE`, regressions are fit stratifying on `A` to
+separately estimate $\overline{Q}_0(1,W)$ and $\overline{Q}_0(0,W)$. In this
+case, the `glm_Q` formula may not include `"A"`.
 
-To understand the variable names available for R-OR, recall from
-(\ref{eqn:qbarr}) that the parameter involves a regression onto the estimated
-propensity score. Thus, the formula that is input via `glm_Qr` should assume
-data with a single column, `"gn"`.  Similarly, the R-PS1 and R-PS2 that are
-computed for the estimators of @benkeser:2017:biometrika (the default
+To understand the variable names available for R-OR, recall from equation
+(\ref{eqn:qoverliner}) that the nuisance parameter involves a regression onto
+the estimated propensity score. Thus, the formula that is input via `glm_Qr`
+should assume data with a single column, `"gn"`.  Similarly, the R-PS1 and R-PS2
+that are computed for the estimators of @benkeser:2017:biometrika (the default
 estimators, computed whenever `reduction = "univariate"`) involve regressions
 onto the estimated outcome regression. Thus, the formula `glm_gr` should assume
 data with a single column named `"Qn"` if `reduction = "univariate"`. Instead,
-if the estimators of @vdl:2014:ijb are preferred (`reduction = "bivariate"`) the
-`glm_gr` formula specifies a model for (\ref{eqn:gr_bivariate}) and assumes data
-with two columns, `"Qn"` and `"gn"`.
+if the estimators of @vdl:2014:ijb are preferred (`reduction = "bivariate"`),
+the `glm_gr` formula specifies a model for (\ref{eqn:gr_bivariate}) and assumes
+data with two columns, `"Qn"` and `"gn"`.
 
 The code below illustrates how generalized linear models can be used to
 estimate the regression parameters. In this call to `drtmle()`, we specify
@@ -519,7 +523,7 @@ library(SuperLearner)
 Super learning is a loss-based ensemble machine learning technique
 [@vdl:2007:statapp] that generalizes stacking and stacked regression
 [@wolpert:1992:nnet; @breiman:1996:ml]. The user specifies many potential
-candidate regression estimators, referred to as a *library* of candidate
+candidate regression algorithms, referred to as a *library* of candidate
 estimators, and the super learner algorithm estimates the convex combination of
 regression estimators that minimizes the $V$-fold cross-validated risk based on
 a user-selected loss function [@dudoit2005asymptotics]. Oracle inequalities
@@ -566,8 +570,8 @@ is identical to the formatting required for writing a `SuperLearner` wrapper
 (see `SuperLearner::write.SL.template()`). The \texttt{drtmle} package includes
 `SL.npreg`, which is an example of how a user can specify a function for
 estimating regression parameters. This functions fits a kernel regression
-estimator using the \texttt{np} package [@npPackage]. Below we show the source code
-for this function.
+estimator using the \texttt{np} package [@npPackage]. Below we show the source
+code for this function.
 
 ```{r}
 SL.npreg
@@ -614,17 +618,19 @@ OR and PS estimates that have been obtained externally.
 ### Reducing dependence on random seed
 
 Some users may find it unsettling that when applying the super learner in real
-data analysis the results are dependent on the random seed that is set. To
-remove this dependence, one can average results over repeated super learner
-runs; more repeats will lead to less dependence on the random seed. There are
-generally two approaches that can be used: (i) averaging on the scale of the
-nuisance parameters and (ii) averaging on the scale of the point estimates.
+data analysis the results are dependent on the random seed that is set. While
+this is a natural artifact of cross-validation (sample-splitting) and adaptive
+estimation, one can average results over repeated super learner runs to reduce
+or remove this dependence -- more repeats will lead to less dependence on the
+random seed. There are generally two approaches that can be used: (i) averaging
+on the scale of the nuisance parameters and (ii) averaging on the scale of the
+point estimates.
 
 For (i), suppose that we have $n_{SL}$ estimated super learners for the OR,
-$\bar{Q}_{n,j}, j = 1, \dots, n_{SL}$, and the PS $g_{n,j}, j = 1, \dots,
+$\overline{Q}_{n,j}, j = 1, \dots, n_{SL}$, and the PS $g_{n,j}, j = 1, \dots,
 n_{SL}$. We can take the average over these fits,
 \begin{equation*}
-  \bar{Q}_n = \frac{1}{n_{SL}} \sum_{j = 1}^{n_{SL}} \bar{Q}_{n,j}
+  \overline{Q}_n = \frac{1}{n_{SL}} \sum_{j = 1}^{n_{SL}} \overline{Q}_{n,j}
 \end{equation*}
 as our estimate of the OR (similarly for the PS). These averaged estimates are
 then used to compute the AIPTW or TMLE, as described above.
@@ -639,22 +645,21 @@ estimates,
 as our estimate of $\psi_{0}(1)$.
 
 This feature is implemented via the `n_SL` and `avg_over` options, where the
-former specifies the number of super learners to repeat and the latter specifies
-the scale(s) to average over. For example, if `avg_over = "drtmle"` and `n_SL =
-2`, then two point estimates are computed, each based on a single super learner,
-and averaged to obtain a final estimate. If instead `avg_over = "SL"` and `n_SL
-= 2`, then two super learners are fit and averaged before a final point estimate
-is obtained. Finally, if `avg_over = c("drtmle", "SL")` and `n_SL = 2` then
-averaging on *both* scales is performed. That is, the final estimate is the
-average of two point estimates, each obtained using OR and PS estimates that are
-averaged over two super learners.
+former specifies the number of super learners to repeat and the latter
+specifies the scale(s) over which to average. For example, if `avg_over =
+"drtmle"` and `n_SL = 2`, then two point estimates are computed, each based on a
+single super learner, and averaged to obtain a final estimate. If instead
+`avg_over = "SL"` and `n_SL = 2`, then two super learners are fit and averaged
+before a final point estimate is obtained. Finally, if `avg_over = c("drtmle",
+"SL")` and `n_SL = 2` then averaging on *both* scales is performed. That is, the
+final estimate is the average of two point estimates, each obtained using OR and
+PS estimates that are averaged over two super learners.
 
-Not surprisingly, averaging over multiple super learners can add considerable
+Unsurprisingly, averaging over multiple super learners can add considerable
 computational expense to calls to `drtmle()`. The package is currently
 parallelized at the level of individual calls to `SuperLearner()`. With
 parallelization over enough cores, repeated super learning should not add too
 much to the computational burden relative to a single call to `SuperLearner()`.
-
 
 ## Standard error estimation
 
@@ -665,45 +670,47 @@ generalize immediately to the DR-TML estimator, but the formulas are more
 complex in this latter case.
 
 Reported standard error estimates are based on an estimate of the asymptotic
-variance of the estimators. This variance can be characterized by influence
-function of the estimators. For example, let $\psi_{n}(1)$ be an AIPTW estimate
-of $\psi_0(1)$. Under regularity conditions,
+variance of the estimators. This variance can be characterized by the
+(efficient) influence function of the estimators. For example, let
+$\psi_{n}(1)$ be an AIPTW estimate of $\psi_0(1)$. Under regularity conditions,
 \begin{equation*}
   \psi_{n}(1) - \psi_0(1) = \frac{1}{n} \sum_{i=1}^n
-    D^{\star}(\bar{Q}_0, g_0, Q_{W,0})(O_i) + o_{p}(n^{-1/2}) \ ,
+    D^{\star}(\overline{Q}_0, g_0, Q_{W,0})(O_i) + o_{p}(n^{-1/2}) \ ,
 \end{equation*}
 where
 \begin{equation*}
-  D^{\star}(\bar{Q}_0, g_0, Q_{W,0})(O_i) = \frac{I(A_i = 1)}
-  {g_0(1 \mid W_i)} \{ Y_i - \bar{Q}_0(1, W_i)\} + \bar{Q}_0(1, W_i) -
-  \int \bar{Q}_0(1, w) dQ_{W,0}(w) \ .
+  D^{\star}(\overline{Q}_0, g_0, Q_{W,0})(O_i) = \frac{I(A_i = 1)}
+  {g_0(1 \mid W_i)} \{ Y_i - \overline{Q}_0(1, W_i)\} + \overline{Q}_0(1, W_i)
+  - \int \overline{Q}_0(1, w) dQ_{W,0}(w) \ .
 \end{equation*}
 Thus, by the central limit theorem, $n^{1/2} \psi_{n}(1)$ converges in
 distribution to a normal distribution with mean $\psi_0(1)$ and variance
 \begin{equation*}
-  \sigma^2_0 = E_0( [ D^{\star}(\bar{Q}_0, g_0, Q_{W,0})(O) -
-  E_0\{D^{\star}(\bar{Q}_0, g_0, Q_{W,0})(O)\} ]^2 ) \ .
+  \sigma^2_0 = E_0( [ D^{\star}(\overline{Q}_0, g_0, Q_{W,0})(O) -
+  E_0\{D^{\star}(\overline{Q}_0, g_0, Q_{W,0})(O)\} ]^2 ) \ .
 \end{equation*}
 An estimate of $\sigma^2_0$ is naturally obtained by taking the empirical
-variance of $D_i = D^{\star}(\bar{Q}_n, g_n, Q_{W,n})(O_i)$, that is,
+variance of $D_i = D^{\star}(\overline{Q}_n, g_n, Q_{W,n})(O_i)$, that is,
 \begin{equation*}
   \sigma^2_n = \frac{1}{n} \sum_{i=1}^n \left\{D_i - \frac{1}{n} \sum_{j=1}^n
   D_j \right\}^2 \ .
 \end{equation*}
-Thus, a natural estimate of the standard error of $\psi_{n}(1)$ is $\sigma_n /
+Thus, an estimate of the standard error of $\psi_{n}(1)$ is $\sigma_n /
 n^{1/2}$. Conveniently, this idea generalizes naturally to estimating the
 asymptotic covariance matrix of a vector $n^{1/2} (\psi_{n}(a) : a)$.
 
 ### Standard errors for TMLE
 
 For TML estimators, it is standard practice to construct $D_i$ using the
-*targeted* version of the OR (denoted by $\bar{Q}_n^{\star}$ above). Recall that
+*targeted* version of the OR (denoted by $\overline{Q}_n^{\star}$ above). Recall that
 such estimates are obtained by modifying an initial OR estimate so as to ensure
 a particular (set of) equation(s) is (are) solved.  However, simulations have
 shown that better standard error estimates for TMLE may be achieved by instead
 using the *initial* OR estimate in the computation of standard errors, as
 described in the preceding subsection. To this end, The `drtmle()` function
-includes the `targeted_se` option.
+includes the `targeted_se` option, which specifies whether initial nuisance
+parameter estimates are to be in computing the standard error (i.e.,
+`targeted_se = FALSE`).
 
 ```{r, show_targeted_se, cache = TRUE}
 glm_fit_uni_nontargeted_se <-
@@ -720,7 +727,7 @@ list(
 
 ### Cross-validated standard errors
 
-Simulation studies have revealed that, when employing machine learning to
+Simulation studies have revealed that when employing machine learning to
 estimate the OR and/or PS, the estimated standard errors are often *too small*,
 in small to moderate-sized samples. Problematically, this leads directly to
 under-coverage of confidence intervals and possibly inflated Type-I error rates
@@ -735,14 +742,16 @@ cross-validation can be used. The same sample-splitting idea can be used to
 obtain more conservative standard error estimates.
 
 Suppose we use $V$-fold cross-validation to obtain $V$ training-sample-specific
-estimates of the OR, $\bar{Q}_{n,v}, v = 1, \dots, V$ and the PS, $g_{n,v},
-v = 1, \dots, V$. For $i = 1, \dots, n$, let $\bar{Q}_{n,i}^{cv}(1)$ denote the
-estimate of $\bar{Q}_{0}(a, W_i)$ obtained when observation $i$ was in the
-validation fold. That is, $\bar{Q}_{n,i}^{cv}$ is an out-of-sample prediction of
-$Y_i$. We define $g_{n,i}^{cv}$ similarly. Using these estimates, we can define
+estimates of the OR, $\overline{Q}_{n,v}, v = 1, \dots, V$ and the PS,
+$g_{n,v}, v = 1, \dots, V$. For $i = 1, \dots, n$, let
+$\overline{Q}_{n,i}^{cv}(1)$ denote the estimate of $\overline{Q}_{0}(a, W_i)$
+obtained when observation $i$ was in the validation fold. That is,
+$\overline{Q}_{n,i}^{cv}$ is an out-of-sample prediction of $Y_i$. We define
+$g_{n,i}^{cv}$ similarly. Using these estimates, we can define
 \begin{equation*}
- D_i^{cv} = \frac{I(A_i = 1)}{g_{n,i}^{cv}} \{ Y_i - \bar{Q}_{n,i}^{cv}(1)\} +
- \bar{Q}_{n,i}^{cv}(1) - \frac{1}{n} \sum_{i=1}^n \bar{Q}_{n,i}^{cv}(1)
+ D_i^{cv} = \frac{I(A_i = 1)}{g_{n,i}^{cv}} \{ Y_i -
+ \overline{Q}_{n,i}^{cv}(1)\} + \overline{Q}_{n,i}^{cv}(1) -
+ \frac{1}{n} \sum_{i=1}^n \overline{Q}_{n,i}^{cv}(1)
 \end{equation*}
 and compute an estimate of $\sigma^2_0$ using
 \begin{equation*}
@@ -751,7 +760,7 @@ and compute an estimate of $\sigma^2_0$ using
 \end{equation*}
 
 In \texttt{drtmle}, cross-validated standard error estimates can be obtained by
-setting `se_cv = "full"` and `se_cvFolds` to a number greater than 1. For
+setting `se_cv = "full"` and `se_cvFolds` to a number greater than one. For
 example,
 
 ```{r, fit_w_full_cv, warning = FALSE, cache = TRUE}
@@ -770,46 +779,48 @@ list(
 ### Partially cross-validated standard errors
 
 Obtaining fully cross-validated standard errors can be fairly time-intensive
-when super learner is used to estimate the OR and PS. In \texttt{drtmle}, we give
-an option to compute standard error estimates that are *partially
+when super learner is used to estimate the OR and PS. In \texttt{drtmle}, we
+give an option to compute standard error estimates that are *partially
 cross-validated* and do not require any additional fitting beyond a standard
 super learner. Here, we describe briefly how these estimates are obtained and
 show calls to `drtmle()` for obtaining such estimates.
 
 Suppose we have $K$ candidate regressions in our super learner library for both
 the OR and PS (in practice, the number could be different for the OR and for the
-PS). Recall that a super learner estimate of, for example, $\bar{Q}_0(a, w)$ is
-obtained as a weighted combination of estimates from each candidate regression.
-Let $\bar{Q}_{n,k}$ denote the estimate of $\bar{Q}_{0}$ obtained by training
-algorithm $k$ using the full data set. The super learner estimate of
-$\bar{Q}_{0}(a,w)$ is
+PS). Recall that a super learner estimate of, for example, $\overline{Q}_0(a,
+w)$ is obtained as a weighted combination of estimates from each candidate
+regression. Let $\overline{Q}_{n,k}$ denote the estimate of $\overline{Q}_{0}$
+obtained by training algorithm $k$ using the full data set. The super learner
+estimate of $\overline{Q}_{0}(a,w)$ is
 \begin{equation*}
-  \bar{Q}_{n,SL}(a, w) = \sum_{k = 1}^K \alpha_{n,k} \bar{Q}_{n,k}(a, w) \ ,
+  \overline{Q}_{n,SL}(a, w) = \sum_{k = 1}^K \alpha_{n,k}
+  \overline{Q}_{n,k}(a, w) \ ,
 \end{equation*}
 where $\alpha_n = (\alpha_{n,1}, \dots, \alpha_{n,K})$ is a weight vector that
 is selected by minimizing a cross-validated risk criterion. That is, each of the
 $K$ algorithms is trained according to a $V$-fold cross-validation scheme,
 resulting in $V + 1$ fits of each algorithm (one in each of $V$ training folds,
 plus one obtained by fitting the algorithm using the full data). Let
-$\bar{Q}_{n,k,v}$ denote the $k$\textsuperscript{th} algorithm trained using the
-$v$\textsuperscript{th} training fold. For $i = 1, \dots, n$, let
-$\bar{Q}_{n,k,i}^{cv}(1)$ denote the estimate of $\bar{Q}_0(1, W_i)$ implied by
-the fitted algorithm $\bar{Q}_{n,k,v}$, which was obtained when observation $i$
-was in the validation sample. That is, for observations with $A_i = 1$,
-$\bar{Q}_{n,k,i}^{cv}(1)$ is an out-of-sample prediction of $Y_i$ based on the
-$k$\textsuperscript{th} algorithm. Now, we can construct a *partially
-cross-validated* super learner prediction as follows. For $i = 1, \dots, n$ let
+$\overline{Q}_{n,k,v}$ denote the $k$\textsuperscript{th} algorithm trained
+using the $v$\textsuperscript{th} training fold. For $i = 1, \dots, n$, let
+$\overline{Q}_{n,k,i}^{cv}(1)$ denote the estimate of $\overline{Q}_0(1, W_i)$
+implied by the fitted algorithm $\overline{Q}_{n,k,v}$, which was obtained when
+observation $i$ was in the validation set. That is, for observations with
+$A_i = 1$, $\overline{Q}_{n,k,i}^{cv}(1)$ is an out-of-sample prediction of
+$Y_i$ based on the $k$\textsuperscript{th} algorithm. Now, we can construct a
+*partially cross-validated* super learner prediction as follows. For
+$i = 1, \dots, n$ let
 \begin{equation*}
-  \bar{Q}_{n,SL,i}^{cv}(1) = \sum_{k = 1}^K \alpha_{n,k}
-    \bar{Q}_{n,k,i}^{cv}(1)
+  \overline{Q}_{n,SL,i}^{cv}(1) = \sum_{k = 1}^K \alpha_{n,k}
+    \overline{Q}_{n,k,i}^{cv}(1)
 \end{equation*}
 be the estimate obtained by ensembling the training-set-specific algorithm fits
 based on $\alpha_n$. We can use these estimates to produce our *partially
 cross-validated* standard error estimate as follows. First, define
 \begin{equation*}
   D_i^{pcv} = \frac{I(A_i = 1)}{g_{n,SL,i}^{cv}} \{ Y_i -
-    \bar{Q}_{n,SL,i}^{cv}(1)\} + \bar{Q}_{n,SL,i}^{cv}(1) -
-    \frac{1}{n} \sum_{i=1}^n \bar{Q}_{n,SL,i}^{cv}(1),
+    \overline{Q}_{n,SL,i}^{cv}(1)\} + \overline{Q}_{n,SL,i}^{cv}(1) -
+    \frac{1}{n} \sum_{i=1}^n \overline{Q}_{n,SL,i}^{cv}(1),
 \end{equation*}
 then, compute an estimate of $\sigma^2_0$ using
 \begin{equation*}
@@ -838,18 +849,18 @@ sl_fit_pcv <- drtmle(W = W, A = A, Y = Y, family = binomial(),
 # pt estimates should be same
 # variance should be larger for pcv
 list(
-  `No-CV` = sl_fit$cov, # no cv
-  `Partial CV` = sl_fit_pcv$cov # partial cv
+  `No-CV` = sl_fit$drtmle$cov, # no cv
+  `Partial CV` = sl_fit_pcv$drtmle$cov # partial cv
 )
 ```
 
 ## Confidence intervals
 
-The \texttt{drtmle} package contains methods that compute doubly-robust confidence
-intervals. The `ci()` method computes confidence intervals about the estimated
-marginal means in a fitted object of S3 class `"drtmle"`, in addition to
-contrasts between those means. By default, the method gives confidence intervals
-about each mean.
+The \texttt{drtmle} package contains methods that compute doubly robust
+confidence intervals. The `ci()` method computes confidence intervals about the
+estimated marginal means in a fitted object of S3 class `"drtmle"`, in addition
+to contrasts between those means. By default, the method gives confidence
+intervals about each mean.
 
 ```{r}
 ci(npreg_fit)
@@ -873,12 +884,12 @@ That is, the confidence interval takes the form
   \exp \biggl[\log \biggl\{ \frac{\psi_n(1)}{\psi_n(0)} \biggr\} \pm
   z_{1-\alpha/2} \sigma^{\log}_n \biggr] \ ,
 \end{equation*}
-where $\sigma^{\log}_n$ is the estimated standard error on the log-scale. By
-the delta method, an estimate of this standard error is given by
+where $\sigma^{\log}_n$ is the estimated standard error on the logarthmic scale.
+By the delta method, an estimate of this standard error is given by
 \begin{equation*}
   \sigma^{\log}_n = \nabla g(\psi_n)^T \Sigma_n \nabla g(\psi_n),
 \end{equation*}
-where $\Sigma_n$ is the doubly-robust covariance matrix estimate output from
+where $\Sigma_n$ is the doubly robust covariance matrix estimate output from
 `drtmle()` and $\nabla g(\psi)$ is the gradient of $\log\{\psi(1)/\psi(0)\}$.
 This confidence interval may be obtained as follows.
 
@@ -924,7 +935,7 @@ ci(npreg_fit, contrast = logitMean)
 
 ## Hypothesis tests
 
-Doubly-robust Wald-style hypothesis tests may be implemented using the
+Doubly robust Wald-style hypothesis tests may be implemented using the
 `wald_test()` method. As with confidence intervals, there are three options for
 testing. First, we may test the null hypothesis that the marginal means equal a
 fixed value (or values). Below, we test the null hypothesis that $\psi_0(1) =
@@ -970,19 +981,19 @@ are common in practice and, if ignored, can bias estimates of the marginal
 means of interest. The estimators previously discussed can be modified to allow
 such missingness processes to depend on observed covariates. Let $\Delta_A$ and
 $\Delta_Y$ be indicators that $A$ and $Y$ are observed, respectively. We can
-redefine the OR to be $\bar{Q}_0(a,w) \coloneqq E_0(\Delta_Y Y \mid \Delta_A
+redefine the OR to be $\overline{Q}_0(a,w) \coloneqq E_0(\Delta_Y Y \mid \Delta_A
 A = a, \Delta_A = 1, \Delta_Y = 1, W = w)$ and similarly redefine the PS to be
 \begin{align}
   g_0(a \mid w) &= Pr_0(\Delta_A = 1, \Delta_A A = a, \Delta_Y = 1 \mid W = w)
-  \notag \\
+  \nonumber \\
   &= Pr_0(\Delta_A = 1 \mid W) Pr_0(\Delta_A A = a \mid \Delta_A = 1, W = w)
   \label{modPS} \\
-  &\hspace{1.5in} Pr_0(\Delta_Y = 1 \mid \Delta_A = 1, \Delta_A A = a, W = w) \
-   \notag.
+  &\hspace{1.5in} Pr_0(\Delta_Y = 1 \mid \Delta_A = 1, \Delta_A A = a, W = w)
+   \nonumber.
 \end{align}
 
-To demonstrate, we artificially introduce missing values to `A` and `Y` in our
-running example.
+To demonstrate, we artificially introduce missing values to `A` and `Y` into
+the data from our running example.
 
 ```{r}
 DeltaA <- rbinom(n, 1, plogis(2 + W$W1))
@@ -991,20 +1002,20 @@ A[DeltaA == 0] <- NA
 Y[DeltaY == 0] <- NA
 ```
 
-The only modification of the call to `drtmle()` is in how the PS estimation is
-performed. The options `glm_g` and `SL_g` are still used to fit generalized
-linear models or a super learner, respectively. However, the code allows for
-separate regression fits for each of the three components of the PS in (8). To
-perform separate generalized linear model fits for each of the three components,
-`glm_g` should be a named list with entries `"DeltaA"`, `"A"`, and `"DeltaY"`.
-Respectively, these should provide a formula expression for the regression of
-$\Delta_A$ on $W$, $A$ on $W$ in observations with $\Delta_A = 1$, and of
-$\Delta_Y$ on $W$ and $A$ in observations with $\Delta_A = \Delta_Y = 1$ (if
-`stratify = FALSE`) _or_ of $\Delta_Y$ on $W$ to be fit in observations with
-$\Delta_A = \Delta_Y = 1$ and $A = a$ for each $a$ specified in option `a_0` (if
-`stratify = TRUE`). If only a single formula is passed to `glm_g`, it is used
-for each of the three regressions. We illustrate a call to `drtmle()` with
-missing data and generalized linear model fits below.
+The only required modification of the call to `drtmle()` is in how the PS
+estimation is performed. The options `glm_g` and `SL_g` are still used to fit
+generalized linear models or a super learner, respectively. However, the code
+allows for separate regression fits for each of the three components of the PS
+in equation (\ref{modPS}). To perform separate generalized linear model fits for
+each of the three components, `glm_g` should be a named list with entries
+`"DeltaA"`, `"A"`, and `"DeltaY"`. Respectively, these should provide a formula
+expression for the regression of $\Delta_A$ on $W$, $A$ on $W$ in observations
+with $\Delta_A = 1$, and of $\Delta_Y$ on $W$ and $A$ in observations with
+$\Delta_A = \Delta_Y = 1$ (if `stratify = FALSE`) _or_ of $\Delta_Y$ on $W$ to
+be fit in observations with $\Delta_A = \Delta_Y = 1$ and $A = a$ for each $a$
+specified in option `a_0` (if `stratify = TRUE`). If only a single formula is
+passed to `glm_g`, it is used for each of the three regressions. We illustrate a
+call to `drtmle()` with missing data and generalized linear model fits below.
 
 ```{r, cache = TRUE}
 glm_fit_wNAs <- drtmle(W = W, A = A, Y = Y, stratify = FALSE,
@@ -1211,11 +1222,12 @@ ci(glm_fit_multiA, contrast = riskRatio_2v0)
 
 To avoid overfitting initial regressions, one can use cross-validated estimates
 of the nuisance regressions. Theoretically, the use of cross-validated
-regression weakens the assumptions necessary to achieve asymptotic normality
-[@zheng:2010:working]. This is true of the regular TML and AIPTW estimators, as
-well as of the TML estimator with doubly-robust inference. The `drtmle()`
-function implements cross-validated estimation of the regression parameters
-through the `cvFolds` option, as shown in the code below.
+regression weakens entropy conditions on nuisance parameter estimators
+necessary to achieve asymptotic normality [@klaassen1987consistent;
+@bickel1993efficient; @zheng:2010:working]. This is true of the regular TML and
+AIPTW estimators, as well as of the TML estimator with doubly robust inference.
+The `drtmle()` function implements cross-validated estimation of the nuisance
+regression parameters through the `cvFolds` option, as shown in the code below.
 
 ```{r, cache = TRUE}
 cv_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
@@ -1229,29 +1241,33 @@ cv_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
 Cross-validation may significantly increase the computation time necessary for
 running `drtmle()`. Parallelized nuisance regression fitting is available by
 setting the option `use_future = TRUE`. Since, internally, all computations are
-carried out using futures (with the API provided by the \texttt{future} R package),
-setting this option amounts only to parallelizing with futures [@futurePackage]
-via `future.apply::lapply()`; when `use_future = FALSE`, base `lapply()` is
-simply used instead.  Together, setting these options results in parallelization
-of the estimation of the OR, PS, and reduced-dimension regressions.
+carried out using futures (with the API provided by the \texttt{future}
+\texttt{R} package), setting this option amounts only to parallelizing with
+futures [@futurePackage; @bengtsson2021unifying] via `future.apply::lapply()`;
+when `use_future = FALSE`, base `lapply()` is simply used instead. Together,
+setting these options results in parallelization of the estimation of the OR,
+PS, and reduced-dimension regressions.
 
 If no adjustments are made prior to invoking the `drtmle()` function, futures
-are computed sequentially, as per the defaults of the \texttt{future} package. It
-is left to the user to specify appropriate system-specific future backends that
-may better suit their problem (e.g., using the \texttt{future.batchtools} package
-[@futurebatchtoolsPackage] or even simply setting a parallelized
-`future::plan()`). Below, we demonstrate registration using an ad-hoc cluster on
-the local system. The choice of backend is flexible, and submission of the job
-to a wide variety of schedulers (e.g., SLURM, TORQUE) is also permitted.
-Interested readers are invited to consult the documentation of the
-\texttt{future.batchtools} package for further information.
+are computed sequentially, as per the defaults of the \texttt{future} package.
+It is left to the user to specify appropriate system-specific future backends
+that may better suit both their analytical problem and computing environment
+(e.g., using the \texttt{future.batchtools} package [@futurebatchtoolsPackage]
+or even simply setting a parallelized `future::plan()`). Below, we demonstrate
+registration using an ad-hoc cluster on the local system. The choice of backend
+is flexible, and submission of the job to a variety of schedulers (e.g., SLURM,
+TORQUE) is also permitted. Interested readers are invited to consult the
+documentation of the \texttt{future.batchtools} package for further information.
 
 ```{r, message = FALSE, eval = FALSE}
+# set up parallel backend via future.batchtools
 library(future.batchtools)
 library(parallel)
 cl <- makeCluster(2, type = "SOCK")
 plan(cluster, workers = cl)
 clusterEvalQ(cl, library("SuperLearner"))
+
+# run drtmle() in parallel using the registered backend via use_future = TRUE
 pcv_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
                      SL_g = c("SL.glm", "SL.glm.interaction","SL.earth"),
                      SL_Q = c("SL.glm", "SL.glm.interaction","SL.earth"),
@@ -1263,38 +1279,44 @@ pcv_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
 
 # Discussion
 
-The \texttt{drtmle} package was designed to provide a user-friendly implementation
-of the TMLE algorithm that facilitates doubly-robust inference about marginal
-means and average treatment effects. While the theory underlying doubly-robust
-inference is complex, the implementation of the methods only requires users to
-provide the data and specify how to estimate nuisance regressions. Though
-estimation of the OR and PS is familiar to those with backgrounds in causal
-inference-related estimation, the reduced-dimension regressions may appear
-strange. Indeed, it is difficult to provide intuition for these parameters and
-more difficult still to determine what scientific background knowledge might
-guide users in how to estimate these regression parameters. Therefore, we
-recommended estimating these quantities adaptively, e.g., with the super
-learner. The super learner library should contain several relatively smooth
-estimators such as `SL.mean`, `SL.glm`, and `SL.gam`. In particular, including
-`SL.mean` (an unadjusted generalized linear model) may be important due to the
-fact that, when the OR and PS are consistently estimated, the reduced-dimension
-regressions are identically equal to zero. Thus, this unadjusted regression
-estimator may do a good job estimating the reduced-dimension regressions in
-situations where the OR and PS are estimated well. In addition to relatively
-smooth estimators, we recommend additionally including several adaptive
-estimators such as `SL.npreg` or `SL.earth`.
+The \texttt{drtmle} package was designed to provide a user-friendly
+implementation of the TMLE algorithm that facilitates doubly robust inference
+about marginal means and average treatment effects. While the theory underlying
+doubly robust inference is complex, the implementation of the methods only
+requires users to provide the data and specify how to estimate nuisance
+regressions. Though estimation of the OR and PS is familiar to those with
+backgrounds in causal inference-related estimation, the reduced-dimension
+regressions may appear strange. Indeed, it is difficult to provide intuition for
+these parameters and more difficult still to determine what scientific
+background knowledge might guide users in how to estimate these regression
+parameters. Therefore, we recommended estimating these quantities adaptively,
+e.g., with the super learner algorithm. The super learner library should contain
+several relatively smooth estimators such as `SL.mean`, `SL.glm`, and `SL.gam`.
+In particular, including `SL.mean` (an unadjusted generalized linear model) may
+be important due to the fact that, when the OR and PS are consistently
+estimated, the reduced-dimension regressions are identically equal to zero.
+Thus, this unadjusted regression estimator may do a good job estimating the
+reduced-dimension regressions in situations where the OR and PS are estimated
+well. In addition to relatively smooth estimators, we recommend additionally
+including several adaptive estimators such as `SL.npreg` or `SL.earth`.
 
 Planned extensions of the \texttt{drtmle} package include extensions to
 longitudinal settings involving treatments at multiple time points and inclusion
 of the collaborative targeted maximum likelihood estimator (C-TMLE) of
-@vdl:2014:ijb that also facilitates collaborative doubly-robust inference.
+@vdl:2014:ijb that also facilitates collaborative doubly robust inference. The
+\texttt{drtmle} \texttt{R} package is publicly available on the Comprehensive
+\texttt{R} Archive Network (CRAN) at https://CRAN.R-project.org/package=drtmle,
+and the open source development repository is available on the GitHub platform
+for collaborative programming at https://github.com/benkeser/drtmle; the
+package's documentation (automatically built via the \texttt{pkgdown} \texttt{R}
+package) is hosted via GitHub Pages at https://benkeser.github.io/drtmle/.
 
 # Appendix
 
 ## Arbitrary user-specified regressions
 
-The \texttt{drtmle} package also allows users to pass in their own estimated OR and
-PS via the `Qn` and `gn` options, respectively.  If `Qn` is specified by the
+The \texttt{drtmle} package also allows users to pass in their own estimated OR
+and PS via the `Qn` and `gn` options, respectively. If `Qn` is specified by the
 user, `drtmle()` will ignore the nuisance parameter estimation routines
 specified by `SL_Q` and `glm_Q` -- similarly for `gn` and `SL_g`, `glm_g`. As
 noted in the package documentation, there is a specific format necessary for
@@ -1393,40 +1415,44 @@ obtain initial estimates of nuisance parameters. The key step is making sure
 that the ordering of `Qn` and `gn` is consistent with `a_0`.
 
 
-## Additional methods included in drtmle
+## Additional methods included in \texttt{drtmle}
 
 ### Inference for IPTW using adaptive PS estimators
 
-Doubly-robust estimators of marginal means are appealing in their robustness and
-efficiency properties. However, researchers may prefer the IPTW estimator for
+Doubly robust estimators of marginal means are appealing in their robustness and
+efficiency properties; however, researchers may prefer the IPTW estimator for
 its intuitive derivation and implementation. Heretofore, inference for IPTW
-estimators precluded the use of adaptive estimators of the PS. However,
-@vdl:2014:ijb proposed modified IPTW estimators that allow for adaptive
-PS estimation. Similarly as above, this estimator is based on an additional
-regression parameter, $\tilde{Q}_{r,0n}(a,w) \coloneqq E_0\{Y \mid A = a, g_n(W)
-= g_n(w)\}$, that is, the regression of the outcome $Y$ on the estimated
-propensity score amongst observations with $A=a$. The author showed that if
-$g_n^{\star}(a \mid w)$, an estimator of the propensity for treatment $A=a$,
-satisfied that
+estimators precluded the use of adaptive estimators of the PS, yet @vdl:2014:ijb
+proposed modified IPTW estimators that allow for adaptive PS estimation by
+incorporating an additional step to update the initial PS estimates. Like those
+presented above, this estimator is based on an additional regression parameter,
+$\tilde{Q}_{r,0n}(a,w) \coloneqq E_0\{Y \mid A = a, g_n(W) = g_n(w)\}$, that is,
+the regression of the outcome $Y$ on the estimated propensity score amongst
+observations with $A=a$. The author showed that if $g_n^{\star}(a \mid w)$, an
+estimator of the propensity for treatment $A=a$, satisfied that
 \begin{equation*}
   \frac{1}{n} \sum\limits_{i=1}^n \frac{\tilde{Q}_{r,0}(a,W_i)}{g_n(a \mid W =
     W_i)} \ \{ I(A_i = a) - g_n(a \mid W = W_i)\} = 0 \ ,
 \end{equation*}
-then the IPTW estimator based on $g_n^{\star}$ would have an asymptotic normal
-distribution with estimable variance. In fact, @vdl:2014:ijb proposed a
-TMLE algorithm that mapped an initial PS estimate into an estimate that
+then the IPTW estimator based on $g_n^{\star}$ would asymptotically attain a normal
+limiting distribution with estimable variance. In fact, @vdl:2014:ijb proposed a
+TMLE-type algorithm that mapped an initial PS estimate into an estimate that
 satisfies this key equation and variance estimators that can be used to generate
 Wald-style confidence intervals and hypothesis tests.
 
 An estimator with equivalent asymptotic properties based on a PS estimate,
 $g_n(a \mid w)$, can be computed as
 \begin{equation*}
-  \psi_{n,IPTW}(a) = \psi_{n,IPTW}(a) - \frac{1}{n} \sum\limits_{i=1}^n
-  \frac{\tilde{Q}_{r,0}(a,W_i)}{g_n(a \mid W = W_i)} \ \{ I(A_i = a) - g_n(a
-  \mid W = W_i)\} \ .
+  \psi_{n,\text{IPTW}}(a) = \psi_{n,\text{IPTW}}(a) - \frac{1}{n}
+  \sum\limits_{i=1}^n \frac{\tilde{Q}_{r,0}(a,W_i)}{g_n(a \mid W = W_i)}
+  \{ I(A_i = a) - g_n(a \mid W = W_i)\} \ .
 \end{equation*}
 Both this estimator and the TMLE-based IPTW estimator above are implemented in
-\texttt{drtmle}.
+\texttt{drtmle}. Alternative approaches for developing IPTW estimators that are
+asymptotically normal and attain the nonparametric efficiency bound have been
+investigated by @ertefaie2022nonparametric and @hejazi2022efficient, who relied
+on undersmoothing-based corrections rather than the TMLE-type corrections of
+@vdl:2014:ijb.
 
 #### Implementation of inference for adaptive IPTW
 
@@ -1459,24 +1485,30 @@ cross-validation allows for valid inference under weaker assumptions.
 
 ### Outcome-adaptive propensity score estimation
 
-We have recently proposed estimators of the average treatment effect to be used
-in settings where this effect is weakly identifiable, as evidenced by estimated
-propensity scores of small magnitude.  In these settings, doubly robust
+@ju2020robust have recently proposed estimators of the average treatment effect
+to be used in settings where this effect is weakly identifiable, as evidenced by
+estimated propensity scores of small magnitude. In these settings, doubly robust
 estimators may exhibit non-robust behavior in small samples. The proposed
-solution was to target an alternative quantity in the propensity score
-estimation step. If we are interested in estimating $\psi_0(a)$ for $a = 0, 1$,
-we can estimate $Pr_0(A = a \mid \bar{Q}_0(1, W), \bar{Q}_0(0, W))$, which
+solution is to target an alternative quantity in the propensity score estimation
+step. If we are interested in estimating $\psi_0(a)$ for $a = 0, 1$, we can
+estimate $Pr_0(A = a \mid \overline{Q}_0(1, W), \overline{Q}_0(0, W))$, which
 describes the conditional probability of receiving treatment $A = a$ given the
 value of the two outcome regressions. For this reason, we call this quantity an
 *outcome-adaptive propensity score*. We have shown that all of the usual
 asymptotics for TMLE carry through when an estimator of this quantity is
 substituted for the true propensity score. The resultant TML estimator is
 *super-efficient*, meaning that it will generally have greater asymptotic
-efficiency than a standard TML estimator. Simulation experiments indicate that
-this approach also delivers more stable behavior in settings where estimated
-propensity scores become very small. However, the estimator is not doubly robust
--- the asymptotics rely on the outcome regression being consistently estimated
-at $n^{-1/4}$ rate. In this sense, this estimator trades off robustness against
+efficiency than a standard TML estimator (in fact, greater asymptotic efficiency
+than is ordinarily available to any regular asymptotically linear estimator).
+Simulation experiments indicate that this approach also delivers more stable
+behavior in settings where estimated propensity scores become very small.
+However, the estimator is not doubly robust -- the asymptotics rely on the
+outcome regression being consistently estimated at $n^{-1/4}$ rate. The highly
+adaptive lasso estimator [@benkeser2016highly; @vdl2017generally;
+@bibaut2019fast], implemented in the open source \texttt{hal9001} \texttt{R}
+package [@hejazi2020hal9001; @coyle2021hal9001], can attain such a convergence
+rate without sacrificing flexible estimation; nevertheless, as a consequence of
+this convergence rate requirement, this estimator trades off robustness against
 achieving greater stability and efficiency. See @ju2020robust for further
 discussion.
 
@@ -1505,10 +1537,10 @@ adaptg_sl_fit <- drtmle(W = W, A = A, Y = Y, family = binomial(),
                      adapt_g = TRUE)
 ```
 
-# Acknowledgements
+# Acknowledgements {-}
 
-NSH is grateful for the support of the National Science Foundation (award no.
-DMS 2102840).
+NSH grateful acknowledges the support of the National Science Foundation (award
+no. [DMS 2102840](https://www.nsf.gov/awardsearch/showAward?AWD_ID=2102840)).
 
 # References
 

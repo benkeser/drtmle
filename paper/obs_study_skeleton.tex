@@ -13,6 +13,7 @@
 \usepackage{amsmath}
 \usepackage{fancyvrb}
 \usepackage{hyperref}
+\bibliographystyle{plainnat}
 
 % add CSL from Pandoc template
 $if(csl-refs)$
@@ -59,11 +60,11 @@ $endif$
 
 % For papers submitted for review, just fill in author names
 % For accepted papers, heading arguments are {volume}{year}{pages}{submitted}{published}{author-full-names}
-\heading{}{}{}{}{}{David Benkeser and Nima S.~Hejazi}
+\heading{volume}{2022}{pages}{June 2022}{N/A}{David Benkeser and Nima S.~Hejazi}
 
 % Short headings should be running head and authors last names
 
-\ShortHeadings{\texttt{drtmle}: Doubly-robust Inference}{Benkeser and Hejazi}
+\ShortHeadings{\texttt{drtmle}: Doubly robust Inference}{Benkeser and Hejazi}
 \firstpageno{1}
 
 % handles adding shaded code boxes when Rmd chunks include echo=TRUE
@@ -72,7 +73,7 @@ $highlighting-macros$
 $endif$
 
 \begin{document}
-\title{Doubly-Robust Inference in R using \texttt{drtmle}}
+\title{Doubly-Robust Inference in \texttt{R} using \texttt{drtmle}}
 
 \author{%
   \name David Benkeser \email benkeser@emory.edu\\
