@@ -245,11 +245,11 @@ drtmle <- function(Y, A, W,
   # get overwritten later.
   Qn_user <- !is.null(Qn)
   if(Qn_user){
-    Qn_se <- Qn_user
+    Qn_se <- Qn
   }
   gn_user <- !is.null(gn)
   if(gn_user){
-    gn_se <- gn_user
+    gn_se <- gn
   }
 
   # check if any additional targeting is performed
