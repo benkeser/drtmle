@@ -1,3 +1,9 @@
+# drtmle 1.1.2
+
+* Version 1.1.2 released on GitHub and CRAN.
+* Major changes
+	* fixed bug in standard error calculation when user inputs estimates
+
 # drtmle 1.1.1
 
 * Version 1.1.1 released on GitHub and CRAN.
