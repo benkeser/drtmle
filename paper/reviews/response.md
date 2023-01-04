@@ -10,7 +10,7 @@ Section 3– Unless I am missing something, I would mention that, in addition to
 
 _Response_: Thanks, we have added references to the exact regularity conditions as they appear in the original manuscripts. We have also added the sentence 
 
-	> The regularity conditions required to achieve asymptotic linearity include assumptions on the convergence rates of the OR, PS, R-OR, and R-PS to their true counterparts."
+> The regularity conditions required to achieve asymptotic linearity include assumptions on the convergence rates of the OR, PS, R-OR, and R-PS to their true counterparts."
 
 Page 6, line starting with “The key theory…”– Should the estimators of the OR and PS satisfy equation (5) rather than (4)?
 
@@ -32,12 +32,31 @@ The workhorse functions (drtmle and adaptive_iptw) allow for missingness in trea
 
 _Response_: Thanks for the suggestion. We have added the formal assumptions needed for identification to that section (copied here): 
 
-if we define $\Delta_A$ and $\Delta_Y$ as indicators that $A$ and $Y$ are observed, respectively, then we can still perform valid inference on $\psi_0$ under the assumptions that (i) $Y(a) \perp \Delta_A \mid W$, (ii) $Y(a) \perp A \mid \Delta_A = 1, W$, and
+if we define $\Delta_A$ and $\Delta_Y$ as indicators that $A$ and $Y$ are observed, respectively, then we can still perform valid inference on $E[Y(a)]$ under the assumptions that (i) $Y(a) \perp \Delta_A \mid W$, (ii) $Y(a) \perp A \mid \Delta_A = 1, W$, and
 (iii) $Y(a) \perp \Delta_Y \mid \Delta_A = 1, A = a, W$.
 
 Related to point 1., why is missingness in the covariates (W) not considered? I am aware that this would be a very challenging scenario methodologically (and this is a good enough reason to not deal with it), but I am just curious whether there is something fundamentally different about W in this setting which precludes consideration of it being partially missing. Any guidance on what a practitioner should do if W is partially missing?
 
-_Response_: Thanks for the suggestion. We have added a brief paragraph on missingness in $W$.
+_Response_: Thanks for the suggestion. We have added a paragraph on missingness in $W$, copied below.
+
+> In practice it is common to also have missingness in $W$. In this
+situation, there are varying assumptions under which one can still identify and 
+estimate $E[Y(a)]$. The only native solution in `drtmle` currently is to augment $W$
+with columns of missingness indicators for each component of $W$. For example, if
+variable $W_1$ is observed, we could define a new indicator $\Delta_{W,1} = 1$ and 
+$\Delta_{W,1} = 0$ otherwise. For observations with $\Delta_{W,1} = 0$, we could use
+some (possibly very simple) imputation strategy to fill in a value for $W_1$. Candidate
+learners for the OR and PS may then include appropriate cross-products between $W_1$ 
+and $\Delta_{W,1}$. Other learners may opt to treat the imputed value of $W_1$ as 
+the true value and ignore $\Delta_{W,1}$. Super learner can be used to help determine
+the modeling strategy that leads to the optimal model fit conditional on $W_1$ and
+$\Delta_{W,1}$. It is important to note that this approach is only valid for drawing 
+causal inference under the assumption that $Y(a)$ is independent of $A$ conditional on
+the partially observed variables in $W$ and their missingness indicators. This assumption
+may not be plausible depending on the form of missingness of $W$. Other approaches for 
+handling missing data, e.g., multiple imputation, could in theory be coupled with `drtmle`, 
+though such applications have not been studied empirically and are not available natively
+in the `drtmle` package.
 
 In section 4.2 on standard error estimation, the discussion is focused on the AIPW and standard TMLE (i.e., not the DR-TMLE implemented in the package). They say “The ideas generalize immediately to the DR-TML estimator, but the formulas are more complex in this latter case”. Presumably, that means that inference within drtmle is based on the empirical variance of the influence function of the DR-TMLE, but authors should elaborate at least a little. If the formulas are too complex to be presented within the manuscript, readers should be referred to the relevant sections of van der Laan (2014) and/or Benkeser et al. (2017).
 

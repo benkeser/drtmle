@@ -988,7 +988,7 @@ are common in practice and, if ignored, can bias estimates of the marginal
 means of interest. The estimators previously discussed can be modified to allow
 such missingness processes to depend on observed covariates. That is, if we 
 define $\Delta_A$ and $\Delta_Y$ as indicators that $A$ and $Y$ are observed, respectively,
-then we can still perform valid inference on $\psi_0$ under the assumptions that 
+then we can still perform valid inference on $E[Y(a)]$ under the assumptions that 
 (i) $Y(a) \perp \Delta_A \mid W$, (ii) $Y(a) \perp A \mid \Delta_A = 1, W$, and
 (iii) $Y(a) \perp \Delta_Y \mid \Delta_A = 1, A = a, W$. 
 In this case, we can
@@ -1111,7 +1111,7 @@ out_fit_ps
 
 \textbf{Remark: } In practice it is common to also have missingness in $W$. In this
 situation, there are varying assumptions under which one can still identify and 
-estimate $\psi_0$. The only native solution in `drtmle` currently is to augment $W$
+estimate $E[Y(a)]$. The only native solution in `drtmle` currently is to augment $W$
 with columns of missingness indicators for each component of $W$. For example, if
 variable $W_1$ is observed, we could define a new indicator $\Delta_{W,1} = 1$ and 
 $\Delta_{W,1} = 0$ otherwise. For observations with $\Delta_{W,1} = 0$, we could use
@@ -1121,9 +1121,10 @@ and $\Delta_{W,1}$. Other learners may opt to treat the imputed value of $W_1$ a
 the true value and ignore $\Delta_{W,1}$. Super learner can be used to help determine
 the modeling strategy that leads to the optimal model fit conditional on $W_1$ and
 $\Delta_{W,1}$. It is important to note that this approach is only valid for drawing 
-causal inference under the assumption that $Y(a) \perp A \mid \Delta_W W$, which may 
-not be plausible depending on the form of missingness of $W$. Other approaches for handling
-missing data, e.g., multiple imputation, could in theory be coupled with `drtmle`, 
+causal inference under the assumption that $Y(a)$ is independent of $A$ conditional on
+the partially observed variables in $W$ and their missingness indicators. This assumption
+may not be plausible depending on the form of missingness of $W$. Other approaches for 
+handling missing data, e.g., multiple imputation, could in theory be coupled with `drtmle`, 
 though such applications have not been studied empirically and are not available natively
 in the `drtmle` package.
 
